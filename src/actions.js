@@ -1,7 +1,21 @@
-export const SUCCESS_SUFFIX = '_SUCCESS';
-export const ERROR_SUFFIX = '_ERROR';
-export const ABORT_SUFFIX = '_ABORT';
+const suffixes = {
+  successSuffix: '_SUCCESS',
+  errorSuffix: '_ERROR',
+  abortSuffix: '_ABORT',
+};
 
-export const getSuccessAction = actionType => actionType + SUCCESS_SUFFIX;
-export const getErrorAction = actionType => actionType + ERROR_SUFFIX;
-export const getAbortAction = actionType => actionType + ABORT_SUFFIX;
+export const getSuccessAction = actionType => actionType + suffixes.successSuffix;
+export const getErrorAction = actionType => actionType + suffixes.errorSuffix;
+export const getAbortAction = actionType => actionType + suffixes.abortSuffix;
+
+export const getSuffixes = () => suffixes;
+
+export const updateSuffixes = ({
+  successSuffix = '_SUCCESS',
+  errorSuffix = '_ERROR',
+  abortSuffix = '_ABORT',
+} = {}) => {
+  suffixes.successSuffix = successSuffix;
+  suffixes.errorSuffix = errorSuffix;
+  suffixes.abortSuffix = abortSuffix;
+};

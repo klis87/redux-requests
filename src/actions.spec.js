@@ -1,28 +1,62 @@
 import {
-  SUCCESS_SUFFIX,
-  ERROR_SUFFIX,
-  ABORT_SUFFIX,
+  getSuffixes,
+  updateSuffixes,
   getSuccessAction,
   getErrorAction,
   getAbortAction,
 } from './actions';
 
 describe('action suffixes', () => {
-  describe('SUCCESS_SUFFIX', () => {
-    it('should have a correct value', () => {
-      assert.equal(SUCCESS_SUFFIX, '_SUCCESS');
-    });
-  });
+  describe('getSuffixes', () => {
+    afterEach(updateSuffixes);
 
-  describe('ERROR_SUFFIX', () => {
-    it('should have a correct value', () => {
-      assert.equal(ERROR_SUFFIX, '_ERROR');
-    });
-  });
+    it('should return suffixes with correct default values', () => {
+      const expected = {
+        successSuffix: '_SUCCESS',
+        errorSuffix: '_ERROR',
+        abortSuffix: '_ABORT',
+      };
 
-  describe('ABORT_SUFFIX', () => {
-    it('should have a correct value', () => {
-      assert.equal(ABORT_SUFFIX, '_ABORT');
+      assert.deepEqual(getSuffixes(), expected);
+    });
+
+    it('should return suffixes with updated successSuffix', () => {
+      const newSuccessSuffix = 'newSuccessSuffix';
+      updateSuffixes({ successSuffix: newSuccessSuffix });
+
+      const expected = {
+        successSuffix: newSuccessSuffix,
+        errorSuffix: '_ERROR',
+        abortSuffix: '_ABORT',
+      };
+
+      assert.deepEqual(getSuffixes(), expected);
+    });
+
+    it('should return suffixes with updated errorSuffix', () => {
+      const newErrorSuffix = 'newErrorSuffix';
+      updateSuffixes({ errorSuffix: newErrorSuffix });
+
+      const expected = {
+        successSuffix: '_SUCCESS',
+        errorSuffix: newErrorSuffix,
+        abortSuffix: '_ABORT',
+      };
+
+      assert.deepEqual(getSuffixes(), expected);
+    });
+
+    it('should return suffixes with updated abortSuffix', () => {
+      const newAbortSuffix = 'abortSuffix';
+      updateSuffixes({ abortSuffix: newAbortSuffix });
+
+      const expected = {
+        successSuffix: '_SUCCESS',
+        errorSuffix: '_ERROR',
+        abortSuffix: newAbortSuffix,
+      };
+
+      assert.deepEqual(getSuffixes(), expected);
     });
   });
 });
@@ -32,19 +66,32 @@ describe('action type transformers', () => {
 
   describe('getSuccessAction', () => {
     it('should add success suffix', () => {
-      assert.equal(getSuccessAction(SOME_ACTION), SOME_ACTION + SUCCESS_SUFFIX);
+      assert.equal(getSuccessAction(SOME_ACTION), `${SOME_ACTION}_SUCCESS`);
+    });
+
+    it('should add default success suffix after updateSuffixes with custom error and abort suffixes', () => {
+      updateSuffixes({ errorSuffix: 'customErrorSuffix', abortSuffix: 'customAbortSuffix' });
+      assert.equal(getSuccessAction(SOME_ACTION), `${SOME_ACTION}_SUCCESS`);
+      updateSuffixes();
+    });
+
+    it('should add custom success suffix after updateSuffixes', () => {
+      const customSuffix = 'success';
+      updateSuffixes({ successSuffix: customSuffix });
+      assert.equal(getSuccessAction(SOME_ACTION), SOME_ACTION + customSuffix);
+      updateSuffixes();
     });
   });
 
   describe('getErrorAction', () => {
     it('should add error suffix', () => {
-      assert.equal(getErrorAction(SOME_ACTION), SOME_ACTION + ERROR_SUFFIX);
+      assert.equal(getErrorAction(SOME_ACTION), `${SOME_ACTION}_ERROR`);
     });
   });
 
   describe('getAbortAction', () => {
     it('should add success suffix', () => {
-      assert.equal(getAbortAction(SOME_ACTION), SOME_ACTION + ABORT_SUFFIX);
+      assert.equal(getAbortAction(SOME_ACTION), `${SOME_ACTION}_ABORT`);
     });
   });
 });
