@@ -1,0 +1,12 @@
+{
+  "extends": "airbnb-base",
+  "env": {
+    "mocha": true
+  },
+  "globals": {
+    "assert": true
+  },
+  "rules": {
+    "import/prefer-default-export": 0
+  }
+}

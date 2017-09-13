@@ -6,15 +6,30 @@
   "repository": "git@github.com:klis87/redux-saga-requests.git",
   "author": "Konrad Lisiczynski <klisiczynski@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "test": "mocha -r babel-register -r chai/register-assert 'src/**/*.spec.js'",
+    "cover": "cross-env BABEL_ENV=coverage nyc --reporter=lcov --reporter=text yarn test",
+    "report": "nyc report"
+  },
   "devDependencies": {
     "babel-core": "6.26.0",
-    "babel-eslint": "7.2.3",
+    "babel-plugin-istanbul": "4.1.4",
     "babel-preset-env": "1.6.0",
     "babel-preset-stage-3": "6.24.1",
+    "babel-register": "6.26.0",
     "chai": "4.1.2",
+    "cross-env": "5.0.5",
     "eslint": "4.6.1",
-    "eslint-config-airbnb": "15.1.0",
+    "eslint-config-airbnb-base": "12.0.0",
+    "eslint-plugin-import": "2.7.0",
     "mocha": "3.5.3",
     "nyc": "11.2.1"
+  },
+  "nyc": {
+    "exclude": [
+      "**/*.spec.js"
+    ],
+    "sourceMap": false,
+    "instrument": false
   }
 }
