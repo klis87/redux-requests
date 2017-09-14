@@ -4,6 +4,9 @@ import {
   getSuccessAction,
   getErrorAction,
   getAbortAction,
+  success,
+  error,
+  abort,
 } from './actions';
 
 describe('action suffixes', () => {
@@ -92,6 +95,28 @@ describe('action type transformers', () => {
   describe('getAbortAction', () => {
     it('should add success suffix', () => {
       assert.equal(getAbortAction(SOME_ACTION), `${SOME_ACTION}_ABORT`);
+    });
+  });
+});
+
+describe('action template strings', () => {
+  const SOME_ACTION = 'SOME_ACTION';
+
+  describe('success', () => {
+    it('returns the same what getSuccessAction', () => {
+      assert.equal(getSuccessAction(SOME_ACTION), success`${SOME_ACTION}`);
+    });
+  });
+
+  describe('error', () => {
+    it('returns the same what getErrorAction', () => {
+      assert.equal(getErrorAction(SOME_ACTION), error`${SOME_ACTION}`);
+    });
+  });
+
+  describe('abort', () => {
+    it('returns the same what getAbortAction', () => {
+      assert.equal(getAbortAction(SOME_ACTION), abort`${SOME_ACTION}`);
     });
   });
 });
