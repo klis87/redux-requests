@@ -1,4 +1,4 @@
-import { call, put, all, cancelled, getContext, setContext } from 'redux-saga/effects';
+import { call, takeEvery, put, all, cancelled, getContext, setContext } from 'redux-saga/effects';
 
 import { success, error, abort } from './actions';
 import { REQUEST_INSTANCE, INCORRECT_PAYLOAD_ERROR } from './constants';
@@ -19,8 +19,10 @@ export function* cancelTokenSource(tokenSource) {
   yield call([tokenSource, 'cancel']);
 }
 
+export const isRequestAction = action => action.request || action.requests;
+
 export function* sendRequest(action) {
-  if (!action.request && !action.requests) {
+  if (!isRequestAction(action)) {
     throw new Error(INCORRECT_PAYLOAD_ERROR);
   }
 
@@ -62,4 +64,8 @@ export function* sendRequest(action) {
       yield put({ type: abort`${action.type}` });
     }
   }
+}
+
+export function* watchRequests() {
+  yield takeEvery(isRequestAction, sendRequest);
 }

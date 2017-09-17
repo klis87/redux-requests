@@ -1,7 +1,15 @@
-import { getContext, setContext, call, put, all, cancelled } from 'redux-saga/effects';
+import { getContext, setContext, call, put, all, takeEvery, cancelled } from 'redux-saga/effects';
 import { cloneableGenerator } from 'redux-saga/utils';
 
-import { getRequestInstance, saveRequestInstance, sendRequest, getTokenSource, cancelTokenSource } from './sagas';
+import {
+  getRequestInstance,
+  saveRequestInstance,
+  sendRequest,
+  getTokenSource,
+  cancelTokenSource,
+  watchRequests,
+  isRequestAction
+} from './sagas';
 import { success, error, abort } from './actions';
 import { REQUEST_INSTANCE, INCORRECT_PAYLOAD_ERROR } from './constants';
 
@@ -154,6 +162,13 @@ describe('sagas', () => {
         const gen = sendRequest(invalidAction);
         assert.throws(() => gen.next(), INCORRECT_PAYLOAD_ERROR);
       });
+    });
+  });
+
+  describe('watchRequests', () => {
+    it('forks sendRequest for every request action', () => {
+      const gen = watchRequests();
+      assert.deepEqual(gen.next().value, takeEvery(isRequestAction, sendRequest));
     });
   });
 });
