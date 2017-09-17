@@ -1,17 +1,40 @@
 {
   "name": "redux-saga-requests",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Redux Saga addon to simplify AJAX requests",
   "main": "lib/index.js",
+  "module": "es/index.js",
+  "jsnext:main": "es/index.js",
   "repository": "git@github.com:klis87/redux-saga-requests.git",
   "author": "Konrad Lisiczynski <klisiczynski@gmail.com>",
   "license": "MIT",
+  "files": [
+    "lib",
+    "es",
+    "src"
+  ],
+  "keywords": [
+    "redux",
+    "redux-saga",
+    "axios",
+    "fetch",
+    "ajax"
+  ],
+  "homepage": "https://github.com/klis87/redux-saga-requests",
+  "bugs": {
+    "url": "https://github.com/klis87/redux-saga-requests/issues"
+  },
   "scripts": {
+    "clean": "rimraf es lib dist",
     "test": "mocha -r babel-register -r babel-polyfill -r chai/register-assert 'src/**/*.spec.js'",
     "cover": "cross-env BABEL_ENV=coverage nyc --reporter=lcov --reporter=text yarn test",
-    "report": "nyc report"
+    "report": "nyc report",
+    "build:commonjs": "cross-env BABEL_ENV=commonjs babel src --out-dir lib --ignore spec.js",
+    "build:es": "cross-env BABEL_ENV=es babel src --out-dir es --ignore spec.js",
+    "build": "yarn run clean && yarn run build:commonjs && yarn run build:es"
   },
   "devDependencies": {
+    "babel-cli": "6.26.0",
     "babel-core": "6.26.0",
     "babel-plugin-istanbul": "4.1.4",
     "babel-polyfill": "6.26.0",
@@ -25,7 +48,8 @@
     "eslint-plugin-import": "2.7.0",
     "mocha": "3.5.3",
     "nyc": "11.2.1",
-    "redux-saga": "0.15.6"
+    "redux-saga": "0.15.6",
+    "rimraf": "2.6.2"
   },
   "nyc": {
     "exclude": [
