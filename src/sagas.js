@@ -1,6 +1,6 @@
-import { call, put, all, getContext, setContext } from 'redux-saga/effects';
+import { call, put, all, cancelled, getContext, setContext } from 'redux-saga/effects';
 
-import { success, error } from './actions';
+import { success, error, abort } from './actions';
 import { REQUEST_INSTANCE, INCORRECT_PAYLOAD_ERROR } from './constants';
 
 export function saveRequestInstance(requestInstance) {
@@ -11,6 +11,14 @@ export function getRequestInstance() {
   return getContext(REQUEST_INSTANCE);
 }
 
+export function* getTokenSource(requestInstance) {
+  yield call([requestInstance.CancelToken, 'source']);
+}
+
+export function* cancelTokenSource(tokenSource) {
+  yield call([tokenSource, 'cancel']);
+}
+
 export function* sendRequest(action) {
   if (!action.request && !action.requests) {
     throw new Error(INCORRECT_PAYLOAD_ERROR);
@@ -18,7 +26,8 @@ export function* sendRequest(action) {
 
   const requestInstance = yield call(getRequestInstance);
   yield put(action);
-  const getApiCall = request => call(requestInstance, request);
+  const tokenSource = yield call(getTokenSource, requestInstance);
+  const getApiCall = request => call(requestInstance, { cancelToken: tokenSource.token, ...request });
   const dispatchSuccessAction = data => ({
     type: success`${action.type}`,
     payload: {
@@ -31,11 +40,11 @@ export function* sendRequest(action) {
     if (action.request) {
       const response = yield getApiCall(action.request);
       yield put(dispatchSuccessAction(response.data));
-      return response;
+      yield response;
     } else {
       const responses = yield all(action.requests.map(getApiCall));
       yield put(dispatchSuccessAction(responses.map(response => response.data)));
-      return responses;
+      yield responses;
     }
   } catch (e) {
     yield put({
@@ -46,6 +55,11 @@ export function* sendRequest(action) {
       },
     });
 
-    return { error: e };
+    yield { error: e };
+  } finally {
+    if (yield cancelled()) {
+      yield call(cancelTokenSource, tokenSource);
+      yield put({ type: abort`${action.type}` });
+    }
   }
 }
