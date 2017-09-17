@@ -7,13 +7,14 @@
   "author": "Konrad Lisiczynski <klisiczynski@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "test": "mocha -r babel-register -r chai/register-assert 'src/**/*.spec.js'",
+    "test": "mocha -r babel-register -r babel-polyfill -r chai/register-assert 'src/**/*.spec.js'",
     "cover": "cross-env BABEL_ENV=coverage nyc --reporter=lcov --reporter=text yarn test",
     "report": "nyc report"
   },
   "devDependencies": {
     "babel-core": "6.26.0",
     "babel-plugin-istanbul": "4.1.4",
+    "babel-polyfill": "6.26.0",
     "babel-preset-env": "1.6.0",
     "babel-preset-stage-3": "6.24.1",
     "babel-register": "6.26.0",
