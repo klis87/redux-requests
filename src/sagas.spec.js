@@ -1,6 +1,8 @@
 import { getContext, setContext, call, put, all, takeEvery, cancelled } from 'redux-saga/effects';
 import { cloneableGenerator } from 'redux-saga/utils';
 
+import { success, error, abort } from './actions';
+import { REQUEST_INSTANCE, INCORRECT_PAYLOAD_ERROR } from './constants';
 import {
   getRequestInstance,
   saveRequestInstance,
@@ -8,10 +10,8 @@ import {
   getTokenSource,
   cancelTokenSource,
   watchRequests,
-  isRequestAction
+  isRequestAction,
 } from './sagas';
-import { success, error, abort } from './actions';
-import { REQUEST_INSTANCE, INCORRECT_PAYLOAD_ERROR } from './constants';
 
 describe('sagas', () => {
   describe('saveRequestInstance', () => {
@@ -31,16 +31,14 @@ describe('sagas', () => {
       const requestInstance = {
         CancelToken: { source: () => {} },
       };
-      const gen = getTokenSource(requestInstance);
-      assert.deepEqual(gen.next().value, call([requestInstance.CancelToken, 'source']));
+      assert.deepEqual(getTokenSource(requestInstance), call([requestInstance.CancelToken, 'source']));
     });
   });
 
   describe('cancelTokenSource', () => {
     it('calls tokenSource.cancel', () => {
       const tokenSource = { cancel: () => {} };
-      const gen = cancelTokenSource(tokenSource);
-      assert.deepEqual(gen.next().value, call([tokenSource, 'cancel']));
+      assert.deepEqual(cancelTokenSource(tokenSource), call([tokenSource, 'cancel']));
     });
   });
 
@@ -49,11 +47,12 @@ describe('sagas', () => {
       const action = { type: 'FETCH', request: { url: '/url' } };
       const gen = cloneableGenerator(sendRequest)(action);
       const requestInstance = () => ({ type: 'axios' });
+      requestInstance.CancelToken = { source: () => {} };
       const response = { data: 'some response' };
-      const tokenSource = { token: 'token' };
+      const tokenSource = { token: 'token', cancel: () => {} };
 
       it('gets request instance', () => {
-        assert.deepEqual(gen.next().value, call(getRequestInstance));
+        assert.deepEqual(gen.next().value, getRequestInstance());
       });
 
       it('dispatches request action', () => {
@@ -61,7 +60,7 @@ describe('sagas', () => {
       });
 
       it('calls getTokenSource', () => {
-        assert.deepEqual(gen.next().value, call(getTokenSource, requestInstance));
+        assert.deepEqual(gen.next().value, getTokenSource(requestInstance));
       });
 
       it('calls requestInstance', () => {
@@ -108,7 +107,7 @@ describe('sagas', () => {
       });
 
       it('handles cancellation when cancelled', () => {
-        assert.deepEqual(gen.next(true).value, call(cancelTokenSource, tokenSource));
+        assert.deepEqual(gen.next(true).value, cancelTokenSource(tokenSource));
         assert.deepEqual(gen.next().value, put({ type: abort`${action.type}` }));
       });
     });
@@ -117,11 +116,12 @@ describe('sagas', () => {
       const action = { type: 'FETCH_MULTIPLE', requests: [{ url: '/url1' }, { url: '/url2' }] };
       const gen = sendRequest(action);
       const requestInstance = () => ({ type: 'axios' });
+      requestInstance.CancelToken = { source: () => {} };
       const responses = [{ data: 'some response' }, { data: 'another response' }];
       const tokenSource = { token: 'token' };
 
       it('gets request instance', () => {
-        assert.deepEqual(gen.next().value, call(getRequestInstance));
+        assert.deepEqual(gen.next().value, getRequestInstance());
       });
 
       it('dispatches request action', () => {
@@ -129,7 +129,7 @@ describe('sagas', () => {
       });
 
       it('calls getTokenSource', () => {
-        assert.deepEqual(gen.next().value, call(getTokenSource, requestInstance));
+        assert.deepEqual(gen.next().value, getTokenSource(requestInstance));
       });
 
       it('calls requestInstance', () => {

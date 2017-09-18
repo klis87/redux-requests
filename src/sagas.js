@@ -11,12 +11,12 @@ export function getRequestInstance() {
   return getContext(REQUEST_INSTANCE);
 }
 
-export function* getTokenSource(requestInstance) {
-  yield call([requestInstance.CancelToken, 'source']);
+export function getTokenSource(requestInstance) {
+  return call([requestInstance.CancelToken, 'source']);
 }
 
-export function* cancelTokenSource(tokenSource) {
-  yield call([tokenSource, 'cancel']);
+export function cancelTokenSource(tokenSource) {
+  return call([tokenSource, 'cancel']);
 }
 
 export const isRequestAction = action => action.request || action.requests;
@@ -26,9 +26,9 @@ export function* sendRequest(action) {
     throw new Error(INCORRECT_PAYLOAD_ERROR);
   }
 
-  const requestInstance = yield call(getRequestInstance);
+  const requestInstance = yield getRequestInstance();
   yield put(action);
-  const tokenSource = yield call(getTokenSource, requestInstance);
+  const tokenSource = yield getTokenSource(requestInstance);
   const getApiCall = request => call(requestInstance, { cancelToken: tokenSource.token, ...request });
   const dispatchSuccessAction = data => ({
     type: success`${action.type}`,
@@ -60,7 +60,7 @@ export function* sendRequest(action) {
     yield { error: e };
   } finally {
     if (yield cancelled()) {
-      yield call(cancelTokenSource, tokenSource);
+      yield cancelTokenSource(tokenSource);
       yield put({ type: abort`${action.type}` });
     }
   }
