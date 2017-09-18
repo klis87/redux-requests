@@ -26,8 +26,8 @@
   },
   "scripts": {
     "clean": "rimraf es lib dist",
-    "test": "mocha -r babel-register -r babel-polyfill -r chai/register-assert 'src/**/*.spec.js'",
-    "cover": "cross-env BABEL_ENV=coverage nyc --reporter=lcov --reporter=text yarn test",
+    "test": "cross-env BABEL_ENV=commonjs mocha -r babel-register -r babel-polyfill -r chai/register-assert 'src/**/*.spec.js'",
+    "cover": "cross-env BABEL_ENV=coverage nyc --reporter=lcov --reporter=text mocha -r babel-register -r babel-polyfill -r chai/register-assert 'src/**/*.spec.js'",
     "report": "nyc report",
     "build:commonjs": "cross-env BABEL_ENV=commonjs babel src --out-dir lib --ignore spec.js",
     "build:es": "cross-env BABEL_ENV=es babel src --out-dir es --ignore spec.js",
