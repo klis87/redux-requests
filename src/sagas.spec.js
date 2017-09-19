@@ -1,5 +1,6 @@
 import { getContext, setContext, call, put, all, takeEvery, cancelled } from 'redux-saga/effects';
 import { cloneableGenerator } from 'redux-saga/utils';
+import axios from 'axios';
 
 import { success, error, abort } from './actions';
 import { REQUEST_INSTANCE, INCORRECT_PAYLOAD_ERROR } from './constants';
@@ -31,7 +32,7 @@ describe('sagas', () => {
       const requestInstance = {
         CancelToken: { source: () => {} },
       };
-      assert.deepEqual(getTokenSource(requestInstance), call([requestInstance.CancelToken, 'source']));
+      assert.deepEqual(getTokenSource(requestInstance), call(([axios.CancelToken, 'source'])));
     });
   });
 
@@ -65,7 +66,7 @@ describe('sagas', () => {
       });
 
       it('calls getTokenSource', () => {
-        assert.deepEqual(gen.next(requestInstance).value, getTokenSource(requestInstance));
+        assert.deepEqual(gen.next(requestInstance).value, getTokenSource());
       });
 
       it('calls requestInstance', () => {

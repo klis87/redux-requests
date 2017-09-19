@@ -11,6 +11,7 @@
     "max-len": [0, 120],
     "no-else-return": 0,
     "import/prefer-default-export": 0,
+    "import/no-extraneous-dependencies": [2, {"devDependencies": true}],
     "react/jsx-filename-extension": 0,
     "react/prop-types": 0
   }

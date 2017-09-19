@@ -1,4 +1,5 @@
 import { call, takeEvery, put, all, cancelled, getContext, setContext } from 'redux-saga/effects';
+import axios from 'axios';
 
 import { success, error, abort } from './actions';
 import { REQUEST_INSTANCE, INCORRECT_PAYLOAD_ERROR } from './constants';
@@ -11,8 +12,8 @@ export function getRequestInstance() {
   return getContext(REQUEST_INSTANCE);
 }
 
-export function getTokenSource(requestInstance) {
-  return call([requestInstance.CancelToken, 'source']);
+export function getTokenSource() {
+  return call([axios.CancelToken, 'source']);
 }
 
 export function cancelTokenSource(tokenSource) {
@@ -32,7 +33,7 @@ export function* sendRequest(action, dispatchRequestAction = false) {
     yield put(action);
   }
 
-  const tokenSource = yield getTokenSource(requestInstance);
+  const tokenSource = yield getTokenSource();
   const getApiCall = request => call(requestInstance, { cancelToken: tokenSource.token, ...request });
   const dispatchSuccessAction = data => ({
     type: success`${action.type}`,
