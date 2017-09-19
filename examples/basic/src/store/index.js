@@ -25,6 +25,7 @@ export const configureStore = () => {
     ),
   );
 
-  sagaMiddleware.run(rootSaga, axios);
+  const axiosInstance = axios.create({ baseURL: 'https://jsonplaceholder.typicode.com' });
+  sagaMiddleware.run(rootSaga, axiosInstance);
   return store;
 };
