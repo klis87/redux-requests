@@ -21,13 +21,17 @@ export function cancelTokenSource(tokenSource) {
 
 export const isRequestAction = action => action.request || action.requests;
 
-export function* sendRequest(action) {
+export function* sendRequest(action, dispatchRequestAction = false) {
   if (!isRequestAction(action)) {
     throw new Error(INCORRECT_PAYLOAD_ERROR);
   }
 
   const requestInstance = yield getRequestInstance();
-  yield put(action);
+
+  if (dispatchRequestAction) {
+    yield put(action);
+  }
+
   const tokenSource = yield getTokenSource(requestInstance);
   const getApiCall = request => call(requestInstance, { cancelToken: tokenSource.token, ...request });
   const dispatchSuccessAction = data => ({

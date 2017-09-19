@@ -43,6 +43,15 @@ describe('sagas', () => {
   });
 
   describe('sendRequest', () => {
+    describe('with correct payload with dispatchRequestAction', () => {
+      it('dispatches request action', () => {
+        const action = { type: 'FETCH', request: { url: '/url' } };
+        const gen = sendRequest(action, true);
+        gen.next();
+        assert.deepEqual(gen.next().value, put(action));
+      });
+    });
+
     describe('with correct payload', () => {
       const action = { type: 'FETCH', request: { url: '/url' } };
       const gen = cloneableGenerator(sendRequest)(action);
@@ -55,12 +64,8 @@ describe('sagas', () => {
         assert.deepEqual(gen.next().value, getRequestInstance());
       });
 
-      it('dispatches request action', () => {
-        assert.deepEqual(gen.next(requestInstance).value, put(action));
-      });
-
       it('calls getTokenSource', () => {
-        assert.deepEqual(gen.next().value, getTokenSource(requestInstance));
+        assert.deepEqual(gen.next(requestInstance).value, getTokenSource(requestInstance));
       });
 
       it('calls requestInstance', () => {
@@ -124,12 +129,8 @@ describe('sagas', () => {
         assert.deepEqual(gen.next().value, getRequestInstance());
       });
 
-      it('dispatches request action', () => {
-        assert.deepEqual(gen.next(requestInstance).value, put(action));
-      });
-
       it('calls getTokenSource', () => {
-        assert.deepEqual(gen.next().value, getTokenSource(requestInstance));
+        assert.deepEqual(gen.next(requestInstance).value, getTokenSource(requestInstance));
       });
 
       it('calls requestInstance', () => {
