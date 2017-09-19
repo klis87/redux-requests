@@ -4,3 +4,4 @@ es
 lib
 .nyc_output
 coverage
+examples/**/yarn.lock
