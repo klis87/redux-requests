@@ -114,7 +114,13 @@ describe('sagas', () => {
 
       it('handles cancellation when cancelled', () => {
         assert.deepEqual(gen.next(true).value, cancelTokenSource(tokenSource));
-        assert.deepEqual(gen.next().value, put({ type: abort`${action.type}` }));
+        const expected = put({
+          type: abort`${action.type}`,
+          payload: {
+            meta: action,
+          },
+        });
+        assert.deepEqual(gen.next().value, expected);
       });
     });
 

@@ -66,7 +66,12 @@ export function* sendRequest(action, dispatchRequestAction = false) {
   } finally {
     if (yield cancelled()) {
       yield cancelTokenSource(tokenSource);
-      yield put({ type: abort`${action.type}` });
+      yield put({
+        type: abort`${action.type}`,
+        payload: {
+          meta: action,
+        },
+      });
     }
   }
 }
