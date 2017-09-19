@@ -2,9 +2,13 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 import { fetchPosts } from '../store/actions';
+import { postsSelector, postsAreFetchingSelector } from '../store/selectors';
+import Post from './post';
+import Spinner from './spinner';
 
 const mapStateToProps = state => ({
-  posts: state.posts,
+  posts: postsSelector(state),
+  postsAreFetching: postsAreFetchingSelector(state),
 });
 
 const mapDispatchToProps = {
@@ -17,9 +21,17 @@ class App extends Component {
   }
 
   render() {
+    const { posts, postsAreFetching } = this.props;
+
     return (
       <div>
-        <h2>dewdwd</h2>
+        <h1>Redux Saga Requests basic example</h1>
+        <h2>Posts</h2>
+        {postsAreFetching ? (
+          <Spinner />
+        ) : (
+          posts.map(post => <Post key={post.id} title={post.title} body={post.body} />)
+        )}
       </div>
     );
   }
