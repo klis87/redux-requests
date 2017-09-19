@@ -54,7 +54,12 @@ describe('sagas', () => {
     });
 
     describe('with correct payload', () => {
-      const action = { type: 'FETCH', request: { url: '/url' } };
+      const action = {
+        type: 'FETCH',
+        payload: {
+          request: { url: '/url' },
+        },
+      };
       const gen = cloneableGenerator(sendRequest)(action);
       const requestInstance = () => ({ type: 'axios' });
       requestInstance.CancelToken = { source: () => {} };
@@ -70,7 +75,7 @@ describe('sagas', () => {
       });
 
       it('calls requestInstance', () => {
-        const expected = call(requestInstance, { ...action.request, cancelToken: tokenSource.token });
+        const expected = call(requestInstance, { ...action.payload.request, cancelToken: tokenSource.token });
         assert.deepEqual(gen.next(tokenSource).value, expected);
       });
 

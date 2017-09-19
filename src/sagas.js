@@ -20,7 +20,12 @@ export function cancelTokenSource(tokenSource) {
   return call([tokenSource, 'cancel']);
 }
 
-export const isRequestAction = action => action.request || action.requests;
+const getActionPayload = action => (action.payload === undefined ? action : action.payload);
+
+export const isRequestAction = (action) => {
+  const actionPayload = getActionPayload(action);
+  return actionPayload.request || actionPayload.requests;
+};
 
 export function* sendRequest(action, dispatchRequestAction = false) {
   if (!isRequestAction(action)) {
@@ -43,13 +48,15 @@ export function* sendRequest(action, dispatchRequestAction = false) {
     },
   });
 
+  const actionPayload = getActionPayload(action);
+
   try {
-    if (action.request) {
-      const response = yield getApiCall(action.request);
+    if (actionPayload.request) {
+      const response = yield getApiCall(actionPayload.request);
       yield put(dispatchSuccessAction(response.data));
       yield response;
     } else {
-      const responses = yield all(action.requests.map(getApiCall));
+      const responses = yield all(actionPayload.requests.map(getApiCall));
       yield put(dispatchSuccessAction(responses.map(response => response.data)));
       yield responses;
     }
