@@ -1,0 +1,32 @@
+{
+  "name": "redux-saga-requests-redux-act-example",
+  "version": "1.0.0",
+  "description": "redux-saga-requests redux act example",
+  "main": "src/index.js",
+  "repository": "git@github.com:klis87/redux-saga-requests.git",
+  "author": "Konrad Lisiczynski <klisiczynski@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "webpack-dev-server"
+  },
+  "dependencies": {
+    "axios": "0.16.2",
+    "babel-polyfill": "6.26.0",
+    "react": "15.6.1",
+    "react-dom": "15.6.1",
+    "react-redux": "5.0.6",
+    "redux": "3.7.2",
+    "redux-act": "1.4.1",
+    "redux-saga": "0.15.6"
+  },
+  "devDependencies": {
+    "babel-core": "6.26.0",
+    "babel-loader": "7.1.2",
+    "babel-preset-env": "1.6.0",
+    "babel-preset-react": "6.24.1",
+    "babel-preset-stage-2": "6.24.1",
+    "html-webpack-plugin": "2.30.1",
+    "webpack": "3.6.0",
+    "webpack-dev-server": "2.8.2"
+  }
+}
