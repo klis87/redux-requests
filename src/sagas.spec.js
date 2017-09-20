@@ -1,17 +1,15 @@
 import { getContext, setContext, call, put, all, takeEvery, cancelled } from 'redux-saga/effects';
 import { cloneableGenerator } from 'redux-saga/utils';
-import axios from 'axios';
 
 import { success, error, abort } from './actions';
 import { REQUEST_INSTANCE, REQUESTS_CONFIG, INCORRECT_PAYLOAD_ERROR } from './constants';
+import axiosDriver from './drivers/axios-driver';
 import {
   defaultConfig,
   createRequestInstance,
   getRequestInstance,
   getRequestsConfig,
   sendRequest,
-  getTokenSource,
-  cancelTokenSource,
   watchRequests,
   isRequestAction,
 } from './sagas';
@@ -23,6 +21,7 @@ describe('sagas', () => {
         success,
         error,
         abort,
+        driver: axiosDriver,
       };
 
       assert.deepEqual(defaultConfig, expected);
@@ -45,6 +44,7 @@ describe('sagas', () => {
         success: 'success',
         error: 'error',
         abort: 'abort',
+        driver: 'some driver',
       };
 
       const expected = setContext({
@@ -64,22 +64,6 @@ describe('sagas', () => {
   describe('getRequestsConfig', () => {
     it('returns correct effect', () => {
       assert.deepEqual(getRequestsConfig(), getContext(REQUESTS_CONFIG));
-    });
-  });
-
-  describe('getTokenSource', () => {
-    it('calls requestInstance.CancelToken.source', () => {
-      const requestInstance = {
-        CancelToken: { source: () => {} },
-      };
-      assert.deepEqual(getTokenSource(requestInstance), call(([axios.CancelToken, 'source'])));
-    });
-  });
-
-  describe('cancelTokenSource', () => {
-    it('calls tokenSource.cancel', () => {
-      const tokenSource = { cancel: () => {} };
-      assert.deepEqual(cancelTokenSource(tokenSource), call([tokenSource, 'cancel']));
     });
   });
 
@@ -103,9 +87,9 @@ describe('sagas', () => {
       };
       const gen = cloneableGenerator(sendRequest)(action);
       const requestInstance = () => ({ type: 'axios' });
-      requestInstance.CancelToken = { source: () => {} };
       const response = { data: 'some response' };
-      const tokenSource = { token: 'token', cancel: () => {} };
+      const driver = defaultConfig.driver;
+      const requestHandlers = driver.getRequestHandlers(requestInstance);
 
       it('gets request instance', () => {
         assert.deepEqual(gen.next().value, getRequestInstance());
@@ -115,13 +99,14 @@ describe('sagas', () => {
         assert.deepEqual(gen.next(requestInstance).value, getRequestsConfig());
       });
 
-      it('calls getTokenSource', () => {
-        assert.deepEqual(gen.next(defaultConfig).value, getTokenSource());
+      it('gets request handlers', () => {
+        const expected = call([driver, 'getRequestHandlers'], requestInstance);
+        assert.deepEqual(gen.next(defaultConfig).value, expected);
       });
 
-      it('calls requestInstance', () => {
-        const expected = call(requestInstance, { ...action.payload.request, cancelToken: tokenSource.token });
-        assert.deepEqual(gen.next(tokenSource).value, expected);
+      it('calls sendRequest', () => {
+        const expected = requestHandlers.sendRequest(action.payload.request);
+        assert.deepEqual(gen.next(requestHandlers).value, expected);
       });
 
       it('dispatches and returns request error action when there is an error', () => {
@@ -139,7 +124,7 @@ describe('sagas', () => {
         assert.deepEqual(errorGen.next().value, { error: requestError });
       });
 
-      it('dispatches request success action when reponse is successful', () => {
+      it('dispatches request success action when response is successful', () => {
         const expected = put({
           type: success(action.type),
           payload: {
@@ -163,7 +148,7 @@ describe('sagas', () => {
       });
 
       it('handles cancellation when cancelled', () => {
-        assert.deepEqual(gen.next(true).value, cancelTokenSource(tokenSource));
+        assert.deepEqual(gen.next(true).value, requestHandlers.abortRequest);
         const expected = put({
           type: abort(action.type),
           payload: {
@@ -178,9 +163,9 @@ describe('sagas', () => {
       const action = { type: 'FETCH_MULTIPLE', requests: [{ url: '/url1' }, { url: '/url2' }] };
       const gen = sendRequest(action);
       const requestInstance = () => ({ type: 'axios' });
-      requestInstance.CancelToken = { source: () => {} };
       const responses = [{ data: 'some response' }, { data: 'another response' }];
-      const tokenSource = { token: 'token' };
+      const driver = defaultConfig.driver;
+      const requestHandlers = driver.getRequestHandlers(requestInstance);
 
       it('gets request instance', () => {
         assert.deepEqual(gen.next().value, getRequestInstance());
@@ -190,16 +175,17 @@ describe('sagas', () => {
         assert.deepEqual(gen.next(requestInstance).value, getRequestsConfig());
       });
 
-      it('calls getTokenSource', () => {
-        assert.deepEqual(gen.next(defaultConfig).value, getTokenSource(requestInstance));
+      it('gets request handlers', () => {
+        const expected = call([driver, 'getRequestHandlers'], requestInstance);
+        assert.deepEqual(gen.next(defaultConfig).value, expected);
       });
 
-      it('calls requestInstance', () => {
+      it('calls sendRequests', () => {
         const expected = all([
-          call(requestInstance, { ...action.requests[0], cancelToken: tokenSource.token }),
-          call(requestInstance, { ...action.requests[1], cancelToken: tokenSource.token }),
+          requestHandlers.sendRequest(action.requests[0]),
+          requestHandlers.sendRequest(action.requests[1]),
         ]);
-        assert.deepEqual(gen.next(tokenSource).value, expected);
+        assert.deepEqual(gen.next(requestHandlers).value, expected);
       });
 
       it('dispatches request success action when reponse is successful', () => {

@@ -1,13 +1,14 @@
 import { call, takeEvery, put, all, cancelled, getContext, setContext } from 'redux-saga/effects';
-import axios from 'axios';
 
 import { success, error, abort } from './actions';
 import { REQUEST_INSTANCE, REQUESTS_CONFIG, INCORRECT_PAYLOAD_ERROR } from './constants';
+import axiosDriver from './drivers/axios-driver';
 
 export const defaultConfig = {
   success,
   error,
   abort,
+  driver: axiosDriver,
 };
 
 export function createRequestInstance(requestInstance, config = {}) {
@@ -23,14 +24,6 @@ export function getRequestInstance() {
 
 export function getRequestsConfig() {
   return getContext(REQUESTS_CONFIG);
-}
-
-export function getTokenSource() {
-  return call([axios.CancelToken, 'source']);
-}
-
-export function cancelTokenSource(tokenSource) {
-  return call([tokenSource, 'cancel']);
 }
 
 const getActionPayload = action => (action.payload === undefined ? action : action.payload);
@@ -52,12 +45,13 @@ export function* sendRequest(action, dispatchRequestAction = false) {
     yield put(action);
   }
 
-  const tokenSource = yield getTokenSource();
-  const getApiCall = request => call(requestInstance, { cancelToken: tokenSource.token, ...request });
-  const dispatchSuccessAction = data => ({
+  const driver = requestsConfig.driver;
+  const requestHandlers = yield call([driver, 'getRequestHandlers'], requestInstance);
+
+  const dispatchSuccessAction = response => ({
     type: requestsConfig.success(action.type),
     payload: {
-      data,
+      data: driver.getSuccessPayload(response),
       meta: action,
     },
   });
@@ -66,19 +60,19 @@ export function* sendRequest(action, dispatchRequestAction = false) {
 
   try {
     if (actionPayload.request) {
-      const response = yield getApiCall(actionPayload.request);
-      yield put(dispatchSuccessAction(response.data));
+      const response = yield requestHandlers.sendRequest(actionPayload.request);
+      yield put(dispatchSuccessAction(response));
       yield response;
     } else {
-      const responses = yield all(actionPayload.requests.map(getApiCall));
-      yield put(dispatchSuccessAction(responses.map(response => response.data)));
-      yield responses;
+      const response = yield all(actionPayload.requests.map(requestHandlers.sendRequest));
+      yield put(dispatchSuccessAction(response));
+      yield response;
     }
   } catch (e) {
     yield put({
       type: requestsConfig.error(action.type),
       payload: {
-        error: e,
+        error: driver.getErrorPayload(e),
         meta: action,
       },
     });
@@ -86,7 +80,11 @@ export function* sendRequest(action, dispatchRequestAction = false) {
     yield { error: e };
   } finally {
     if (yield cancelled()) {
-      yield cancelTokenSource(tokenSource);
+      // TODO: add test
+      if (requestHandlers.abortRequest) {
+        yield requestHandlers.abortRequest;
+      }
+
       yield put({
         type: requestsConfig.abort(action.type),
         payload: {
