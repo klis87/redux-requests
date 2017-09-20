@@ -35,7 +35,7 @@ const App = ({
   clearPosts,
 }) => (
   <div>
-    <h1>Redux Saga Requests advance example</h1>
+    <h1>Redux Saga Requests advanced example</h1>
     <button style={buttonStyle} onClick={clearPosts}>Clear</button>
     <button style={buttonStyle} onClick={fetchPosts}>Fetch posts</button>
     <button style={buttonStyle} onClick={fetchPostsWithMicroTimeout}>Fetch posts with timeout error</button>
