@@ -1,12 +1,4 @@
-export {
-  getSuccessAction,
-  getErrorAction,
-  getAbortAction,
-  success,
-  error,
-  abort,
-  updateSuffixes,
-} from './actions';
+export { success, error, abort } from './actions';
 
 export {
   saveRequestInstance,

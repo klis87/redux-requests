@@ -41,7 +41,7 @@ export function* sendRequest(action, dispatchRequestAction = false) {
   const tokenSource = yield getTokenSource();
   const getApiCall = request => call(requestInstance, { cancelToken: tokenSource.token, ...request });
   const dispatchSuccessAction = data => ({
-    type: success`${action.type}`,
+    type: success(action.type),
     payload: {
       data,
       meta: action,
@@ -62,7 +62,7 @@ export function* sendRequest(action, dispatchRequestAction = false) {
     }
   } catch (e) {
     yield put({
-      type: error`${action.type}`,
+      type: error(action.type),
       payload: {
         error: e,
         meta: action,
@@ -74,7 +74,7 @@ export function* sendRequest(action, dispatchRequestAction = false) {
     if (yield cancelled()) {
       yield cancelTokenSource(tokenSource);
       yield put({
-        type: abort`${action.type}`,
+        type: abort(action.type),
         payload: {
           meta: action,
         },

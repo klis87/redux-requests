@@ -83,7 +83,7 @@ describe('sagas', () => {
         const errorGen = gen.clone();
         const requestError = new Error('Something went wrong');
         const expected = put({
-          type: error`${action.type}`,
+          type: error(action.type),
           payload: {
             error: requestError,
             meta: action,
@@ -96,7 +96,7 @@ describe('sagas', () => {
 
       it('dispatches request success action when reponse is successful', () => {
         const expected = put({
-          type: success`${action.type}`,
+          type: success(action.type),
           payload: {
             data: response.data,
             meta: action,
@@ -120,7 +120,7 @@ describe('sagas', () => {
       it('handles cancellation when cancelled', () => {
         assert.deepEqual(gen.next(true).value, cancelTokenSource(tokenSource));
         const expected = put({
-          type: abort`${action.type}`,
+          type: abort(action.type),
           payload: {
             meta: action,
           },
@@ -155,7 +155,7 @@ describe('sagas', () => {
 
       it('dispatches request success action when reponse is successful', () => {
         const expected = put({
-          type: success`${action.type}`,
+          type: success(action.type),
           payload: {
             data: [responses[0].data, responses[1].data],
             meta: action,

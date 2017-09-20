@@ -1,25 +1,7 @@
-const suffixes = {
-  successSuffix: '_SUCCESS',
-  errorSuffix: '_ERROR',
-  abortSuffix: '_ABORT',
-};
+import { SUCCESS_SUFFIX, ERROR_SUFFIX, ABORT_SUFFIX } from './constants';
 
-export const getSuccessAction = actionType => actionType + suffixes.successSuffix;
-export const getErrorAction = actionType => actionType + suffixes.errorSuffix;
-export const getAbortAction = actionType => actionType + suffixes.abortSuffix;
+export const getActionWithSuffix = suffix => actionType => actionType + suffix;
 
-export const success = (strings, action) => getSuccessAction(action);
-export const error = (strings, action) => getErrorAction(action);
-export const abort = (strings, action) => getAbortAction(action);
-
-export const getSuffixes = () => suffixes;
-
-export const updateSuffixes = ({
-  successSuffix = '_SUCCESS',
-  errorSuffix = '_ERROR',
-  abortSuffix = '_ABORT',
-} = {}) => {
-  suffixes.successSuffix = successSuffix;
-  suffixes.errorSuffix = errorSuffix;
-  suffixes.abortSuffix = abortSuffix;
-};
+export const success = getActionWithSuffix(SUCCESS_SUFFIX);
+export const error = getActionWithSuffix(ERROR_SUFFIX);
+export const abort = getActionWithSuffix(ABORT_SUFFIX);
