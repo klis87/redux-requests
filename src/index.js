@@ -1,7 +1,7 @@
-export { success, error, abort } from './actions';
+export { success, error, abort, getActionWithSuffix } from './actions';
 
 export {
-  saveRequestInstance,
+  createRequestInstance,
   getRequestInstance,
   sendRequest,
   watchRequests,

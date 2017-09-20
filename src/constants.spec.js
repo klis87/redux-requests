@@ -3,6 +3,7 @@ import {
   ERROR_SUFFIX,
   ABORT_SUFFIX,
   REQUEST_INSTANCE,
+  REQUESTS_CONFIG,
   INCORRECT_PAYLOAD_ERROR,
 } from './constants';
 
@@ -27,7 +28,13 @@ describe('constants', () => {
 
   describe('REQUEST_INSTANCE', () => {
     it('has correct value', () => {
-      assert.equal(REQUEST_INSTANCE, 'REDUX_SAGA_REQUESTS_REQUEST_INSTANCE_CONTEXT');
+      assert.equal(REQUEST_INSTANCE, 'REDUX_SAGA_REQUESTS_REQUEST_INSTANCE');
+    });
+  });
+
+  describe('REQUESTS_CONFIG', () => {
+    it('has correct value', () => {
+      assert.equal(REQUESTS_CONFIG, 'REDUX_SAGA_REQUESTS_CONFIG');
     });
   });
 

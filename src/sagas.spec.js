@@ -3,10 +3,12 @@ import { cloneableGenerator } from 'redux-saga/utils';
 import axios from 'axios';
 
 import { success, error, abort } from './actions';
-import { REQUEST_INSTANCE, INCORRECT_PAYLOAD_ERROR } from './constants';
+import { REQUEST_INSTANCE, REQUESTS_CONFIG, INCORRECT_PAYLOAD_ERROR } from './constants';
 import {
+  defaultConfig,
+  createRequestInstance,
   getRequestInstance,
-  saveRequestInstance,
+  getRequestsConfig,
   sendRequest,
   getTokenSource,
   cancelTokenSource,
@@ -15,15 +17,53 @@ import {
 } from './sagas';
 
 describe('sagas', () => {
-  describe('saveRequestInstance', () => {
-    it('returns correct effect', () => {
-      assert.deepEqual(saveRequestInstance({}), setContext({ [REQUEST_INSTANCE]: {} }));
+  describe('defaultConfig', () => {
+    it('has correct value', () => {
+      const expected = {
+        success,
+        error,
+        abort,
+      };
+
+      assert.deepEqual(defaultConfig, expected);
+    });
+  });
+
+  describe('createRequestInstance', () => {
+    const requestInstance = { type: 'axios' };
+
+    it('returns correct effect with default config', () => {
+      const expected = setContext({
+        [REQUEST_INSTANCE]: requestInstance,
+        [REQUESTS_CONFIG]: defaultConfig,
+      });
+      assert.deepEqual(createRequestInstance(requestInstance), expected);
+    });
+
+    it('returns correct effect with overwritten config', () => {
+      const config = {
+        success: 'success',
+        error: 'error',
+        abort: 'abort',
+      };
+
+      const expected = setContext({
+        [REQUEST_INSTANCE]: requestInstance,
+        [REQUESTS_CONFIG]: config,
+      });
+      assert.deepEqual(createRequestInstance(requestInstance, config), expected);
     });
   });
 
   describe('getRequestInstance', () => {
     it('returns correct effect', () => {
-      assert.deepEqual(getRequestInstance({}), getContext(REQUEST_INSTANCE));
+      assert.deepEqual(getRequestInstance(), getContext(REQUEST_INSTANCE));
+    });
+  });
+
+  describe('getRequestsConfig', () => {
+    it('returns correct effect', () => {
+      assert.deepEqual(getRequestsConfig(), getContext(REQUESTS_CONFIG));
     });
   });
 
@@ -49,6 +89,7 @@ describe('sagas', () => {
         const action = { type: 'FETCH', request: { url: '/url' } };
         const gen = sendRequest(action, true);
         gen.next();
+        gen.next();
         assert.deepEqual(gen.next().value, put(action));
       });
     });
@@ -70,8 +111,12 @@ describe('sagas', () => {
         assert.deepEqual(gen.next().value, getRequestInstance());
       });
 
+      it('gets request config', () => {
+        assert.deepEqual(gen.next(requestInstance).value, getRequestsConfig());
+      });
+
       it('calls getTokenSource', () => {
-        assert.deepEqual(gen.next(requestInstance).value, getTokenSource());
+        assert.deepEqual(gen.next(defaultConfig).value, getTokenSource());
       });
 
       it('calls requestInstance', () => {
@@ -141,8 +186,12 @@ describe('sagas', () => {
         assert.deepEqual(gen.next().value, getRequestInstance());
       });
 
+      it('gets request config', () => {
+        assert.deepEqual(gen.next(requestInstance).value, getRequestsConfig());
+      });
+
       it('calls getTokenSource', () => {
-        assert.deepEqual(gen.next(requestInstance).value, getTokenSource(requestInstance));
+        assert.deepEqual(gen.next(defaultConfig).value, getTokenSource(requestInstance));
       });
 
       it('calls requestInstance', () => {

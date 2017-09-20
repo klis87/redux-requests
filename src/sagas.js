@@ -2,14 +2,27 @@ import { call, takeEvery, put, all, cancelled, getContext, setContext } from 're
 import axios from 'axios';
 
 import { success, error, abort } from './actions';
-import { REQUEST_INSTANCE, INCORRECT_PAYLOAD_ERROR } from './constants';
+import { REQUEST_INSTANCE, REQUESTS_CONFIG, INCORRECT_PAYLOAD_ERROR } from './constants';
 
-export function saveRequestInstance(requestInstance) {
-  return setContext({ [REQUEST_INSTANCE]: requestInstance });
+export const defaultConfig = {
+  success,
+  error,
+  abort,
+};
+
+export function createRequestInstance(requestInstance, config = {}) {
+  return setContext({
+    [REQUEST_INSTANCE]: requestInstance,
+    [REQUESTS_CONFIG]: { ...defaultConfig, ...config },
+  });
 }
 
 export function getRequestInstance() {
   return getContext(REQUEST_INSTANCE);
+}
+
+export function getRequestsConfig() {
+  return getContext(REQUESTS_CONFIG);
 }
 
 export function getTokenSource() {
@@ -33,6 +46,7 @@ export function* sendRequest(action, dispatchRequestAction = false) {
   }
 
   const requestInstance = yield getRequestInstance();
+  const requestsConfig = yield getRequestsConfig();
 
   if (dispatchRequestAction) {
     yield put(action);
@@ -41,7 +55,7 @@ export function* sendRequest(action, dispatchRequestAction = false) {
   const tokenSource = yield getTokenSource();
   const getApiCall = request => call(requestInstance, { cancelToken: tokenSource.token, ...request });
   const dispatchSuccessAction = data => ({
-    type: success(action.type),
+    type: requestsConfig.success(action.type),
     payload: {
       data,
       meta: action,
@@ -62,7 +76,7 @@ export function* sendRequest(action, dispatchRequestAction = false) {
     }
   } catch (e) {
     yield put({
-      type: error(action.type),
+      type: requestsConfig.error(action.type),
       payload: {
         error: e,
         meta: action,
@@ -74,7 +88,7 @@ export function* sendRequest(action, dispatchRequestAction = false) {
     if (yield cancelled()) {
       yield cancelTokenSource(tokenSource);
       yield put({
-        type: abort(action.type),
+        type: requestsConfig.abort(action.type),
         payload: {
           meta: action,
         },
