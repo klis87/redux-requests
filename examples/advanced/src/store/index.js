@@ -2,13 +2,13 @@ import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import { fork } from 'redux-saga/effects';
 import axios from 'axios';
-import { saveRequestInstance } from 'redux-saga-requests';
+import { createRequestInstance } from 'redux-saga-requests';
 
 import { postsReducer, abortCounterReducer } from './reducers';
 import { postsSaga } from './sagas';
 
 function* rootSaga(axiosInstance) {
-  yield saveRequestInstance(axiosInstance);
+  yield createRequestInstance(axiosInstance);
   yield fork(postsSaga);
 }
 
