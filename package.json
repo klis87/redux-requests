@@ -54,7 +54,8 @@
     "nodemon": "1.12.1",
     "nyc": "11.2.1",
     "redux-saga": "0.15.6",
-    "rimraf": "2.6.2"
+    "rimraf": "2.6.2",
+    "sinon": "3.3.0"
   },
   "nyc": {
     "exclude": [
