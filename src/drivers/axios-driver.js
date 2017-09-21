@@ -1,12 +1,13 @@
-import { call } from 'redux-saga/effects';
 import axios from 'axios';
+
+const prepareSuccessPayload = response => response.data;
 
 const getSuccessPayload = (response) => {
   if (Array.isArray(response)) {
-    return response.map(responseItem => responseItem.data);
+    return response.map(prepareSuccessPayload);
   }
 
-  return response.data;
+  return prepareSuccessPayload(response);
 };
 
 const getErrorPayload = error => error;
@@ -15,8 +16,8 @@ const getRequestHandlers = (requestInstance) => {
   const tokenSource = axios.CancelToken.source();
 
   return {
-    sendRequest: requestConfig => call(requestInstance, { cancelToken: tokenSource.token, ...requestConfig }),
-    abortRequest: call([tokenSource, 'cancel']),
+    sendRequest: requestConfig => requestInstance({ cancelToken: tokenSource.token, ...requestConfig }),
+    abortRequest: tokenSource.cancel,
   };
 };
 

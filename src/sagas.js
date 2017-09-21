@@ -48,10 +48,10 @@ export function* sendRequest(action, dispatchRequestAction = false) {
   const driver = requestsConfig.driver;
   const requestHandlers = yield call([driver, 'getRequestHandlers'], requestInstance);
 
-  const dispatchSuccessAction = response => ({
+  const dispatchSuccessAction = data => ({
     type: requestsConfig.success(action.type),
     payload: {
-      data: driver.getSuccessPayload(response),
+      data,
       meta: action,
     },
   });
@@ -59,30 +59,32 @@ export function* sendRequest(action, dispatchRequestAction = false) {
   const actionPayload = getActionPayload(action);
 
   try {
+    let response;
+
     if (actionPayload.request) {
-      const response = yield requestHandlers.sendRequest(actionPayload.request);
-      yield put(dispatchSuccessAction(response));
-      yield response;
+      response = yield call(requestHandlers.sendRequest, actionPayload.request);
     } else {
-      const response = yield all(actionPayload.requests.map(requestHandlers.sendRequest));
-      yield put(dispatchSuccessAction(response));
-      yield response;
+      response = yield all(actionPayload.requests.map(request => call(requestHandlers.sendRequest, request)));
     }
+
+    const data = yield call(driver.getSuccessPayload, response);
+    yield put(dispatchSuccessAction(data));
+    yield response;
   } catch (e) {
+    const errorPayload = yield call(driver.getErrorPayload, e);
     yield put({
       type: requestsConfig.error(action.type),
       payload: {
-        error: driver.getErrorPayload(e),
+        error: errorPayload,
         meta: action,
       },
     });
-
     yield { error: e };
   } finally {
     if (yield cancelled()) {
       // TODO: add test
       if (requestHandlers.abortRequest) {
-        yield requestHandlers.abortRequest;
+        yield call(requestHandlers.abortRequest);
       }
 
       yield put({

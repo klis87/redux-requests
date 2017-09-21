@@ -1,10 +1,9 @@
 import sinon from 'sinon';
 import axios from 'axios';
-import { call } from 'redux-saga/effects';
 
 import axiosDriver from './axios-driver';
 
-describe('axios driver', () => {
+describe('axiosDriver', () => {
   describe('getSuccessPayload', () => {
     it('returns response data', () => {
       const response = { data: 'data' };
@@ -32,15 +31,15 @@ describe('axios driver', () => {
     it('returns request handlers', () => {
       const tokenSource = {
         token: 'token',
-        cancel: () => {},
+        cancel: () => 'cancelled',
       };
 
       sinon.stub(axios.CancelToken, 'source').returns(tokenSource);
       const config = { myKey: 'myValue' };
-      const requestInstance = () => {};
+      const requestInstance = requestConfig => requestConfig;
       const expected = {
-        sendRequest: requestConfig => call(requestInstance, { cancelToken: tokenSource.token, ...requestConfig }),
-        abortRequest: call([tokenSource, 'cancel']),
+        sendRequest: requestConfig => requestInstance({ cancelToken: tokenSource.token, ...requestConfig }),
+        abortRequest: tokenSource.cancel,
       };
       const result = axiosDriver.getRequestHandlers(requestInstance);
       assert.hasAllKeys(result, ['sendRequest', 'abortRequest']);

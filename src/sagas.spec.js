@@ -105,26 +105,28 @@ describe('sagas', () => {
       });
 
       it('calls sendRequest', () => {
-        const expected = requestHandlers.sendRequest(action.payload.request);
+        const expected = call(requestHandlers.sendRequest, action.payload.request);
         assert.deepEqual(gen.next(requestHandlers).value, expected);
       });
 
       it('dispatches and returns request error action when there is an error', () => {
         const errorGen = gen.clone();
         const requestError = new Error('Something went wrong');
+        const errorPayload = 'error payload';
+        assert.deepEqual(errorGen.throw(requestError).value, call(driver.getErrorPayload, requestError));
         const expected = put({
           type: error(action.type),
           payload: {
-            error: requestError,
+            error: errorPayload,
             meta: action,
           },
         });
-
-        assert.deepEqual(errorGen.throw(requestError).value, expected);
+        assert.deepEqual(errorGen.next(errorPayload).value, expected);
         assert.deepEqual(errorGen.next().value, { error: requestError });
       });
 
       it('dispatches request success action when response is successful', () => {
+        assert.deepEqual(gen.next(response).value, call(driver.getSuccessPayload, response));
         const expected = put({
           type: success(action.type),
           payload: {
@@ -132,7 +134,7 @@ describe('sagas', () => {
             meta: action,
           },
         });
-        assert.deepEqual(gen.next(response).value, expected);
+        assert.deepEqual(gen.next(response.data).value, expected);
       });
 
       it('returns response', () => {
@@ -148,7 +150,7 @@ describe('sagas', () => {
       });
 
       it('handles cancellation when cancelled', () => {
-        assert.deepEqual(gen.next(true).value, requestHandlers.abortRequest);
+        assert.deepEqual(gen.next(true).value, call(requestHandlers.abortRequest));
         const expected = put({
           type: abort(action.type),
           payload: {
@@ -182,21 +184,23 @@ describe('sagas', () => {
 
       it('calls sendRequests', () => {
         const expected = all([
-          requestHandlers.sendRequest(action.requests[0]),
-          requestHandlers.sendRequest(action.requests[1]),
+          call(requestHandlers.sendRequest, action.requests[0]),
+          call(requestHandlers.sendRequest, action.requests[1]),
         ]);
         assert.deepEqual(gen.next(requestHandlers).value, expected);
       });
 
       it('dispatches request success action when reponse is successful', () => {
+        assert.deepEqual(gen.next(responses).value, call(driver.getSuccessPayload, responses));
+        const data = [responses[0].data, responses[1].data];
         const expected = put({
           type: success(action.type),
           payload: {
-            data: [responses[0].data, responses[1].data],
+            data,
             meta: action,
           },
         });
-        assert.deepEqual(gen.next(responses).value, expected);
+        assert.deepEqual(gen.next(data).value, expected);
       });
 
       it('returns response array', () => {
