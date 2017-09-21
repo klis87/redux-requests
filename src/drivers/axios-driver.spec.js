@@ -1,3 +1,4 @@
+import sinon from 'sinon';
 import axios from 'axios';
 import { call } from 'redux-saga/effects';
 
@@ -24,15 +25,27 @@ describe('axios driver', () => {
   });
 
   describe('getRequestHandlers', () => {
-    // TODO: add sinon mock
-    it.skip('returns request handlers', () => {
-      const tokenSource = axios.CancelToken.source();
-      const requestInstance = { type: 'axios' };
+    after(() => {
+      axios.CancelToken.source.restore();
+    });
+
+    it('returns request handlers', () => {
+      const tokenSource = {
+        token: 'token',
+        cancel: () => {},
+      };
+
+      sinon.stub(axios.CancelToken, 'source').returns(tokenSource);
+      const config = { myKey: 'myValue' };
+      const requestInstance = () => {};
       const expected = {
         sendRequest: requestConfig => call(requestInstance, { cancelToken: tokenSource.token, ...requestConfig }),
         abortRequest: call([tokenSource, 'cancel']),
       };
-      assert.deepEqual(axiosDriver.getRequestHandlers(requestInstance).sendRequest, expected.sendRequest);
+      const result = axiosDriver.getRequestHandlers(requestInstance);
+      assert.hasAllKeys(result, ['sendRequest', 'abortRequest']);
+      assert.deepEqual(result.abortRequest, expected.abortRequest);
+      assert.deepEqual(result.sendRequest(config), expected.sendRequest(config));
     });
   });
 });
