@@ -126,7 +126,7 @@ describe('sagas', () => {
       });
 
       it('dispatches request success action when response is successful', () => {
-        assert.deepEqual(gen.next(response).value, call(driver.getSuccessPayload, response));
+        assert.deepEqual(gen.next(response).value, call(driver.getSuccessPayload, response, action.payload.request));
         const expected = put({
           type: success(action.type),
           payload: {
@@ -191,7 +191,7 @@ describe('sagas', () => {
       });
 
       it('dispatches request success action when reponse is successful', () => {
-        assert.deepEqual(gen.next(responses).value, call(driver.getSuccessPayload, responses));
+        assert.deepEqual(gen.next(responses).value, call(driver.getSuccessPayload, responses, action.requests));
         const data = [responses[0].data, responses[1].data];
         const expected = put({
           type: success(action.type),

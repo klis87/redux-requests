@@ -60,14 +60,16 @@ export function* sendRequest(action, dispatchRequestAction = false) {
 
   try {
     let response;
+    let data;
 
     if (actionPayload.request) {
       response = yield call(requestHandlers.sendRequest, actionPayload.request);
+      data = yield call(driver.getSuccessPayload, response, actionPayload.request);
     } else {
       response = yield all(actionPayload.requests.map(request => call(requestHandlers.sendRequest, request)));
+      data = yield call(driver.getSuccessPayload, response, actionPayload.requests);
     }
 
-    const data = yield call(driver.getSuccessPayload, response);
     yield put(dispatchSuccessAction(data));
     yield response;
   } catch (e) {

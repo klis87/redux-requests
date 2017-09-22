@@ -2,15 +2,17 @@ import fetchApiDriver from './fetch-api-driver';
 
 describe('fetchApiDriver', () => {
   describe('getSuccessPayload', () => {
+    const request = { responseType: 'json' };
+
     it('returns response data', async () => {
       const response = { json: () => 'data' };
-      const actual = await fetchApiDriver.getSuccessPayload(response);
+      const actual = await fetchApiDriver.getSuccessPayload(response, request);
       assert.equal(actual, 'data');
     });
 
     it('returns array of response data', async () => {
       const response = [{ json: () => 'data1' }, { json: () => 'data2' }];
-      const actual = await fetchApiDriver.getSuccessPayload(response);
+      const actual = await fetchApiDriver.getSuccessPayload(response, [request, request]);
       assert.deepEqual(actual, ['data1', 'data2']);
     });
   });
