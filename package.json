@@ -31,13 +31,16 @@
     "report": "nyc report",
     "build:commonjs": "cross-env BABEL_ENV=commonjs babel src --out-dir lib --ignore spec.js",
     "build:es": "cross-env BABEL_ENV=es babel src --out-dir es --ignore spec.js",
-    "build": "yarn run clean && yarn run build:commonjs && yarn run build:es",
+    "build:umd": "cross-env BABEL_ENV=es NODE_ENV=development webpack src dist/redux-saga-requests.js",
+    "build:umd:min": "cross-env BABEL_ENV=es NODE_ENV=production webpack -p src dist/redux-saga-requests.min.js",
+    "build": "yarn run clean && yarn run build:commonjs && yarn run build:es && yarn run build:umd && yarn run build:umd:min",
     "build:watch": "nodemon --watch src --ignore src/**/*.spec.js --exec 'yarn run build:es'"
   },
   "devDependencies": {
     "axios": "0.16.2",
     "babel-cli": "6.26.0",
     "babel-core": "6.26.0",
+    "babel-loader": "7.1.2",
     "babel-plugin-istanbul": "4.1.4",
     "babel-polyfill": "6.26.0",
     "babel-preset-env": "1.6.0",
@@ -55,7 +58,8 @@
     "nyc": "11.2.1",
     "redux-saga": "0.15.6",
     "rimraf": "2.6.2",
-    "sinon": "3.3.0"
+    "sinon": "3.3.0",
+    "webpack": "3.6.0"
   },
   "nyc": {
     "exclude": [
