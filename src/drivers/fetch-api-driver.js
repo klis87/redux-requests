@@ -1,29 +1,25 @@
-import { call, all } from 'redux-saga/effects';
+const prepareSuccessPayload = response => response.json();
 
-const prepareSuccessPayload = response => call([response, 'json']);
-
-function* getSuccessPayload(response) {
+const getSuccessPayload = (response) => {
   if (Array.isArray(response)) {
-    const successPayloads = yield all(response.map(prepareSuccessPayload));
-    return successPayloads;
+    return Promise.all(response.map(prepareSuccessPayload));
   }
 
-  const successPayload = yield prepareSuccessPayload(response);
-  return successPayload;
-}
+  return prepareSuccessPayload(response);
+};
 
 const getErrorPayload = error => error;
 
 const getRequestHandlers = (requestInstance) => {
-  function* sendRequestSaga({ url, ...requestConfig }) {
-    const response = yield call(requestInstance, url, requestConfig);
+  const sendRequestSaga = async ({ url, ...requestConfig }) => {
+    const response = await requestInstance(url, requestConfig);
 
     if (!response.ok) {
       throw response;
     }
 
     return response;
-  }
+  };
 
   return { sendRequest: sendRequestSaga };
 };
