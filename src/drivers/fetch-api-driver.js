@@ -1,3 +1,5 @@
+import isAbsoluteUrl from 'axios/lib/helpers/isAbsoluteURL';
+
 const prepareSuccessPayload = response => response.json();
 
 const getSuccessPayload = (response) => {
@@ -10,9 +12,10 @@ const getSuccessPayload = (response) => {
 
 const getErrorPayload = error => error;
 
-const getRequestHandlers = (requestInstance) => {
+const getRequestHandlers = (requestInstance, { baseURL = '' } = {}) => {
   const sendRequestSaga = async ({ url, ...requestConfig }) => {
-    const response = await requestInstance(url, requestConfig);
+    // TODO: add test
+    const response = await requestInstance(isAbsoluteUrl(url) ? url : baseURL + url, requestConfig);
 
     if (!response.ok) {
       throw response;

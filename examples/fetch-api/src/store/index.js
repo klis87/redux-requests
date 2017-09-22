@@ -7,7 +7,10 @@ import { postsReducer, abortCounterReducer } from './reducers';
 import { postsSaga } from './sagas';
 
 function* rootSaga() {
-  yield createRequestInstance(window.fetch, { driver: fetchApiDriver });
+  yield createRequestInstance(
+    window.fetch,
+    { driver: fetchApiDriver, baseURL: 'https://jsonplaceholder.typicode.com' },
+  );
   yield fork(postsSaga);
 }
 

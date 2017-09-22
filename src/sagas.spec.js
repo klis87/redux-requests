@@ -100,7 +100,7 @@ describe('sagas', () => {
       });
 
       it('gets request handlers', () => {
-        const expected = call([driver, 'getRequestHandlers'], requestInstance);
+        const expected = call([driver, 'getRequestHandlers'], requestInstance, defaultConfig);
         assert.deepEqual(gen.next(defaultConfig).value, expected);
       });
 
@@ -178,7 +178,7 @@ describe('sagas', () => {
       });
 
       it('gets request handlers', () => {
-        const expected = call([driver, 'getRequestHandlers'], requestInstance);
+        const expected = call([driver, 'getRequestHandlers'], requestInstance, defaultConfig);
         assert.deepEqual(gen.next(defaultConfig).value, expected);
       });
 
