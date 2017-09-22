@@ -38,8 +38,13 @@
     "build": "yarn run clean && yarn run build:commonjs && yarn run build:es && yarn run build:umd && yarn run build:umd:min",
     "build:watch": "nodemon --watch src --ignore src/**/*.spec.js --exec 'yarn run build:es'"
   },
+  "dependencies": {
+    "axios": ">=0.16.0"
+  },
+  "peerDependencies": {
+    "redux-saga": ">=0.15.0"
+  },
   "devDependencies": {
-    "axios": "0.16.2",
     "babel-cli": "6.26.0",
     "babel-core": "6.26.0",
     "babel-loader": "7.1.2",
