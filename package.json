@@ -32,7 +32,7 @@
     "build:commonjs": "cross-env BABEL_ENV=commonjs babel src --out-dir lib --ignore spec.js",
     "build:es": "cross-env BABEL_ENV=es babel src --out-dir es --ignore spec.js",
     "build": "yarn run clean && yarn run build:commonjs && yarn run build:es",
-    "build:watch": "nodemon --watch src --ignore src/**/*.spec.js --exec yarn run build:es"
+    "build:watch": "nodemon --watch src --ignore src/**/*.spec.js --exec 'yarn run build:es'"
   },
   "devDependencies": {
     "axios": "0.16.2",
