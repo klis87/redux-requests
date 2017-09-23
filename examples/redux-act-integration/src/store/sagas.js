@@ -1,8 +1,19 @@
-import { takeLatest } from 'redux-saga/effects';
+import { takeLatest, race, call, take } from 'redux-saga/effects';
 import { sendRequest } from 'redux-saga-requests';
 
-import { fetchPosts } from './actions';
+import { fetchPhoto, fetchPost, cancelFetchPost } from './actions';
 
-export function* postsSaga() {
-  yield takeLatest(fetchPosts, sendRequest);
+export function* photoSaga() {
+  yield takeLatest(fetchPhoto, sendRequest);
+}
+
+function* fetchPostSaga(fetchPostAction) {
+  yield race([
+    call(sendRequest, fetchPostAction),
+    take(cancelFetchPost),
+  ]);
+}
+
+export function* postSaga() {
+  yield takeLatest(fetchPost, fetchPostSaga);
 }

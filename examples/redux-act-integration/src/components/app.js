@@ -1,47 +1,78 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { fetchPosts, clearPosts } from '../store/actions';
-import {
-  postsSelector,
-  postsAreFetchingSelector,
-  postsFetchErrorSelector,
-  abortCounterSelector,
-} from '../store/selectors';
-import Posts from './posts';
+import { fetchPhoto, clearPhoto, fetchPost, clearPost, cancelFetchPost } from '../store/actions';
+import EntityContainer from './entity-container';
+import Photo from './photo';
+import Post from './post';
 
+// You should use selectors here in your real projects, here we don't for simplicity
 const mapStateToProps = state => ({
-  posts: postsSelector(state),
-  postsAreFetching: postsAreFetchingSelector(state),
-  postsFetchError: postsFetchErrorSelector(state),
-  abortCounter: abortCounterSelector(state),
+  photo: state.photo.data,
+  photoIsFetched: state.photo.data !== null,
+  photoIsFetching: state.photo.fetching,
+  photoFetchError: state.photo.error,
+  post: state.post.data,
+  postIsFetched: state.post.data !== null,
+  postIsFetching: state.post.pendingRequestsCounter > 0,
+  postFetchError: state.post.error,
+  abortCounter: state.abortCounter,
 });
 
 const mapDispatchToProps = {
-  fetchPosts,
-  clearPosts,
+  fetchPhoto,
+  clearPhoto,
+  fetchPost,
+  clearPost,
+  cancelFetchPost,
 };
 
 const buttonStyle = { marginRight: 10 };
 
 const App = ({
-  posts,
-  postsAreFetching,
-  postsFetchError,
+  photo,
+  photoIsFetched,
+  photoIsFetching,
+  photoFetchError,
+  post,
+  postIsFetched,
+  postIsFetching,
+  postFetchError,
+  fetchPhoto,
+  clearPhoto,
+  fetchPost,
+  clearPost,
+  cancelFetchPost,
   abortCounter,
-  fetchPosts,
-  clearPosts,
 }) => (
   <div>
-    <h1>Redux Saga Requests Redux Act example</h1>
-    <button style={buttonStyle} onClick={() => clearPosts()}>Clear</button>
-    <button style={buttonStyle} onClick={() => fetchPosts()}>Fetch posts</button>
-    <button style={buttonStyle} onClick={() => fetchPosts(1)}>Fetch posts with timeout error</button>
-    <span>Aborted counter: {abortCounter}</span>
+    <h1>Redux Saga Requests integration with Redux Act example</h1>
+    <hr />
     <div>
-      <h2>Posts</h2>
-      <Posts postsFetchError={postsFetchError} postsAreFetching={postsAreFetching} posts={posts} />
+      <span>Abort counter: {abortCounter}</span>
     </div>
+    <hr />
+    <div>
+      <h2>Photo</h2>
+      <button style={buttonStyle} onClick={() => clearPhoto()}>Clear</button>
+      <button style={buttonStyle} onClick={() => fetchPhoto(1)}>Fetch photo with id 1</button>
+      <button style={buttonStyle} onClick={() => fetchPhoto(10001)}>Fetch non-existent photo</button>
+      <EntityContainer error={photoFetchError} isFetching={photoIsFetching} isFetched={photoIsFetched}>
+        <Photo data={photo} />
+      </EntityContainer>
+    </div>
+    <hr />
+    <div>
+      <h2>Post</h2>
+      <button style={buttonStyle} onClick={() => clearPost()}>Clear</button>
+      <button style={buttonStyle} onClick={() => fetchPost(1)}>Fetch post with id 1</button>
+      <button style={buttonStyle} onClick={() => fetchPost(1001)}>Fetch non-existent post</button>
+      {postIsFetching && <button style={buttonStyle} onClick={() => cancelFetchPost()}>Cancel fetch</button>}
+      <EntityContainer error={postFetchError} isFetching={postIsFetching} isFetched={postIsFetched}>
+        <Post data={post} />
+      </EntityContainer>
+    </div>
+    <hr />
   </div>
 );
 

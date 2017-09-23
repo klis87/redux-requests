@@ -5,10 +5,18 @@ export const success = getActionWithSuffix(' success');
 export const error = getActionWithSuffix(' error');
 export const abort = getActionWithSuffix(' abort');
 
-export const fetchPosts = createAction('fetch posts', (timeout = null) => {
-  return {
-    request: { url: '/posts', timeout },
-  };
-});
+export const fetchPhoto = createAction('fetch photo', id => ({
+  request: { url: `/photos/${id}` },
+}));
 
-export const clearPosts = createAction('clear posts');
+export const clearPhoto = createAction('clear photo');
+
+export const fetchPost = createAction('fetch post', id => ({
+  requests: [
+    { url: `/posts/${id}` },
+    { url: `/posts/${id}/comments` },
+  ],
+}));
+
+export const clearPost = createAction('clear post');
+export const cancelFetchPost = createAction('cancel fetch post');
