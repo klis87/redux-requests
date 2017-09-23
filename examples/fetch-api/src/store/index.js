@@ -3,20 +3,22 @@ import createSagaMiddleware from 'redux-saga';
 import { fork } from 'redux-saga/effects';
 import { createRequestInstance, fetchApiDriver } from 'redux-saga-requests';
 
-import { postsReducer, abortCounterReducer } from './reducers';
-import { postsSaga } from './sagas';
+import { photoReducer, postReducer, abortCounterReducer } from './reducers';
+import { photoSaga, postSaga } from './sagas';
 
 function* rootSaga() {
   yield createRequestInstance(
     window.fetch,
     { driver: fetchApiDriver, baseURL: 'https://jsonplaceholder.typicode.com' },
   );
-  yield fork(postsSaga);
+  yield fork(photoSaga);
+  yield fork(postSaga);
 }
 
 export const configureStore = () => {
   const reducers = combineReducers({
-    posts: postsReducer,
+    photo: photoReducer,
+    post: postReducer,
     abortCounter: abortCounterReducer,
   });
 
