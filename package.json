@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "module": "es/index.js",
   "jsnext:main": "es/index.js",
-  "unpkg": "dist/redux-saga-requests.js",
+  "unpkg": "dist/redux-saga-requests.min.js",
   "repository": "git@github.com:klis87/redux-saga-requests.git",
   "author": "Konrad Lisiczynski <klisiczynski@gmail.com>",
   "license": "MIT",
