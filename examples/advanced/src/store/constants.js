@@ -1,2 +1,4 @@
-export const FETCH_POSTS = 'FETCH_POSTS';
-export const CLEAR_POSTS = 'CLEAR_POSTS';
+export const FETCH_PHOTO = 'FETCH_PHOTO';
+export const CLEAR_PHOTO = 'CLEAR_PHOTO';
+export const FETCH_POST = 'FETCH_POST';
+export const CLEAR_POST = 'CLEAR_POST';

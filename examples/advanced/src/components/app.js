@@ -1,49 +1,75 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { fetchPosts, fetchPostsWithMicroTimeout, clearPosts } from '../store/actions';
-import {
-  postsSelector,
-  postsAreFetchingSelector,
-  postsFetchErrorSelector,
-  abortCounterSelector,
-} from '../store/selectors';
-import Posts from './posts';
+import { fetchPhoto, clearPhoto, fetchPost, clearPost } from '../store/actions';
+import EntityContainer from './entity-container';
+import Photo from './photo';
+import Post from './post';
 
+// You should use selectors here in your real projects, here we don't for simplicity
 const mapStateToProps = state => ({
-  posts: postsSelector(state),
-  postsAreFetching: postsAreFetchingSelector(state),
-  postsFetchError: postsFetchErrorSelector(state),
-  abortCounter: abortCounterSelector(state),
+  photo: state.photo.data,
+  photoIsFetched: state.photo.data !== null,
+  photoIsFetching: state.photo.fetching,
+  photoFetchError: state.photo.error,
+  post: state.post.data,
+  postIsFetched: state.post.data !== null,
+  postIsFetching: state.post.fetching,
+  postFetchError: state.post.error,
+  abortCounter: state.abortCounter,
 });
 
 const mapDispatchToProps = {
-  fetchPosts,
-  fetchPostsWithMicroTimeout,
-  clearPosts,
+  fetchPhoto,
+  clearPhoto,
+  fetchPost,
+  clearPost,
 };
 
 const buttonStyle = { marginRight: 10 };
 
 const App = ({
-  posts,
-  postsAreFetching,
-  postsFetchError,
+  photo,
+  photoIsFetched,
+  photoIsFetching,
+  photoFetchError,
+  post,
+  postIsFetched,
+  postIsFetching,
+  postFetchError,
+  fetchPhoto,
+  clearPhoto,
+  fetchPost,
+  clearPost,
   abortCounter,
-  fetchPosts,
-  fetchPostsWithMicroTimeout,
-  clearPosts,
 }) => (
   <div>
     <h1>Redux Saga Requests advanced example</h1>
-    <button style={buttonStyle} onClick={clearPosts}>Clear</button>
-    <button style={buttonStyle} onClick={fetchPosts}>Fetch posts</button>
-    <button style={buttonStyle} onClick={fetchPostsWithMicroTimeout}>Fetch posts with timeout error</button>
-    <span>Aborted counter: {abortCounter}</span>
+    <hr />
     <div>
-      <h2>Posts</h2>
-      <Posts postsFetchError={postsFetchError} postsAreFetching={postsAreFetching} posts={posts} />
+      <span>Abort counter: {abortCounter}</span>
     </div>
+    <hr />
+    <div>
+      <h2>Photo</h2>
+      <button style={buttonStyle} onClick={clearPhoto}>Clear</button>
+      <button style={buttonStyle} onClick={() => fetchPhoto(1)}>Fetch photo with id 1</button>
+      <button style={buttonStyle} onClick={() => fetchPhoto(10001)}>Fetch non-existent photo</button>
+      <EntityContainer error={photoFetchError} isFetching={photoIsFetching} isFetched={photoIsFetched}>
+        <Photo data={photo} />
+      </EntityContainer>
+    </div>
+    <hr />
+    <div>
+      <h2>Post</h2>
+      <button style={buttonStyle} onClick={clearPost}>Clear</button>
+      <button style={buttonStyle} onClick={() => fetchPost(1)}>Fetch post with id 1</button>
+      <button style={buttonStyle} onClick={() => fetchPost(1001)}>Fetch non-existent post</button>
+      <EntityContainer error={postFetchError} isFetching={postIsFetching} isFetched={postIsFetched}>
+        <Post data={post} />
+      </EntityContainer>
+    </div>
+    <hr />
   </div>
 );
 

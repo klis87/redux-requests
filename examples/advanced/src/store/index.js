@@ -4,17 +4,19 @@ import { fork } from 'redux-saga/effects';
 import axios from 'axios';
 import { createRequestInstance } from 'redux-saga-requests';
 
-import { postsReducer, abortCounterReducer } from './reducers';
-import { postsSaga } from './sagas';
+import { photoReducer, postReducer, abortCounterReducer } from './reducers';
+import { photoSaga, postSaga } from './sagas';
 
 function* rootSaga(axiosInstance) {
   yield createRequestInstance(axiosInstance);
-  yield fork(postsSaga);
+  yield fork(photoSaga);
+  yield fork(postSaga);
 }
 
 export const configureStore = () => {
   const reducers = combineReducers({
-    posts: postsReducer,
+    photo: photoReducer,
+    post: postReducer,
     abortCounter: abortCounterReducer,
   });
 
