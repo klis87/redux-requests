@@ -33,6 +33,14 @@ export const isRequestAction = (action) => {
   return actionPayload.request || actionPayload.requests;
 };
 
+export const abortRequestIfDefined = (abortRequest) => {
+  if (abortRequest) {
+    return call(abortRequest);
+  }
+
+  return null;
+};
+
 export function* sendRequest(action, dispatchRequestAction = false) {
   if (!isRequestAction(action)) {
     throw new Error(INCORRECT_PAYLOAD_ERROR);
@@ -84,11 +92,7 @@ export function* sendRequest(action, dispatchRequestAction = false) {
     yield { error: e };
   } finally {
     if (yield cancelled()) {
-      // TODO: add test
-      if (requestHandlers.abortRequest) {
-        yield call(requestHandlers.abortRequest);
-      }
-
+      yield abortRequestIfDefined(requestHandlers.abortRequest);
       yield put({
         type: requestsConfig.abort(action.type),
         payload: {

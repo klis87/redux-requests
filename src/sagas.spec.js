@@ -12,6 +12,7 @@ import {
   sendRequest,
   watchRequests,
   isRequestAction,
+  abortRequestIfDefined,
 } from './sagas';
 
 describe('sagas', () => {
@@ -64,6 +65,17 @@ describe('sagas', () => {
   describe('getRequestsConfig', () => {
     it('returns correct effect', () => {
       assert.deepEqual(getRequestsConfig(), getContext(REQUESTS_CONFIG));
+    });
+  });
+
+  describe('abortRequestIfDefined', () => {
+    it('returns call effect when abortRequest defined', () => {
+      const abortRequest = () => {};
+      assert.deepEqual(abortRequestIfDefined(abortRequest), call(abortRequest));
+    });
+
+    it('returns null when abortRequest undefined', () => {
+      assert.equal(abortRequestIfDefined(undefined), null);
     });
   });
 
@@ -150,7 +162,7 @@ describe('sagas', () => {
       });
 
       it('handles cancellation when cancelled', () => {
-        assert.deepEqual(gen.next(true).value, call(requestHandlers.abortRequest));
+        assert.deepEqual(gen.next(true).value, abortRequestIfDefined(requestHandlers.abortRequest));
         const expected = put({
           type: abort(action.type),
           payload: {

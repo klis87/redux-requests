@@ -2,8 +2,7 @@ import isAbsoluteUrl from 'axios/lib/helpers/isAbsoluteURL';
 
 const responseTypes = ['arraybuffer', 'blob', 'formData', 'json', 'text'];
 
-const prepareSuccessPayload = (response, { responseType = 'json' } = {}) => {
-  // TODO: add test
+const prepareSuccessPayload = (response, { responseType = 'json' }) => {
   if (responseTypes.indexOf(responseType) === -1) {
     throw new Error("responseType must be one of the following: arraybuffer', 'blob', 'formData', 'json', 'text'");
   }
