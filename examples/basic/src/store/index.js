@@ -3,7 +3,7 @@ import createSagaMiddleware from 'redux-saga';
 import axios from 'axios';
 import { createRequestInstance, watchRequests } from 'redux-saga-requests';
 
-import { postsReducer } from './reducers';
+import { photoReducer, postReducer } from './reducers';
 
 function* rootSaga(axiosInstance) {
   yield createRequestInstance(axiosInstance);
@@ -12,7 +12,8 @@ function* rootSaga(axiosInstance) {
 
 export const configureStore = () => {
   const reducers = combineReducers({
-    posts: postsReducer,
+    photo: photoReducer,
+    post: postReducer,
   });
 
   const sagaMiddleware = createSagaMiddleware();
