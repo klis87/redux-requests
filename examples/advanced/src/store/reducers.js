@@ -27,7 +27,7 @@ export const photoReducer = (state = defaultPhotoState, action) => {
     case error(FETCH_PHOTO):
       return { ...defaultPhotoState, error: true };
     case CLEAR_PHOTO:
-      return defaultPhotoState;
+      return { ...state, data: null, error: false };
     default:
       return state;
   }
@@ -35,23 +35,26 @@ export const photoReducer = (state = defaultPhotoState, action) => {
 
 const defaultPostState = {
   data: null,
-  fetching: false,
+  pendingRequestsCounter: 0,
   error: false,
 };
 
 export const postReducer = (state = defaultPostState, action) => {
   switch (action.type) {
     case FETCH_POST:
-      return { ...defaultPostState, fetching: true };
+      return { ...defaultPostState, pendingRequestsCounter: state.pendingRequestsCounter + 1 };
     case success(FETCH_POST):
       return {
         ...defaultPostState,
         data: { ...action.payload.data[0], comments: action.payload.data[1] },
+        pendingRequestsCounter: state.pendingRequestsCounter - 1,
       };
     case error(FETCH_POST):
-      return { ...defaultPostState, error: true };
+      return { ...defaultPostState, error: true, pendingRequestsCounter: state.pendingRequestsCounter - 1 };
+    case abort(FETCH_POST):
+      return { ...defaultPostState, pendingRequestsCounter: state.pendingRequestsCounter - 1 };
     case CLEAR_POST:
-      return defaultPostState;
+      return { ...state, data: null, error: false };
     default:
       return state;
   }
