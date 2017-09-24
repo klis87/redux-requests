@@ -261,3 +261,25 @@ const fetchUsers = () => ({
 The point is, you can use the same request config like you do with pure Fetch API, but you need to pass `url` in the
 config itself. Also, one additional parameter you could provide in the config is `responseType`, which is set as `json`
 as the default. Available response types are: `arraybuffer`, `blob`, `formData`, `json`, `text`.
+
+## Examples
+
+I highly recommend to try examples how this package could be used in real applications. You could play with those demos
+and see what actions are being sent with [redux-devtools](https://github.com/zalmoxisus/redux-devtools-extension).
+
+There are following examples currently:
+- [basic](https://github.com/klis87/redux-saga-requests/tree/master/examples/basic)
+- [advanced](https://github.com/klis87/redux-saga-requests/tree/master/examples/advanced)
+- [Fetch API](https://github.com/klis87/redux-saga-requests/tree/master/examples/fetch-api)
+- [Redux-act integration](https://github.com/klis87/redux-saga-requests/tree/master/examples/redux-act-integration)
+
+## Credits
+
+This library was inspired by [redux-axios-middleware](https://github.com/svrcekmichal/redux-axios-middleware)
+(I highly recommend this library if someone doesn't use Redux-Saga!)
+and [issue](https://github.com/redux-saga/redux-saga/issues/1117) in Redux-Saga, when it was recommended not to combine
+another async middleware with sagas.
+
+## Licence
+
+MIT
