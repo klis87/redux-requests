@@ -4,11 +4,11 @@ import { fork } from 'redux-saga/effects';
 import axios from 'axios';
 import { createRequestInstance } from 'redux-saga-requests';
 
-import { photoReducer, postReducer, abortCounterReducer } from './reducers';
-import { photoSaga, postSaga } from './sagas';
+import { photoReducer, postReducer, abortCounterReducer, requestCounterReducer } from './reducers';
+import { photoSaga, postSaga, requestCounterSaga } from './sagas';
 
 function* rootSaga(axiosInstance) {
-  yield createRequestInstance(axiosInstance);
+  yield createRequestInstance(axiosInstance, { onRequest: requestCounterSaga });
   yield fork(photoSaga);
   yield fork(postSaga);
 }
@@ -18,6 +18,7 @@ export const configureStore = () => {
     photo: photoReducer,
     post: postReducer,
     abortCounter: abortCounterReducer,
+    requestCounter: requestCounterReducer,
   });
 
   const sagaMiddleware = createSagaMiddleware();
