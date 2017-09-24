@@ -88,7 +88,7 @@ export function* sendRequest(action, dispatchRequestAction = false) {
 
     yield put(dispatchSuccessAction(data));
     yield call(requestsConfig.onSuccess, response);
-    yield response;
+    return { response };
   } catch (e) {
     const errorPayload = yield call(driver.getErrorPayload, e);
     yield put({
@@ -99,7 +99,7 @@ export function* sendRequest(action, dispatchRequestAction = false) {
       },
     });
     yield call(requestsConfig.onError, e);
-    yield { error: e };
+    return { error: e };
   } finally {
     if (yield cancelled()) {
       yield abortRequestIfDefined(requestHandlers.abortRequest);
