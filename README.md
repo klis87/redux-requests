@@ -80,10 +80,14 @@ error and abort(abort is also supported, see below) actions will be dispatched a
 is dispatched, especially handy with `takeLatest` and `race` Redux-Saga effects
 - sending multiple requests in one action - `{ type: FETCH_BOOKS_AND_AUTHORS, request: [{ url: '/books' }, { url: '/authors}'] }`
 will send two requests and wrap them in `Promise.all`
-- flexibility - you can use "auto mode" `watchRequests` (see basic example), or much more flexible `sendRequest`
-(see advanced example), or... you could even access your request instance with `yield getRequestInstance()`
+- flexibility - you can use "auto mode" `watchRequests`
+(see [basic example](https://github.com/klis87/redux-saga-requests/tree/master/examples/basic)),
+or much more flexible `sendRequest`
+(see [advanced example](https://github.com/klis87/redux-saga-requests/tree/master/examples/advanced)),
+or... you could even access your request instance with `yield getRequestInstance()`
 - support for Axios and Fetch API - additional clients will be added in the future, you could also write your own client
-integration as `driver` - see `./src/drivers` for examples
+integration as `driver` - see [./src/drivers](https://github.com/klis87/redux-saga-requests/tree/docs/src/drivers)
+for examples
 - compatible with `Redux-Act` and `Redux-Actions` libraries - see redux-act example
 - simple to use with server side rendering - for example you could pass Axios instance to `createRequestInstance` and
 you don't need to worry that Axios interceptors would be shared across multiple requests
