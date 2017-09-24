@@ -47,6 +47,7 @@ const App = ({
 }) => (
   <div>
     <h1>Redux Saga Requests integration with Redux Act example</h1>
+    <p>In order to see aborts in action, you should set network throttling in your browser</p>
     <hr />
     <div>
       <span>Abort counter: {abortCounter}</span>

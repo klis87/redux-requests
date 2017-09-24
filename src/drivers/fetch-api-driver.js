@@ -4,7 +4,7 @@ const responseTypes = ['arraybuffer', 'blob', 'formData', 'json', 'text'];
 
 const prepareSuccessPayload = (response, { responseType = 'json' }) => {
   if (responseTypes.indexOf(responseType) === -1) {
-    throw new Error("responseType must be one of the following: arraybuffer', 'blob', 'formData', 'json', 'text'");
+    throw new Error("responseType must be one of the following: 'arraybuffer', 'blob', 'formData', 'json', 'text'");
   }
 
   return response[responseType]();
