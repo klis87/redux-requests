@@ -1,5 +1,5 @@
 {
-  "name": "redux-saga-requests-integration-with-redux-act-example",
+  "name": "redux-saga-requests-redux-act-integration-example",
   "version": "1.0.0",
   "description": "redux saga requests integration with redux act example",
   "main": "src/index.js",
