@@ -9,64 +9,62 @@ integrations will be added, as they can be implemented in a plugin fashion.
 
 With `redux-saga-requests`, assuming you use `axios` you could refactor a code in the following way:
 ```diff
- import axios from 'axios';
--import { takeEvery, put, call } from 'redux-saga/effects';
-+import { createRequestInstance, watchRequests, success, error } from 'redux-saga-requests';
+  import axios from 'axios';
+- import { takeEvery, put, call } from 'redux-saga/effects';
++ import { createRequestInstance, watchRequests, success, error } from 'redux-saga-requests';
 
- const FETCH_BOOKS = 'FETCH_BOOKS';
--const FETCH_BOOKS_SUCCESS = 'FETCH_BOOKS_SUCCESS';
--const FETCH_BOOKS_ERROR = 'FETCH_BOOKS_ERROR';
+  const FETCH_BOOKS = 'FETCH_BOOKS';
+- const FETCH_BOOKS_SUCCESS = 'FETCH_BOOKS_SUCCESS';
+- const FETCH_BOOKS_ERROR = 'FETCH_BOOKS_ERROR';
 
--const fetchBooks = () => ({ type: FETCH_BOOKS });
--const fetchBooksSuccess = data => ({ type: FETCH_BOOKS_SUCCESS, payload: { data } });
--const fetchBooksError = error => ({ type: FETCH_BOOKS_ERROR, payload: { error } });
-+const fetchBooks = () => ({
-+  type: FETCH_BOOKS,
-+  request: { url: '/books' },
-+});
+- const fetchBooks = () => ({ type: FETCH_BOOKS });
+- const fetchBooksSuccess = data => ({ type: FETCH_BOOKS_SUCCESS, payload: { data } });
+- const fetchBooksError = error => ({ type: FETCH_BOOKS_ERROR, payload: { error } });
++ const fetchBooks = () => ({
++   type: FETCH_BOOKS,
++   request: { url: '/books' },
++ });
 
- const defaultState = {
-   data: null,
-   fetching: false,
-   error: false,
- };
+  const defaultState = {
+    data: null,
+    fetching: false,
+    error: false,
+  };
 
- const booksReducer = (state = defaultState, action) => {
-   switch (action.type) {
-     case FETCH_BOOKS:
-       return { ...defaultState, fetching: true };
--    case FETCH_BOOKS_SUCCESS:
-+    case success(FETCH_BOOKS):
-       return {
-         ...defaultState,
-         data: { ...action.payload.data },
-       };
--    case FETCH_BOOKS_ERROR:
-+    case error(FETCH_BOOKS):
-       return { ...defaultState, error: true };
-     default:
-       return state;
-   }
- };
+  const booksReducer = (state = defaultState, action) => {
+    switch (action.type) {
+      case FETCH_BOOKS:
+        return { ...defaultState, fetching: true };
+-     case FETCH_BOOKS_SUCCESS:
++     case success(FETCH_BOOKS):
+        return {
+          ...defaultState,
+          data: { ...action.payload.data },
+        };
+-     case FETCH_BOOKS_ERROR:
++     case error(FETCH_BOOKS):
+        return { ...defaultState, error: true };
+      default:
+        return state;
+    }
+  };
 
--const fetchBooksApi = () => axios.get('/books');
+- const fetchBooksApi = () => axios.get('/books');
 -
--function* fetchBooksSaga() {
+- function* fetchBooksSaga() {
+-   try {
+-     const response = yield call(fetchBooksApi);
+-     yield put(fetchBooksSuccess(response.data));
+-   } catch (e) {
+-     yield put(fetchBooksError(e));
+-   }
+- }
 -
--function* fetchBooksSaga() {
--  try {
--    const response = yield call(fetchBooksApi);
--    yield put(fetchBooksSuccess(response.data));
--  } catch (e) {
--    yield put(fetchBooksError(e));
--  }
--}
--
- function* rootSaga() {
--  yield takeEvery(FETCH_BOOKS, fetchBooksSaga);
-+  yield createRequestInstance(axios);
-+  yield watchRequests();
- }
+  function* rootSaga() {
+-   yield takeEvery(FETCH_BOOKS, fetchBooksSaga);
++   yield createRequestInstance(axios);
++   yield watchRequests();
+  }
 ```
 With `redux-saga-requests`, you no longer need to define error and success actions to do things like error handling
 or showing spinner. You don't need to write repetitive sagas to create requests either.
@@ -74,13 +72,13 @@ or showing spinner. You don't need to write repetitive sagas to create requests 
 Here you can see the list of features this library provides:
 - you define your AJAX requests as simple actions, like `{ type: FETCH_BOOKS, request: { url: '/books' } }` and success,
 error and abort(abort is also supported, see below) actions will be dispatched automatically for you
-- `success`, `error` and `abort` functions, which add correct and consistent suffixes to you request action type
+- `success`, `error` and `abort` functions, which add correct and consistent suffixes to your request action type
 - automatic request abort - when a saga is cancelled, a request made by it is automatically aborted and an abort action
 is dispatched, especially handy with `takeLatest` and `race` Redux-Saga effects
-- sending multiple requests in one action - `{ type: FETCH_BOOKS_AND_AUTHORS, request: [{ url: '/books' }, { url '/authors}'] }`
+- sending multiple requests in one action - `{ type: FETCH_BOOKS_AND_AUTHORS, request: [{ url: '/books' }, { url: '/authors}'] }`
 will send two requests and wrap them in `Promise.all`
 - flexibility - you can use "auto mode" `watchRequests` (see basic example), or much more flexible `sendRequest`
-(see advanced example), or... you could access your
+(see advanced example), or... you could access your request instance with `yield getRequestInstance()`
 - support for Axios and Fetch API - additional clients will be added in the future, you could also write your own client
 integration as `driver` - see `./src/drivers` for examples
 - compatible with `Redux-Act` and `Redux-Actions` libraries - see redux-act example
@@ -211,7 +209,7 @@ function* rootSaga(axiosInstance) {
     onError: onErrorSaga,
     onAbort: onAbortSaga,
   });
-  yield watchRequest;
+  yield watchRequest();
 }
 ```
 
@@ -245,7 +243,7 @@ should be translated to this:
 const fetchUsers = () => ({
   type: 'FETCH_USERS',
   request: {
-    url: '/users/,
+    url: '/users/',
     method: 'POST',
     body: data,
   }
