@@ -104,6 +104,7 @@ or...
 ```
 $ npm install redux-saga-requests
 ```
+or you can just use CDN: ```https://unpkg.com/redux-saga-requests```.
 
 Because this is Redux-Saga addon, you also need to install Redux-Saga.
 
