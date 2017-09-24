@@ -22,7 +22,10 @@ With `redux-saga-requests`, assuming you use `axios` you could refactor a code i
 - const fetchBooksError = error => ({ type: FETCH_BOOKS_ERROR, payload: { error } });
 + const fetchBooks = () => ({
 +   type: FETCH_BOOKS,
-+   request: { url: '/books' },
++   request: {
++     url: '/books',
++     // put other Axios config attributes, like method, data, headers etc.
+    },
 + });
 
   const defaultState = {
@@ -67,7 +70,7 @@ With `redux-saga-requests`, assuming you use `axios` you could refactor a code i
   }
 ```
 With `redux-saga-requests`, you no longer need to define error and success actions to do things like error handling
-or showing spinner. You don't need to write repetitive sagas to create requests either.
+or showing loading spinner. You don't need to write repetitive sagas to create requests either.
 
 Here you can see the list of features this library provides:
 - you define your AJAX requests as simple actions, like `{ type: FETCH_BOOKS, request: { url: '/books' } }` and success,
@@ -78,7 +81,7 @@ is dispatched, especially handy with `takeLatest` and `race` Redux-Saga effects
 - sending multiple requests in one action - `{ type: FETCH_BOOKS_AND_AUTHORS, request: [{ url: '/books' }, { url: '/authors}'] }`
 will send two requests and wrap them in `Promise.all`
 - flexibility - you can use "auto mode" `watchRequests` (see basic example), or much more flexible `sendRequest`
-(see advanced example), or... you could access your request instance with `yield getRequestInstance()`
+(see advanced example), or... you could even access your request instance with `yield getRequestInstance()`
 - support for Axios and Fetch API - additional clients will be added in the future, you could also write your own client
 integration as `driver` - see `./src/drivers` for examples
 - compatible with `Redux-Act` and `Redux-Actions` libraries - see redux-act example
@@ -158,17 +161,23 @@ function* rootSaga() {
 }
 ```
 In above case, not only the last `/books` request could be successful, but also it could be aborted with `cancelRequest`
-action.
+action, as `sendRequest` would be aborted as it would lose with `take(CANCEL_REQUEST)` effect.
 
 Of course, you can send requests directly from your sagas:
 ```javascript
 function* fetchBookSaga() {
-  yield call(sendRequest, fetchBooks(), true);
+  const { response, error } = yield call(sendRequest, fetchBooks(), true);
+
+  if (response) {
+    // do sth with response
+  } else {
+    // do sth with error
+  }
 }
 ```
 The key here is, that you need to pass `true` as second argument to `sendRequest`, so that `fetchBooks` action will be
-dispatched - usually it is already dispatched like in previous examples, but here not, so we must explicitely tell
-`sendRequest` to dispatch it.
+dispatched - usually it is already dispatched somewhere else (from your React components `onClick` for instance),
+but here not, so we must explicitely tell `sendRequest` to dispatch it.
 
 Also, it is possible to get access to your request instance (like Axios) in your Saga:
 ```javascript
@@ -217,7 +226,7 @@ function* rootSaga(axiosInstance) {
 
 All of the above examples show Axios usage, in order to use Fetch API, use below snippet:
 ```javascript
-import 'isomorphic-fetch';
+import 'isomorphic-fetch'; // or a different fetch polyfill
 import { createRequestInstance, fetchApiDriver, watchRequests } from 'redux-saga-requests';
 
 function* rootSaga() {
@@ -225,7 +234,7 @@ function* rootSaga() {
     window.fetch,
     {
       driver: fetchApiDriver,
-      baseURL: 'https://myDomain.com' // optional
+      baseURL: 'https://myDomain.com' // optional - it works like axios baseURL
     },
   );
   yield watchRequests();
