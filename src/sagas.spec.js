@@ -13,9 +13,16 @@ import {
   watchRequests,
   isRequestAction,
   abortRequestIfDefined,
+  voidCallback,
 } from './sagas';
 
 describe('sagas', () => {
+  describe('voidCallback', () => {
+    it('returns undefined', () => {
+      assert.equal(voidCallback(), undefined);
+    });
+  });
+
   describe('defaultConfig', () => {
     it('has correct value', () => {
       const expected = {
@@ -23,6 +30,10 @@ describe('sagas', () => {
         error,
         abort,
         driver: axiosDriver,
+        onRequest: voidCallback,
+        onSuccess: voidCallback,
+        onError: voidCallback,
+        onAbort: voidCallback,
       };
 
       assert.deepEqual(defaultConfig, expected);
@@ -46,6 +57,10 @@ describe('sagas', () => {
         error: 'error',
         abort: 'abort',
         driver: 'some driver',
+        onRequest: voidCallback,
+        onSuccess: voidCallback,
+        onError: voidCallback,
+        onAbort: voidCallback,
       };
 
       const expected = setContext({

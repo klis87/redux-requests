@@ -4,11 +4,17 @@ import { success, error, abort } from './actions';
 import { REQUEST_INSTANCE, REQUESTS_CONFIG, INCORRECT_PAYLOAD_ERROR } from './constants';
 import axiosDriver from './drivers/axios-driver';
 
+export const voidCallback = () => {};
+
 export const defaultConfig = {
   success,
   error,
   abort,
   driver: axiosDriver,
+  onRequest: voidCallback,
+  onSuccess: voidCallback,
+  onError: voidCallback,
+  onAbort: voidCallback,
 };
 
 export function createRequestInstance(requestInstance, config = {}) {
