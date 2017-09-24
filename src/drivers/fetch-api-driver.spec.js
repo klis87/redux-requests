@@ -28,7 +28,7 @@ describe('fetchApiDriver', () => {
         error = e;
       }
 
-      const expected = "responseType must be one of the following: arraybuffer', 'blob', 'formData', 'json', 'text'";
+      const expected = "responseType must be one of the following: 'arraybuffer', 'blob', 'formData', 'json', 'text'";
       assert.equal(error.message, expected);
     });
 

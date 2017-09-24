@@ -155,6 +155,7 @@ describe('sagas', () => {
         });
         assert.deepEqual(errorGen.next(errorPayload).value, expected);
         assert.deepEqual(errorGen.next(requestHandlers).value, call(defaultConfig.onError, requestError));
+        errorGen.next(); // to fire finally yield
         assert.deepEqual(errorGen.next().value, { error: requestError });
       });
 
@@ -175,16 +176,8 @@ describe('sagas', () => {
         assert.deepEqual(gen.next().value, expected);
       });
 
-      it('returns response', () => {
-        assert.deepEqual(gen.next().value, response);
-      });
-
       it('awaits cancellation', () => {
         assert.deepEqual(gen.next().value, cancelled());
-      });
-
-      it('ignores cancellation login when not cancelled', () => {
-        assert.deepEqual(gen.clone().next(), { done: true, value: undefined });
       });
 
       it('handles cancellation when cancelled', () => {
@@ -197,6 +190,10 @@ describe('sagas', () => {
         });
         assert.deepEqual(gen.next().value, expected);
         assert.deepEqual(gen.next(requestHandlers).value, call(defaultConfig.onAbort));
+      });
+
+      it('returns response', () => {
+        assert.deepEqual(gen.clone().next().value, { response });
       });
     });
 
@@ -253,7 +250,8 @@ describe('sagas', () => {
       });
 
       it('returns response array', () => {
-        assert.deepEqual(gen.next().value, responses);
+        gen.next(); // to fire finally yield
+        assert.deepEqual(gen.next().value, { response: responses });
       });
     });
 
