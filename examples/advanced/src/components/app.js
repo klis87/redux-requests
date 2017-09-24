@@ -17,6 +17,7 @@ const mapStateToProps = state => ({
   postIsFetching: state.post.pendingRequestsCounter > 0,
   postFetchError: state.post.error,
   abortCounter: state.abortCounter,
+  requestCounter: state.requestCounter,
 });
 
 const mapDispatchToProps = {
@@ -44,12 +45,14 @@ const App = ({
   clearPost,
   cancelFetchPost,
   abortCounter,
+  requestCounter,
 }) => (
   <div>
     <h1>Redux Saga Requests advanced example</h1>
     <hr />
     <div>
-      <span>Abort counter: {abortCounter}</span>
+      <div>Abort counter: {abortCounter}</div>
+      <div>Request counter: {requestCounter}</div>
     </div>
     <hr />
     <div>

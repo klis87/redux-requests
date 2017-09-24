@@ -4,11 +4,17 @@ import { success, error, abort } from './actions';
 import { REQUEST_INSTANCE, REQUESTS_CONFIG, INCORRECT_PAYLOAD_ERROR } from './constants';
 import axiosDriver from './drivers/axios-driver';
 
+export const voidCallback = () => {};
+
 export const defaultConfig = {
   success,
   error,
   abort,
   driver: axiosDriver,
+  onRequest: voidCallback,
+  onSuccess: voidCallback,
+  onError: voidCallback,
+  onAbort: voidCallback,
 };
 
 export function createRequestInstance(requestInstance, config = {}) {
@@ -71,14 +77,17 @@ export function* sendRequest(action, dispatchRequestAction = false) {
     let data;
 
     if (actionPayload.request) {
+      yield call(requestsConfig.onRequest, actionPayload.request);
       response = yield call(requestHandlers.sendRequest, actionPayload.request);
       data = yield call(driver.getSuccessPayload, response, actionPayload.request);
     } else {
+      yield call(requestsConfig.onRequest, actionPayload.requests);
       response = yield all(actionPayload.requests.map(request => call(requestHandlers.sendRequest, request)));
       data = yield call(driver.getSuccessPayload, response, actionPayload.requests);
     }
 
     yield put(dispatchSuccessAction(data));
+    yield call(requestsConfig.onSuccess, response);
     yield response;
   } catch (e) {
     const errorPayload = yield call(driver.getErrorPayload, e);
@@ -89,6 +98,7 @@ export function* sendRequest(action, dispatchRequestAction = false) {
         meta: action,
       },
     });
+    yield call(requestsConfig.onError, e);
     yield { error: e };
   } finally {
     if (yield cancelled()) {
@@ -99,6 +109,7 @@ export function* sendRequest(action, dispatchRequestAction = false) {
           meta: action,
         },
       });
+      yield call(requestsConfig.onAbort);
     }
   }
 }

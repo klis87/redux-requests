@@ -22,7 +22,6 @@ const getErrorPayload = error => error;
 
 const getRequestHandlers = (requestInstance, { baseURL = '' } = {}) => {
   const sendRequestSaga = async ({ url, ...requestConfig }) => {
-    // TODO: add test
     const response = await requestInstance(isAbsoluteUrl(url) ? url : baseURL + url, requestConfig);
 
     if (!response.ok) {

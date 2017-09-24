@@ -13,9 +13,16 @@ import {
   watchRequests,
   isRequestAction,
   abortRequestIfDefined,
+  voidCallback,
 } from './sagas';
 
 describe('sagas', () => {
+  describe('voidCallback', () => {
+    it('returns undefined', () => {
+      assert.equal(voidCallback(), undefined);
+    });
+  });
+
   describe('defaultConfig', () => {
     it('has correct value', () => {
       const expected = {
@@ -23,6 +30,10 @@ describe('sagas', () => {
         error,
         abort,
         driver: axiosDriver,
+        onRequest: voidCallback,
+        onSuccess: voidCallback,
+        onError: voidCallback,
+        onAbort: voidCallback,
       };
 
       assert.deepEqual(defaultConfig, expected);
@@ -46,6 +57,10 @@ describe('sagas', () => {
         error: 'error',
         abort: 'abort',
         driver: 'some driver',
+        onRequest: voidCallback,
+        onSuccess: voidCallback,
+        onError: voidCallback,
+        onAbort: voidCallback,
       };
 
       const expected = setContext({
@@ -116,12 +131,17 @@ describe('sagas', () => {
         assert.deepEqual(gen.next(defaultConfig).value, expected);
       });
 
-      it('calls sendRequest', () => {
-        const expected = call(requestHandlers.sendRequest, action.payload.request);
+      it('calls onRequest', () => {
+        const expected = call(defaultConfig.onRequest, action.payload.request);
         assert.deepEqual(gen.next(requestHandlers).value, expected);
       });
 
-      it('dispatches and returns request error action when there is an error', () => {
+      it('calls sendRequest', () => {
+        const expected = call(requestHandlers.sendRequest, action.payload.request);
+        assert.deepEqual(gen.next().value, expected);
+      });
+
+      it('dispatches error, calls on Error and returns request error action when there is an error', () => {
         const errorGen = gen.clone();
         const requestError = new Error('Something went wrong');
         const errorPayload = 'error payload';
@@ -134,6 +154,7 @@ describe('sagas', () => {
           },
         });
         assert.deepEqual(errorGen.next(errorPayload).value, expected);
+        assert.deepEqual(errorGen.next(requestHandlers).value, call(defaultConfig.onError, requestError));
         assert.deepEqual(errorGen.next().value, { error: requestError });
       });
 
@@ -147,6 +168,11 @@ describe('sagas', () => {
           },
         });
         assert.deepEqual(gen.next(response.data).value, expected);
+      });
+
+      it('calls onSuccess', () => {
+        const expected = call(defaultConfig.onSuccess, response);
+        assert.deepEqual(gen.next().value, expected);
       });
 
       it('returns response', () => {
@@ -170,6 +196,7 @@ describe('sagas', () => {
           },
         });
         assert.deepEqual(gen.next().value, expected);
+        assert.deepEqual(gen.next(requestHandlers).value, call(defaultConfig.onAbort));
       });
     });
 
@@ -194,6 +221,11 @@ describe('sagas', () => {
         assert.deepEqual(gen.next(defaultConfig).value, expected);
       });
 
+      it('calls onRequest', () => {
+        const expected = call(defaultConfig.onRequest, action.requests);
+        assert.deepEqual(gen.next(requestHandlers).value, expected);
+      });
+
       it('calls sendRequests', () => {
         const expected = all([
           call(requestHandlers.sendRequest, action.requests[0]),
@@ -213,6 +245,11 @@ describe('sagas', () => {
           },
         });
         assert.deepEqual(gen.next(data).value, expected);
+      });
+
+      it('calls onSuccess', () => {
+        const expected = call(defaultConfig.onSuccess, responses);
+        assert.deepEqual(gen.next(requestHandlers).value, expected);
       });
 
       it('returns response array', () => {

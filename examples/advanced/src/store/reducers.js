@@ -1,6 +1,6 @@
 import { success, error, abort } from 'redux-saga-requests';
 
-import { FETCH_PHOTO, CLEAR_PHOTO, FETCH_POST, CLEAR_POST } from './constants';
+import { FETCH_PHOTO, CLEAR_PHOTO, FETCH_POST, CLEAR_POST, INCREMENT_REQUEST_COUNTER } from './constants';
 
 export const abortCounterReducer = (state = 0, action) => {
   switch (action.type) {
@@ -55,6 +55,15 @@ export const postReducer = (state = defaultPostState, action) => {
       return { ...defaultPostState, pendingRequestsCounter: state.pendingRequestsCounter - 1 };
     case CLEAR_POST:
       return { ...state, data: null, error: false };
+    default:
+      return state;
+  }
+};
+
+export const requestCounterReducer = (state = 0, action) => {
+  switch (action.type) {
+    case INCREMENT_REQUEST_COUNTER:
+      return state + 1;
     default:
       return state;
   }
