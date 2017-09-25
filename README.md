@@ -140,7 +140,7 @@ specifications, but you won't notice it in your application (apart from unnecess
 You could also use `race` effect:
 ```javascript
 import axios from 'axios';
-import { call, race } from 'redux-saga/effects';
+import { call, race, take, takeLatest } from 'redux-saga/effects';
 import { sendRequest } from 'redux-saga-requests';
 
 const FETCH_BOOKS = 'FETCH_BOOKS';
@@ -216,7 +216,7 @@ function* onAbortSaga() {
   ...
 }
 
-function* rootSaga(axiosInstance) {
+function* rootSaga() {
   yield createRequestInstance(axios, {
     onRequest: onRequestSaga,
     onSuccess: onResponseSaga,
