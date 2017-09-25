@@ -25,7 +25,7 @@ With `redux-saga-requests`, assuming you use `axios` you could refactor a code i
 +   request: {
 +     url: '/books',
 +     // put other Axios config attributes, like method, data, headers etc.
-    },
++   },
 + });
 
   const defaultState = {
