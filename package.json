@@ -9,6 +9,7 @@
   "repository": "git@github.com:klis87/redux-saga-requests.git",
   "author": "Konrad Lisiczynski <klisiczynski@gmail.com>",
   "license": "MIT",
+  "typings": "types/index.d.ts",
   "files": [
     "lib",
     "es",
@@ -28,7 +29,7 @@
   },
   "scripts": {
     "clean": "rimraf es lib dist",
-    "test": "cross-env BABEL_ENV=commonjs mocha -r babel-register -r babel-polyfill -r chai/register-assert 'src/**/*.spec.js'",
+    "test": "cross-env BABEL_ENV=commonjs mocha -r babel-register -r babel-polyfill -r chai/register-assert 'src/**/*.spec.js' 'types/**/*.spec.js'",
     "cover": "cross-env BABEL_ENV=coverage nyc --reporter=lcov --reporter=text mocha -r babel-register -r babel-polyfill -r chai/register-assert 'src/**/*.spec.js'",
     "report": "nyc report",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
@@ -68,6 +69,8 @@
     "redux-saga": "0.15.6",
     "rimraf": "2.6.2",
     "sinon": "3.3.0",
+    "typescript": "2.5.3",
+    "typescript-definition-tester": "0.0.5",
     "webpack": "3.6.0"
   },
   "nyc": {
