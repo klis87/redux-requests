@@ -229,6 +229,27 @@ function* rootSaga(axiosInstance) {
 }
 ```
 
+## Custom action suffixes
+
+As a default, `success`, `error` and `abort` functions generate `_SUCCESS`, `_ERROR` and `_ABORT` suffixes respectively.
+However, it is possible to change them in a following way:
+```javascript
+import axios from 'axios';
+import { getActionWithSuffix, watchRequests, createRequestInstance } from 'redux-saga-requests';
+
+const success = getActionWithSuffix('MY_SUCCESS_SUFFIX');
+const error = getActionWithSuffix('MY_ERROR_SUFFIX');
+const abort = getActionWithSuffix('MY_ABORT_SUFFIX');
+
+function* rootSaga(axiosInstance) {
+  yield createRequestInstance(axiosInstance, { success, error, abort });
+  yield watchRequests();
+}
+```
+So, basically you need to use `getActionWithSuffix` to create your own `success`, `error` and `abort` functions, which
+you need to pass in `createRequestInstance` config. Then, instead of using built-in `success`, `error` and `abort`
+functions in your reducers, you will use your own ones.
+
 ## Usage with Fetch API
 
 All of the above examples show Axios usage, in order to use Fetch API, use below snippet:
