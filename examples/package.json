@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "workspaces": [
+    "advanced",
+    "basic",
+    "fetch-api",
+    "redux-act-integration"
+  ]
+}
