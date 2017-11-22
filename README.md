@@ -1,6 +1,9 @@
 # redux-saga-requests
+
+[![npm version](https://badge.fury.io/js/redux-saga-requests.svg)](https://badge.fury.io/js/redux-saga-requests)
 [![Build Status](https://travis-ci.org/klis87/redux-saga-requests.svg?branch=master)](https://travis-ci.org/klis87/redux-saga-requests)
 [![Coverage Status](https://coveralls.io/repos/github/klis87/redux-saga-requests/badge.svg?branch=master)](https://coveralls.io/github/klis87/redux-saga-requests?branch=master)
+[![Known Vulnerabilities](https://snyk.io/test/github/klis87/redux-saga-requests/badge.svg)](https://snyk.io/test/github/klis87/redux-saga-requests)
 
 Redux-Saga addon to simplify handling of AJAX requests. It supports Axios and Fetch API, in the future additional
 integrations will be added, as they can be implemented in a plugin fashion.
@@ -73,8 +76,8 @@ With `redux-saga-requests`, you no longer need to define error and success actio
 or showing loading spinner. You don't need to write repetitive sagas to create requests either.
 
 Here you can see the list of features this library provides:
-- you define your AJAX requests as simple actions, like `{ type: FETCH_BOOKS, request: { url: '/books' } }` and success,
-error and abort(abort is also supported, see below) actions will be dispatched automatically for you
+- you define your AJAX requests as simple actions, like `{ type: FETCH_BOOKS, request: { url: '/books' } }` and `success`,
+`error` (`abort` is also supported, see below) actions will be dispatched automatically for you
 - `success`, `error` and `abort` functions, which add correct and consistent suffixes to your request action type
 - automatic request abort - when a saga is cancelled, a request made by it is automatically aborted and an abort action
 is dispatched, especially handy with `takeLatest` and `race` Redux-Saga effects
@@ -84,11 +87,11 @@ will send two requests and wrap them in `Promise.all`
 (see [basic example](https://github.com/klis87/redux-saga-requests/tree/master/examples/basic)),
 or much more flexible `sendRequest`
 (see [advanced example](https://github.com/klis87/redux-saga-requests/tree/master/examples/advanced)),
-or... you could even access your request instance with `yield getRequestInstance()`
+or... you could even access your request instance with `getRequestInstance`
 - support for Axios and Fetch API - additional clients will be added in the future, you could also write your own client
 integration as `driver` - see [./src/drivers](https://github.com/klis87/redux-saga-requests/tree/docs/src/drivers)
 for examples
-- compatible with `Redux-Act` and `Redux-Actions` libraries - see redux-act example
+- compatible with `Redux-Act` and `Redux-Actions` libraries - see [redux-act example](https://github.com/klis87/redux-saga-requests/tree/master/examples/redux-act-integration)
 - simple to use with server side rendering - for example you could pass Axios instance to `createRequestInstance` and
 you don't need to worry that Axios interceptors would be shared across multiple requests
 - `onRequest`, `onSuccess`, `onError` and `onAbort` interceptors, you can attach your sagas (or simple functions)
@@ -226,6 +229,27 @@ function* rootSaga() {
   yield watchRequest();
 }
 ```
+
+## Custom action suffixes
+
+As a default, `success`, `error` and `abort` functions generate `_SUCCESS`, `_ERROR` and `_ABORT` suffixes respectively.
+However, it is possible to change them in a following way:
+```javascript
+import axios from 'axios';
+import { getActionWithSuffix, watchRequests, createRequestInstance } from 'redux-saga-requests';
+
+const success = getActionWithSuffix('MY_SUCCESS_SUFFIX');
+const error = getActionWithSuffix('MY_ERROR_SUFFIX');
+const abort = getActionWithSuffix('MY_ABORT_SUFFIX');
+
+function* rootSaga(axiosInstance) {
+  yield createRequestInstance(axiosInstance, { success, error, abort });
+  yield watchRequests();
+}
+```
+So, basically you need to use `getActionWithSuffix` to create your own `success`, `error` and `abort` functions, which
+you need to pass in `createRequestInstance` config. Then, instead of using built-in `success`, `error` and `abort`
+functions in your reducers, you will use your own ones.
 
 ## Usage with Fetch API
 
