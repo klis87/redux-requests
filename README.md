@@ -242,7 +242,7 @@ const error = getActionWithSuffix('MY_ERROR_SUFFIX');
 const abort = getActionWithSuffix('MY_ABORT_SUFFIX');
 
 function* rootSaga(axiosInstance) {
-  yield createRequestInstance(axiosInstance, { success, error, abort });
+  yield createRequestInstance(axios, { success, error, abort });
   yield watchRequests();
 }
 ```
