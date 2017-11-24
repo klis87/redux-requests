@@ -2,22 +2,21 @@ import { call, takeEvery, put, all, cancelled, getContext, setContext } from 're
 
 import { success, error, abort } from './actions';
 import { REQUEST_INSTANCE, REQUESTS_CONFIG, INCORRECT_PAYLOAD_ERROR } from './constants';
-import axiosDriver from './drivers/axios-driver';
 
 export const voidCallback = () => {};
 
 export const defaultConfig = {
+  driver: null,
   success,
   error,
   abort,
-  driver: axiosDriver,
   onRequest: voidCallback,
   onSuccess: voidCallback,
   onError: voidCallback,
   onAbort: voidCallback,
 };
 
-export function createRequestInstance(requestInstance, config = {}) {
+export function createRequestInstance(requestInstance, config) {
   return setContext({
     [REQUEST_INSTANCE]: requestInstance,
     [REQUESTS_CONFIG]: { ...defaultConfig, ...config },

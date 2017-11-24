@@ -3,7 +3,6 @@ import { cloneableGenerator } from 'redux-saga/utils';
 
 import { success, error, abort } from './actions';
 import { REQUEST_INSTANCE, REQUESTS_CONFIG, INCORRECT_PAYLOAD_ERROR } from './constants';
-import axiosDriver from './drivers/axios-driver';
 import {
   defaultConfig,
   createRequestInstance,
@@ -15,6 +14,15 @@ import {
   abortRequestIfDefined,
   voidCallback,
 } from './sagas';
+
+const dummyDriver = {
+  getSuccessPayload: () => {},
+  getErrorPayload: () => {},
+  getRequestHandlers: () => ({
+    sendRequest: () => {},
+    abortRequest: () => {},
+  }),
+};
 
 describe('sagas', () => {
   describe('voidCallback', () => {
@@ -29,7 +37,7 @@ describe('sagas', () => {
         success,
         error,
         abort,
-        driver: axiosDriver,
+        driver: null,
         onRequest: voidCallback,
         onSuccess: voidCallback,
         onError: voidCallback,
@@ -95,6 +103,8 @@ describe('sagas', () => {
   });
 
   describe('sendRequest', () => {
+    const config = { ...defaultConfig, driver: dummyDriver };
+
     describe('with correct payload with dispatchRequestAction', () => {
       it('dispatches request action', () => {
         const action = { type: 'FETCH', request: { url: '/url' } };
@@ -115,8 +125,7 @@ describe('sagas', () => {
       const gen = cloneableGenerator(sendRequest)(action);
       const requestInstance = () => ({ type: 'axios' });
       const response = { data: 'some response' };
-      const driver = defaultConfig.driver;
-      const requestHandlers = driver.getRequestHandlers(requestInstance);
+      const requestHandlers = dummyDriver.getRequestHandlers(requestInstance);
 
       it('gets request instance', () => {
         assert.deepEqual(gen.next().value, getRequestInstance());
@@ -127,12 +136,16 @@ describe('sagas', () => {
       });
 
       it('gets request handlers', () => {
-        const expected = call([driver, 'getRequestHandlers'], requestInstance, defaultConfig);
-        assert.deepEqual(gen.next(defaultConfig).value, expected);
+        const expected = call(
+          [dummyDriver, 'getRequestHandlers'],
+          requestInstance,
+          config,
+        );
+        assert.deepEqual(gen.next(config).value, expected);
       });
 
       it('calls onRequest', () => {
-        const expected = call(defaultConfig.onRequest, action.payload.request);
+        const expected = call(config.onRequest, action.payload.request);
         assert.deepEqual(gen.next(requestHandlers).value, expected);
       });
 
@@ -145,7 +158,7 @@ describe('sagas', () => {
         const errorGen = gen.clone();
         const requestError = new Error('Something went wrong');
         const errorPayload = 'error payload';
-        assert.deepEqual(errorGen.throw(requestError).value, call(driver.getErrorPayload, requestError));
+        assert.deepEqual(errorGen.throw(requestError).value, call(dummyDriver.getErrorPayload, requestError));
         const expected = put({
           type: error(action.type),
           payload: {
@@ -154,13 +167,16 @@ describe('sagas', () => {
           },
         });
         assert.deepEqual(errorGen.next(errorPayload).value, expected);
-        assert.deepEqual(errorGen.next(requestHandlers).value, call(defaultConfig.onError, requestError));
+        assert.deepEqual(errorGen.next(requestHandlers).value, call(config.onError, requestError));
         errorGen.next(); // to fire finally yield
         assert.deepEqual(errorGen.next().value, { error: requestError });
       });
 
       it('dispatches request success action when response is successful', () => {
-        assert.deepEqual(gen.next(response).value, call(driver.getSuccessPayload, response, action.payload.request));
+        assert.deepEqual(
+          gen.next(response).value,
+          call(dummyDriver.getSuccessPayload, response, action.payload.request),
+        );
         const expected = put({
           type: success(action.type),
           payload: {
@@ -172,7 +188,7 @@ describe('sagas', () => {
       });
 
       it('calls onSuccess', () => {
-        const expected = call(defaultConfig.onSuccess, response);
+        const expected = call(config.onSuccess, response);
         assert.deepEqual(gen.next().value, expected);
       });
 
@@ -189,7 +205,7 @@ describe('sagas', () => {
           },
         });
         assert.deepEqual(gen.next().value, expected);
-        assert.deepEqual(gen.next(requestHandlers).value, call(defaultConfig.onAbort));
+        assert.deepEqual(gen.next(requestHandlers).value, call(config.onAbort));
       });
 
       it('returns response', () => {
@@ -202,8 +218,7 @@ describe('sagas', () => {
       const gen = sendRequest(action);
       const requestInstance = () => ({ type: 'axios' });
       const responses = [{ data: 'some response' }, { data: 'another response' }];
-      const driver = defaultConfig.driver;
-      const requestHandlers = driver.getRequestHandlers(requestInstance);
+      const requestHandlers = dummyDriver.getRequestHandlers(requestInstance);
 
       it('gets request instance', () => {
         assert.deepEqual(gen.next().value, getRequestInstance());
@@ -214,12 +229,16 @@ describe('sagas', () => {
       });
 
       it('gets request handlers', () => {
-        const expected = call([driver, 'getRequestHandlers'], requestInstance, defaultConfig);
-        assert.deepEqual(gen.next(defaultConfig).value, expected);
+        const expected = call(
+          [dummyDriver, 'getRequestHandlers'],
+          requestInstance,
+          config,
+        );
+        assert.deepEqual(gen.next(config).value, expected);
       });
 
       it('calls onRequest', () => {
-        const expected = call(defaultConfig.onRequest, action.requests);
+        const expected = call(config.onRequest, action.requests);
         assert.deepEqual(gen.next(requestHandlers).value, expected);
       });
 
@@ -232,7 +251,7 @@ describe('sagas', () => {
       });
 
       it('dispatches request success action when reponse is successful', () => {
-        assert.deepEqual(gen.next(responses).value, call(driver.getSuccessPayload, responses, action.requests));
+        assert.deepEqual(gen.next(responses).value, call(dummyDriver.getSuccessPayload, responses, action.requests));
         const data = [responses[0].data, responses[1].data];
         const expected = put({
           type: success(action.type),
@@ -245,7 +264,7 @@ describe('sagas', () => {
       });
 
       it('calls onSuccess', () => {
-        const expected = call(defaultConfig.onSuccess, responses);
+        const expected = call(config.onSuccess, responses);
         assert.deepEqual(gen.next(requestHandlers).value, expected);
       });
 

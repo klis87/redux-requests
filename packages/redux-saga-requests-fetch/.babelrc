@@ -1,0 +1,17 @@
+{
+  "env": {
+    "commonjs": {
+      "presets": ["env", "stage-3"]
+    },
+    "es": {
+      "presets": [
+        ["env", { "modules": false }],
+        "stage-3"
+      ]
+    },
+    "coverage": {
+      "presets": ["env", "stage-3"],
+      "plugins": ["istanbul"]
+    }
+  }
+}
