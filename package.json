@@ -3,7 +3,21 @@
   "workspaces": [
     "packages/*"
   ],
+  "scripts": {
+    "cover": "nyc --reporter=lcov --reporter=text lerna run test:cover",
+    "report": "nyc report",
+    "coveralls": "nyc report --reporter=text-lcov | coveralls"
+  },
   "devDependencies": {
-    "lerna": "2.5.1"
+    "coveralls": "2.13.1",
+    "lerna": "2.5.1",
+    "nyc": "11.2.1"
+  },
+  "nyc": {
+    "exclude": [
+      "**/*.spec.js"
+    ],
+    "sourceMap": false,
+    "instrument": false
   }
 }
