@@ -10,13 +10,6 @@
   "author": "Konrad Lisiczynski <klisiczynski@gmail.com>",
   "license": "MIT",
   "typings": "types/index.d.ts",
-  "files": [
-    "lib",
-    "es",
-    "src",
-    "dist",
-    "types"
-  ],
   "keywords": [
     "redux",
     "redux-saga",
