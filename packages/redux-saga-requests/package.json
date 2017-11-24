@@ -24,9 +24,7 @@
   "scripts": {
     "clean": "rimraf es lib dist",
     "test": "cross-env BABEL_ENV=commonjs mocha -r babel-register -r babel-polyfill -r chai/register-assert 'src/**/*.spec.js' 'types/**/*.spec.js'",
-    "cover": "cross-env BABEL_ENV=coverage nyc --reporter=lcov --reporter=text mocha -r babel-register -r babel-polyfill -r chai/register-assert 'src/**/*.spec.js'",
-    "report": "nyc report",
-    "coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "test:cover": "cross-env BABEL_ENV=coverage mocha -r babel-register -r babel-polyfill -r chai/register-assert 'src/**/*.spec.js'",
     "build:commonjs": "cross-env BABEL_ENV=commonjs babel src --out-dir lib --ignore spec.js",
     "build:es": "cross-env BABEL_ENV=es babel src --out-dir es --ignore spec.js",
     "build:umd": "cross-env BABEL_ENV=es NODE_ENV=development webpack src dist/redux-saga-requests.js",
@@ -47,7 +45,6 @@
     "babel-preset-stage-3": "6.24.1",
     "babel-register": "6.26.0",
     "chai": "4.1.2",
-    "coveralls": "2.13.1",
     "cross-env": "5.0.5",
     "eslint": "4.6.1",
     "eslint-config-airbnb": "15.1.0",
@@ -56,19 +53,11 @@
     "eslint-plugin-react": "7.3.0",
     "mocha": "3.5.3",
     "nodemon": "1.12.1",
-    "nyc": "11.2.1",
     "redux-saga": "0.15.6",
     "rimraf": "2.6.2",
     "sinon": "3.3.0",
     "typescript": "2.5.3",
     "typescript-definition-tester": "0.0.5",
     "webpack": "3.6.0"
-  },
-  "nyc": {
-    "exclude": [
-      "**/*.spec.js"
-    ],
-    "sourceMap": false,
-    "instrument": false
   }
 }
