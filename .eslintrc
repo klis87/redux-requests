@@ -11,9 +11,17 @@
     "max-len": [0, 120],
     "no-else-return": 0,
     "import/prefer-default-export": 0,
-    "import/no-extraneous-dependencies": [2, {"devDependencies": true}],
+    "import/no-extraneous-dependencies": [2, {"peerDependencies": true, "devDependencies": false}],
     "import/named": 2,
     "react/jsx-filename-extension": 0,
     "react/prop-types": 0
-  }
+  },
+  "overrides": [
+    {
+      "files": ["packages/**/*.spec.js"],
+      "rules": {
+        "import/no-extraneous-dependencies": [2, {"peerDependencies": false, "devDependencies": true}]
+      }
+    }
+  ]
 }
