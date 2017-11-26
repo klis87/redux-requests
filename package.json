@@ -4,6 +4,7 @@
     "packages/*"
   ],
   "scripts": {
+    "lint": "lerna run lint",
     "cover": "nyc --reporter=lcov --reporter=text lerna run test:cover",
     "report": "nyc report",
     "coveralls": "nyc report --reporter=text-lcov | coveralls"
