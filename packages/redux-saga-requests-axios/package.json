@@ -32,7 +32,7 @@
     "build:es": "cross-env BABEL_ENV=es babel src --out-dir es --ignore spec.js",
     "build:umd": "cross-env BABEL_ENV=es NODE_ENV=development webpack src dist/redux-saga-requests-axios.js",
     "build:umd:min": "cross-env BABEL_ENV=es NODE_ENV=production webpack -p src dist/redux-saga-requests-axios.min.js",
-    "build": "yarn run clean && yarn run build:commonjs && yarn run build:es && yarn run build:umd && yarn run build:umd:min",
+    "build": "npm-run-all clean -p build:commonjs build:es build:umd build:umd:min",
     "build:watch": "nodemon --watch src --ignore src/**/*.spec.js --exec 'yarn run build:es'"
   },
   "peerDependencies": {
@@ -58,6 +58,7 @@
     "eslint-plugin-react": "7.3.0",
     "mocha": "3.5.3",
     "nodemon": "1.12.1",
+    "npm-run-all": "4.1.2",
     "rimraf": "2.6.2",
     "sinon": "3.3.0",
     "typescript": "2.5.3",
