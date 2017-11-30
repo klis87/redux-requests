@@ -7,5 +7,5 @@ script:
 after_success: yarn run coveralls
 cache: yarn
 branches:
-  only:
-    - master
+  except:
+    - /^v\d+\.\d+\.\d+$/
