@@ -1,7 +1,8 @@
 import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import { fork } from 'redux-saga/effects';
-import { createRequestInstance, fetchApiDriver } from 'redux-saga-requests';
+import { createRequestInstance } from 'redux-saga-requests';
+import fetchDriver from 'redux-saga-requests-fetch';
 
 import { photoReducer, postReducer, abortCounterReducer } from './reducers';
 import { photoSaga, postSaga } from './sagas';
@@ -9,7 +10,7 @@ import { photoSaga, postSaga } from './sagas';
 function* rootSaga() {
   yield createRequestInstance(
     window.fetch,
-    { driver: fetchApiDriver, baseURL: 'https://jsonplaceholder.typicode.com' },
+    { driver: fetchDriver, baseURL: 'https://jsonplaceholder.typicode.com' },
   );
   yield fork(photoSaga);
   yield fork(postSaga);
