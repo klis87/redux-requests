@@ -4,7 +4,7 @@ const DEBUG = process.env.NODE_ENV !== 'production';
 
 module.exports = {
   output: {
-    library: 'ReduxSagaRequests',
+    library: 'ReduxSagaRequestsFetch',
     libraryTarget: 'umd',
   },
   module: {
@@ -15,20 +15,6 @@ module.exports = {
         loader: 'babel-loader',
       },
     ],
-  },
-  externals: {
-    axios: {
-      commonjs: 'axios',
-      commonjs2: 'axios',
-      amd: 'axios',
-      root: 'axios',
-    },
-    'redux-saga/effects': {
-      commonjs: 'redux-saga/effects',
-      commonjs2: 'redux-saga/effects',
-      amd: 'redux-saga/effects',
-      root: 'ReduxSaga.effects',
-    },
   },
   devtool: 'source-map',
   plugins: [

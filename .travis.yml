@@ -1,9 +1,11 @@
 language: node_js
 node_js:
   - node
-script: yarn run cover
+script:
+  - yarn run lint
+  - yarn run cover
 after_success: yarn run coveralls
 cache: yarn
 branches:
-  only:
-    - master
+  except:
+    - /^v\d+\.\d+\.\d+$/

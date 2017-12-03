@@ -35,13 +35,11 @@ interface getRequestHandlers {
   (requestInstance: any, config?: any): requestsHandlers;
 }
 
-interface driver {
+export interface driver {
   getSuccessPayload: getSuccessPayload;
   getErrorPayload: getErrorPayload;
   getRequestHandlers: getRequestHandlers;
 }
-
-export const fetchApiDriver: driver;
 
 interface onRequest {
   (request: any): any;
@@ -60,17 +58,17 @@ interface onAbort {
 }
 
 interface requestInstanceConfig {
+  driver: driver;
   success?: actionTypeModifier;
   error?: actionTypeModifier;
   abort?: actionTypeModifier;
-  driver?: driver;
   onRequest?: onRequest;
   onSuccess?: onSuccess;
   onError?: onError;
   onAbort?: onAbort;
 }
 
-export function createRequestInstance(requestInstance: any, config?: requestInstanceConfig): any;
+export function createRequestInstance(requestInstance: any, config: requestInstanceConfig): any;
 
 export function getRequestInstance(): any;
 

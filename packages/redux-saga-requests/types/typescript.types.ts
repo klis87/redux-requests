@@ -3,7 +3,7 @@ import {
   error,
   abort,
   getActionWithSuffix,
-  fetchApiDriver,
+  driver,
   createRequestInstance,
   getRequestInstance,
   sendRequest,
@@ -17,23 +17,26 @@ abort('type');
 const actionModifier = getActionWithSuffix('suffix');
 actionModifier('type');
 
-fetchApiDriver.getSuccessPayload({}, {});
-fetchApiDriver.getErrorPayload({});
-const requestHandlers = fetchApiDriver.getRequestHandlers({}, {});
+let dummyDriver: driver;
+
+dummyDriver.getSuccessPayload({}, {});
+dummyDriver.getErrorPayload({});
+const requestHandlers = dummyDriver.getRequestHandlers({}, {});
 requestHandlers.sendRequest({});
 
-createRequestInstance({});
+createRequestInstance({}, { driver: dummyDriver });
 
 const requestInstanceConfig = {
   success: actionModifier,
   error: actionModifier,
   abort: actionModifier,
-  driver: fetchApiDriver,
+  driver: dummyDriver,
   onRequest: request => ({}),
   onSuccess: response => ({}),
   onError: error => ({}),
   onAbort: () => ({}),
-}
+};
+
 createRequestInstance({}, requestInstanceConfig);
 
 getRequestInstance();
