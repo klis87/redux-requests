@@ -8,23 +8,33 @@ const defaultConfig = {
   fetchingKey: 'fetching',
 };
 
-const getRequestState = ({ dataKey, errorKey, fetchingKey }) => ({
-  [dataKey]: null,
+const getEmptyData = multiple => multiple ? [] : null;
+
+const getRequestState = ({ dataKey, errorKey, fetchingKey }, multiple) => ({
+  [dataKey]: getEmptyData(multiple),
   [fetchingKey]: false,
   [errorKey]: null,
 });
 
-const getInitialState = (state, reducer, config) => {
+const getInitialState = (state, reducer, config, multiple) => {
   if (!reducer) {
-    return getRequestState(config);
+    return getRequestState(config, multiple);
   }
 
-  return { ...getRequestState(config), ...reducer(undefined, {}) };
+  return { ...getRequestState(config, multiple), ...reducer(undefined, {}) };
 };
 
-export const createRequestsReducer = (userConfig = {}) => ({ actionType }, reducer = null) => (state, action) => {
+export const createRequestsReducer = (
+  userConfig = {},
+) => (
+  { actionType, multiple = false },
+  reducer = null,
+) => (
+  state,
+  action,
+) => {
   const config = { ...defaultConfig, ...userConfig };
-  const nextState = state === undefined ? getInitialState(state, reducer, config) : state;
+  const nextState = state === undefined ? getInitialState(state, reducer, config, multiple) : state;
 
   const {
     getSuccessSuffix,
@@ -38,7 +48,7 @@ export const createRequestsReducer = (userConfig = {}) => ({ actionType }, reduc
     case actionType:
       return {
         ...nextState,
-        [dataKey]: null,
+        [dataKey]: getEmptyData(multiple),
         [fetchingKey]: true,
         [errorKey]: null,
       };
@@ -52,7 +62,7 @@ export const createRequestsReducer = (userConfig = {}) => ({ actionType }, reduc
     case getErrorSuffix(actionType):
       return {
         ...nextState,
-        [dataKey]: null,
+        [dataKey]: getEmptyData(multiple),
         [fetchingKey]: false,
         [errorKey]: action.payload.error,
       };

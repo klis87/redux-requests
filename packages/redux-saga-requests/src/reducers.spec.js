@@ -1,17 +1,16 @@
 import { success, error } from './actions';
 import { requestsReducer } from './reducers';
 
-const defaultState = {
-  data: null,
-  fetching: false,
-  error: null,
-};
-
 const actionType = 'ACTION';
 
 describe('reducers', () => {
   describe('requestsReducer', () => {
     describe('without passed reducer', () => {
+      const defaultState = {
+        data: null,
+        fetching: false,
+        error: null,
+      };
       const reducer = requestsReducer({ actionType });
 
       it('returns correct default state', () => {
@@ -64,6 +63,58 @@ describe('reducers', () => {
           payload: { error: someError },
         };
         assert.deepEqual(reducer(defaultState, action), expected);
+      });
+    });
+
+    describe('without passed reducer with array data', () => {
+      const reducer = requestsReducer({ actionType, multiple: true });
+      const initialState = reducer(undefined, {});
+
+      it('returns correct default state', () => {
+        const state = reducer(undefined, {});
+        const expected = {
+          data: [],
+          error: null,
+          fetching: false,
+        };
+        assert.deepEqual(state, expected);
+      });
+
+      it('returns correct state for request action', () => {
+        const expected = {
+          data: [],
+          error: null,
+          fetching: true,
+        };
+        assert.deepEqual(reducer(initialState, { type: actionType }), expected);
+      });
+
+      it('returns correct state for success action', () => {
+        const data = ['data'];
+        const expected = {
+          data,
+          error: null,
+          fetching: false,
+        };
+        const action = {
+          type: success(actionType),
+          payload: { data },
+        };
+        assert.deepEqual(reducer(initialState, action), expected);
+      });
+
+      it('returns correct state for error action', () => {
+        const someError = 'error';
+        const expected = {
+          data: [],
+          error: someError,
+          fetching: false,
+        };
+        const action = {
+          type: error(actionType),
+          payload: { error: someError },
+        };
+        assert.deepEqual(reducer(initialState, action), expected);
       });
     });
 
