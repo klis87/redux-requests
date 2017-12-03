@@ -34,11 +34,10 @@
     "build:watch": "nodemon --watch src --ignore src/**/*.spec.js --exec 'yarn run build:es'"
   },
   "dependencies": {
-    "axios": ">=0.16.0",
-    "react": "16.0.0"
+    "axios": ">=0.16.0"
   },
   "peerDependencies": {
-    "redux-saga-requests": ">=0.3.0"
+    "redux-saga-requests": ">=0.4.0"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",

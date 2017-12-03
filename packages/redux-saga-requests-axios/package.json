@@ -37,7 +37,7 @@
   },
   "peerDependencies": {
     "axios": ">=0.16.0",
-    "redux-saga-requests": ">=0.3.0"
+    "redux-saga-requests": ">=0.4.0"
   },
   "devDependencies": {
     "axios": "0.16.0",
