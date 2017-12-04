@@ -1,4 +1,4 @@
-import { success, error } from './actions';
+import { success, error, getActionWithSuffix } from './actions';
 import { requestsReducer } from './reducers';
 
 const actionType = 'ACTION';
@@ -66,25 +66,35 @@ describe('reducers', () => {
       });
     });
 
-    describe('without passed reducer with array data', () => {
-      const reducer = requestsReducer({ actionType, multiple: true });
+    describe('without passed reducer with local config override', () => {
+      const localSuccess = getActionWithSuffix('success');
+      const localError = getActionWithSuffix('error');
+      const reducer = requestsReducer({
+        actionType,
+        getSuccessSuffix: localSuccess,
+        getErrorSuffix: localError,
+        dataKey: 'items',
+        errorKey: 'fail',
+        fetchingKey: 'pending',
+        multiple: true,
+      });
       const initialState = reducer(undefined, {});
 
       it('returns correct default state', () => {
         const state = reducer(undefined, {});
         const expected = {
-          data: [],
-          error: null,
-          fetching: false,
+          items: [],
+          fail: null,
+          pending: false,
         };
         assert.deepEqual(state, expected);
       });
 
       it('returns correct state for request action', () => {
         const expected = {
-          data: [],
-          error: null,
-          fetching: true,
+          items: [],
+          fail: null,
+          pending: true,
         };
         assert.deepEqual(reducer(initialState, { type: actionType }), expected);
       });
@@ -92,12 +102,12 @@ describe('reducers', () => {
       it('returns correct state for success action', () => {
         const data = ['data'];
         const expected = {
-          data,
-          error: null,
-          fetching: false,
+          items: data,
+          fail: null,
+          pending: false,
         };
         const action = {
-          type: success(actionType),
+          type: localSuccess(actionType),
           payload: { data },
         };
         assert.deepEqual(reducer(initialState, action), expected);
@@ -106,12 +116,12 @@ describe('reducers', () => {
       it('returns correct state for error action', () => {
         const someError = 'error';
         const expected = {
-          data: [],
-          error: someError,
-          fetching: false,
+          items: [],
+          fail: someError,
+          pending: false,
         };
         const action = {
-          type: error(actionType),
+          type: localError(actionType),
           payload: { error: someError },
         };
         assert.deepEqual(reducer(initialState, action), expected);
