@@ -31,7 +31,8 @@
     "build:umd": "cross-env BABEL_ENV=es NODE_ENV=development webpack src dist/redux-saga-requests.js",
     "build:umd:min": "cross-env BABEL_ENV=es NODE_ENV=production webpack -p src dist/redux-saga-requests.min.js",
     "build": "npm-run-all clean -p build:commonjs build:es build:umd build:umd:min",
-    "build:watch": "nodemon --watch src --ignore src/**/*.spec.js --exec 'yarn run build:es'"
+    "build:watch": "nodemon --watch src --ignore src/**/*.spec.js --exec 'yarn run build:es'",
+    "prepublish": "yarn run build"
   },
   "peerDependencies": {
     "redux-saga": ">=0.15.0"
