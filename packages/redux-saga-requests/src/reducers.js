@@ -1,46 +1,51 @@
-import { success, error } from './actions';
+import { success, error, abort } from './actions';
 
 const getEmptyData = multiple => multiple ? [] : null;
 
-const getRequestState = ({ dataKey, errorKey, fetchingKey, multiple }) => ({
+const getInitialRequestState = ({ dataKey, errorKey, pendingKey, multiple }) => ({
   [dataKey]: getEmptyData(multiple),
-  [fetchingKey]: false,
+  [pendingKey]: 0,
   [errorKey]: null,
 });
 
 const getInitialState = (state, reducer, config) => {
   if (!reducer) {
-    return getRequestState(config);
+    return getInitialRequestState(config);
   }
 
-  return { ...getRequestState(config), ...reducer(undefined, {}) };
+  return { ...getInitialRequestState(config), ...reducer(undefined, {}) };
 };
 
 const defaultConfig = {
   getSuccessSuffix: success,
   getErrorSuffix: error,
+  getAbortSuffix: abort,
   dataKey: 'data',
   errorKey: 'error',
-  fetchingKey: 'fetching',
+  pendingKey: 'pending',
   multiple: false,
   getData: (state, action) => action.payload.data,
-  onRequest: (state, action, { dataKey, multiple, fetchingKey, errorKey }) => ({
+  onRequest: (state, action, { dataKey, multiple, pendingKey, errorKey }) => ({
     ...state,
     [dataKey]: getEmptyData(multiple),
-    [fetchingKey]: true,
+    [pendingKey]: state[pendingKey] + 1,
     [errorKey]: null,
   }),
-  onSuccess: (state, action, { dataKey, fetchingKey, errorKey, getData }) => ({
+  onSuccess: (state, action, { dataKey, pendingKey, errorKey, getData }) => ({
     ...state,
     [dataKey]: getData(state, action),
-    [fetchingKey]: false,
+    [pendingKey]: state[pendingKey] - 1,
     [errorKey]: null,
   }),
-  onError: (state, action, { dataKey, multiple, fetchingKey, errorKey }) => ({
+  onError: (state, action, { dataKey, multiple, pendingKey, errorKey }) => ({
     ...state,
     [dataKey]: getEmptyData(multiple),
-    [fetchingKey]: false,
+    [pendingKey]: state[pendingKey] - 1,
     [errorKey]: action.payload.error,
+  }),
+  onAbort: (state, action, { pendingKey }) => ({
+    ...state,
+    [pendingKey]: state[pendingKey] - 1,
   }),
 };
 
@@ -60,8 +65,10 @@ export const createRequestsReducer = (
     onRequest,
     onSuccess,
     onError,
+    onAbort,
     getSuccessSuffix,
     getErrorSuffix,
+    getAbortSuffix,
     actionType,
   } = config;
 
@@ -72,6 +79,8 @@ export const createRequestsReducer = (
       return onSuccess(state, action, config);
     case getErrorSuffix(actionType):
       return onError(state, action, config);
+    case getAbortSuffix(actionType):
+      return onAbort(state, action, config);
     default:
       return reducer ? reducer(nextState, action) : nextState;
   }
