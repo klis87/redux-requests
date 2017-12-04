@@ -10,11 +10,11 @@ import Post from './post';
 const mapStateToProps = state => ({
   photo: state.photo.data,
   photoIsFetched: state.photo.data !== null,
-  photoIsFetching: state.photo.fetching,
+  photoIsFetching: state.photo.pending > 0,
   photoFetchError: state.photo.error,
   post: state.post.data,
   postIsFetched: state.post.data !== null,
-  postIsFetching: state.post.pendingRequestsCounter > 0,
+  postIsFetching: state.post.pending > 0,
   postFetchError: state.post.error,
   abortCounter: state.abortCounter,
 });

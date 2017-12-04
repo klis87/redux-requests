@@ -1,3 +1,4 @@
+import { createRequestsReducer } from 'redux-saga-requests';
 import { createReducer } from 'redux-act';
 
 import { success, error, abort, fetchPhoto, clearPhoto, fetchPost, clearPost } from './actions';
@@ -9,37 +10,22 @@ export const abortCounterReducer = createReducer({
   [abort(fetchPost)]: increment,
 }, 0);
 
-const defaultPhotoState = {
-  data: null,
-  fetching: false,
-  error: false,
-};
+const requestsReducer = createRequestsReducer({
+  getSuccessSuffix: success,
+  getErrorSuffix: error,
+  getAbortSuffix: abort,
+});
 
-export const photoReducer = createReducer({
-  [fetchPhoto]: () => ({ ...defaultPhotoState, fetching: true }),
-  [success(fetchPhoto)]: (state, payload) => ({ ...defaultPhotoState, data: payload.data }),
-  [error(fetchPhoto)]: () => ({ ...defaultPhotoState, error: true }),
-  [clearPhoto]: state => ({ ...state, data: null, error: false }),
-}, defaultPhotoState);
+export const photoReducer = requestsReducer({ actionType: fetchPhoto.getType() }, createReducer({
+  [clearPhoto]: state => ({ ...state, data: null, error: null }),
+}));
 
-const defaultPostState = {
-  data: null,
-  pendingRequestsCounter: 0,
-  error: false,
-};
-
-export const postReducer = createReducer({
-  [fetchPost]: state => ({ ...defaultPostState, pendingRequestsCounter: state.pendingRequestsCounter + 1 }),
-  [success(fetchPost)]: (state, payload) => ({
-    ...defaultPostState,
-    data: { ...payload.data[0], comments: payload.data[1] },
-    pendingRequestsCounter: state.pendingRequestsCounter - 1,
+export const postReducer = requestsReducer(
+  {
+    actionType: fetchPost.getType(),
+    getData: (state, action) => ({ ...action.payload.data[0], comments: action.payload.data[1] }),
+  },
+  createReducer({
+    [clearPost]: state => ({ ...state, data: null, error: null }),
   }),
-  [error(fetchPost)]: state => ({
-    ...defaultPostState,
-    error: true,
-    pendingRequestsCounter: state.pendingRequestsCounter - 1
-  }),
-  [abort(fetchPost)]: state => ({ ...defaultPostState, pendingRequestsCounter: state.pendingRequestsCounter - 1 }),
-  [clearPost]: state => ({ ...state, data: null, error: false }),
-}, defaultPostState);
+);
