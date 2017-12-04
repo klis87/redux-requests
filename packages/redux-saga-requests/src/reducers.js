@@ -23,15 +23,16 @@ const defaultConfig = {
   errorKey: 'error',
   fetchingKey: 'fetching',
   multiple: false,
+  getData: (state, action) => action.payload.data,
   onRequest: (state, action, { dataKey, multiple, fetchingKey, errorKey }) => ({
     ...state,
     [dataKey]: getEmptyData(multiple),
     [fetchingKey]: true,
     [errorKey]: null,
   }),
-  onSuccess: (state, action, { dataKey, fetchingKey, errorKey }) => ({
+  onSuccess: (state, action, { dataKey, fetchingKey, errorKey, getData }) => ({
     ...state,
-    [dataKey]: action.payload.data,
+    [dataKey]: getData(state, action),
     [fetchingKey]: false,
     [errorKey]: null,
   }),

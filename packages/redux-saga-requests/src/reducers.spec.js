@@ -77,6 +77,7 @@ describe('reducers', () => {
         errorKey: 'fail',
         fetchingKey: 'pending',
         multiple: true,
+        getData: (state, action) => ({ nested: action.payload.data }),
         onRequest: (state, action, { dataKey, multiple, fetchingKey, errorKey }) => ({
           ...state,
           [dataKey]: multiple ? [] : null,
@@ -84,9 +85,9 @@ describe('reducers', () => {
           [errorKey]: null,
           multiple,
         }),
-        onSuccess: (state, action, { dataKey, multiple, fetchingKey, errorKey }) => ({
+        onSuccess: (state, action, { dataKey, multiple, fetchingKey, errorKey, getData }) => ({
           ...state,
-          [dataKey]: action.payload.data,
+          [dataKey]: getData(state, action),
           [fetchingKey]: false,
           [errorKey]: null,
           multiple,
@@ -124,7 +125,7 @@ describe('reducers', () => {
       it('returns correct state for success action', () => {
         const data = ['data'];
         const expected = {
-          items: data,
+          items: { nested: data },
           fail: null,
           pending: false,
           multiple: true,
