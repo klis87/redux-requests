@@ -77,6 +77,27 @@ describe('reducers', () => {
         errorKey: 'fail',
         fetchingKey: 'pending',
         multiple: true,
+        onRequest: (state, action, { dataKey, multiple, fetchingKey, errorKey }) => ({
+          ...state,
+          [dataKey]: multiple ? [] : null,
+          [fetchingKey]: true,
+          [errorKey]: null,
+          multiple,
+        }),
+        onSuccess: (state, action, { dataKey, multiple, fetchingKey, errorKey }) => ({
+          ...state,
+          [dataKey]: action.payload.data,
+          [fetchingKey]: false,
+          [errorKey]: null,
+          multiple,
+        }),
+        onError: (state, action, { dataKey, multiple, fetchingKey, errorKey }) => ({
+          ...state,
+          [dataKey]: multiple ? [] : null,
+          [fetchingKey]: false,
+          [errorKey]: action.payload.error,
+          multiple,
+        }),
       });
       const initialState = reducer(undefined, {});
 
@@ -95,6 +116,7 @@ describe('reducers', () => {
           items: [],
           fail: null,
           pending: true,
+          multiple: true,
         };
         assert.deepEqual(reducer(initialState, { type: actionType }), expected);
       });
@@ -105,6 +127,7 @@ describe('reducers', () => {
           items: data,
           fail: null,
           pending: false,
+          multiple: true,
         };
         const action = {
           type: localSuccess(actionType),
@@ -119,6 +142,7 @@ describe('reducers', () => {
           items: [],
           fail: someError,
           pending: false,
+          multiple: true,
         };
         const action = {
           type: localError(actionType),
