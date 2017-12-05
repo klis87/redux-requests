@@ -74,6 +74,18 @@ describe('reducers', () => {
         const action = { type: abort(actionType) };
         assert.deepEqual(reducer(defaultState, action), expected);
       });
+
+      it('supports action creator libraries', () => {
+        const expected = {
+          data: null,
+          error: null,
+          pending: 1,
+        };
+        const action = () => ({ type: actionType });
+        action.toString = () => actionType;
+        const reduxActReducer = requestsReducer({ actionType: action });
+        assert.deepEqual(reduxActReducer(defaultState, action()), expected);
+      });
     });
 
     describe('without passed reducer with local config override', () => {

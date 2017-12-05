@@ -16,13 +16,13 @@ const requestsReducer = createRequestsReducer({
   getAbortSuffix: abort,
 });
 
-export const photoReducer = requestsReducer({ actionType: fetchPhoto.getType() }, createReducer({
+export const photoReducer = requestsReducer({ actionType: fetchPhoto }, createReducer({
   [clearPhoto]: state => ({ ...state, data: null, error: null }),
 }));
 
 export const postReducer = requestsReducer(
   {
-    actionType: fetchPost.getType(),
+    actionType: fetchPost,
     getData: (state, action) => ({ ...action.payload.data[0], comments: action.payload.data[1] }),
   },
   createReducer({
