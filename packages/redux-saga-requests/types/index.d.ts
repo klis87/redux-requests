@@ -1,3 +1,5 @@
+import { AnyAction, Reducer } from 'redux';
+
 interface actionTypeModifier {
   (actionType: string): string;
 }
@@ -104,8 +106,61 @@ type action =
   | actionWithSingleRequest
   | actionWithMultipleRequests
   | actionWithSingleRequestAsPayload
-  | actionWithMultipleRequestAsPayload
+  | actionWithMultipleRequestAsPayload;
 
 export function sendRequest(action: action, dispatchRequestAction?: boolean): any;
 
 export function watchRequests(): any;
+
+interface getData {
+  (state: any, action: AnyAction): any;
+}
+
+interface onActionCallback {
+  (state: any, action: AnyAction, config: mergedReducerConfig): any;
+}
+
+type globalReducerConfig = {
+  getSuccessSuffix?: actionTypeModifier;
+  getErrorSuffix?: actionTypeModifier;
+  getAbortSuffix?: actionTypeModifier;
+  dataKey?: string;
+  errorKey?: string;
+  pendingKey?: string;
+  multiple?: boolean;
+  getData?: getData,
+  onRequest?: onActionCallback,
+  onSuccess?: onActionCallback,
+  onError?: onActionCallback,
+  onAbort?: onActionCallback,
+};
+
+type actionTypeReducerConfig = {
+  actionType: string;
+};
+
+type localReducerConfig = globalReducerConfig & actionTypeReducerConfig;
+
+type mergedReducerConfig = {
+  actionType: string;
+  getSuccessSuffix: actionTypeModifier;
+  getErrorSuffix: actionTypeModifier;
+  getAbortSuffix: actionTypeModifier;
+  dataKey: string;
+  errorKey: string;
+  pendingKey: string;
+  multiple: boolean;
+  getData: getData,
+  onRequest: onActionCallback,
+  onSuccess: onActionCallback,
+  onError: onActionCallback,
+  onAbort: onActionCallback,
+};
+
+interface requestsReducerType {
+  (localConfig: localReducerConfig, reducer?: Reducer<any>): Reducer<any>;
+}
+
+export const requestsReducer: requestsReducerType;
+
+export function createRequestsReducer(globalConfig?: globalReducerConfig): requestsReducerType;
