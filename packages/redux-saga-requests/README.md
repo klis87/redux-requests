@@ -9,7 +9,18 @@
 Redux-Saga addon to simplify handling of AJAX requests. It supports Axios and Fetch API, but different
 integrations could be added, as they are implemented in a plugin fashion.
 
-## Motivation
+## Table of content
+
+- [Motivation](#motivation)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Reducers](#reducers)
+- [Interceptors](#interceptors)
+- [Custom action suffixes](#custom-action-suffixes)
+- [Usage with Fetch API](#usage-with-fetch-api)
+- [Examples](#examples)
+
+## Motivation [:arrow_up:](#table-of-content)
 
 With `redux-saga-requests`, assuming you use `axios` you could refactor a code in the following way:
 ```diff
@@ -98,7 +109,7 @@ you don't need to worry that Axios interceptors would be shared across multiple 
 - `onRequest`, `onSuccess`, `onError` and `onAbort` interceptors, you can attach your sagas (or simple functions)
 to them to define a global behaviour for a given event type
 
-## Installation
+## Installation [:arrow_up:](#table-of-content)
 
 To install the package, just run:
 ```
