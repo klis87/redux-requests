@@ -269,7 +269,7 @@ const reducer = requestsReducer({ actionType: `FETCH_SOMETHING`, multiple: true 
 ```
 which will keep your empty data as `[]`, not `null`.
 
-For inspiration how you could override any of those attribues, see default config
+For inspiration how you could override any of those attributes, see default config
 [source](https://github.com/klis87/redux-saga-requests/blob/master/packages/redux-saga-requests/src/reducers.js#L19).
 
 You might also want to adjust any configuration for all your requests reducers globally. Here is how you can do this:
@@ -308,7 +308,7 @@ const state = {
 Basically, you can use `requestsReducer`, which will handle requests related logic in a configurable way with any custom
 logic you need.
 
-However, it `requestsReducer` seems too magical for you, this is totally fine, you can write your reducers in a standard
+However, if `requestsReducer` seems too magical for you, this is totally fine, you can write your reducers in a standard
 way too, but you might consider using `success`, `error` and `abort` helpers, which can add proper suffixes for you:
 ```javascript
 import { success, error } from 'redux-saga-requests';
