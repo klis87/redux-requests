@@ -11,14 +11,14 @@ integrations could be added, as they are implemented in a plugin fashion.
 
 ## Table of content
 
-- [Motivation](#motivation)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Reducers](#reducers)
-- [Interceptors](#interceptors)
-- [Custom action suffixes](#custom-action-suffixes)
-- [Usage with Fetch API](#usage-with-fetch-api)
-- [Examples](#examples)
+- [Motivation](#motivation-arrow_up)
+- [Installation](#installation-arrow_up)
+- [Usage](#usage-arrow_up)
+- [Reducers](#reducers-arrow_up)
+- [Interceptors](#interceptors-arrow_up)
+- [Custom action suffixes](#custom-action-suffixes-arrow_up)
+- [Usage with Fetch API](#usage-with-fetch-api-arrow_up)
+- [Examples](#examples-arrow_up)
 
 ## Motivation [:arrow_up:](#table-of-content)
 
@@ -143,7 +143,7 @@ Also, you need to install a driver:
 
 Of course, because this is Redux-Saga addon, you also need to install Redux-Saga.
 
-## Usage
+## Usage [:arrow_up:](#table-of-content)
 
 For a basic usage, see [Motivation](#motivation) paragraph. If you don't care about request cancellation, this will be
 probably all you need in your applications. You could also use [Interceptors](#interceptors), if you need to do
@@ -237,7 +237,7 @@ function* fetchBookSaga() {
 You can do whatever you want with it, which gives you maximum flexibility. You could even add Axios interceptors here,
 but it is preferable to use [Interceptors](#interceptors) from this library.
 
-## Reducers
+## Reducers [:arrow_up:](#table-of-content)
 
 Except for `watchRequests` and `sendRequest`, which can simplify your actions and sagas a lot, you can also use
 `requestsReducer`, a higher order reducer, which is responsible for a portion of your state related to a given request type.
@@ -349,7 +349,7 @@ const booksReducer = (state = initialState, action) => {
 };
 ```
 
-## Interceptors
+## Interceptors [:arrow_up:](#table-of-content)
 
 You can add global handlers to `onRequest`, `onSuccess`, `onError` add `onAbort`, like so:
 ```javascript
@@ -381,7 +381,7 @@ function* rootSaga() {
 }
 ```
 
-## Custom action suffixes
+## Custom action suffixes [:arrow_up:](#table-of-content)
 
 As a default, `success`, `error` and `abort` functions generate `_SUCCESS`, `_ERROR` and `_ABORT` suffixes respectively.
 However, it is possible to change them in a following way:
@@ -410,7 +410,7 @@ you need to pass in `createRequestInstance` config. Also, if you use `requestsRe
 of it with `createRequestsReducer` with your suffixes. Otherwise, instead of using built-in `success`, `error` and `abort`
 functions in your reducers, you will need to use your own ones.
 
-## Usage with Fetch API
+## Usage with Fetch API [:arrow_up:](#table-of-content)
 
 All of the above examples show Axios usage, in order to use Fetch API, use below snippet:
 ```javascript
@@ -451,7 +451,7 @@ The point is, you can use the same request config like you do with pure Fetch AP
 config itself. Also, one additional parameter you could provide in the config is `responseType`, which is set as `json`
 as the default. Available response types are: `arraybuffer`, `blob`, `formData`, `json`, `text`.
 
-## Examples
+## Examples [:arrow_up:](#table-of-content)
 
 I highly recommend to try examples how this package could be used in real applications. You could play with those demos
 and see what actions are being sent with [redux-devtools](https://github.com/zalmoxisus/redux-devtools-extension).
@@ -463,13 +463,13 @@ There are following examples currently:
 - [redux-act integration](https://github.com/klis87/redux-saga-requests/tree/master/examples/redux-act-integration)
 - [low-level-reducers](https://github.com/klis87/redux-saga-requests/tree/master/examples/low-level-reducers)
 
-## Credits
+## Credits [:arrow_up:](#table-of-content)
 
 This library was inspired by [redux-axios-middleware](https://github.com/svrcekmichal/redux-axios-middleware)
 (I highly recommend this library if someone doesn't use Redux-Saga!)
 and [issue](https://github.com/redux-saga/redux-saga/issues/1117) in Redux-Saga, when it was recommended not to combine
 another async middleware with sagas.
 
-## Licence
+## Licence [:arrow_up:](#table-of-content)
 
 MIT
