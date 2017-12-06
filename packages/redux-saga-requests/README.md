@@ -15,7 +15,7 @@ With `redux-saga-requests`, assuming you use `axios` you could refactor a code i
 ```diff
   import axios from 'axios';
 - import { takeEvery, put, call } from 'redux-saga/effects';
-+ import { createRequestInstance, watchRequests, success, error } from 'redux-saga-requests';
++ import { createRequestInstance, watchRequests, requestsReducer } from 'redux-saga-requests';
 + import axiosDriver from 'redux-saga-requests-axios';
 
   const FETCH_BOOKS = 'FETCH_BOOKS';
@@ -33,29 +33,25 @@ With `redux-saga-requests`, assuming you use `axios` you could refactor a code i
 +   },
 + });
 
-  const defaultState = {
-    data: null,
-    fetching: false,
-    error: false,
-  };
-
-  const booksReducer = (state = defaultState, action) => {
-    switch (action.type) {
-      case FETCH_BOOKS:
-        return { ...defaultState, fetching: true };
+- const defaultState = {
+-   data: null,
+-   pending: 0, // number of pending FETCH_BOOKS requests
+-   error: null,
+- };
+-
+- const booksReducer = (state = defaultState, action) => {
+-   switch (action.type) {
+-     case FETCH_BOOKS:
+-       return { ...defaultState, pending: state.pending + 1 };
 -     case FETCH_BOOKS_SUCCESS:
-+     case success(FETCH_BOOKS):
-        return {
-          ...defaultState,
-          data: { ...action.payload.data },
-        };
+-       return { ...defaultState, data: action.payload.data, pending: state.pending - 1 };
 -     case FETCH_BOOKS_ERROR:
-+     case error(FETCH_BOOKS):
-        return { ...defaultState, error: true };
-      default:
-        return state;
-    }
-  };
+-       return { ...defaultState, error: action.payload.error, pending: state.pending - 1 };
+-     default:
+-       return state;
+-   }
+- };
++ const booksReducer = requestsReducer({ actionType: FETCH_BOOKS });
 
 - const fetchBooksApi = () => axios.get('/books');
 -
@@ -75,12 +71,15 @@ With `redux-saga-requests`, assuming you use `axios` you could refactor a code i
   }
 ```
 With `redux-saga-requests`, you no longer need to define error and success actions to do things like error handling
-or showing loading spinners. You don't need to write repetitive sagas to create requests either.
+or showing loading spinners. You don't need to write requests related repetitive sagas and reducers either.
 
 Here you can see the list of features this library provides:
 - you define your AJAX requests as simple actions, like `{ type: FETCH_BOOKS, request: { url: '/books' } }` and `success`,
 `error` (`abort` is also supported, see below) actions will be dispatched automatically for you
 - `success`, `error` and `abort` functions, which add correct and consistent suffixes to your request action types
+(check [low-level-reducers example](https://github.com/klis87/redux-saga-requests/tree/master/examples/low-level-reducers)
+to see how to use those functions in your reducers)
+- `requestsReducer` higher order reducer, which takes requests related state management burden from your shoulders
 - automatic request abort - when a saga is cancelled, a request made by it is automatically aborted and an abort action
 is dispatched (especially handy with `takeLatest` and `race` Redux-Saga effects)
 - sending multiple requests in one action - `{ type: FETCH_BOOKS_AND_AUTHORS, request: [{ url: '/books' }, { url: '/authors}'] }`
@@ -91,9 +90,9 @@ or much more flexible `sendRequest`
 (see [advanced example](https://github.com/klis87/redux-saga-requests/tree/master/examples/advanced)),
 or... you could even access your request instance with `getRequestInstance`
 - support for Axios and Fetch API - additional clients could be added, you could even write your own client
-integration as a `driver` - see [./packages/redux-saga-requests-axios/src/axios-driver.js](https://github.com/klis87/redux-saga-requests/blob/monorepo/packages/redux-saga-requests-axios/src/axios-driver.js)
-for the example
-- compatible with `redux-act` and `redux-actions` libraries - see [redux-act example](https://github.com/klis87/redux-saga-requests/tree/master/examples/redux-act-integration)
+integration as a `driver` (see [./packages/redux-saga-requests-axios/src/axios-driver.js](https://github.com/klis87/redux-saga-requests/blob/master/packages/redux-saga-requests-axios/src/axios-driver.js)
+for the example)
+- compatible with `redux-act` and `redux-actions` libraries (see [redux-act example](https://github.com/klis87/redux-saga-requests/tree/master/examples/redux-act-integration))
 - simple to use with server side rendering - for example you could pass Axios instance to `createRequestInstance` and
 you don't need to worry that Axios interceptors would be shared across multiple requests
 - `onRequest`, `onSuccess`, `onError` and `onAbort` interceptors, you can attach your sagas (or simple functions)
@@ -135,12 +134,12 @@ Of course, because this is Redux-Saga addon, you also need to install Redux-Saga
 
 ## Usage
 
-For a basic usage, see `Motivation` paragraph. If you don't care about request cancellation, this will be probably all
-you need in your applications. You could also use interceptors, if you need to do something extra for every request,
-successful response or error.
+For a basic usage, see [Motivation](#motivation) paragraph. If you don't care about request cancellation, this will be
+probably all you need in your applications. You could also use [Interceptors](#interceptors), if you need to do
+something extra for every request, successful response or error. For reducers usage, see [Reducers](#reducers) paragraph.
 
-But, if you would like to take advantage of a possibility to cancel requests, instead of `watchRequests`, you will
-need to use `sendRequest`:
+Apart from the auto-mode `watchRequests`, this library provides also much more flexible and powerful (automatic requests
+abort to name a few) and flexible `sendRequest`:
 ```javascript
 import axios from 'axios';
 import { takeLatest } from 'redux-saga/effects';
@@ -160,8 +159,9 @@ function* rootSaga() {
 }
 ```
 Now, if `/books` request is pending and another `fetchPost` action is triggered, the previous request will be aborted
-and `FETCH_BOOKS_ABORT` will be dispatched. Of course, request cannot be really aborted for Fetch API according to their
-specifications, at least [not yet](https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort),
+and `FETCH_BOOKS_ABORT` will be dispatched. Please note, that requests aborts are working only for `axios` driver,
+request cannot be really aborted for Fetch API according to their specifications, at least
+[not yet](https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort),
 but you won't notice it in your application (apart from unnecessary request overhead) - `FETCH_BOOKS_ABORT` actions
 will still be fired.
 
@@ -197,7 +197,7 @@ function* rootSaga() {
 In above case, not only the last `/books` request could be successful, but also it could be aborted with `cancelRequest`
 action, as `sendRequest` would be aborted as it would lose with `take(CANCEL_REQUEST)` effect.
 
-Of course, you can send requests directly from your sagas:
+Of course, you can send requests directly also from your sagas:
 ```javascript
 function* fetchBookSaga() {
   const { response, error } = yield call(sendRequest, fetchBooks(), true);
@@ -224,7 +224,119 @@ function* fetchBookSaga() {
 }
 ```
 You can do whatever you want with it, which gives you maximum flexibility. You could even add Axios interceptors here,
-but it is preferable to use interceptors from this library.
+but it is preferable to use [Interceptors](#interceptors) from this library.
+
+## Reducers
+
+Except for `watchRequests` and `sendRequest`, which can simplify your actions and sagas a lot, you can also use
+`requestsReducer`, a higher order reducer, which is responsible for a portion of your state related to a given request type.
+For a general idea how it works, see [Motivation](#motivation) paragraph. This is just a minimal example, where with simple:
+```javascript
+const reducer = requestsReducer({ actionType: `FETCH_SOMETHING` });
+```
+you already have a working reducer which will handle `FETCH_SOMETHING`, `FETCH_SOMETHING_SUCCESS`,
+`FETCH_SOMETHING_ERROR` and `FETCH_SOMETHING_ABORT` actions, updating a following state attributes for you:
+- `data`: here a data from your API will be kept, updated after `FETCH_SOMETHING_SUCCESS` is dispatched, initially
+set to `null` (default) or `[]`, depending on `multiple` config attribute (see below)
+- `error`: initially `null`, updated to a HTTP error after `FETCH_SOMETHING_ERROR` is dispatched
+- `pending`: number of pending `FETCH_SOMETHING` requests, initially `0`, incremented by `1` for each `FETCH_SOMETHING`,
+and decremented by `1` for each of `FETCH_SOMETHING_SUCCESS`, `FETCH_SOMETHING_ERROR`, `FETCH_SOMETHING_ABORT`
+(implemeted as `integer`, not `boolean` due to possibility of multiple pending requests of the same type -
+for example in a sequence `FETCH_SOMETHING`, `FETCH_SOMETHING`, `FETCH_SOMETHING_SUCCESS` we would set `pending`
+to `false`, despite the fact 2nd `FETCH_SOMETHING` is still running, with `integer` `pending` will be set to `1`,
+which for example allows you to easily write a selector like `showSpinner = pending => pending > 0`)
+
+In order to be flexible, apart from `actionType` passed in `requestsReducer` config, optionally you can pass any of
+following attributes:
+- `multiple: boolean`: default to `false`, change it to `true` if you want your not loaded data to be stored as `[]`
+instead of `null`
+- `dataKey: string`: default to `'data'`, change it, if for some reason you want your data to be kept in a different key
+- `errorKey: string`: default to `'error'`, change it, if for some reason you want your errors to be kept in a different key
+- `pendingKey: string`: default to `'pending'`, change it, if for some reason you want your pending state to be kept in a different key
+- `getData: (state, action) => data`: describes how to get data from `action` object, returns `action.payload.data` as
+the default
+- `onRequest: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles request actions
+- `onSuccess: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles success actions
+- `onError: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles error actions
+- `onAbort: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles abort actions
+- `getSuccessAction: (actionType: string) => string`: adds `_SUCCESS` to `actionType` as a default
+- `getErrorAction: (actionType: string) => string`: adds `_ERROR` to `actionType` as a default
+- `getAbortAction: (actionType: string) => string`: adds `_ABORT` to `actionType` as a default
+
+For example:
+```javascript
+const reducer = requestsReducer({ actionType: `FETCH_SOMETHING`, multiple: true });
+```
+which will keep your empty data as `[]`, not `null`.
+
+For inspiration how you could override any of those attribues, see default config
+[source](https://github.com/klis87/redux-saga-requests/blob/master/packages/redux-saga-requests/src/reducers.js#L19).
+
+You might also want to adjust any configuration for all your requests reducers globally. Here is how you can do this:
+```javascript
+import { createRequestsReducer } from 'redux-saga-requests';
+
+const requestsReducer = createRequestsReducer({ errorKey: 'fail' });
+```
+Now, instead of built-in `requestsReducer`, you can use your own one, and from now on all errors will be kept in `fail`
+key in your state, not `error`.
+
+If you need to have an additional state next to built-in state in `requestsReducer`, or additional actions you would like
+it to handle, you can pass an optional custom reducer as a 2nd pararameter to `requestsReducer`:
+```javascript
+const activeReducer = (state = { active: false }, action) => {
+  switch (action.type) {
+    case `SET_ACTIVE`:
+      return { ...state, active: true };
+    case `SET_INACTIVE`:
+      return { ...state, active: false };
+    default:
+      return state;
+  }
+
+const reducer = requestsReducer({ actionType }, activeReducer);
+```
+which effectively will merge `activeReducer` with `requestsReducer`, giving you initial state:
+```javascript
+const state = {
+  data: null,
+  error: null,
+  pending: 0,
+  active: false,
+};
+```
+Basically, you can use `requestsReducer`, which will handle requests related logic in a configurable way with any custom
+logic you need.
+
+However, it `requestsReducer` seems too magical for you, this is totally fine, you can write your reducers in a standard
+way too, but you might consider using `success`, `error` and `abort` helpers, which can add proper suffixes for you:
+```javascript
+import { success, error } from 'redux-saga-requests';
+
+const initialState = {
+  data: null,
+  fetching: false,
+  error: false,
+};
+
+const FETCH_BOOKS = 'FETCH_BOOKS';
+
+const booksReducer = (state = initialState, action) => {
+  switch (action.type) {
+    case FETCH_BOOKS:
+      return { ...initialState, fetching: true };
+    case success(FETCH_BOOKS):
+      return {
+        ...initialState,
+        data: { ...action.payload.data },
+      };
+    case error(FETCH_BOOKS):
+      return { ...initialState, error: true };
+    default:
+      return state;
+  }
+};
+```
 
 ## Interceptors
 
@@ -264,7 +376,7 @@ As a default, `success`, `error` and `abort` functions generate `_SUCCESS`, `_ER
 However, it is possible to change them in a following way:
 ```javascript
 import axios from 'axios';
-import { getActionWithSuffix, watchRequests, createRequestInstance } from 'redux-saga-requests';
+import { getActionWithSuffix, watchRequests, createRequestInstance, createRequestsReducer } from 'redux-saga-requests';
 import axiosDriver from 'redux-saga-requests-axios'; // or a different driver
 
 const success = getActionWithSuffix('MY_SUCCESS_SUFFIX');
@@ -275,10 +387,17 @@ function* rootSaga() {
   yield createRequestInstance(axios, { driver: axiosDriver, success, error, abort });
   yield watchRequests();
 }
+
+const requestsReducer = createRequestsReducer({
+  getSuccessAction: success,
+  getErrorAction: error,
+  getAbortAction: abort,
+});
 ```
 So, basically you need to use `getActionWithSuffix` to create your own `success`, `error` and `abort` functions, which
-you need to pass in `createRequestInstance` config. Then, instead of using built-in `success`, `error` and `abort`
-functions in your reducers, you will use your own ones.
+you need to pass in `createRequestInstance` config. Also, if you use `requestsReducer`, you can create you own version
+of it with `createRequestsReducer` with your suffixes. Otherwise, instead of using built-in `success`, `error` and `abort`
+functions in your reducers, you will need to use your own ones.
 
 ## Usage with Fetch API
 
@@ -331,6 +450,7 @@ There are following examples currently:
 - [advanced](https://github.com/klis87/redux-saga-requests/tree/master/examples/advanced)
 - [Fetch API](https://github.com/klis87/redux-saga-requests/tree/master/examples/fetch-api)
 - [redux-act integration](https://github.com/klis87/redux-saga-requests/tree/master/examples/redux-act-integration)
+- [low-level-reducers](https://github.com/klis87/redux-saga-requests/tree/master/examples/low-level-reducers)
 
 ## Credits
 
