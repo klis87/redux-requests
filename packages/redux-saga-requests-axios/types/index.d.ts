@@ -1,1 +1,1 @@
-export { driver as default } from 'redux-saga-requests'
+export { Driver as default } from 'redux-saga-requests'

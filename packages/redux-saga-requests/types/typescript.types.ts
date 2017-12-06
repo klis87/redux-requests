@@ -3,7 +3,7 @@ import {
   error,
   abort,
   getActionWithSuffix,
-  driver,
+  Driver,
   createRequestInstance,
   getRequestInstance,
   sendRequest,
@@ -19,7 +19,7 @@ abort('type');
 const actionModifier = getActionWithSuffix('suffix');
 actionModifier('type');
 
-let dummyDriver: driver;
+let dummyDriver: Driver;
 
 dummyDriver.getSuccessPayload({}, {});
 dummyDriver.getErrorPayload({});
