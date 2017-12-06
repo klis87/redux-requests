@@ -3,11 +3,13 @@ import {
   error,
   abort,
   getActionWithSuffix,
-  driver,
+  Driver,
   createRequestInstance,
   getRequestInstance,
   sendRequest,
   watchRequests,
+  requestsReducer,
+  createRequestsReducer,
 } from './index';
 
 success('type');
@@ -17,7 +19,7 @@ abort('type');
 const actionModifier = getActionWithSuffix('suffix');
 actionModifier('type');
 
-let dummyDriver: driver;
+let dummyDriver: Driver;
 
 dummyDriver.getSuccessPayload({}, {});
 dummyDriver.getErrorPayload({});
@@ -47,3 +49,48 @@ sendRequest({ type: 'type', payload: { requests: [{}] } });
 sendRequest({ type: 'type', requests: [{}, {}] }, true);
 
 watchRequests();
+
+const globalConfig = {
+  getSuccessAction: success,
+  getErrorAction: error,
+  getAbortAction: abort,
+  dataKey: 'data',
+  errorKey: 'error',
+  pendingKey: 'pending',
+  multiple: false,
+  getData: (state, action) => action.payload.data,
+  onRequest: (state, action, { dataKey, multiple, pendingKey, errorKey }) => ({
+    ...state,
+    [dataKey]: null,
+    [pendingKey]: state[pendingKey] + 1,
+    [errorKey]: null,
+  }),
+  onSuccess: (state, action, { dataKey, pendingKey, errorKey, getData }) => ({
+    ...state,
+    [dataKey]: getData(state, action),
+    [pendingKey]: state[pendingKey] - 1,
+    [errorKey]: null,
+  }),
+  onError: (state, action, { dataKey, multiple, pendingKey, errorKey }) => ({
+    ...state,
+    [dataKey]: null,
+    [pendingKey]: state[pendingKey] - 1,
+    [errorKey]: action.payload.error,
+  }),
+  onAbort: (state, action, { pendingKey }) => ({
+    ...state,
+    [pendingKey]: state[pendingKey] - 1,
+  }),
+};
+requestsReducer({ actionType: 'actionType' });
+requestsReducer({
+  actionType: 'actionType',
+  ...globalConfig
+});
+requestsReducer({ actionType: 'actionType' }, (state, action) => state);
+
+createRequestsReducer()({ actionType: 'actionType' });
+createRequestsReducer(globalConfig)({
+  actionType: 'actionType',
+  ...globalConfig
+});

@@ -10,11 +10,11 @@ import Post from './post';
 const mapStateToProps = state => ({
   photo: state.photo.data,
   photoIsFetched: state.photo.data !== null,
-  photoIsFetching: state.photo.pending > 0,
+  photoIsFetching: state.photo.fetching,
   photoFetchError: state.photo.error,
   post: state.post.data,
   postIsFetched: state.post.data !== null,
-  postIsFetching: state.post.pending > 0,
+  postIsFetching: state.post.fetching,
   postFetchError: state.post.error,
 });
 
@@ -42,7 +42,7 @@ const App = ({
   clearPost,
 }) => (
   <div>
-    <h1>Redux Saga Requests basic example</h1>
+    <h1>Redux Saga Requests low level reducers example</h1>
     <hr />
     <div>
       <h2>Photo</h2>

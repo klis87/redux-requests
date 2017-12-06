@@ -25,13 +25,14 @@
     "clean": "rimraf es lib dist",
     "lint": "eslint src/**",
     "test": "cross-env BABEL_ENV=commonjs mocha -r babel-register -r babel-polyfill -r chai/register-assert 'src/**/*.spec.js' 'types/**/*.spec.js'",
-    "test:cover": "cross-env BABEL_ENV=coverage mocha -r babel-register -r babel-polyfill -r chai/register-assert 'src/**/*.spec.js'",
+    "test:cover": "cross-env BABEL_ENV=coverage mocha -r babel-register -r babel-polyfill -r chai/register-assert 'src/**/*.spec.js' 'types/**/*.spec.js'",
     "build:commonjs": "cross-env BABEL_ENV=commonjs babel src --out-dir lib --ignore spec.js",
     "build:es": "cross-env BABEL_ENV=es babel src --out-dir es --ignore spec.js",
     "build:umd": "cross-env BABEL_ENV=es NODE_ENV=development webpack src dist/redux-saga-requests-fetch.js",
     "build:umd:min": "cross-env BABEL_ENV=es NODE_ENV=production webpack -p src dist/redux-saga-requests-fetch.min.js",
     "build": "npm-run-all clean -p build:commonjs build:es build:umd build:umd:min",
-    "build:watch": "nodemon --watch src --ignore src/**/*.spec.js --exec 'yarn run build:es'"
+    "build:watch": "nodemon --watch src --ignore src/**/*.spec.js --exec 'yarn run build:es'",
+    "prepublish": "yarn run build"
   },
   "dependencies": {
     "axios": ">=0.16.0"

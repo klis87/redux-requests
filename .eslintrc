@@ -10,6 +10,9 @@
   "rules": {
     "max-len": [0, 120],
     "no-else-return": 0,
+    "no-confusing-arrow": 0,
+    "space-before-function-paren": 0,
+    "func-names": 0,
     "import/prefer-default-export": 0,
     "import/no-extraneous-dependencies": [2, {"peerDependencies": true, "devDependencies": false}],
     "import/named": 2,
