@@ -94,9 +94,9 @@ describe('reducers', () => {
       const localAbort = getActionWithSuffix('abort');
       const reducer = requestsReducer({
         actionType,
-        getSuccessSuffix: localSuccess,
-        getErrorSuffix: localError,
-        getAbortSuffix: localAbort,
+        getSuccessAction: localSuccess,
+        getErrorAction: localError,
+        getAbortAction: localAbort,
         dataKey: 'items',
         errorKey: 'fail',
         pendingKey: 'fetching',

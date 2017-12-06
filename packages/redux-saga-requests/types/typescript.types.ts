@@ -51,9 +51,9 @@ sendRequest({ type: 'type', requests: [{}, {}] }, true);
 watchRequests();
 
 const globalConfig = {
-  getSuccessSuffix: success,
-  getErrorSuffix: error,
-  getAbortSuffix: abort,
+  getSuccessAction: success,
+  getErrorAction: error,
+  getAbortAction: abort,
   dataKey: 'data',
   errorKey: 'error',
   pendingKey: 'pending',

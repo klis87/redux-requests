@@ -20,9 +20,9 @@ const getInitialState = (state, reducer, config) => {
 };
 
 const defaultConfig = {
-  getSuccessSuffix: success,
-  getErrorSuffix: error,
-  getAbortSuffix: abort,
+  getSuccessAction: success,
+  getErrorAction: error,
+  getAbortAction: abort,
   dataKey: 'data',
   errorKey: 'error',
   pendingKey: 'pending',
@@ -69,9 +69,9 @@ export const createRequestsReducer = (
     onSuccess,
     onError,
     onAbort,
-    getSuccessSuffix,
-    getErrorSuffix,
-    getAbortSuffix,
+    getSuccessAction,
+    getErrorAction,
+    getAbortAction,
     actionType,
   } = config;
 
@@ -80,11 +80,11 @@ export const createRequestsReducer = (
   switch (action.type) {
     case normalizedActionType:
       return onRequest(state, action, config);
-    case getSuccessSuffix(normalizedActionType):
+    case getSuccessAction(normalizedActionType):
       return onSuccess(state, action, config);
-    case getErrorSuffix(normalizedActionType):
+    case getErrorAction(normalizedActionType):
       return onError(state, action, config);
-    case getAbortSuffix(normalizedActionType):
+    case getAbortAction(normalizedActionType):
       return onAbort(state, action, config);
     default:
       return reducer ? reducer(nextState, action) : nextState;

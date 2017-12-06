@@ -121,9 +121,9 @@ interface OnActionCallback {
 }
 
 type GlobalReducerConfig = {
-  getSuccessSuffix?: ActionTypeModifier;
-  getErrorSuffix?: ActionTypeModifier;
-  getAbortSuffix?: ActionTypeModifier;
+  getSuccessAction?: ActionTypeModifier;
+  getErrorAction?: ActionTypeModifier;
+  getAbortAction?: ActionTypeModifier;
   dataKey?: string;
   errorKey?: string;
   pendingKey?: string;
@@ -143,9 +143,9 @@ type LocalReducerConfig = GlobalReducerConfig & ActionTypeReducerConfig;
 
 type MergedReducerConfig = {
   actionType: string;
-  getSuccessSuffix: ActionTypeModifier;
-  getErrorSuffix: ActionTypeModifier;
-  getAbortSuffix: ActionTypeModifier;
+  getSuccessAction: ActionTypeModifier;
+  getErrorAction: ActionTypeModifier;
+  getAbortAction: ActionTypeModifier;
   dataKey: string;
   errorKey: string;
   pendingKey: string;
