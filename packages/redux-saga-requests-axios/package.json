@@ -25,7 +25,7 @@
     "clean": "rimraf es lib dist",
     "lint": "eslint src/**",
     "test": "cross-env BABEL_ENV=commonjs mocha -r babel-register -r babel-polyfill -r chai/register-assert 'src/**/*.spec.js' 'types/**/*.spec.js'",
-    "test:cover": "cross-env BABEL_ENV=coverage mocha -r babel-register -r babel-polyfill -r chai/register-assert 'src/**/*.spec.js'",
+    "test:cover": "cross-env BABEL_ENV=coverage mocha -r babel-register -r babel-polyfill -r chai/register-assert 'src/**/*.spec.js' 'types/**/*.spec.js'",
     "report": "nyc report",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
     "build:commonjs": "cross-env BABEL_ENV=commonjs babel src --out-dir lib --ignore spec.js",
