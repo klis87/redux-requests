@@ -14,7 +14,7 @@
   "devDependencies": {
     "coveralls": "2.13.1",
     "lerna": "2.5.1",
-    "nyc": "11.2.1"
+    "nyc": "11.3.0"
   },
   "nyc": {
     "exclude": [
