@@ -63,6 +63,6 @@
     "sinon": "3.3.0",
     "typescript": "2.5.3",
     "typescript-definition-tester": "0.0.5",
-    "webpack": "3.6.0"
+    "webpack": "3.10.0"
   }
 }
