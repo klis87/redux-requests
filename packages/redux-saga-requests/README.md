@@ -149,7 +149,7 @@ For a basic usage, see [Motivation](#motivation) paragraph. If you don't care ab
 probably all you need in your applications. You could also use [Interceptors](#interceptors), if you need to do
 something extra for every request, successful response or error. For reducers usage, see [Reducers](#reducers) paragraph.
 
-Apart from the auto-mode `watchRequests`, this library provides also much more flexible and powerful (automatic requests
+Apart from the auto-mode `watchRequests`, this library provides also much more powerful (automatic requests
 abort to name a few) and flexible `sendRequest`:
 ```javascript
 import axios from 'axios';
