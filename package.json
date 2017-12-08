@@ -12,7 +12,7 @@
     "coveralls": "nyc report --reporter=text-lcov | coveralls"
   },
   "devDependencies": {
-    "coveralls": "2.13.1",
+    "coveralls": "3.0.0",
     "lerna": "2.5.1",
     "nyc": "11.3.0"
   },
