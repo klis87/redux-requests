@@ -16,7 +16,7 @@
     "react-dom": "16.2.0",
     "react-redux": "5.0.6",
     "redux": "3.7.2",
-    "redux-saga": "0.15.6"
+    "redux-saga": "0.16.0"
   },
   "devDependencies": {
     "babel-core": "6.26.0",
