@@ -58,7 +58,7 @@ export function* sendRequest(action, dispatchRequestAction = false) {
     yield put(action);
   }
 
-  const driver = requestsConfig.driver;
+  const { driver } = requestsConfig;
   const requestHandlers = yield call([driver, 'getRequestHandlers'], requestInstance, requestsConfig);
 
   const dispatchSuccessAction = data => ({

@@ -13,6 +13,8 @@
     "no-confusing-arrow": 0,
     "space-before-function-paren": 0,
     "func-names": 0,
+    "object-curly-newline": [2, {"minProperties": 6, "consistent": true}],
+    "function-paren-newline": [2, "consistent"],
     "import/prefer-default-export": 0,
     "import/no-extraneous-dependencies": [2, {"peerDependencies": true, "devDependencies": false}],
     "import/named": 2,
