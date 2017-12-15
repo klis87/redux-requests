@@ -3605,9 +3605,9 @@ node-pre-gyp@^0.6.39:
     tar "^2.2.1"
     tar-pack "^3.4.0"
 
-nodemon@1.12.7:
-  version "1.12.7"
-  resolved "https://registry.yarnpkg.com/nodemon/-/nodemon-1.12.7.tgz#4d0fa8386291c4f532f583cc102c05350722f647"
+nodemon@1.13.0:
+  version "1.13.0"
+  resolved "https://registry.yarnpkg.com/nodemon/-/nodemon-1.13.0.tgz#de794b62c3fc149151766681993b565ccc91c064"
   dependencies:
     chokidar "^1.7.0"
     debug "^2.6.8"
