@@ -3269,9 +3269,9 @@ redent@^1.0.0:
     indent-string "^2.1.0"
     strip-indent "^1.0.1"
 
-redux-act@1.5.1:
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/redux-act/-/redux-act-1.5.1.tgz#9eaffa6880dc668730b0524e74f24a60273fe423"
+redux-act@1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/redux-act/-/redux-act-1.6.0.tgz#cd39761a16fbf553b9c908d8193fe1d61442421f"
 
 redux-saga@0.16.0:
   version "0.16.0"
