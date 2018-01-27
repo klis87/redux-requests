@@ -7,6 +7,7 @@ export const voidCallback = () => {};
 
 export const defaultConfig = {
   driver: null,
+  fsa: false,
   success,
   error,
   abort,
@@ -63,9 +64,16 @@ export function* sendRequest(action, dispatchRequestAction = false) {
 
   const dispatchSuccessAction = data => ({
     type: requestsConfig.success(action.type),
-    payload: {
+    ...requestsConfig.fsa ? ({
+      payload: {
+        data,
+      },
+    }) : ({
       data,
-      meta: action,
+    }),
+    meta: {
+      ...action.meta,
+      requestAction: action,
     },
   });
 
@@ -92,9 +100,15 @@ export function* sendRequest(action, dispatchRequestAction = false) {
     const errorPayload = yield call(driver.getErrorPayload, e);
     yield put({
       type: requestsConfig.error(action.type),
-      payload: {
+      ...requestsConfig.fsa ? ({
+        payload: errorPayload,
+        error: true,
+      }) : ({
         error: errorPayload,
-        meta: action,
+      }),
+      meta: {
+        ...action.meta,
+        requestAction: action,
       },
     });
     yield call(requestsConfig.onError, e);
@@ -104,8 +118,9 @@ export function* sendRequest(action, dispatchRequestAction = false) {
       yield abortRequestIfDefined(requestHandlers.abortRequest);
       yield put({
         type: requestsConfig.abort(action.type),
-        payload: {
-          meta: action,
+        meta: {
+          ...action.meta,
+          requestAction: action,
         },
       });
       yield call(requestsConfig.onAbort);

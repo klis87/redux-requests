@@ -27,24 +27,26 @@ const defaultConfig = {
   errorKey: 'error',
   pendingKey: 'pending',
   multiple: false,
-  getData: (state, action) => action.payload.data,
+  fsa: false,
+  getData: (state, action, { fsa }) => (fsa ? action.payload.data : action.data),
+  getError: (state, action, { fsa }) => (fsa ? action.payload : action.error),
   onRequest: (state, action, { dataKey, multiple, pendingKey, errorKey }) => ({
     ...state,
     [dataKey]: getEmptyData(multiple),
     [pendingKey]: state[pendingKey] + 1,
     [errorKey]: null,
   }),
-  onSuccess: (state, action, { dataKey, pendingKey, errorKey, getData }) => ({
+  onSuccess: (state, action, { dataKey, pendingKey, errorKey, getData, fsa }) => ({
     ...state,
-    [dataKey]: getData(state, action),
+    [dataKey]: getData(state, action, { fsa }),
     [pendingKey]: state[pendingKey] - 1,
     [errorKey]: null,
   }),
-  onError: (state, action, { dataKey, multiple, pendingKey, errorKey }) => ({
+  onError: (state, action, { dataKey, multiple, pendingKey, errorKey, getError, fsa }) => ({
     ...state,
     [dataKey]: getEmptyData(multiple),
     [pendingKey]: state[pendingKey] - 1,
-    [errorKey]: action.payload.error,
+    [errorKey]: getError(state, action, { fsa }),
   }),
   onAbort: (state, action, { pendingKey }) => ({
     ...state,

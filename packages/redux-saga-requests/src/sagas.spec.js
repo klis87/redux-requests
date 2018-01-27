@@ -15,6 +15,7 @@ import {
   voidCallback,
 } from './sagas';
 
+// TODO: implement those test with a saga test library
 const dummyDriver = {
   getSuccessPayload: () => {},
   getErrorPayload: () => {},
@@ -38,6 +39,7 @@ describe('sagas', () => {
         error,
         abort,
         driver: null,
+        fsa: false,
         onRequest: voidCallback,
         onSuccess: voidCallback,
         onError: voidCallback,
@@ -69,6 +71,7 @@ describe('sagas', () => {
         onSuccess: voidCallback,
         onError: voidCallback,
         onAbort: voidCallback,
+        fsa: false,
       };
 
       const expected = setContext({
@@ -103,8 +106,6 @@ describe('sagas', () => {
   });
 
   describe('sendRequest', () => {
-    const config = { ...defaultConfig, driver: dummyDriver };
-
     describe('with correct payload with dispatchRequestAction', () => {
       it('dispatches request action', () => {
         const action = { type: 'FETCH', request: { url: '/url' } };
@@ -116,6 +117,7 @@ describe('sagas', () => {
     });
 
     describe('with correct payload', () => {
+      const config = { ...defaultConfig, driver: dummyDriver, fsa: true };
       const action = {
         type: 'FETCH',
         payload: {
@@ -161,9 +163,10 @@ describe('sagas', () => {
         assert.deepEqual(errorGen.throw(requestError).value, call(dummyDriver.getErrorPayload, requestError));
         const expected = put({
           type: error(action.type),
-          payload: {
-            error: errorPayload,
-            meta: action,
+          payload: errorPayload,
+          error: true,
+          meta: {
+            requestAction: action,
           },
         });
         assert.deepEqual(errorGen.next(errorPayload).value, expected);
@@ -181,7 +184,9 @@ describe('sagas', () => {
           type: success(action.type),
           payload: {
             data: response.data,
-            meta: action,
+          },
+          meta: {
+            requestAction: action,
           },
         });
         assert.deepEqual(gen.next(response.data).value, expected);
@@ -200,8 +205,8 @@ describe('sagas', () => {
         assert.deepEqual(gen.next(true).value, abortRequestIfDefined(requestHandlers.abortRequest));
         const expected = put({
           type: abort(action.type),
-          payload: {
-            meta: action,
+          meta: {
+            requestAction: action,
           },
         });
         assert.deepEqual(gen.next().value, expected);
@@ -214,6 +219,7 @@ describe('sagas', () => {
     });
 
     describe('with correct payload with multiple requests', () => {
+      const config = { ...defaultConfig, driver: dummyDriver, fsa: false };
       const action = { type: 'FETCH_MULTIPLE', requests: [{ url: '/url1' }, { url: '/url2' }] };
       const gen = sendRequest(action);
       const requestInstance = () => ({ type: 'axios' });
@@ -255,9 +261,9 @@ describe('sagas', () => {
         const data = [responses[0].data, responses[1].data];
         const expected = put({
           type: success(action.type),
-          payload: {
-            data,
-            meta: action,
+          data,
+          meta: {
+            requestAction: action,
           },
         });
         assert.deepEqual(gen.next(data).value, expected);

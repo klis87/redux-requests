@@ -13,7 +13,7 @@ export const photoReducer = (state = defaultState, action) => {
     case FETCH_PHOTO:
       return { ...defaultState, fetching: true };
     case success(FETCH_PHOTO):
-      return { ...defaultState, data: action.payload.data };
+      return { ...defaultState, data: action.data };
     case error(FETCH_PHOTO):
       return { ...defaultState, error: true };
     case CLEAR_PHOTO:
@@ -30,7 +30,7 @@ export const postReducer = (state = defaultState, action) => {
     case success(FETCH_POST):
       return {
         ...defaultState,
-        data: { ...action.payload.data[0], comments: action.payload.data[1] },
+        data: { ...action.data[0], comments: action.data[1] },
       };
     case error(FETCH_POST):
       return { ...defaultState, error: true };
