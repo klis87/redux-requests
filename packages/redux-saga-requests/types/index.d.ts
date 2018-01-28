@@ -116,6 +116,10 @@ interface GetData {
   (state: any, action: AnyAction): any;
 }
 
+interface GetError {
+  (state: any, action: AnyAction): any;
+}
+
 interface OnActionCallback {
   (state: any, action: AnyAction, config: MergedReducerConfig): any;
 }
@@ -129,6 +133,7 @@ type GlobalReducerConfig = {
   pendingKey?: string;
   multiple?: boolean;
   getData?: GetData,
+  getError?: GetError,
   onRequest?: OnActionCallback,
   onSuccess?: OnActionCallback,
   onError?: OnActionCallback,
@@ -151,6 +156,7 @@ type MergedReducerConfig = {
   pendingKey: string;
   multiple: boolean;
   getData: GetData,
+  getError: GetError,
   onRequest: OnActionCallback,
   onSuccess: OnActionCallback,
   onError: OnActionCallback,
