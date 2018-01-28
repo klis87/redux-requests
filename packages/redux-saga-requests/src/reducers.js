@@ -27,7 +27,8 @@ const defaultConfig = {
   errorKey: 'error',
   pendingKey: 'pending',
   multiple: false,
-  getData: (state, action) => action.payload.data,
+  getData: (state, action) => (action.payload ? action.payload.data : action.data),
+  getError: (state, action) => (action.payload ? action.payload : action.error),
   onRequest: (state, action, { dataKey, multiple, pendingKey, errorKey }) => ({
     ...state,
     [dataKey]: getEmptyData(multiple),
@@ -40,11 +41,11 @@ const defaultConfig = {
     [pendingKey]: state[pendingKey] - 1,
     [errorKey]: null,
   }),
-  onError: (state, action, { dataKey, multiple, pendingKey, errorKey }) => ({
+  onError: (state, action, { dataKey, multiple, pendingKey, errorKey, getError }) => ({
     ...state,
     [dataKey]: getEmptyData(multiple),
     [pendingKey]: state[pendingKey] - 1,
-    [errorKey]: action.payload.error,
+    [errorKey]: getError(state, action),
   }),
   onAbort: (state, action, { pendingKey }) => ({
     ...state,

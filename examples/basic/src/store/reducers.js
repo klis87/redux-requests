@@ -14,7 +14,7 @@ export const photoReducer = requestsReducer({ actionType: FETCH_PHOTO }, (state,
 export const postReducer = requestsReducer(
   {
     actionType: FETCH_POST,
-    getData: (state, action) => ({ ...action.payload.data[0], comments: action.payload.data[1] }),
+    getData: (state, action) => ({ ...action.data[0], comments: action.data[1] }),
   },
   (state, action) => {
     switch (action.type) {

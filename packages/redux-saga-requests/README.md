@@ -14,9 +14,11 @@ integrations could be added, as they are implemented in a plugin fashion.
 - [Motivation](#motivation-arrow_up)
 - [Installation](#installation-arrow_up)
 - [Usage](#usage-arrow_up)
+- [Actions](#actions-arrow_up)
 - [Reducers](#reducers-arrow_up)
 - [Interceptors](#interceptors-arrow_up)
 - [Custom action suffixes](#custom-action-suffixes-arrow_up)
+- [FSA](#fsa-arrow_up)
 - [Usage with Fetch API](#usage-with-fetch-api-arrow_up)
 - [Examples](#examples-arrow_up)
 
@@ -34,8 +36,8 @@ With `redux-saga-requests`, assuming you use `axios` you could refactor a code i
 - const FETCH_BOOKS_ERROR = 'FETCH_BOOKS_ERROR';
 
 - const fetchBooks = () => ({ type: FETCH_BOOKS });
-- const fetchBooksSuccess = data => ({ type: FETCH_BOOKS_SUCCESS, payload: { data } });
-- const fetchBooksError = error => ({ type: FETCH_BOOKS_ERROR, payload: { error } });
+- const fetchBooksSuccess = data => ({ type: FETCH_BOOKS_SUCCESS, data });
+- const fetchBooksError = error => ({ type: FETCH_BOOKS_ERROR, error });
 + const fetchBooks = () => ({
 +   type: FETCH_BOOKS,
 +   request: {
@@ -55,9 +57,9 @@ With `redux-saga-requests`, assuming you use `axios` you could refactor a code i
 -     case FETCH_BOOKS:
 -       return { ...defaultState, pending: state.pending + 1 };
 -     case FETCH_BOOKS_SUCCESS:
--       return { ...defaultState, data: action.payload.data, pending: state.pending - 1 };
+-       return { ...defaultState, data: action.data, pending: state.pending - 1 };
 -     case FETCH_BOOKS_ERROR:
--       return { ...defaultState, error: action.payload.error, pending: state.pending - 1 };
+-       return { ...defaultState, error: action.error, pending: state.pending - 1 };
 -     default:
 -       return state;
 -   }
@@ -103,7 +105,7 @@ or... you could even access your request instance with `getRequestInstance`
 - support for Axios and Fetch API - additional clients could be added, you could even write your own client
 integration as a `driver` (see [./packages/redux-saga-requests-axios/src/axios-driver.js](https://github.com/klis87/redux-saga-requests/blob/master/packages/redux-saga-requests-axios/src/axios-driver.js)
 for the example)
-- compatible with `redux-act` and `redux-actions` libraries (see [redux-act example](https://github.com/klis87/redux-saga-requests/tree/master/examples/redux-act-integration))
+- compatible with FSA, `redux-act` and `redux-actions` libraries (see [redux-act example](https://github.com/klis87/redux-saga-requests/tree/master/examples/redux-act-integration))
 - simple to use with server side rendering - for example you could pass Axios instance to `createRequestInstance` and
 you don't need to worry that Axios interceptors would be shared across multiple requests
 - `onRequest`, `onSuccess`, `onError` and `onAbort` interceptors, you can attach your sagas (or simple functions)
@@ -237,6 +239,91 @@ function* fetchBookSaga() {
 You can do whatever you want with it, which gives you maximum flexibility. You could even add Axios interceptors here,
 but it is preferable to use [Interceptors](#interceptors) from this library.
 
+## Actions [:arrow_up:](#table-of-content)
+
+No matter whether you use `watchRequests` or `sendRequest`, you only need to define request actions, which will trigger AJAX
+calls for you, as well as dispatch success, error or abort actions. Lets say you defined a following request
+action:
+```js
+const fetchBooks = (id) => ({
+  type: 'DELETE_BOOK',
+  request: {
+    url: `/books/${id}`,
+    method: 'delete'
+  },
+  meta: { // meta is optional, it will be added to success, error or abort action when defined
+    id,
+  },
+});
+```
+
+With this request action, assuming `id = 1`, following actions will be dispatched, depending on the request outcome:
+
+### Successful response
+
+```js
+{
+  type: 'DELETE_BOOK_SUCCESS',
+  data: 'a server response',
+  meta: {
+    id: 1, // got from request action meta
+    requestAction: {
+      type: 'DELETE_BOOK',
+      request: {
+        url: '/books/1',
+        method: 'delete'
+      },
+      meta: {
+        id: 1,
+      },
+    },
+  },
+}
+```
+
+### Error response
+
+```js
+{
+  type: 'DELETE_BOOK_ERROR',
+  error: 'a server error',
+  meta: {
+    id: 1, // got from request action meta
+    requestAction: {
+      type: 'DELETE_BOOK',
+      request: {
+        url: '/books/1',
+        method: 'delete'
+      },
+      meta: {
+        id: 1,
+      },
+    },
+  },
+}
+```
+
+### Aborted request
+
+```js
+{
+  type: 'DELETE_BOOK_ABORT',
+  meta: {
+    id: 1, // got from request action meta
+    requestAction: {
+      type: 'DELETE_BOOK',
+      request: {
+        url: '/books/1',
+        method: 'delete'
+      },
+      meta: {
+        id: 1,
+      },
+    },
+  },
+}
+```
+
 ## Reducers [:arrow_up:](#table-of-content)
 
 Except for `watchRequests` and `sendRequest`, which can simplify your actions and sagas a lot, you can also use
@@ -264,8 +351,10 @@ instead of `null`
 - `dataKey: string`: default to `'data'`, change it, if for some reason you want your data to be kept in a different key
 - `errorKey: string`: default to `'error'`, change it, if for some reason you want your errors to be kept in a different key
 - `pendingKey: string`: default to `'pending'`, change it, if for some reason you want your pending state to be kept in a different key
-- `getData: (state, action) => data`: describes how to get data from `action` object, returns `action.payload.data` as
-the default
+- `getData: (state, action) => data`: describes how to get data from `action` object, returns `action.data` or `action.payload.data`
+when action is FSA compliant
+- `getError: (state, action) => data`: describes how to get error from `action` object, returns `action.error` or `action.payload`
+when action is FSA compliant
 - `onRequest: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles request actions
 - `onSuccess: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles success actions
 - `onError: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles error actions
@@ -322,7 +411,7 @@ logic you need.
 However, if `requestsReducer` seems too magical for you, this is totally fine, you can write your reducers in a standard
 way too, but you might consider using `success`, `error` and `abort` helpers, which can add proper suffixes for you:
 ```javascript
-import { success, error } from 'redux-saga-requests';
+import { success, error, abort } from 'redux-saga-requests';
 
 const initialState = {
   data: null,
@@ -339,10 +428,12 @@ const booksReducer = (state = initialState, action) => {
     case success(FETCH_BOOKS):
       return {
         ...initialState,
-        data: { ...action.payload.data },
+        data: { ...action.data },
       };
     case error(FETCH_BOOKS):
       return { ...initialState, error: true };
+    case abort(FETCH_BOOKS):
+      return { ...initialState, fetching: false };
     default:
       return state;
   }
@@ -409,6 +500,27 @@ So, basically you need to use `getActionWithSuffix` to create your own `success`
 you need to pass in `createRequestInstance` config. Also, if you use `requestsReducer`, you can create you own version
 of it with `createRequestsReducer` with your suffixes. Otherwise, instead of using built-in `success`, `error` and `abort`
 functions in your reducers, you will need to use your own ones.
+
+## FSA [:arrow_up:](#table-of-content)
+
+If you like your actions to be compatible with
+[Flux Standard Action](https://github.com/acdlite/flux-standard-action#flux-standard-action),
+that's totally fine, you can define your request actions like:
+```js
+const fetchBooks = () => ({
+  type: 'FETCH_BOOKS',
+  payload: {
+    request: {
+      url: '/books',
+    },
+  },
+  meta: { // optional
+    someKey: 'someValue',
+  },
+});
+```
+Then, success, error and abort actions will also be FSA compliant. Moreover, `requestsReducer` will also correctly handle FSA actions.
+For details, see [redux-act example](https://github.com/klis87/redux-saga-requests/tree/master/examples/redux-act-integration).
 
 ## Usage with Fetch API [:arrow_up:](#table-of-content)
 

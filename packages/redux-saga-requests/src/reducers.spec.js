@@ -46,7 +46,7 @@ describe('reducers', () => {
         };
         const action = {
           type: success(actionType),
-          payload: { data },
+          data,
         };
         assert.deepEqual(reducer(defaultState, action), expected);
       });
@@ -60,7 +60,7 @@ describe('reducers', () => {
         };
         const action = {
           type: error(actionType),
-          payload: { error: someError },
+          error: someError,
         };
         assert.deepEqual(reducer(defaultState, action), expected);
       });
@@ -120,7 +120,7 @@ describe('reducers', () => {
           ...state,
           [dataKey]: multiple ? [] : null,
           [pendingKey]: state[pendingKey] - 1,
-          [errorKey]: action.payload.error,
+          [errorKey]: action.payload,
           multiple,
         }),
         onAbort: (state, action, { pendingKey, multiple }) => ({
@@ -176,7 +176,7 @@ describe('reducers', () => {
         };
         const action = {
           type: localError(actionType),
-          payload: { error: someError },
+          payload: someError,
         };
         assert.deepEqual(reducer(initialState, action), expected);
       });
@@ -257,7 +257,7 @@ describe('reducers', () => {
         };
         const action = {
           type: error(actionType),
-          payload: { error: someError },
+          payload: someError,
         };
         assert.deepEqual(reducer(initialState, action), expected);
       });

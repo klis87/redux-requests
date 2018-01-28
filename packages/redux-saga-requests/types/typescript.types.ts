@@ -59,6 +59,7 @@ const globalConfig = {
   pendingKey: 'pending',
   multiple: false,
   getData: (state, action) => action.payload.data,
+  getError: (state, action) => action.payload,
   onRequest: (state, action, { dataKey, multiple, pendingKey, errorKey }) => ({
     ...state,
     [dataKey]: null,

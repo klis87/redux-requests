@@ -60,12 +60,20 @@ export function* sendRequest(action, dispatchRequestAction = false) {
 
   const { driver } = requestsConfig;
   const requestHandlers = yield call([driver, 'getRequestHandlers'], requestInstance, requestsConfig);
+  const fsa = !!action.payload;
 
   const dispatchSuccessAction = data => ({
     type: requestsConfig.success(action.type),
-    payload: {
+    ...fsa ? ({
+      payload: {
+        data,
+      },
+    }) : ({
       data,
-      meta: action,
+    }),
+    meta: {
+      ...action.meta,
+      requestAction: action,
     },
   });
 
@@ -92,9 +100,15 @@ export function* sendRequest(action, dispatchRequestAction = false) {
     const errorPayload = yield call(driver.getErrorPayload, e);
     yield put({
       type: requestsConfig.error(action.type),
-      payload: {
+      ...fsa ? ({
+        payload: errorPayload,
+        error: true,
+      }) : ({
         error: errorPayload,
-        meta: action,
+      }),
+      meta: {
+        ...action.meta,
+        requestAction: action,
       },
     });
     yield call(requestsConfig.onError, e);
@@ -104,8 +118,9 @@ export function* sendRequest(action, dispatchRequestAction = false) {
       yield abortRequestIfDefined(requestHandlers.abortRequest);
       yield put({
         type: requestsConfig.abort(action.type),
-        payload: {
-          meta: action,
+        meta: {
+          ...action.meta,
+          requestAction: action,
         },
       });
       yield call(requestsConfig.onAbort);
