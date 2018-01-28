@@ -351,11 +351,10 @@ instead of `null`
 - `dataKey: string`: default to `'data'`, change it, if for some reason you want your data to be kept in a different key
 - `errorKey: string`: default to `'error'`, change it, if for some reason you want your errors to be kept in a different key
 - `pendingKey: string`: default to `'pending'`, change it, if for some reason you want your pending state to be kept in a different key
-- `fsa: boolean`: default to `false`, change it to `true` if you want to use FSA
-- `getData: (state, action, config) => data`: describes how to get data from `action` object, returns `action.data` as
-the default, or `action.payload.data` when `fsa` is `true`
-- `getError: (state, action, config) => data`: describes how to get error from `action` object, returns `action.error` as
-the default, or `action.payload` when `fsa` is `true`
+- `getData: (state, action) => data`: describes how to get data from `action` object, returns `action.data` or `action.payload.data`
+when action is FSA compliant
+- `getError: (state, action) => data`: describes how to get error from `action` object, returns `action.error` or `action.payload`
+when action is FSA compliant
 - `onRequest: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles request actions
 - `onSuccess: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles success actions
 - `onError: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles error actions
@@ -520,20 +519,8 @@ const fetchBooks = () => ({
   },
 });
 ```
-In order to have success and error actions in FSA format as well, you have to pass `fsa: true` to `createRequestInstance`:
-```js
-function* rootSaga() {
-  yield createRequestInstance(axios, { driver: axiosDriver, fsa: true });
-  yield watchRequests();
-}
-```
-
-If you use `requestsReducer`, you have to create FSA compatible one:
-```js
-import { createRequestsReducer } from 'redux-saga-requests';
-
-const requestsReducer = createRequestsReducer({ fsa: true });
-```
+Then, success, error and abort actions will also be FSA compliant. Moreover, `requestsReducer` will also correctly handle FSA actions.
+For details, see [redux-act example](https://github.com/klis87/redux-saga-requests/tree/master/examples/redux-act-integration).
 
 ## Usage with Fetch API [:arrow_up:](#table-of-content)
 

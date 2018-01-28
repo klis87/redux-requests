@@ -7,7 +7,6 @@ export const voidCallback = () => {};
 
 export const defaultConfig = {
   driver: null,
-  fsa: false,
   success,
   error,
   abort,
@@ -61,10 +60,11 @@ export function* sendRequest(action, dispatchRequestAction = false) {
 
   const { driver } = requestsConfig;
   const requestHandlers = yield call([driver, 'getRequestHandlers'], requestInstance, requestsConfig);
+  const fsa = !!action.payload;
 
   const dispatchSuccessAction = data => ({
     type: requestsConfig.success(action.type),
-    ...requestsConfig.fsa ? ({
+    ...fsa ? ({
       payload: {
         data,
       },
@@ -100,7 +100,7 @@ export function* sendRequest(action, dispatchRequestAction = false) {
     const errorPayload = yield call(driver.getErrorPayload, e);
     yield put({
       type: requestsConfig.error(action.type),
-      ...requestsConfig.fsa ? ({
+      ...fsa ? ({
         payload: errorPayload,
         error: true,
       }) : ({

@@ -10,7 +10,7 @@ import { photoSaga, postSaga } from './sagas';
 import { success, error, abort } from './actions';
 
 function* rootSaga(axiosInstance) {
-  yield createRequestInstance(axiosInstance, { driver: axiosDriver, fsa: true, success, error, abort });
+  yield createRequestInstance(axiosInstance, { driver: axiosDriver, success, error, abort });
   yield fork(photoSaga);
   yield fork(postSaga);
 }

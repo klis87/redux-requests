@@ -39,7 +39,6 @@ describe('sagas', () => {
         error,
         abort,
         driver: null,
-        fsa: false,
         onRequest: voidCallback,
         onSuccess: voidCallback,
         onError: voidCallback,
@@ -71,7 +70,6 @@ describe('sagas', () => {
         onSuccess: voidCallback,
         onError: voidCallback,
         onAbort: voidCallback,
-        fsa: false,
       };
 
       const expected = setContext({
@@ -117,7 +115,7 @@ describe('sagas', () => {
     });
 
     describe('with correct payload', () => {
-      const config = { ...defaultConfig, driver: dummyDriver, fsa: true };
+      const config = { ...defaultConfig, driver: dummyDriver };
       const action = {
         type: 'FETCH',
         payload: {
@@ -219,7 +217,7 @@ describe('sagas', () => {
     });
 
     describe('with correct payload with multiple requests', () => {
-      const config = { ...defaultConfig, driver: dummyDriver, fsa: false };
+      const config = { ...defaultConfig, driver: dummyDriver };
       const action = { type: 'FETCH_MULTIPLE', requests: [{ url: '/url1' }, { url: '/url2' }] };
       const gen = sendRequest(action);
       const requestInstance = () => ({ type: 'axios' });

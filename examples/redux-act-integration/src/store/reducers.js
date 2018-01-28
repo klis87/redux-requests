@@ -14,7 +14,6 @@ const requestsReducer = createRequestsReducer({
   getSuccessAction: success,
   getErrorAction: error,
   getAbortAction: abort,
-  fsa: true,
 });
 
 export const photoReducer = requestsReducer({ actionType: fetchPhoto }, createReducer({

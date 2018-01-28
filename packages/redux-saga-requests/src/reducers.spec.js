@@ -196,7 +196,7 @@ describe('reducers', () => {
     describe('with passed reducer', () => {
       const notRequestState = { counter: 0 };
       const INCREMENT = 'INCREMENT';
-      const reducer = requestsReducer({ actionType, fsa: true }, (state = notRequestState, action) => {
+      const reducer = requestsReducer({ actionType }, (state = notRequestState, action) => {
         switch (action.type) {
           case INCREMENT:
             return { ...state, counter: state.counter + 1 };
