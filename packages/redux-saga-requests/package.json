@@ -60,7 +60,7 @@
     "redux-saga": "0.16.0",
     "rimraf": "2.6.2",
     "sinon": "4.2.2",
-    "typescript": "2.6.2",
+    "typescript": "2.7.1",
     "typescript-definition-tester": "0.0.5",
     "webpack": "3.10.0"
   }
