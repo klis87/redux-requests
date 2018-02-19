@@ -41,7 +41,7 @@
     "redux-saga-requests": ">=0.4.0"
   },
   "devDependencies": {
-    "axios": "0.17.1",
+    "axios": "0.18.0",
     "babel-cli": "6.26.0",
     "babel-core": "6.26.0",
     "babel-loader": "7.1.2",
