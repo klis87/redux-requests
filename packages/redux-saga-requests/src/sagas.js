@@ -5,35 +5,39 @@ import { REQUEST_INSTANCE, REQUESTS_CONFIG, INCORRECT_PAYLOAD_ERROR } from './co
 
 export const voidCallback = () => {};
 
+export const successAction = (action, data) => {
+  const fsa = !!action.payload;
+
+  return {
+    ...fsa ? ({
+      payload: {
+        data,
+      },
+    }) : ({
+      data,
+    }),
+  };
+};
+
+export const errorAction = (action, data) => {
+  const fsa = !!action.payload;
+
+  return {
+    ...fsa ? ({
+      payload: data,
+      error: true,
+    }) : ({
+      error: data,
+    }),
+  };
+};
+
 export const defaultConfig = {
   driver: null,
   success,
-  successAction: (action, data) => {
-    const fsa = !!action.payload;
-
-    return {
-      ...fsa ? ({
-        payload: {
-          data,
-        },
-      }) : ({
-        data,
-      }),
-    };
-  },
+  successAction,
   error,
-  errorAction: (action, data) => {
-    const fsa = !!action.payload;
-
-    return {
-      ...fsa ? ({
-        payload: data,
-        error: true,
-      }) : ({
-        error: data,
-      }),
-    };
-  },
+  errorAction,
   abort,
   abortAction: voidCallback,
   onRequest: voidCallback,
