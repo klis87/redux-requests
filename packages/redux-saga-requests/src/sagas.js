@@ -8,7 +8,7 @@ export const voidCallback = () => {};
 export const defaultConfig = {
   driver: null,
   success,
-  successAction: (action, data) => (
+  successAction: (action, data) => {
     const fsa = !!action.payload;
     
     return {
@@ -20,9 +20,9 @@ export const defaultConfig = {
         data,
       }),
     };
-  }), 
+  }, 
   error,
-  errorAction: (action, data) => (
+  errorAction: (action, data) => {
     const fsa = !!action.payload;
     
     return {
@@ -33,9 +33,9 @@ export const defaultConfig = {
         error: data,
       }),
     };
-  }),
+  },
   abort,
-  abortAction: (action) => ({}),
+  abortAction: (action) => {},
   onRequest: voidCallback,
   onSuccess: voidCallback,
   onError: voidCallback,
