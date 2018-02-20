@@ -10,7 +10,7 @@ export const defaultConfig = {
   success,
   successAction: (action, data) => {
     const fsa = !!action.payload;
-    
+
     return {
       ...fsa ? ({
         payload: {
@@ -20,11 +20,11 @@ export const defaultConfig = {
         data,
       }),
     };
-  }, 
+  },
   error,
   errorAction: (action, data) => {
     const fsa = !!action.payload;
-    
+
     return {
       ...fsa ? ({
         payload: data,
@@ -35,7 +35,7 @@ export const defaultConfig = {
     };
   },
   abort,
-  abortAction: (action) => {},
+  abortAction: voidCallback,
   onRequest: voidCallback,
   onSuccess: voidCallback,
   onError: voidCallback,
