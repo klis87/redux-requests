@@ -127,14 +127,6 @@ export function sendRequest(action: Action, dispatchRequestAction?: boolean): an
 
 export function watchRequests(): any;
 
-interface GetData {
-  (state: any, action: AnyAction): any;
-}
-
-interface GetError {
-  (state: any, action: AnyAction): any;
-}
-
 interface OnActionCallback {
   (state: any, action: AnyAction, config: MergedReducerConfig): any;
 }
@@ -147,8 +139,8 @@ type GlobalReducerConfig = {
   errorKey?: string;
   pendingKey?: string;
   multiple?: boolean;
-  getData?: GetData,
-  getError?: GetError,
+  getData?: OnActionCallback,
+  getError?: OnActionCallback,
   onRequest?: OnActionCallback,
   onSuccess?: OnActionCallback,
   onError?: OnActionCallback,
@@ -170,8 +162,8 @@ type MergedReducerConfig = {
   errorKey: string;
   pendingKey: string;
   multiple: boolean;
-  getData: GetData,
-  getError: GetError,
+  getData: OnActionCallback,
+  getError: OnActionCallback,
   onRequest: OnActionCallback,
   onSuccess: OnActionCallback,
   onError: OnActionCallback,

@@ -393,9 +393,9 @@ instead of `null`
 - `dataKey: string`: default to `'data'`, change it, if for some reason you want your data to be kept in a different key
 - `errorKey: string`: default to `'error'`, change it, if for some reason you want your errors to be kept in a different key
 - `pendingKey: string`: default to `'pending'`, change it, if for some reason you want your pending state to be kept in a different key
-- `getData: (state, action) => data`: describes how to get data from `action` object, returns `action.data` or `action.payload.data`
+- `getData: (state, action, config) => data`: describes how to get data from `action` object, returns `action.data` or `action.payload.data`
 when action is FSA compliant
-- `getError: (state, action) => data`: describes how to get error from `action` object, returns `action.error` or `action.payload`
+- `getError: (state, action, config) => data`: describes how to get error from `action` object, returns `action.error` or `action.payload`
 when action is FSA compliant
 - `onRequest: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles request actions
 - `onSuccess: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles success actions

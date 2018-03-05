@@ -39,18 +39,26 @@ const defaultConfig = {
     [pendingKey]: state[pendingKey] + 1,
     [errorKey]: null,
   }),
-  onSuccess: (state, action, { dataKey, pendingKey, errorKey, getData }) => ({
-    ...state,
-    [dataKey]: getData(state, action),
-    [pendingKey]: state[pendingKey] - 1,
-    [errorKey]: null,
-  }),
-  onError: (state, action, { dataKey, multiple, pendingKey, errorKey, getError }) => ({
-    ...state,
-    [dataKey]: getEmptyData(multiple),
-    [pendingKey]: state[pendingKey] - 1,
-    [errorKey]: getError(state, action),
-  }),
+  onSuccess: (state, action, config) => {
+    const { dataKey, pendingKey, errorKey, getData } = config;
+
+    return {
+      ...state,
+      [dataKey]: getData(state, action, config),
+      [pendingKey]: state[pendingKey] - 1,
+      [errorKey]: null,
+    };
+  },
+  onError: (state, action, config) => {
+    const { dataKey, multiple, pendingKey, errorKey, getError } = config;
+
+    return {
+      ...state,
+      [dataKey]: getEmptyData(multiple),
+      [pendingKey]: state[pendingKey] - 1,
+      [errorKey]: getError(state, action, config),
+    };
+  },
   onAbort: (state, action, { pendingKey }) => ({
     ...state,
     [pendingKey]: state[pendingKey] - 1,
