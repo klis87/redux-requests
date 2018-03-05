@@ -14,6 +14,7 @@ import {
   abortRequestIfDefined,
   successAction,
   errorAction,
+  abortAction,
   voidCallback,
 } from './sagas';
 
@@ -38,11 +39,11 @@ describe('sagas', () => {
     it('has correct value', () => {
       const expected = {
         success,
-        successAction,
         error,
-        errorAction,
         abort,
-        abortAction: voidCallback,
+        successAction,
+        errorAction,
+        abortAction,
         driver: null,
         onRequest: voidCallback,
         onSuccess: voidCallback,

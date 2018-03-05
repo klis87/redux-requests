@@ -5,41 +5,50 @@ import { REQUEST_INSTANCE, REQUESTS_CONFIG, INCORRECT_PAYLOAD_ERROR } from './co
 
 export const voidCallback = () => {};
 
-export const successAction = (action, data) => {
-  const fsa = !!action.payload;
+const isFSA = action => !!action.payload;
 
-  return {
-    ...fsa ? ({
-      payload: {
-        data,
-      },
-    }) : ({
+export const successAction = (action, data) => ({
+  ...isFSA(action) ? ({
+    payload: {
       data,
-    }),
-  };
-};
+    },
+  }) : ({
+    data,
+  }),
+  meta: {
+    ...action.meta,
+    requestAction: action,
+  },
+});
 
-export const errorAction = (action, data) => {
-  const fsa = !!action.payload;
+export const errorAction = (action, errorData) => ({
+  ...isFSA(action) ? ({
+    payload: errorData,
+    error: true,
+  }) : ({
+    error,
+  }),
+  meta: {
+    ...action.meta,
+    requestAction: action,
+  },
+});
 
-  return {
-    ...fsa ? ({
-      payload: data,
-      error: true,
-    }) : ({
-      error: data,
-    }),
-  };
-};
+export const abortAction = action => ({
+  meta: {
+    ...action.meta,
+    requestAction: action,
+  },
+});
 
 export const defaultConfig = {
   driver: null,
   success,
-  successAction,
   error,
-  errorAction,
   abort,
-  abortAction: voidCallback,
+  successAction,
+  errorAction,
+  abortAction,
   onRequest: voidCallback,
   onSuccess: voidCallback,
   onError: voidCallback,
@@ -109,10 +118,6 @@ export function* sendRequest(action, dispatchRequestAction = false) {
 
     yield put({
       type: requestsConfig.success(action.type),
-      meta: {
-        ...action.meta,
-        requestAction: action,
-      },
       ...requestsConfig.successAction(action, successPayload),
     });
     yield call(requestsConfig.onSuccess, response);
@@ -121,10 +126,6 @@ export function* sendRequest(action, dispatchRequestAction = false) {
     const errorPayload = yield call(driver.getErrorPayload, e);
     yield put({
       type: requestsConfig.error(action.type),
-      meta: {
-        ...action.meta,
-        requestAction: action,
-      },
       ...requestsConfig.errorAction(action, errorPayload),
     });
     yield call(requestsConfig.onError, e);
@@ -134,10 +135,6 @@ export function* sendRequest(action, dispatchRequestAction = false) {
       yield abortRequestIfDefined(requestHandlers.abortRequest);
       yield put({
         type: requestsConfig.abort(action.type),
-        meta: {
-          ...action.meta,
-          requestAction: action,
-        },
         ...requestsConfig.abortAction(action),
       });
       yield call(requestsConfig.onAbort);
