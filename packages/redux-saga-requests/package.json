@@ -21,6 +21,7 @@
   "bugs": {
     "url": "https://github.com/klis87/redux-saga-requests/issues"
   },
+  "sideEffects": false,
   "scripts": {
     "clean": "rimraf es lib dist",
     "lint": "eslint src/**",
