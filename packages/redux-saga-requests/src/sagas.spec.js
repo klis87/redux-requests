@@ -12,6 +12,9 @@ import {
   watchRequests,
   isRequestAction,
   abortRequestIfDefined,
+  successAction,
+  errorAction,
+  abortAction,
   voidCallback,
 } from './sagas';
 
@@ -38,6 +41,9 @@ describe('sagas', () => {
         success,
         error,
         abort,
+        successAction,
+        errorAction,
+        abortAction,
         driver: null,
         onRequest: voidCallback,
         onSuccess: voidCallback,
@@ -63,8 +69,11 @@ describe('sagas', () => {
     it('returns correct effect with overwritten config', () => {
       const config = {
         success: 'success',
+        successAction,
         error: 'error',
+        errorAction,
         abort: 'abort',
+        abortAction: voidCallback,
         driver: 'some driver',
         onRequest: voidCallback,
         onSuccess: voidCallback,

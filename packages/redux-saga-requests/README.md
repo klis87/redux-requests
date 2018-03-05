@@ -17,7 +17,6 @@ integrations could be added, as they are implemented in a plugin fashion.
 - [Actions](#actions-arrow_up)
 - [Reducers](#reducers-arrow_up)
 - [Interceptors](#interceptors-arrow_up)
-- [Custom action suffixes](#custom-action-suffixes-arrow_up)
 - [FSA](#fsa-arrow_up)
 - [Usage with Fetch API](#usage-with-fetch-api-arrow_up)
 - [Examples](#examples-arrow_up)
@@ -324,6 +323,49 @@ With this request action, assuming `id = 1`, following actions will be dispatche
 }
 ```
 
+### Custom actions
+
+If you don't like the way how success, error and abort are structured, it is possible to adjust them. You can change `_SUCCESS`, `_ERROR` and `_ABORT` default suffixes with `success`, `error` and `abort` in `createRequestInstance` config:
+
+```javascript
+import axios from 'axios';
+import { getActionWithSuffix, watchRequests, createRequestInstance, createRequestsReducer } from 'redux-saga-requests';
+import axiosDriver from 'redux-saga-requests-axios'; // or a different driver
+
+const success = getActionWithSuffix('MY_SUCCESS_SUFFIX');
+const error = getActionWithSuffix('MY_ERROR_SUFFIX');
+const abort = getActionWithSuffix('MY_ABORT_SUFFIX');
+
+function* rootSaga() {
+  yield createRequestInstance(axios, {
+    driver: axiosDriver,
+    success,
+    error,
+    abort,
+  });
+  yield watchRequests();
+}
+```
+
+If you need even more control, you can define how the rest of actions payloads look like by passing
+`successAction`, `errorAction`, `abortAction`, for example:
+```js
+const successAction = (action, data) => ({
+  responseData: data,
+  meta: {
+    requestAction: action,
+  },
+});
+
+function* rootSaga() {
+  yield createRequestInstance(axios, {
+    driver: axiosDriver,
+    successAction,
+  });
+  yield watchRequests();
+}
+```
+
 ## Reducers [:arrow_up:](#table-of-content)
 
 Except for `watchRequests` and `sendRequest`, which can simplify your actions and sagas a lot, you can also use
@@ -471,35 +513,6 @@ function* rootSaga() {
   yield watchRequest();
 }
 ```
-
-## Custom action suffixes [:arrow_up:](#table-of-content)
-
-As a default, `success`, `error` and `abort` functions generate `_SUCCESS`, `_ERROR` and `_ABORT` suffixes respectively.
-However, it is possible to change them in a following way:
-```javascript
-import axios from 'axios';
-import { getActionWithSuffix, watchRequests, createRequestInstance, createRequestsReducer } from 'redux-saga-requests';
-import axiosDriver from 'redux-saga-requests-axios'; // or a different driver
-
-const success = getActionWithSuffix('MY_SUCCESS_SUFFIX');
-const error = getActionWithSuffix('MY_ERROR_SUFFIX');
-const abort = getActionWithSuffix('MY_ABORT_SUFFIX');
-
-function* rootSaga() {
-  yield createRequestInstance(axios, { driver: axiosDriver, success, error, abort });
-  yield watchRequests();
-}
-
-const requestsReducer = createRequestsReducer({
-  getSuccessAction: success,
-  getErrorAction: error,
-  getAbortAction: abort,
-});
-```
-So, basically you need to use `getActionWithSuffix` to create your own `success`, `error` and `abort` functions, which
-you need to pass in `createRequestInstance` config. Also, if you use `requestsReducer`, you can create you own version
-of it with `createRequestsReducer` with your suffixes. Otherwise, instead of using built-in `success`, `error` and `abort`
-functions in your reducers, you will need to use your own ones.
 
 ## FSA [:arrow_up:](#table-of-content)
 

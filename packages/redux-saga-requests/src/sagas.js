@@ -5,11 +5,50 @@ import { REQUEST_INSTANCE, REQUESTS_CONFIG, INCORRECT_PAYLOAD_ERROR } from './co
 
 export const voidCallback = () => {};
 
+const isFSA = action => !!action.payload;
+
+export const successAction = (action, data) => ({
+  ...isFSA(action) ? ({
+    payload: {
+      data,
+    },
+  }) : ({
+    data,
+  }),
+  meta: {
+    ...action.meta,
+    requestAction: action,
+  },
+});
+
+export const errorAction = (action, errorData) => ({
+  ...isFSA(action) ? ({
+    payload: errorData,
+    error: true,
+  }) : ({
+    error,
+  }),
+  meta: {
+    ...action.meta,
+    requestAction: action,
+  },
+});
+
+export const abortAction = action => ({
+  meta: {
+    ...action.meta,
+    requestAction: action,
+  },
+});
+
 export const defaultConfig = {
   driver: null,
   success,
   error,
   abort,
+  successAction,
+  errorAction,
+  abortAction,
   onRequest: voidCallback,
   onSuccess: voidCallback,
   onError: voidCallback,
@@ -60,56 +99,34 @@ export function* sendRequest(action, dispatchRequestAction = false) {
 
   const { driver } = requestsConfig;
   const requestHandlers = yield call([driver, 'getRequestHandlers'], requestInstance, requestsConfig);
-  const fsa = !!action.payload;
-
-  const dispatchSuccessAction = data => ({
-    type: requestsConfig.success(action.type),
-    ...fsa ? ({
-      payload: {
-        data,
-      },
-    }) : ({
-      data,
-    }),
-    meta: {
-      ...action.meta,
-      requestAction: action,
-    },
-  });
 
   const actionPayload = getActionPayload(action);
 
   try {
     let response;
-    let data;
+    let successPayload;
 
     if (actionPayload.request) {
       yield call(requestsConfig.onRequest, actionPayload.request);
       response = yield call(requestHandlers.sendRequest, actionPayload.request);
-      data = yield call(driver.getSuccessPayload, response, actionPayload.request);
+      successPayload = yield call(driver.getSuccessPayload, response, actionPayload.request);
     } else {
       yield call(requestsConfig.onRequest, actionPayload.requests);
       response = yield all(actionPayload.requests.map(request => call(requestHandlers.sendRequest, request)));
-      data = yield call(driver.getSuccessPayload, response, actionPayload.requests);
+      successPayload = yield call(driver.getSuccessPayload, response, actionPayload.requests);
     }
 
-    yield put(dispatchSuccessAction(data));
+    yield put({
+      type: requestsConfig.success(action.type),
+      ...requestsConfig.successAction(action, successPayload),
+    });
     yield call(requestsConfig.onSuccess, response);
     return { response };
   } catch (e) {
     const errorPayload = yield call(driver.getErrorPayload, e);
     yield put({
       type: requestsConfig.error(action.type),
-      ...fsa ? ({
-        payload: errorPayload,
-        error: true,
-      }) : ({
-        error: errorPayload,
-      }),
-      meta: {
-        ...action.meta,
-        requestAction: action,
-      },
+      ...requestsConfig.errorAction(action, errorPayload),
     });
     yield call(requestsConfig.onError, e);
     return { error: e };
@@ -118,10 +135,7 @@ export function* sendRequest(action, dispatchRequestAction = false) {
       yield abortRequestIfDefined(requestHandlers.abortRequest);
       yield put({
         type: requestsConfig.abort(action.type),
-        meta: {
-          ...action.meta,
-          requestAction: action,
-        },
+        ...requestsConfig.abortAction(action),
       });
       yield call(requestsConfig.onAbort);
     }
