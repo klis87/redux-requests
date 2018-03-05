@@ -59,21 +59,6 @@ interface OnAbort {
   (): any;
 }
 
-interface RequestInstanceConfig {
-  driver: Driver;
-  success?: ActionTypeModifier;
-  error?: ActionTypeModifier;
-  abort?: ActionTypeModifier;
-  onRequest?: OnRequest;
-  onSuccess?: OnSuccess;
-  onError?: OnError;
-  onAbort?: OnAbort;
-}
-
-export function createRequestInstance(requestInstance: any, config: RequestInstanceConfig): any;
-
-export function getRequestInstance(): any;
-
 type ActionWithSingleRequest = {
   type: string;
   request: any;
@@ -107,6 +92,36 @@ type Action =
   | ActionWithMultipleRequests
   | ActionWithSingleRequestAsPayload
   | ActionWithMultipleRequestAsPayload;
+
+interface SuccessAction {
+  (action: Action, data: any): AnyAction
+}
+
+interface ErrorAction {
+  (action: Action, error: any): AnyAction
+}
+
+interface AbortAction {
+  (action: Action): AnyAction
+}
+
+interface RequestInstanceConfig {
+  driver: Driver;
+  success?: ActionTypeModifier;
+  error?: ActionTypeModifier;
+  abort?: ActionTypeModifier;
+  successAction?: SuccessAction,
+  errorAction?: ErrorAction,
+  abortAction?: AbortAction,
+  onRequest?: OnRequest;
+  onSuccess?: OnSuccess;
+  onError?: OnError;
+  onAbort?: OnAbort;
+}
+
+export function createRequestInstance(requestInstance: any, config: RequestInstanceConfig): any;
+
+export function getRequestInstance(): any;
 
 export function sendRequest(action: Action, dispatchRequestAction?: boolean): any;
 

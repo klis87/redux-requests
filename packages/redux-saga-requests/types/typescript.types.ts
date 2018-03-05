@@ -28,10 +28,17 @@ requestHandlers.sendRequest({});
 
 createRequestInstance({}, { driver: dummyDriver });
 
+const successAction = (action, data) => ({ type: 'SUCCESS', data });
+const errorAction = (action, data) => ({ type: 'ERROR', data });
+const abortAction = (action) => ({ type: 'ABORT' });
+
 const requestInstanceConfig = {
   success: actionModifier,
   error: actionModifier,
   abort: actionModifier,
+  successAction,
+  errorAction,
+  abortAction,
   driver: dummyDriver,
   onRequest: request => ({}),
   onSuccess: response => ({}),
