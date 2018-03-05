@@ -1,4 +1,8 @@
-import { success, error, abort } from './actions';
+import {
+  success as defaultSuccess,
+  error as defaultError,
+  abort as defaultAbort,
+} from './actions';
 
 // to support libraries like redux-act and redux-actions
 const normalizeActionType = actionType => typeof actionType === 'function' ? actionType.toString() : actionType;
@@ -20,9 +24,9 @@ const getInitialState = (state, reducer, config) => {
 };
 
 const defaultConfig = {
-  getSuccessAction: success,
-  getErrorAction: error,
-  getAbortAction: abort,
+  success: defaultSuccess,
+  error: defaultError,
+  abort: defaultAbort,
   dataKey: 'data',
   errorKey: 'error',
   pendingKey: 'pending',
@@ -70,9 +74,9 @@ export const createRequestsReducer = (
     onSuccess,
     onError,
     onAbort,
-    getSuccessAction,
-    getErrorAction,
-    getAbortAction,
+    success,
+    error,
+    abort,
     actionType,
   } = config;
 
@@ -81,11 +85,11 @@ export const createRequestsReducer = (
   switch (action.type) {
     case normalizedActionType:
       return onRequest(state, action, config);
-    case getSuccessAction(normalizedActionType):
+    case success(normalizedActionType):
       return onSuccess(state, action, config);
-    case getErrorAction(normalizedActionType):
+    case error(normalizedActionType):
       return onError(state, action, config);
-    case getAbortAction(normalizedActionType):
+    case abort(normalizedActionType):
       return onAbort(state, action, config);
     default:
       return reducer ? reducer(nextState, action) : nextState;

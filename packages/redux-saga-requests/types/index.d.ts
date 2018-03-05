@@ -140,9 +140,9 @@ interface OnActionCallback {
 }
 
 type GlobalReducerConfig = {
-  getSuccessAction?: ActionTypeModifier;
-  getErrorAction?: ActionTypeModifier;
-  getAbortAction?: ActionTypeModifier;
+  success?: ActionTypeModifier;
+  error?: ActionTypeModifier;
+  abort?: ActionTypeModifier;
   dataKey?: string;
   errorKey?: string;
   pendingKey?: string;
@@ -163,9 +163,9 @@ type LocalReducerConfig = GlobalReducerConfig & ActionTypeReducerConfig;
 
 type MergedReducerConfig = {
   actionType: string;
-  getSuccessAction: ActionTypeModifier;
-  getErrorAction: ActionTypeModifier;
-  getAbortAction: ActionTypeModifier;
+  success: ActionTypeModifier;
+  error: ActionTypeModifier;
+  abort: ActionTypeModifier;
   dataKey: string;
   errorKey: string;
   pendingKey: string;

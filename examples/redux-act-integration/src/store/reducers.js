@@ -11,9 +11,9 @@ export const abortCounterReducer = createReducer({
 }, 0);
 
 const requestsReducer = createRequestsReducer({
-  getSuccessAction: success,
-  getErrorAction: error,
-  getAbortAction: abort,
+  success,
+  error,
+  abort,
 });
 
 export const photoReducer = requestsReducer({ actionType: fetchPhoto }, createReducer({

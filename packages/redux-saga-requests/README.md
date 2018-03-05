@@ -401,9 +401,9 @@ when action is FSA compliant
 - `onSuccess: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles success actions
 - `onError: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles error actions
 - `onAbort: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles abort actions
-- `getSuccessAction: (actionType: string) => string`: adds `_SUCCESS` to `actionType` as a default
-- `getErrorAction: (actionType: string) => string`: adds `_ERROR` to `actionType` as a default
-- `getAbortAction: (actionType: string) => string`: adds `_ABORT` to `actionType` as a default
+- `success: (actionType: string) => string`: override when using not standard success action suffix, handles `_SUCCESS` as a default
+- `error: (actionType: string) => string`: : override when using not standard error action suffix, handles `_ERROR` as a default
+- `abort: (actionType: string) => string`: : override when using not standard abort action suffix, handles `_ABORT` as a default
 
 For example:
 ```javascript
