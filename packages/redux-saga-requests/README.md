@@ -125,6 +125,7 @@ or you can just use CDN: `https://unpkg.com/redux-saga-requests`.
 
 Also, you need to install a driver:
 - if you use Axios, install `axios` and `redux-saga-requests-axios`:
+
   ```
   $ yarn add axios redux-saga-requests-axios
   ```
@@ -134,6 +135,7 @@ Also, you need to install a driver:
   ```
   or CDN: `https://unpkg.com/redux-saga-requests-axios`.
 - if you use Fetch API, install `isomorphic-fetch` (or a different Fetch polyfill) and `redux-saga-requests-fetch`:
+
   ```
   $ yarn add isomorphic-fetch redux-saga-requests-fetch
   ```
