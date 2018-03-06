@@ -1,20 +1,34 @@
-import { call, takeEvery, put, all, cancelled, getContext, setContext } from 'redux-saga/effects';
+import {
+  call,
+  takeEvery,
+  put,
+  all,
+  cancelled,
+  getContext,
+  setContext,
+} from 'redux-saga/effects';
 
 import { success, error, abort } from './actions';
-import { REQUEST_INSTANCE, REQUESTS_CONFIG, INCORRECT_PAYLOAD_ERROR } from './constants';
+import {
+  REQUEST_INSTANCE,
+  REQUESTS_CONFIG,
+  INCORRECT_PAYLOAD_ERROR,
+} from './constants';
 
 export const voidCallback = () => {};
 
 const isFSA = action => !!action.payload;
 
 export const successAction = (action, data) => ({
-  ...isFSA(action) ? ({
-    payload: {
-      data,
-    },
-  }) : ({
-    data,
-  }),
+  ...(isFSA(action)
+    ? {
+        payload: {
+          data,
+        },
+      }
+    : {
+        data,
+      }),
   meta: {
     ...action.meta,
     requestAction: action,
@@ -22,12 +36,14 @@ export const successAction = (action, data) => ({
 });
 
 export const errorAction = (action, errorData) => ({
-  ...isFSA(action) ? ({
-    payload: errorData,
-    error: true,
-  }) : ({
-    error,
-  }),
+  ...(isFSA(action)
+    ? {
+        payload: errorData,
+        error: true,
+      }
+    : {
+        error,
+      }),
   meta: {
     ...action.meta,
     requestAction: action,
@@ -70,14 +86,15 @@ export function getRequestsConfig() {
   return getContext(REQUESTS_CONFIG);
 }
 
-const getActionPayload = action => (action.payload === undefined ? action : action.payload);
+const getActionPayload = action =>
+  action.payload === undefined ? action : action.payload;
 
-export const isRequestAction = (action) => {
+export const isRequestAction = action => {
   const actionPayload = getActionPayload(action);
   return actionPayload.request || actionPayload.requests;
 };
 
-export const abortRequestIfDefined = (abortRequest) => {
+export const abortRequestIfDefined = abortRequest => {
   if (abortRequest) {
     return call(abortRequest);
   }
@@ -98,7 +115,11 @@ export function* sendRequest(action, dispatchRequestAction = false) {
   }
 
   const { driver } = requestsConfig;
-  const requestHandlers = yield call([driver, 'getRequestHandlers'], requestInstance, requestsConfig);
+  const requestHandlers = yield call(
+    [driver, 'getRequestHandlers'],
+    requestInstance,
+    requestsConfig,
+  );
 
   const actionPayload = getActionPayload(action);
 
@@ -109,11 +130,23 @@ export function* sendRequest(action, dispatchRequestAction = false) {
     if (actionPayload.request) {
       yield call(requestsConfig.onRequest, actionPayload.request);
       response = yield call(requestHandlers.sendRequest, actionPayload.request);
-      successPayload = yield call(driver.getSuccessPayload, response, actionPayload.request);
+      successPayload = yield call(
+        driver.getSuccessPayload,
+        response,
+        actionPayload.request,
+      );
     } else {
       yield call(requestsConfig.onRequest, actionPayload.requests);
-      response = yield all(actionPayload.requests.map(request => call(requestHandlers.sendRequest, request)));
-      successPayload = yield call(driver.getSuccessPayload, response, actionPayload.requests);
+      response = yield all(
+        actionPayload.requests.map(request =>
+          call(requestHandlers.sendRequest, request),
+        ),
+      );
+      successPayload = yield call(
+        driver.getSuccessPayload,
+        response,
+        actionPayload.requests,
+      );
     }
 
     yield put({

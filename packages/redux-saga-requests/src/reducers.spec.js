@@ -102,21 +102,33 @@ describe('reducers', () => {
         pendingKey: 'fetching',
         multiple: true,
         getData: (state, action) => ({ nested: action.payload.data }),
-        onRequest: (state, action, { dataKey, multiple, pendingKey, errorKey }) => ({
+        onRequest: (
+          state,
+          action,
+          { dataKey, multiple, pendingKey, errorKey },
+        ) => ({
           ...state,
           [dataKey]: multiple ? [] : null,
           [pendingKey]: state[pendingKey] + 1,
           [errorKey]: null,
           multiple,
         }),
-        onSuccess: (state, action, { dataKey, multiple, pendingKey, errorKey, getData }) => ({
+        onSuccess: (
+          state,
+          action,
+          { dataKey, multiple, pendingKey, errorKey, getData },
+        ) => ({
           ...state,
           [dataKey]: getData(state, action),
           [pendingKey]: state[pendingKey] - 1,
           [errorKey]: null,
           multiple,
         }),
-        onError: (state, action, { dataKey, multiple, pendingKey, errorKey }) => ({
+        onError: (
+          state,
+          action,
+          { dataKey, multiple, pendingKey, errorKey },
+        ) => ({
           ...state,
           [dataKey]: multiple ? [] : null,
           [pendingKey]: state[pendingKey] - 1,
@@ -196,14 +208,17 @@ describe('reducers', () => {
     describe('with passed reducer', () => {
       const notRequestState = { counter: 0 };
       const INCREMENT = 'INCREMENT';
-      const reducer = requestsReducer({ actionType }, (state = notRequestState, action) => {
-        switch (action.type) {
-          case INCREMENT:
-            return { ...state, counter: state.counter + 1 };
-          default:
-            return state;
-        }
-      });
+      const reducer = requestsReducer(
+        { actionType },
+        (state = notRequestState, action) => {
+          switch (action.type) {
+            case INCREMENT:
+              return { ...state, counter: state.counter + 1 };
+            default:
+              return state;
+          }
+        },
+      );
       const initialState = reducer(undefined, {});
 
       it('returns correct default state', () => {

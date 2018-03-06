@@ -12,8 +12,22 @@ module.exports = {
   },
   resolve: {
     alias: {
-      'redux-saga-requests': path.join(__dirname, '..', '..', 'packages', 'redux-saga-requests', 'es'),
-      'redux-saga-requests-axios': path.join(__dirname, '..', '..', 'packages', 'redux-saga-requests-axios', 'es'),
+      'redux-saga-requests': path.join(
+        __dirname,
+        '..',
+        '..',
+        'packages',
+        'redux-saga-requests',
+        'es',
+      ),
+      'redux-saga-requests-axios': path.join(
+        __dirname,
+        '..',
+        '..',
+        'packages',
+        'redux-saga-requests-axios',
+        'es',
+      ),
     },
   },
   module: {

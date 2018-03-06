@@ -1,8 +1,20 @@
-import { getContext, setContext, call, put, all, takeEvery, cancelled } from 'redux-saga/effects';
+import {
+  getContext,
+  setContext,
+  call,
+  put,
+  all,
+  takeEvery,
+  cancelled,
+} from 'redux-saga/effects';
 import { cloneableGenerator } from 'redux-saga/utils';
 
 import { success, error, abort } from './actions';
-import { REQUEST_INSTANCE, REQUESTS_CONFIG, INCORRECT_PAYLOAD_ERROR } from './constants';
+import {
+  REQUEST_INSTANCE,
+  REQUESTS_CONFIG,
+  INCORRECT_PAYLOAD_ERROR,
+} from './constants';
 import {
   defaultConfig,
   createRequestInstance,
@@ -85,7 +97,10 @@ describe('sagas', () => {
         [REQUEST_INSTANCE]: requestInstance,
         [REQUESTS_CONFIG]: config,
       });
-      assert.deepEqual(createRequestInstance(requestInstance, config), expected);
+      assert.deepEqual(
+        createRequestInstance(requestInstance, config),
+        expected,
+      );
     });
   });
 
@@ -159,7 +174,10 @@ describe('sagas', () => {
       });
 
       it('calls sendRequest', () => {
-        const expected = call(requestHandlers.sendRequest, action.payload.request);
+        const expected = call(
+          requestHandlers.sendRequest,
+          action.payload.request,
+        );
         assert.deepEqual(gen.next().value, expected);
       });
 
@@ -167,7 +185,10 @@ describe('sagas', () => {
         const errorGen = gen.clone();
         const requestError = new Error('Something went wrong');
         const errorPayload = 'error payload';
-        assert.deepEqual(errorGen.throw(requestError).value, call(dummyDriver.getErrorPayload, requestError));
+        assert.deepEqual(
+          errorGen.throw(requestError).value,
+          call(dummyDriver.getErrorPayload, requestError),
+        );
         const expected = put({
           type: error(action.type),
           payload: errorPayload,
@@ -177,7 +198,10 @@ describe('sagas', () => {
           },
         });
         assert.deepEqual(errorGen.next(errorPayload).value, expected);
-        assert.deepEqual(errorGen.next(requestHandlers).value, call(config.onError, requestError));
+        assert.deepEqual(
+          errorGen.next(requestHandlers).value,
+          call(config.onError, requestError),
+        );
         errorGen.next(); // to fire finally yield
         assert.deepEqual(errorGen.next().value, { error: requestError });
       });
@@ -209,7 +233,10 @@ describe('sagas', () => {
       });
 
       it('handles cancellation when cancelled', () => {
-        assert.deepEqual(gen.next(true).value, abortRequestIfDefined(requestHandlers.abortRequest));
+        assert.deepEqual(
+          gen.next(true).value,
+          abortRequestIfDefined(requestHandlers.abortRequest),
+        );
         const expected = put({
           type: abort(action.type),
           meta: {
@@ -227,10 +254,16 @@ describe('sagas', () => {
 
     describe('with correct payload with multiple requests', () => {
       const config = { ...defaultConfig, driver: dummyDriver };
-      const action = { type: 'FETCH_MULTIPLE', requests: [{ url: '/url1' }, { url: '/url2' }] };
+      const action = {
+        type: 'FETCH_MULTIPLE',
+        requests: [{ url: '/url1' }, { url: '/url2' }],
+      };
       const gen = sendRequest(action);
       const requestInstance = () => ({ type: 'axios' });
-      const responses = [{ data: 'some response' }, { data: 'another response' }];
+      const responses = [
+        { data: 'some response' },
+        { data: 'another response' },
+      ];
       const requestHandlers = dummyDriver.getRequestHandlers(requestInstance);
 
       it('gets request instance', () => {
@@ -264,7 +297,10 @@ describe('sagas', () => {
       });
 
       it('dispatches request success action when reponse is successful', () => {
-        assert.deepEqual(gen.next(responses).value, call(dummyDriver.getSuccessPayload, responses, action.requests));
+        assert.deepEqual(
+          gen.next(responses).value,
+          call(dummyDriver.getSuccessPayload, responses, action.requests),
+        );
         const data = [responses[0].data, responses[1].data];
         const expected = put({
           type: success(action.type),
@@ -299,7 +335,10 @@ describe('sagas', () => {
   describe('watchRequests', () => {
     it('forks sendRequest for every request action', () => {
       const gen = watchRequests();
-      assert.deepEqual(gen.next().value, takeEvery(isRequestAction, sendRequest));
+      assert.deepEqual(
+        gen.next().value,
+        takeEvery(isRequestAction, sendRequest),
+      );
     });
   });
 });

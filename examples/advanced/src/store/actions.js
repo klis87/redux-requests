@@ -16,13 +16,12 @@ export const clearPhoto = () => ({ type: CLEAR_PHOTO });
 
 export const fetchPost = id => ({
   type: FETCH_POST,
-  requests: [
-    { url: `/posts/${id}` },
-    { url: `/posts/${id}/comments` },
-  ],
+  requests: [{ url: `/posts/${id}` }, { url: `/posts/${id}/comments` }],
 });
 
 export const clearPost = () => ({ type: CLEAR_POST });
 export const cancelFetchPost = () => ({ type: CANCEL_FETCH_POST });
 
-export const incrementRequestCounter = () => ({ type: INCREMENT_REQUEST_COUNTER });
+export const incrementRequestCounter = () => ({
+  type: INCREMENT_REQUEST_COUNTER,
+});

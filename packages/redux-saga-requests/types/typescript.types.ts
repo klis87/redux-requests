@@ -30,7 +30,7 @@ createRequestInstance({}, { driver: dummyDriver });
 
 const successAction = (action, data) => ({ type: 'SUCCESS', data });
 const errorAction = (action, data) => ({ type: 'ERROR', data });
-const abortAction = (action) => ({ type: 'ABORT' });
+const abortAction = action => ({ type: 'ABORT' });
 
 const requestInstanceConfig = {
   success: actionModifier,
@@ -93,12 +93,12 @@ const globalConfig = {
 requestsReducer({ actionType: 'actionType' });
 requestsReducer({
   actionType: 'actionType',
-  ...globalConfig
+  ...globalConfig,
 });
 requestsReducer({ actionType: 'actionType' }, (state, action) => state);
 
 createRequestsReducer()({ actionType: 'actionType' });
 createRequestsReducer(globalConfig)({
   actionType: 'actionType',
-  ...globalConfig
+  ...globalConfig,
 });

@@ -8,10 +8,7 @@ export function* photoSaga() {
 }
 
 function* fetchPostSaga(fetchPostAction) {
-  yield race([
-    call(sendRequest, fetchPostAction),
-    take(cancelFetchPost),
-  ]);
+  yield race([call(sendRequest, fetchPostAction), take(cancelFetchPost)]);
 }
 
 export function* postSaga() {

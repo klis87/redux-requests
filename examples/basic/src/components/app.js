@@ -46,20 +46,40 @@ const App = ({
     <hr />
     <div>
       <h2>Photo</h2>
-      <button style={buttonStyle} onClick={clearPhoto}>Clear</button>
-      <button style={buttonStyle} onClick={() => fetchPhoto(1)}>Fetch photo with id 1</button>
-      <button style={buttonStyle} onClick={() => fetchPhoto(10001)}>Fetch non-existent photo</button>
-      <EntityContainer error={photoFetchError} isFetching={photoIsFetching} isFetched={photoIsFetched}>
+      <button style={buttonStyle} onClick={clearPhoto}>
+        Clear
+      </button>
+      <button style={buttonStyle} onClick={() => fetchPhoto(1)}>
+        Fetch photo with id 1
+      </button>
+      <button style={buttonStyle} onClick={() => fetchPhoto(10001)}>
+        Fetch non-existent photo
+      </button>
+      <EntityContainer
+        error={photoFetchError}
+        isFetching={photoIsFetching}
+        isFetched={photoIsFetched}
+      >
         <Photo data={photo} />
       </EntityContainer>
     </div>
     <hr />
     <div>
       <h2>Post</h2>
-      <button style={buttonStyle} onClick={clearPost}>Clear</button>
-      <button style={buttonStyle} onClick={() => fetchPost(1)}>Fetch post with id 1</button>
-      <button style={buttonStyle} onClick={() => fetchPost(1001)}>Fetch non-existent post</button>
-      <EntityContainer error={postFetchError} isFetching={postIsFetching} isFetched={postIsFetched}>
+      <button style={buttonStyle} onClick={clearPost}>
+        Clear
+      </button>
+      <button style={buttonStyle} onClick={() => fetchPost(1)}>
+        Fetch post with id 1
+      </button>
+      <button style={buttonStyle} onClick={() => fetchPost(1001)}>
+        Fetch non-existent post
+      </button>
+      <EntityContainer
+        error={postFetchError}
+        isFetching={postIsFetching}
+        isFetched={postIsFetched}
+      >
         <Post data={post} />
       </EntityContainer>
     </div>

@@ -12,10 +12,7 @@ export const fetchPhoto = createAction('fetch photo', id => ({
 export const clearPhoto = createAction('clear photo');
 
 export const fetchPost = createAction('fetch post', id => ({
-  requests: [
-    { url: `/posts/${id}` },
-    { url: `/posts/${id}/comments` },
-  ],
+  requests: [{ url: `/posts/${id}` }, { url: `/posts/${id}/comments` }],
 }));
 
 export const clearPost = createAction('clear post');

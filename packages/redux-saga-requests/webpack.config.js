@@ -26,14 +26,12 @@ module.exports = {
   },
   devtool: 'source-map',
   plugins: [
-    DEBUG ? (
-      new webpack.NamedModulesPlugin()
-    ) : (
-      new webpack.HashedModuleIdsPlugin({
-        hashFunction: 'sha256',
-        hashDigest: 'hex',
-        hashDigestLength: 20,
-      })
-    ),
+    DEBUG
+      ? new webpack.NamedModulesPlugin()
+      : new webpack.HashedModuleIdsPlugin({
+          hashFunction: 'sha256',
+          hashDigest: 'hex',
+          hashDigestLength: 20,
+        }),
   ],
 };

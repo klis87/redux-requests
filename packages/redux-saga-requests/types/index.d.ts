@@ -62,30 +62,30 @@ interface OnAbort {
 type ActionWithSingleRequest = {
   type: string;
   request: any;
-}
+};
 
 type ActionWithMultipleRequests = {
   type: string;
   requests: any[];
-}
+};
 
 type PayloadWithRequest = {
   request: any;
-}
+};
 
 type PayloadWithRequests = {
   requests: any[];
-}
+};
 
 type ActionWithSingleRequestAsPayload = {
   type: string;
   payload: PayloadWithRequest;
-}
+};
 
 type ActionWithMultipleRequestAsPayload = {
   type: string;
   payload: PayloadWithRequests;
-}
+};
 
 type Action =
   | ActionWithSingleRequest
@@ -94,15 +94,15 @@ type Action =
   | ActionWithMultipleRequestAsPayload;
 
 interface SuccessAction {
-  (action: Action, data: any): AnyAction
+  (action: Action, data: any): AnyAction;
 }
 
 interface ErrorAction {
-  (action: Action, error: any): AnyAction
+  (action: Action, error: any): AnyAction;
 }
 
 interface AbortAction {
-  (action: Action): AnyAction
+  (action: Action): AnyAction;
 }
 
 interface RequestInstanceConfig {
@@ -110,20 +110,26 @@ interface RequestInstanceConfig {
   success?: ActionTypeModifier;
   error?: ActionTypeModifier;
   abort?: ActionTypeModifier;
-  successAction?: SuccessAction,
-  errorAction?: ErrorAction,
-  abortAction?: AbortAction,
+  successAction?: SuccessAction;
+  errorAction?: ErrorAction;
+  abortAction?: AbortAction;
   onRequest?: OnRequest;
   onSuccess?: OnSuccess;
   onError?: OnError;
   onAbort?: OnAbort;
 }
 
-export function createRequestInstance(requestInstance: any, config: RequestInstanceConfig): any;
+export function createRequestInstance(
+  requestInstance: any,
+  config: RequestInstanceConfig,
+): any;
 
 export function getRequestInstance(): any;
 
-export function sendRequest(action: Action, dispatchRequestAction?: boolean): any;
+export function sendRequest(
+  action: Action,
+  dispatchRequestAction?: boolean,
+): any;
 
 export function watchRequests(): any;
 
@@ -139,12 +145,12 @@ type GlobalReducerConfig = {
   errorKey?: string;
   pendingKey?: string;
   multiple?: boolean;
-  getData?: OnActionCallback,
-  getError?: OnActionCallback,
-  onRequest?: OnActionCallback,
-  onSuccess?: OnActionCallback,
-  onError?: OnActionCallback,
-  onAbort?: OnActionCallback,
+  getData?: OnActionCallback;
+  getError?: OnActionCallback;
+  onRequest?: OnActionCallback;
+  onSuccess?: OnActionCallback;
+  onError?: OnActionCallback;
+  onAbort?: OnActionCallback;
 };
 
 type ActionTypeReducerConfig = {
@@ -162,12 +168,12 @@ type MergedReducerConfig = {
   errorKey: string;
   pendingKey: string;
   multiple: boolean;
-  getData: OnActionCallback,
-  getError: OnActionCallback,
-  onRequest: OnActionCallback,
-  onSuccess: OnActionCallback,
-  onError: OnActionCallback,
-  onAbort: OnActionCallback,
+  getData: OnActionCallback;
+  getError: OnActionCallback;
+  onRequest: OnActionCallback;
+  onSuccess: OnActionCallback;
+  onError: OnActionCallback;
+  onAbort: OnActionCallback;
 };
 
 interface RequestsReducer {
@@ -176,4 +182,6 @@ interface RequestsReducer {
 
 export const requestsReducer: RequestsReducer;
 
-export function createRequestsReducer(globalConfig?: GlobalReducerConfig): RequestsReducer;
+export function createRequestsReducer(
+  globalConfig?: GlobalReducerConfig,
+): RequestsReducer;

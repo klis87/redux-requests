@@ -9,12 +9,14 @@
     "lint": "lerna run lint",
     "cover": "nyc --reporter=lcov --reporter=text lerna run test:cover",
     "report": "nyc report",
-    "coveralls": "nyc report --reporter=text-lcov | coveralls"
+    "coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "prettify": "prettier --write '{packages,examples}/**/*.{js,jsx,ts}'"
   },
   "devDependencies": {
     "coveralls": "3.0.0",
     "lerna": "2.9.0",
-    "nyc": "11.4.1"
+    "nyc": "11.4.1",
+    "prettier": "1.11.1"
   },
   "nyc": {
     "exclude": [

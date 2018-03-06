@@ -5,11 +5,17 @@ import {
 } from './actions';
 
 // to support libraries like redux-act and redux-actions
-const normalizeActionType = actionType => typeof actionType === 'function' ? actionType.toString() : actionType;
+const normalizeActionType = actionType =>
+  typeof actionType === 'function' ? actionType.toString() : actionType;
 
-const getEmptyData = multiple => multiple ? [] : null;
+const getEmptyData = multiple => (multiple ? [] : null);
 
-const getInitialRequestState = ({ dataKey, errorKey, pendingKey, multiple }) => ({
+const getInitialRequestState = ({
+  dataKey,
+  errorKey,
+  pendingKey,
+  multiple,
+}) => ({
   [dataKey]: getEmptyData(multiple),
   [pendingKey]: 0,
   [errorKey]: null,
@@ -31,7 +37,8 @@ const defaultConfig = {
   errorKey: 'error',
   pendingKey: 'pending',
   multiple: false,
-  getData: (state, action) => (action.payload ? action.payload.data : action.data),
+  getData: (state, action) =>
+    action.payload ? action.payload.data : action.data,
   getError: (state, action) => (action.payload ? action.payload : action.error),
   onRequest: (state, action, { dataKey, multiple, pendingKey, errorKey }) => ({
     ...state,
@@ -65,17 +72,13 @@ const defaultConfig = {
   }),
 };
 
-export const createRequestsReducer = (
-  globalConfig = {},
-) => (
+export const createRequestsReducer = (globalConfig = {}) => (
   localConfig,
   reducer = null,
-) => (
-  state,
-  action,
-) => {
+) => (state, action) => {
   const config = { ...defaultConfig, ...globalConfig, ...localConfig };
-  const nextState = state === undefined ? getInitialState(state, reducer, config) : state;
+  const nextState =
+    state === undefined ? getInitialState(state, reducer, config) : state;
 
   const {
     onRequest,

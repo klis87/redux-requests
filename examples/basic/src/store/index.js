@@ -18,16 +18,19 @@ export const configureStore = () => {
   });
 
   const sagaMiddleware = createSagaMiddleware();
-  const composeEnhancers = (typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) || compose;
+  const composeEnhancers =
+    (typeof window !== 'undefined' &&
+      window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) ||
+    compose;
 
   const store = createStore(
     reducers,
-    composeEnhancers(
-      applyMiddleware(sagaMiddleware),
-    ),
+    composeEnhancers(applyMiddleware(sagaMiddleware)),
   );
 
-  const axiosInstance = axios.create({ baseURL: 'https://jsonplaceholder.typicode.com' });
+  const axiosInstance = axios.create({
+    baseURL: 'https://jsonplaceholder.typicode.com',
+  });
   sagaMiddleware.run(rootSaga, axiosInstance);
   return store;
 };

@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const prepareSuccessPayload = response => response.data;
 
-const getSuccessPayload = (response) => {
+const getSuccessPayload = response => {
   if (Array.isArray(response)) {
     return response.map(prepareSuccessPayload);
   }
@@ -12,11 +12,12 @@ const getSuccessPayload = (response) => {
 
 const getErrorPayload = error => error;
 
-const getRequestHandlers = (requestInstance) => {
+const getRequestHandlers = requestInstance => {
   const tokenSource = axios.CancelToken.source();
 
   return {
-    sendRequest: requestConfig => requestInstance({ cancelToken: tokenSource.token, ...requestConfig }),
+    sendRequest: requestConfig =>
+      requestInstance({ cancelToken: tokenSource.token, ...requestConfig }),
     abortRequest: tokenSource.cancel,
   };
 };

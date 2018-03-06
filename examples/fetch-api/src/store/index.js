@@ -8,10 +8,10 @@ import { photoReducer, postReducer, abortCounterReducer } from './reducers';
 import { photoSaga, postSaga } from './sagas';
 
 function* rootSaga() {
-  yield createRequestInstance(
-    window.fetch,
-    { driver: fetchDriver, baseURL: 'https://jsonplaceholder.typicode.com' },
-  );
+  yield createRequestInstance(window.fetch, {
+    driver: fetchDriver,
+    baseURL: 'https://jsonplaceholder.typicode.com',
+  });
   yield fork(photoSaga);
   yield fork(postSaga);
 }
@@ -24,13 +24,14 @@ export const configureStore = () => {
   });
 
   const sagaMiddleware = createSagaMiddleware();
-  const composeEnhancers = (typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) || compose;
+  const composeEnhancers =
+    (typeof window !== 'undefined' &&
+      window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) ||
+    compose;
 
   const store = createStore(
     reducers,
-    composeEnhancers(
-      applyMiddleware(sagaMiddleware),
-    ),
+    composeEnhancers(applyMiddleware(sagaMiddleware)),
   );
 
   sagaMiddleware.run(rootSaga);

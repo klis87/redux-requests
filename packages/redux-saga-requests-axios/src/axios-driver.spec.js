@@ -12,7 +12,10 @@ describe('axiosDriver', () => {
 
     it('returns array of response data', () => {
       const responses = [{ data: 'data1' }, { data: 'data2' }];
-      assert.deepEqual(axiosDriver.getSuccessPayload(responses), [responses[0].data, responses[1].data]);
+      assert.deepEqual(axiosDriver.getSuccessPayload(responses), [
+        responses[0].data,
+        responses[1].data,
+      ]);
     });
   });
 
@@ -38,13 +41,17 @@ describe('axiosDriver', () => {
       const config = { myKey: 'myValue' };
       const requestInstance = requestConfig => requestConfig;
       const expected = {
-        sendRequest: requestConfig => requestInstance({ cancelToken: tokenSource.token, ...requestConfig }),
+        sendRequest: requestConfig =>
+          requestInstance({ cancelToken: tokenSource.token, ...requestConfig }),
         abortRequest: tokenSource.cancel,
       };
       const result = axiosDriver.getRequestHandlers(requestInstance);
       assert.hasAllKeys(result, ['sendRequest', 'abortRequest']);
       assert.deepEqual(result.abortRequest, expected.abortRequest);
-      assert.deepEqual(result.sendRequest(config), expected.sendRequest(config));
+      assert.deepEqual(
+        result.sendRequest(config),
+        expected.sendRequest(config),
+      );
     });
   });
 });

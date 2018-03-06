@@ -9,7 +9,9 @@ const Post = ({ data: { title, body, comments } }) => (
       {comments.map(comment => (
         <div key={comment.id}>
           <hr />
-          <b>{comment.email} - {comment.name}</b>
+          <b>
+            {comment.email} - {comment.name}
+          </b>
           <div>{comment.body}</div>
         </div>
       ))}
