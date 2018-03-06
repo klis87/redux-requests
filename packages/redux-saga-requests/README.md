@@ -213,7 +213,11 @@ action, as `sendRequest` would be aborted as it would lose with `take(CANCEL_REQ
 Of course, you can send requests directly also from your sagas:
 ```javascript
 function* fetchBookSaga() {
-  const { response, error } = yield call(sendRequest, fetchBooks(), true);
+  const { response, error } = yield call(
+    sendRequest,
+    fetchBooks(),
+    { dispatchRequestAction: true },
+  );
 
   if (response) {
     // do sth with response
@@ -222,7 +226,7 @@ function* fetchBookSaga() {
   }
 }
 ```
-The key here is, that you need to pass `true` as second argument to `sendRequest`, so that `fetchBooks` action will be
+The key here is, that you need to pass `{ dispatchRequestAction: true }` as second argument to `sendRequest`, so that `fetchBooks` action will be
 dispatched - usually it is already dispatched somewhere else (from your React components `onClick` for instance),
 but here not, so we must explicitely tell `sendRequest` to dispatch it.
 
@@ -487,20 +491,34 @@ const booksReducer = (state = initialState, action) => {
 
 You can add global handlers to `onRequest`, `onSuccess`, `onError` add `onAbort`, like so:
 ```javascript
-function* onRequestSaga(request) {
-  ...
+function* onRequestSaga(request, action) {
+  // do sth with you request, like add header etc.
+  return request;
 }
 
-function* onResponseSaga(response) {
-  ...
+function* onResponseSaga(response, action) {
+  // do sth with the response
+  return response;
 }
 
-function* onErrorSaga(error) {
-  ...
+function* onErrorSaga(error, action) {
+  // do sth here
+  throw error; // rethrow the error
+  // or...
+  // do something else, like retry this request
+  // remember to pass { silent: true }, which wont dispatch any action for below request
+  // and it wont call any interceptor, which could cause an infinite loop
+  const { response, error } = yield call(sendRequest, action, { silent: true });
+
+  if (response) {
+    return response; // now request succeeded, we can return response
+  }
+
+  throw error; // we have an error again, so we dont retry anymore but throw the error
 }
 
-function* onAbortSaga() {
-  ...
+function* onAbortSaga(action) {
+  // do sth, for example an action dispatch
 }
 
 function* rootSaga() {
