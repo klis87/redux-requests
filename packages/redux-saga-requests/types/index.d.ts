@@ -43,22 +43,6 @@ export interface Driver {
   getRequestHandlers: GetRequestHandlers;
 }
 
-interface OnRequest {
-  (request: any): any;
-}
-
-interface OnSuccess {
-  (response: any): any;
-}
-
-interface OnError {
-  (error: any): any;
-}
-
-interface OnAbort {
-  (): any;
-}
-
 type ActionWithSingleRequest = {
   type: string;
   request: any;
@@ -87,22 +71,38 @@ type ActionWithMultipleRequestAsPayload = {
   payload: PayloadWithRequests;
 };
 
-type Action =
+type RequestAction =
   | ActionWithSingleRequest
   | ActionWithMultipleRequests
   | ActionWithSingleRequestAsPayload
   | ActionWithMultipleRequestAsPayload;
 
 interface SuccessAction {
-  (action: Action, data: any): AnyAction;
+  (action: RequestAction, data: any): AnyAction;
 }
 
 interface ErrorAction {
-  (action: Action, error: any): AnyAction;
+  (action: RequestAction, error: any): AnyAction;
 }
 
 interface AbortAction {
-  (action: Action): AnyAction;
+  (action: RequestAction): AnyAction;
+}
+
+interface OnRequest {
+  (request: any, action: RequestAction): any;
+}
+
+interface OnSuccess {
+  (response: any, action: RequestAction): any;
+}
+
+interface OnError {
+  (error: any, action: RequestAction): any;
+}
+
+interface OnAbort {
+  (action: RequestAction): void;
 }
 
 interface RequestInstanceConfig {
@@ -126,9 +126,14 @@ export function createRequestInstance(
 
 export function getRequestInstance(): any;
 
+type SendRequestConfig = {
+  dispatchRequestAction?: boolean;
+  silent?: boolean;
+};
+
 export function sendRequest(
-  action: Action,
-  dispatchRequestAction?: boolean,
+  action: RequestAction,
+  config?: SendRequestConfig,
 ): any;
 
 export function watchRequests(): any;

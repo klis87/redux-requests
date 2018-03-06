@@ -53,7 +53,10 @@ getRequestInstance();
 sendRequest({ type: 'type', request: {} });
 sendRequest({ type: 'type', payload: { request: {} } });
 sendRequest({ type: 'type', payload: { requests: [{}] } });
-sendRequest({ type: 'type', requests: [{}, {}] }, true);
+sendRequest(
+  { type: 'type', requests: [{}, {}] },
+  { dispatchRequestAction: true },
+);
 
 watchRequests();
 
