@@ -65,10 +65,10 @@ export const defaultConfig = {
   successAction,
   errorAction,
   abortAction,
-  onRequest: voidCallback,
-  onSuccess: voidCallback,
-  onError: voidCallback,
-  onAbort: voidCallback,
+  onRequest: null,
+  onSuccess: null,
+  onError: null,
+  onAbort: null,
 };
 
 export function createRequestInstance(requestInstance, config) {
@@ -115,6 +115,7 @@ export function* sendRequest(action, dispatchRequestAction = false) {
   }
 
   const { driver } = requestsConfig;
+
   const requestHandlers = yield call(
     [driver, 'getRequestHandlers'],
     requestInstance,
@@ -123,54 +124,77 @@ export function* sendRequest(action, dispatchRequestAction = false) {
 
   const actionPayload = getActionPayload(action);
 
+  let request = actionPayload.request || actionPayload.requests;
+
+  if (requestsConfig.onRequest) {
+    request = yield call(requestsConfig.onRequest, request);
+  }
+
   try {
     let response;
-    let successPayload;
+    let responseError;
 
-    if (actionPayload.request) {
-      yield call(requestsConfig.onRequest, actionPayload.request);
-      response = yield call(requestHandlers.sendRequest, actionPayload.request);
-      successPayload = yield call(
-        driver.getSuccessPayload,
-        response,
-        actionPayload.request,
-      );
-    } else {
-      yield call(requestsConfig.onRequest, actionPayload.requests);
-      response = yield all(
-        actionPayload.requests.map(request =>
-          call(requestHandlers.sendRequest, request),
-        ),
-      );
-      successPayload = yield call(
-        driver.getSuccessPayload,
-        response,
-        actionPayload.requests,
-      );
+    try {
+      if (actionPayload.request) {
+        response = yield call(requestHandlers.sendRequest, request);
+      } else {
+        response = yield all(
+          request.map(request => call(requestHandlers.sendRequest, request)),
+        );
+      }
+    } catch (e) {
+      responseError = e;
     }
+
+    if (responseError) {
+      if (requestsConfig.onError) {
+        try {
+          response = yield call(requestsConfig.onError, responseError);
+        } catch (e) {
+          responseError = e;
+        }
+      }
+
+      if (!response) {
+        const errorPayload = yield call(driver.getErrorPayload, responseError);
+
+        yield put({
+          type: requestsConfig.error(action.type),
+          ...requestsConfig.errorAction(action, errorPayload),
+        });
+
+        return { error: responseError };
+      }
+    }
+
+    if (requestsConfig.onSuccess) {
+      response = yield call(requestsConfig.onSuccess, response);
+    }
+
+    const successPayload = yield call(
+      driver.getSuccessPayload,
+      response,
+      request,
+    );
 
     yield put({
       type: requestsConfig.success(action.type),
       ...requestsConfig.successAction(action, successPayload),
     });
-    yield call(requestsConfig.onSuccess, response);
+
     return { response };
-  } catch (e) {
-    const errorPayload = yield call(driver.getErrorPayload, e);
-    yield put({
-      type: requestsConfig.error(action.type),
-      ...requestsConfig.errorAction(action, errorPayload),
-    });
-    yield call(requestsConfig.onError, e);
-    return { error: e };
   } finally {
     if (yield cancelled()) {
       yield abortRequestIfDefined(requestHandlers.abortRequest);
+
+      if (requestsConfig.onAbort) {
+        yield call(requestsConfig.onAbort);
+      }
+
       yield put({
         type: requestsConfig.abort(action.type),
         ...requestsConfig.abortAction(action),
       });
-      yield call(requestsConfig.onAbort);
     }
   }
 }

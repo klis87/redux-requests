@@ -31,6 +31,7 @@ import {
 } from './sagas';
 
 // TODO: implement those test with a saga test library
+
 const dummyDriver = {
   getSuccessPayload: () => {},
   getErrorPayload: () => {},
@@ -57,10 +58,10 @@ describe('sagas', () => {
         errorAction,
         abortAction,
         driver: null,
-        onRequest: voidCallback,
-        onSuccess: voidCallback,
-        onError: voidCallback,
-        onAbort: voidCallback,
+        onRequest: null,
+        onSuccess: null,
+        onError: null,
+        onAbort: null,
       };
 
       assert.deepEqual(defaultConfig, expected);
@@ -168,17 +169,17 @@ describe('sagas', () => {
         assert.deepEqual(gen.next(config).value, expected);
       });
 
-      it('calls onRequest', () => {
-        const expected = call(config.onRequest, action.payload.request);
-        assert.deepEqual(gen.next(requestHandlers).value, expected);
-      });
+      // it('calls onRequest', () => {
+      //   const expected = call(config.onRequest, action.payload.request);
+      //   assert.deepEqual(gen.next(requestHandlers).value, expected);
+      // });
 
       it('calls sendRequest', () => {
         const expected = call(
           requestHandlers.sendRequest,
           action.payload.request,
         );
-        assert.deepEqual(gen.next().value, expected);
+        assert.deepEqual(gen.next(requestHandlers).value, expected);
       });
 
       it('dispatches error, calls on Error and returns request error action when there is an error', () => {
@@ -198,10 +199,10 @@ describe('sagas', () => {
           },
         });
         assert.deepEqual(errorGen.next(errorPayload).value, expected);
-        assert.deepEqual(
-          errorGen.next(requestHandlers).value,
-          call(config.onError, requestError),
-        );
+        // assert.deepEqual(
+        //   errorGen.next(requestHandlers).value,
+        //   call(config.onError, requestError),
+        // );
         errorGen.next(); // to fire finally yield
         assert.deepEqual(errorGen.next().value, { error: requestError });
       });
@@ -223,10 +224,10 @@ describe('sagas', () => {
         assert.deepEqual(gen.next(response.data).value, expected);
       });
 
-      it('calls onSuccess', () => {
-        const expected = call(config.onSuccess, response);
-        assert.deepEqual(gen.next().value, expected);
-      });
+      // it('calls onSuccess', () => {
+      //   const expected = call(config.onSuccess, response);
+      //   assert.deepEqual(gen.next().value, expected);
+      // });
 
       it('awaits cancellation', () => {
         assert.deepEqual(gen.next().value, cancelled());
@@ -244,7 +245,7 @@ describe('sagas', () => {
           },
         });
         assert.deepEqual(gen.next().value, expected);
-        assert.deepEqual(gen.next(requestHandlers).value, call(config.onAbort));
+        // assert.deepEqual(gen.next(requestHandlers).value, call(config.onAbort));
       });
 
       it('returns response', () => {
@@ -283,10 +284,10 @@ describe('sagas', () => {
         assert.deepEqual(gen.next(config).value, expected);
       });
 
-      it('calls onRequest', () => {
-        const expected = call(config.onRequest, action.requests);
-        assert.deepEqual(gen.next(requestHandlers).value, expected);
-      });
+      // it('calls onRequest', () => {
+      //   const expected = call(config.onRequest, action.requests);
+      //   assert.deepEqual(gen.next(requestHandlers).value, expected);
+      // });
 
       it('calls sendRequests', () => {
         const expected = all([
@@ -312,10 +313,10 @@ describe('sagas', () => {
         assert.deepEqual(gen.next(data).value, expected);
       });
 
-      it('calls onSuccess', () => {
-        const expected = call(config.onSuccess, responses);
-        assert.deepEqual(gen.next(requestHandlers).value, expected);
-      });
+      // it('calls onSuccess', () => {
+      //   const expected = call(config.onSuccess, responses);
+      //   assert.deepEqual(gen.next(requestHandlers).value, expected);
+      // });
 
       it('returns response array', () => {
         gen.next(); // to fire finally yield

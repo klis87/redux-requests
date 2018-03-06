@@ -5,6 +5,8 @@ import {
   CLEAR_POST,
   CANCEL_FETCH_POST,
   INCREMENT_REQUEST_COUNTER,
+  INCREMENT_RESPONSE_COUNTER,
+  INCREMENT_ERROR_COUNTER,
 } from './constants';
 
 export const fetchPhoto = id => ({
@@ -24,4 +26,12 @@ export const cancelFetchPost = () => ({ type: CANCEL_FETCH_POST });
 
 export const incrementRequestCounter = () => ({
   type: INCREMENT_REQUEST_COUNTER,
+});
+
+export const incrementResponseCounter = () => ({
+  type: INCREMENT_RESPONSE_COUNTER,
+});
+
+export const incrementErrorCounter = () => ({
+  type: INCREMENT_ERROR_COUNTER,
 });

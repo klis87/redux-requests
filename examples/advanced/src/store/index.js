@@ -10,12 +10,22 @@ import {
   postReducer,
   abortCounterReducer,
   requestCounterReducer,
+  responseCounterReducer,
+  errorCounterReducer,
 } from './reducers';
-import { photoSaga, postSaga, requestCounterSaga } from './sagas';
+import {
+  photoSaga,
+  postSaga,
+  requestCounterSaga,
+  responseCounterSaga,
+  errorCounterSaga,
+} from './sagas';
 
 function* rootSaga(axiosInstance) {
   yield createRequestInstance(axiosInstance, {
     onRequest: requestCounterSaga,
+    onSuccess: responseCounterSaga,
+    onError: errorCounterSaga,
     driver: axiosDriver,
   });
   yield fork(photoSaga);
@@ -28,6 +38,8 @@ export const configureStore = () => {
     post: postReducer,
     abortCounter: abortCounterReducer,
     requestCounter: requestCounterReducer,
+    responseCounter: responseCounterReducer,
+    errorCounter: errorCounterReducer,
   });
 
   const sagaMiddleware = createSagaMiddleware();
