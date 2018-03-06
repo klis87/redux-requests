@@ -6,6 +6,7 @@ import {
   incrementRequestCounter,
   incrementResponseCounter,
   incrementErrorCounter,
+  fetchPhoto,
 } from './actions';
 
 export function* photoSaga() {
@@ -30,7 +31,24 @@ export function* responseCounterSaga(response) {
   return response;
 }
 
-export function* errorCounterSaga(error) {
+export function* errorCounterSaga(error, action) {
   yield put(incrementErrorCounter());
+
+  if (
+    error.response &&
+    error.response.status === 404 &&
+    action.type === FETCH_PHOTO
+  ) {
+    const { response, error } = yield sendRequest(fetchPhoto(1), {
+      silent: true,
+    });
+
+    if (response) {
+      return response;
+    }
+
+    throw error;
+  }
+
   throw error;
 }

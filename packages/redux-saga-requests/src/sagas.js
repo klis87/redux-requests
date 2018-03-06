@@ -102,7 +102,10 @@ export const abortRequestIfDefined = abortRequest => {
   return null;
 };
 
-export function* sendRequest(action, dispatchRequestAction = false) {
+export function* sendRequest(
+  action,
+  { dispatchRequestAction = false, silent = false } = {},
+) {
   if (!isRequestAction(action)) {
     throw new Error(INCORRECT_PAYLOAD_ERROR);
   }
@@ -110,7 +113,7 @@ export function* sendRequest(action, dispatchRequestAction = false) {
   const requestInstance = yield getRequestInstance();
   const requestsConfig = yield getRequestsConfig();
 
-  if (dispatchRequestAction) {
+  if (dispatchRequestAction && !silent) {
     yield put(action);
   }
 
@@ -126,8 +129,8 @@ export function* sendRequest(action, dispatchRequestAction = false) {
 
   let request = actionPayload.request || actionPayload.requests;
 
-  if (requestsConfig.onRequest) {
-    request = yield call(requestsConfig.onRequest, request);
+  if (requestsConfig.onRequest && !silent) {
+    request = yield call(requestsConfig.onRequest, request, action);
   }
 
   try {
@@ -147,9 +150,9 @@ export function* sendRequest(action, dispatchRequestAction = false) {
     }
 
     if (responseError) {
-      if (requestsConfig.onError) {
+      if (requestsConfig.onError && !silent) {
         try {
-          response = yield call(requestsConfig.onError, responseError);
+          response = yield call(requestsConfig.onError, responseError, action);
         } catch (e) {
           responseError = e;
         }
@@ -158,17 +161,19 @@ export function* sendRequest(action, dispatchRequestAction = false) {
       if (!response) {
         const errorPayload = yield call(driver.getErrorPayload, responseError);
 
-        yield put({
-          type: requestsConfig.error(action.type),
-          ...requestsConfig.errorAction(action, errorPayload),
-        });
+        if (!silent) {
+          yield put({
+            type: requestsConfig.error(action.type),
+            ...requestsConfig.errorAction(action, errorPayload),
+          });
+        }
 
         return { error: responseError };
       }
     }
 
-    if (requestsConfig.onSuccess) {
-      response = yield call(requestsConfig.onSuccess, response);
+    if (requestsConfig.onSuccess && !silent) {
+      response = yield call(requestsConfig.onSuccess, response, action);
     }
 
     const successPayload = yield call(
@@ -177,24 +182,28 @@ export function* sendRequest(action, dispatchRequestAction = false) {
       request,
     );
 
-    yield put({
-      type: requestsConfig.success(action.type),
-      ...requestsConfig.successAction(action, successPayload),
-    });
+    if (!silent) {
+      yield put({
+        type: requestsConfig.success(action.type),
+        ...requestsConfig.successAction(action, successPayload),
+      });
+    }
 
     return { response };
   } finally {
     if (yield cancelled()) {
       yield abortRequestIfDefined(requestHandlers.abortRequest);
 
-      if (requestsConfig.onAbort) {
-        yield call(requestsConfig.onAbort);
+      if (requestsConfig.onAbort && !silent) {
+        yield call(requestsConfig.onAbort, action);
       }
 
-      yield put({
-        type: requestsConfig.abort(action.type),
-        ...requestsConfig.abortAction(action),
-      });
+      if (!silent) {
+        yield put({
+          type: requestsConfig.abort(action.type),
+          ...requestsConfig.abortAction(action),
+        });
+      }
     }
   }
 }

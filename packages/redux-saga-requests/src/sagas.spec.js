@@ -132,7 +132,7 @@ describe('sagas', () => {
     describe('with correct payload with dispatchRequestAction', () => {
       it('dispatches request action', () => {
         const action = { type: 'FETCH', request: { url: '/url' } };
-        const gen = sendRequest(action, true);
+        const gen = sendRequest(action, { dispatchRequestAction: true });
         gen.next();
         gen.next();
         assert.deepEqual(gen.next().value, put(action));

@@ -80,7 +80,8 @@ const App = ({
         Fetch photo with id 1
       </button>
       <button style={buttonStyle} onClick={() => fetchPhoto(10001)}>
-        Fetch non-existent photo
+        Fetch non-existent photo, with id 1 as fallback (with onError
+        interceptor)
       </button>
       <EntityContainer
         error={photoFetchError}
