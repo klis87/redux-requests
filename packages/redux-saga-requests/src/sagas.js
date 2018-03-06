@@ -142,7 +142,9 @@ export function* sendRequest(
         response = yield call(requestHandlers.sendRequest, request);
       } else {
         response = yield all(
-          request.map(request => call(requestHandlers.sendRequest, request)),
+          request.map(requestItem =>
+            call(requestHandlers.sendRequest, requestItem),
+          ),
         );
       }
     } catch (e) {
