@@ -530,7 +530,7 @@ function* onErrorSaga(error, action) {
       // - with runOnError: false not to call this interceptor again for this request
       return yield call(sendRequest, action, { silent: true, runOnError: false });
 
-      // above is a handy shortcut of doing
+      /* above is a handy shortcut of doing
       const { response, error } = yield call(
         sendRequest,
         action,
@@ -541,7 +541,7 @@ function* onErrorSaga(error, action) {
         return { response };
       } else {
         return { error };
-      }
+      } */
     } catch(e) {
       // we didnt manage to get a new token
       return { error: e }
