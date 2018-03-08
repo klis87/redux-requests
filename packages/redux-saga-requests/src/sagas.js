@@ -104,7 +104,14 @@ export const abortRequestIfDefined = abortRequest => {
 
 export function* sendRequest(
   action,
-  { dispatchRequestAction = false, silent = false } = {},
+  {
+    dispatchRequestAction = false,
+    silent = false,
+    runOnRequest = true,
+    runOnSuccess = true,
+    runOnError = true,
+    runOnAbort = true,
+  } = {},
 ) {
   if (!isRequestAction(action)) {
     throw new Error(INCORRECT_PAYLOAD_ERROR);
@@ -129,7 +136,7 @@ export function* sendRequest(
 
   let request = actionPayload.request || actionPayload.requests;
 
-  if (requestsConfig.onRequest && !silent) {
+  if (requestsConfig.onRequest && runOnRequest) {
     request = yield call(requestsConfig.onRequest, request, action);
   }
 
@@ -152,7 +159,7 @@ export function* sendRequest(
     }
 
     if (responseError) {
-      if (requestsConfig.onError && !silent) {
+      if (requestsConfig.onError && runOnError) {
         try {
           response = yield call(requestsConfig.onError, responseError, action);
         } catch (e) {
@@ -174,7 +181,7 @@ export function* sendRequest(
       }
     }
 
-    if (requestsConfig.onSuccess && !silent) {
+    if (requestsConfig.onSuccess && runOnSuccess) {
       response = yield call(requestsConfig.onSuccess, response, action);
     }
 
@@ -196,7 +203,7 @@ export function* sendRequest(
     if (yield cancelled()) {
       yield abortRequestIfDefined(requestHandlers.abortRequest);
 
-      if (requestsConfig.onAbort && !silent) {
+      if (requestsConfig.onAbort && runOnAbort) {
         yield call(requestsConfig.onAbort, action);
       }
 

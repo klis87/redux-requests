@@ -129,6 +129,10 @@ export function getRequestInstance(): any;
 type SendRequestConfig = {
   dispatchRequestAction?: boolean;
   silent?: boolean;
+  runOnRequest?: boolean;
+  runOnSuccess?: boolean;
+  runOnError?: boolean;
+  runOnAbort?: boolean;
 };
 
 export function sendRequest(

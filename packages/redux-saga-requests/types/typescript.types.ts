@@ -55,7 +55,14 @@ sendRequest({ type: 'type', payload: { request: {} } });
 sendRequest({ type: 'type', payload: { requests: [{}] } });
 sendRequest(
   { type: 'type', requests: [{}, {}] },
-  { dispatchRequestAction: true },
+  {
+    dispatchRequestAction: true,
+    silent: false,
+    runOnRequest: false,
+    runOnSuccess: false,
+    runOnError: false,
+    runOnAbort: false,
+  },
 );
 
 watchRequests();
