@@ -40,10 +40,10 @@ const requestInstanceConfig = {
   errorAction,
   abortAction,
   driver: dummyDriver,
-  onRequest: request => ({}),
-  onSuccess: response => ({}),
-  onError: error => ({}),
-  onAbort: () => ({}),
+  onRequest: (request, action) => request,
+  onSuccess: (response, action) => response,
+  onError: (error, action) => ({ error }),
+  onAbort: action => {},
 };
 
 createRequestInstance({}, requestInstanceConfig);
