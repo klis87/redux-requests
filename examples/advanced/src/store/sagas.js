@@ -39,16 +39,11 @@ export function* errorCounterSaga(error, action) {
     error.response.status === 404 &&
     action.type === FETCH_PHOTO
   ) {
-    const { response, error } = yield sendRequest(fetchPhoto(1), {
+    return yield sendRequest(fetchPhoto(1), {
       silent: true,
+      runOnError: false, // to prevent endless loop in case photo with id 1 also doesnt exist
     });
-
-    if (response) {
-      return response;
-    }
-
-    throw error;
   }
 
-  throw error;
+  return { error };
 }

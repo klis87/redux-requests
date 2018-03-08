@@ -160,10 +160,16 @@ export function* sendRequest(
 
     if (responseError) {
       if (requestsConfig.onError && runOnError) {
-        try {
-          response = yield call(requestsConfig.onError, responseError, action);
-        } catch (e) {
-          responseError = e;
+        const { response: onErrorResponse, error: onErrorError } = yield call(
+          requestsConfig.onError,
+          responseError,
+          action,
+        );
+
+        if (onErrorResponse) {
+          response = onErrorResponse;
+        } else {
+          responseError = onErrorError;
         }
       }
 
