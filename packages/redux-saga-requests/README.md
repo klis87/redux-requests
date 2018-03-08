@@ -493,30 +493,63 @@ const booksReducer = (state = initialState, action) => {
 
 You can add global handlers to `onRequest`, `onSuccess`, `onError` add `onAbort`, like so:
 ```javascript
+import { sendRequest, getRequestInstance } from 'redux-saga-requests';
+
 function* onRequestSaga(request, action) {
-  // do sth with you request, like add header etc.
+  // do sth with you request, like add token to header, or dispatch some action etc.
   return request;
 }
 
 function* onResponseSaga(response, action) {
-  // do sth with the response
+  // do sth with the response, dispatch some action etc
   return response;
 }
 
 function* onErrorSaga(error, action) {
-  // do sth here
-  throw error; // rethrow the error
-  // or...
-  // do something else, like retry this request
-  // remember to pass { silent: true }, which wont dispatch any action for below request
-  // and it wont call any interceptor, which could cause an infinite loop
-  const { response, error } = yield call(sendRequest, action, { silent: true });
+  // do sth here, like dispatch some action
 
-  if (response) {
-    return response; // now request succeeded, we can return response
+  // you must return { error } in case you dont want to catch error
+  // or { error: anotherError }
+  // or { response: someRequestResponse } if you want to recover from error
+
+  if (tokenExpired(error)) {
+    // get driver instance, in our case Axios to make a request without Redux
+    const requestInstance = yield getRequestInstance();
+
+    try {
+      // trying to get a new token
+      const { data } = yield call(
+        requestInstance.post,
+        '/refreshToken',
+      );
+
+      saveNewToken(data.token); // for example to localStorage
+
+      // we fire the same request again:
+      // - with silent: true not to dispatch duplicated actions
+      // - with runOnError: false not to call this interceptor again for this request
+      return yield call(sendRequest, action, { silent: true, runOnError: false });
+
+      // above is a handy shortcut of doing
+      const { response, error } = yield call(
+        sendRequest,
+        action,
+        { silent: true, runOnError: false },
+      );
+
+      if (response) {
+        return { response };
+      } else {
+        return { error };
+      }
+    } catch(e) {
+      // we didnt manage to get a new token
+      return { error: e }
+    }
   }
 
-  throw error; // we have an error again, so we dont retry anymore but throw the error
+  // not related token error, we pass it like nothing happened
+  return { error };
 }
 
 function* onAbortSaga(action) {
