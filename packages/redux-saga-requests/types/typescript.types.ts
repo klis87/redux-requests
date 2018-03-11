@@ -99,6 +99,7 @@ const globalConfig = {
     ...state,
     [pendingKey]: state[pendingKey] - 1,
   }),
+  resetOn: ['RESET'],
 };
 requestsReducer({ actionType: 'actionType' });
 requestsReducer({

@@ -70,6 +70,7 @@ const defaultConfig = {
     ...state,
     [pendingKey]: state[pendingKey] - 1,
   }),
+  resetOn: [],
 };
 
 export const createRequestsReducer = (globalConfig = {}) => (
@@ -88,10 +89,15 @@ export const createRequestsReducer = (globalConfig = {}) => (
     success,
     error,
     abort,
+    resetOn,
     actionType,
   } = config;
 
   const normalizedActionType = normalizeActionType(actionType);
+
+  if (resetOn.includes(action.type)) {
+    return getInitialState(state, reducer, config);
+  }
 
   switch (action.type) {
     case normalizedActionType:

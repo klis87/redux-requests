@@ -208,8 +208,9 @@ describe('reducers', () => {
     describe('with passed reducer', () => {
       const notRequestState = { counter: 0 };
       const INCREMENT = 'INCREMENT';
+      const RESET = 'RESET';
       const reducer = requestsReducer(
-        { actionType },
+        { actionType, resetOn: [RESET] },
         (state = notRequestState, action) => {
           switch (action.type) {
             case INCREMENT:
@@ -297,6 +298,19 @@ describe('reducers', () => {
         };
         const action = { type: INCREMENT };
         assert.deepEqual(reducer(initialState, action), expected);
+      });
+
+      it('handles reset action', () => {
+        const expected = {
+          data: null,
+          error: null,
+          pending: 0,
+          counter: 0,
+        };
+
+        let nextState = reducer(initialState, { type: INCREMENT });
+        nextState = reducer(nextState, { type: actionType });
+        assert.deepEqual(reducer(nextState, { type: RESET }), expected);
       });
     });
   });
