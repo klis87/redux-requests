@@ -411,7 +411,7 @@ when action is FSA compliant
 - `success: (actionType: string) => string`: override when using not standard success action suffix, handles `_SUCCESS` as a default
 - `error: (actionType: string) => string`: override when using not standard error action suffix, handles `_ERROR` as a default
 - `abort: (actionType: string) => string`: override when using not standard abort action suffix, handles `_ABORT` as a default
-- `resetOn: string[]`: array of action types on which reducer will reset its state to initial one, for instance `['LOGOUT']`, `[]` as a default
+- `resetOn: action => boolean or string[]`: callback or array of action types on which reducer will reset its state to initial one, for instance `['LOGOUT']` or `action => action.type === 'TYPE'`, `[]` as a default
 
 For example:
 ```javascript

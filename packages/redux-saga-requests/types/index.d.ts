@@ -146,6 +146,10 @@ interface OnActionCallback {
   (state: any, action: AnyAction, config: MergedReducerConfig): any;
 }
 
+interface ResetOnCallback {
+  (action: AnyAction): boolean;
+}
+
 type GlobalReducerConfig = {
   success?: ActionTypeModifier;
   error?: ActionTypeModifier;
@@ -160,7 +164,7 @@ type GlobalReducerConfig = {
   onSuccess?: OnActionCallback;
   onError?: OnActionCallback;
   onAbort?: OnActionCallback;
-  resetOn?: string[];
+  resetOn?: ResetOnCallback | string[];
 };
 
 type ActionTypeReducerConfig = {

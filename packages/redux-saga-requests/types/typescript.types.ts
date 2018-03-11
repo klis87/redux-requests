@@ -101,7 +101,10 @@ const globalConfig = {
   }),
   resetOn: ['RESET'],
 };
-requestsReducer({ actionType: 'actionType' });
+requestsReducer({
+  actionType: 'actionType',
+  resetOn: action => action.type === 'SOME_TYPE',
+});
 requestsReducer({
   actionType: 'actionType',
   ...globalConfig,

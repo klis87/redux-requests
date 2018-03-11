@@ -92,6 +92,7 @@ describe('reducers', () => {
       const localSuccess = getActionWithSuffix('success');
       const localError = getActionWithSuffix('error');
       const localAbort = getActionWithSuffix('abort');
+      const RESET = 'RESET';
       const reducer = requestsReducer({
         actionType,
         success: localSuccess,
@@ -140,6 +141,7 @@ describe('reducers', () => {
           [pendingKey]: state[pendingKey] - 1,
           multiple,
         }),
+        resetOn: action => action.type === RESET,
       });
       const initialState = reducer(undefined, {});
 
@@ -202,6 +204,17 @@ describe('reducers', () => {
         };
         const action = { type: localAbort(actionType) };
         assert.deepEqual(reducer(initialState, action), expected);
+      });
+
+      it('handles reset action when resetOn is function', () => {
+        const expected = {
+          items: [],
+          fail: null,
+          fetching: 0,
+        };
+
+        const nextState = reducer(initialState, { type: actionType });
+        assert.deepEqual(reducer(nextState, { type: 'RESET' }), expected);
       });
     });
 
@@ -300,7 +313,7 @@ describe('reducers', () => {
         assert.deepEqual(reducer(initialState, action), expected);
       });
 
-      it('handles reset action', () => {
+      it('handles reset action when resetOn is string array', () => {
         const expected = {
           data: null,
           error: null,
