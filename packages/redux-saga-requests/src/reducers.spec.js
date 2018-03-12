@@ -210,10 +210,11 @@ describe('reducers', () => {
         const expected = {
           items: [],
           fail: null,
-          fetching: 0,
+          fetching: 2,
         };
 
-        const nextState = reducer(initialState, { type: actionType });
+        let nextState = reducer(initialState, { type: actionType });
+        nextState = reducer(nextState, { type: actionType });
         assert.deepEqual(reducer(nextState, { type: 'RESET' }), expected);
       });
     });
@@ -317,7 +318,7 @@ describe('reducers', () => {
         const expected = {
           data: null,
           error: null,
-          pending: 0,
+          pending: 1,
           counter: 0,
         };
 

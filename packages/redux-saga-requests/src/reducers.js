@@ -90,6 +90,7 @@ export const createRequestsReducer = (globalConfig = {}) => (
     error,
     abort,
     resetOn,
+    pendingKey,
     actionType,
   } = config;
 
@@ -99,7 +100,10 @@ export const createRequestsReducer = (globalConfig = {}) => (
     (typeof resetOn === 'function' && resetOn(action)) ||
     (typeof resetOn !== 'function' && resetOn.includes(action.type))
   ) {
-    return getInitialState(state, reducer, config);
+    return {
+      ...getInitialState(state, reducer, config),
+      [pendingKey]: state[pendingKey],
+    };
   }
 
   switch (action.type) {
