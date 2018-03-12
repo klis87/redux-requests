@@ -98,7 +98,8 @@ export const createRequestsReducer = (globalConfig = {}) => (
 
   if (
     (typeof resetOn === 'function' && resetOn(action)) ||
-    (typeof resetOn !== 'function' && resetOn.includes(action.type))
+    (typeof resetOn !== 'function' &&
+      resetOn.map(normalizeActionType).includes(action.type))
   ) {
     return {
       ...getInitialState(state, reducer, config),
