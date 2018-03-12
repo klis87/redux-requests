@@ -1,8 +1,7 @@
 import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
 import createSagaMiddleware from 'redux-saga';
-import { fork } from 'redux-saga/effects';
 import axios from 'axios';
-import { createRequestInstance } from 'redux-saga-requests';
+import { createRequestInstance, watchRequests } from 'redux-saga-requests';
 import axiosDriver from 'redux-saga-requests-axios';
 
 import {
@@ -14,12 +13,11 @@ import {
   errorCounterReducer,
 } from './reducers';
 import {
-  photoSaga,
-  postSaga,
   requestCounterSaga,
   responseCounterSaga,
   errorCounterSaga,
 } from './sagas';
+import { FETCH_PHOTO, CLEAR_PHOTO, FETCH_POST, CLEAR_POST } from './constants';
 
 function* rootSaga(axiosInstance) {
   yield createRequestInstance(axiosInstance, {
@@ -28,8 +26,10 @@ function* rootSaga(axiosInstance) {
     onError: errorCounterSaga,
     driver: axiosDriver,
   });
-  yield fork(photoSaga);
-  yield fork(postSaga);
+  yield watchRequests(null, {
+    [FETCH_PHOTO]: { abortOn: CLEAR_PHOTO },
+    [FETCH_POST]: { abortOn: CLEAR_POST },
+  });
 }
 
 export const configureStore = () => {

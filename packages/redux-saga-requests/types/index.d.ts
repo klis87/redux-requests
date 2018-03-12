@@ -140,14 +140,27 @@ export function sendRequest(
   config?: SendRequestConfig,
 ): any;
 
-export function watchRequests(): any;
+interface FilterOnActionCallback {
+  (action: AnyAction): boolean;
+}
+
+type WatchRequestsConfig = {
+  takeLatest?: boolean;
+  abortOn?: FilterOnActionCallback | string | string[];
+  getLastActionKey?: (action: AnyAction) => string;
+};
+
+type WatchRequestsConfigPerRequestType = {
+  [actionType: string]: WatchRequestsConfig;
+};
+
+export function watchRequests(
+  commonConfig?: WatchRequestsConfig,
+  perRequestTypeConfig?: WatchRequestsConfigPerRequestType,
+): void;
 
 interface OnActionCallback {
   (state: any, action: AnyAction, config: MergedReducerConfig): any;
-}
-
-interface ResetOnCallback {
-  (action: AnyAction): boolean;
 }
 
 type GlobalReducerConfig = {
@@ -164,7 +177,7 @@ type GlobalReducerConfig = {
   onSuccess?: OnActionCallback;
   onError?: OnActionCallback;
   onAbort?: OnActionCallback;
-  resetOn?: ResetOnCallback | string[];
+  resetOn?: FilterOnActionCallback | string[];
 };
 
 type ActionTypeReducerConfig = {
@@ -188,7 +201,7 @@ type MergedReducerConfig = {
   onSuccess: OnActionCallback;
   onError: OnActionCallback;
   onAbort: OnActionCallback;
-  resetOn: string[];
+  resetOn: FilterOnActionCallback | string[];
 };
 
 interface RequestsReducer {

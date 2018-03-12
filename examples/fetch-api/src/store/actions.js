@@ -1,10 +1,4 @@
-import {
-  FETCH_PHOTO,
-  CLEAR_PHOTO,
-  FETCH_POST,
-  CLEAR_POST,
-  CANCEL_FETCH_POST,
-} from './constants';
+import { FETCH_PHOTO, CLEAR_PHOTO, FETCH_POST, CLEAR_POST } from './constants';
 
 export const fetchPhoto = id => ({
   type: FETCH_PHOTO,
@@ -19,4 +13,3 @@ export const fetchPost = id => ({
 });
 
 export const clearPost = () => ({ type: CLEAR_POST });
-export const cancelFetchPost = () => ({ type: CANCEL_FETCH_POST });

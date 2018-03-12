@@ -4,7 +4,8 @@ import {
   call,
   put,
   all,
-  takeEvery,
+  fork,
+  take,
   cancelled,
 } from 'redux-saga/effects';
 import { cloneableGenerator } from 'redux-saga/utils';
@@ -30,7 +31,7 @@ import {
   voidCallback,
 } from './sagas';
 
-// TODO: implement those test with a saga test library
+// TODO: implement those tests with a saga test library
 
 const dummyDriver = {
   getSuccessPayload: () => {},
@@ -334,12 +335,19 @@ describe('sagas', () => {
   });
 
   describe('watchRequests', () => {
-    it('forks sendRequest for every request action', () => {
-      const gen = watchRequests();
-      assert.deepEqual(
-        gen.next().value,
-        takeEvery(isRequestAction, sendRequest),
-      );
+    const gen = watchRequests();
+
+    it('waits for a request action', () => {
+      assert.deepEqual(gen.next().value, take(isRequestAction));
+    });
+
+    it('forks sendRequest', () => {
+      const action = { type: 'REQUEST' };
+      assert.deepEqual(gen.next(action).value, fork(sendRequest, action));
+    });
+
+    it('waits for another request action', () => {
+      assert.deepEqual(gen.next().value, take(isRequestAction));
     });
   });
 });

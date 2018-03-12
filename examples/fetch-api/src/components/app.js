@@ -1,13 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import {
-  fetchPhoto,
-  clearPhoto,
-  fetchPost,
-  clearPost,
-  cancelFetchPost,
-} from '../store/actions';
+import { fetchPhoto, clearPhoto, fetchPost, clearPost } from '../store/actions';
 import EntityContainer from './entity-container';
 import Photo from './photo';
 import Post from './post';
@@ -30,7 +24,6 @@ const mapDispatchToProps = {
   clearPhoto,
   fetchPost,
   clearPost,
-  cancelFetchPost,
 };
 
 const buttonStyle = { marginRight: 10 };
@@ -48,7 +41,6 @@ const App = ({
   clearPhoto,
   fetchPost,
   clearPost,
-  cancelFetchPost,
   abortCounter,
 }) => (
   <div>
@@ -93,11 +85,6 @@ const App = ({
       <button style={buttonStyle} onClick={() => fetchPost(1001)}>
         Fetch non-existent post
       </button>
-      {postIsFetching && (
-        <button style={buttonStyle} onClick={cancelFetchPost}>
-          Cancel fetch
-        </button>
-      )}
       <EntityContainer
         error={postFetchError}
         isFetching={postIsFetching}

@@ -43,6 +43,10 @@ const App = ({
 }) => (
   <div>
     <h1>Redux Saga Requests basic example</h1>
+    <p>
+      In order to see aborts in action, you should set network throttling in
+      your browser
+    </p>
     <hr />
     <div>
       <h2>Photo</h2>

@@ -1,12 +1,17 @@
 import {
   call,
-  takeEvery,
+  fork,
+  join,
+  take,
+  race,
+  cancel,
   put,
   all,
   cancelled,
   getContext,
   setContext,
 } from 'redux-saga/effects';
+import { delay } from 'redux-saga';
 
 import { success, error, abort } from './actions';
 import {
@@ -223,6 +228,52 @@ export function* sendRequest(
   }
 }
 
-export function* watchRequests() {
-  yield takeEvery(isRequestAction, sendRequest);
+const watchRequestsDefaultConfig = {
+  takeLatest: true,
+  abortOn: null,
+  getLastActionKey: action => action.type,
+};
+
+function* cancelSendRequestOnAction(abortOn, task) {
+  const { abortingAction } = yield race({
+    abortingAction: take(abortOn),
+    taskFinished: join(task),
+    timeout: call(delay, 10000), // taskFinished doesnt work for aborted tasks
+  });
+
+  if (abortingAction) {
+    yield cancel(task);
+  }
+}
+
+export function* watchRequests(common = {}, perRequestType = {}) {
+  const lastTasks = {};
+  const config = { ...watchRequestsDefaultConfig, ...common };
+
+  while (true) {
+    const action = yield take(isRequestAction);
+    const localConfig = perRequestType[action.type]
+      ? { ...config, ...perRequestType[action.type] }
+      : config;
+
+    const lastActionKey = localConfig.getLastActionKey(action);
+
+    if (localConfig.takeLatest) {
+      const activeTask = lastTasks[lastActionKey];
+
+      if (activeTask) {
+        yield cancel(activeTask);
+      }
+    }
+
+    const newTask = yield fork(sendRequest, action);
+
+    if (localConfig.takeLatest) {
+      lastTasks[lastActionKey] = newTask;
+    }
+
+    if (localConfig.abortOn) {
+      yield fork(cancelSendRequestOnAction, localConfig.abortOn, newTask);
+    }
+  }
 }

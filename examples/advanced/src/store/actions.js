@@ -3,7 +3,6 @@ import {
   CLEAR_PHOTO,
   FETCH_POST,
   CLEAR_POST,
-  CANCEL_FETCH_POST,
   INCREMENT_REQUEST_COUNTER,
   INCREMENT_RESPONSE_COUNTER,
   INCREMENT_ERROR_COUNTER,
@@ -22,7 +21,6 @@ export const fetchPost = id => ({
 });
 
 export const clearPost = () => ({ type: CLEAR_POST });
-export const cancelFetchPost = () => ({ type: CANCEL_FETCH_POST });
 
 export const incrementRequestCounter = () => ({
   type: INCREMENT_REQUEST_COUNTER,

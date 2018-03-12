@@ -1,19 +1,20 @@
 import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
 import createSagaMiddleware from 'redux-saga';
-import { fork } from 'redux-saga/effects';
-import { createRequestInstance } from 'redux-saga-requests';
+import { createRequestInstance, watchRequests } from 'redux-saga-requests';
 import fetchDriver from 'redux-saga-requests-fetch';
 
 import { photoReducer, postReducer, abortCounterReducer } from './reducers';
-import { photoSaga, postSaga } from './sagas';
+import { FETCH_PHOTO, CLEAR_PHOTO, FETCH_POST, CLEAR_POST } from './constants';
 
 function* rootSaga() {
   yield createRequestInstance(window.fetch, {
     driver: fetchDriver,
     baseURL: 'https://jsonplaceholder.typicode.com',
   });
-  yield fork(photoSaga);
-  yield fork(postSaga);
+  yield watchRequests(null, {
+    [FETCH_PHOTO]: { abortOn: CLEAR_PHOTO },
+    [FETCH_POST]: { abortOn: CLEAR_POST },
+  });
 }
 
 export const configureStore = () => {

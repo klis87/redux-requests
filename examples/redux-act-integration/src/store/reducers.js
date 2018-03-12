@@ -27,22 +27,16 @@ const requestsReducer = createRequestsReducer({
   abort,
 });
 
-export const photoReducer = requestsReducer(
-  { actionType: fetchPhoto },
-  createReducer({
-    [clearPhoto]: state => ({ ...state, data: null, error: null }),
-  }),
-);
+export const photoReducer = requestsReducer({
+  actionType: fetchPhoto,
+  resetOn: [clearPhoto],
+});
 
-export const postReducer = requestsReducer(
-  {
-    actionType: fetchPost,
-    getData: (state, action) => ({
-      ...action.payload.data[0],
-      comments: action.payload.data[1],
-    }),
-  },
-  createReducer({
-    [clearPost]: state => ({ ...state, data: null, error: null }),
+export const postReducer = requestsReducer({
+  actionType: fetchPost,
+  resetOn: [clearPost],
+  getData: (state, action) => ({
+    ...action.payload.data[0],
+    comments: action.payload.data[1],
   }),
-);
+});

@@ -16,4 +16,3 @@ export const fetchPost = createAction('fetch post', id => ({
 }));
 
 export const clearPost = createAction('clear post');
-export const cancelFetchPost = createAction('cancel fetch post');

@@ -5,10 +5,14 @@ import { createRequestInstance, watchRequests } from 'redux-saga-requests';
 import axiosDriver from 'redux-saga-requests-axios';
 
 import { photoReducer, postReducer } from './reducers';
+import { FETCH_PHOTO, CLEAR_PHOTO, FETCH_POST, CLEAR_POST } from './constants';
 
 function* rootSaga(axiosInstance) {
   yield createRequestInstance(axiosInstance, { driver: axiosDriver });
-  yield watchRequests();
+  yield watchRequests(null, {
+    [FETCH_PHOTO]: { abortOn: CLEAR_PHOTO },
+    [FETCH_POST]: { abortOn: CLEAR_POST },
+  });
 }
 
 export const configureStore = () => {

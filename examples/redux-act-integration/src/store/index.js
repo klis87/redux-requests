@@ -6,8 +6,15 @@ import { createRequestInstance, watchRequests } from 'redux-saga-requests';
 import axiosDriver from 'redux-saga-requests-axios';
 
 import { photoReducer, postReducer, abortCounterReducer } from './reducers';
-import { photoSaga, postSaga } from './sagas';
-import { success, error, abort } from './actions';
+import {
+  success,
+  error,
+  abort,
+  fetchPhoto,
+  clearPhoto,
+  fetchPost,
+  clearPost,
+} from './actions';
 
 function* rootSaga(axiosInstance) {
   yield createRequestInstance(axiosInstance, {
@@ -16,8 +23,10 @@ function* rootSaga(axiosInstance) {
     error,
     abort,
   });
-  yield fork(photoSaga);
-  yield fork(postSaga);
+  yield watchRequests(null, {
+    [fetchPhoto]: { abortOn: clearPhoto },
+    [fetchPost]: { abortOn: clearPost },
+  });
 }
 
 export const configureStore = () => {
