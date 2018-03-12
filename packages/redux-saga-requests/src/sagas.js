@@ -42,7 +42,7 @@ export const errorAction = (action, errorData) => ({
         error: true,
       }
     : {
-        error,
+        error: errorData,
       }),
   meta: {
     ...action.meta,
