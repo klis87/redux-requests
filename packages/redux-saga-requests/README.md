@@ -95,11 +95,11 @@ to see how to use those functions in your reducers)
 - `requestsReducer` higher order reducer, which takes requests related state management burden from your shoulders
 - automatic request abort - when a saga is cancelled, a request made by it is automatically aborted and an abort action
 is dispatched (especially handy with `takeLatest` and `race` Redux-Saga effects)
-- sending multiple requests in one action - `{ type: FETCH_BOOKS_AND_AUTHORS, request: [{ url: '/books' }, { url: '/authors}'] }`
+- sending multiple requests in one action - `{ type: FETCH_BOOKS_AND_AUTHORS, requests: [{ url: '/books' }, { url: '/authors}'] }`
 will send two requests and wrap them in `Promise.all`
 - flexibility - you can use "auto mode" `watchRequests`
 (see [basic example](https://github.com/klis87/redux-saga-requests/tree/master/examples/basic)),
-or much more flexible `sendRequest`
+or lower level `sendRequest`
 (see [advanced example](https://github.com/klis87/redux-saga-requests/tree/master/examples/advanced)),
 or... you could even access your request instance with `getRequestInstance`
 - support for Axios and Fetch API - additional clients could be added, you could even write your own client
@@ -149,12 +149,87 @@ Of course, because this is Redux-Saga addon, you also need to install Redux-Saga
 
 ## Usage [:arrow_up:](#table-of-content)
 
-For a basic usage, see [Motivation](#motivation) paragraph. If you don't care about request cancellation, this will be
-probably all you need in your applications. You could also use [Interceptors](#interceptors), if you need to do
-something extra for every request, successful response or error. For reducers usage, see [Reducers](#reducers) paragraph.
+For a basic usage, see [Motivation](#motivation) paragraph.
 
-Apart from the auto-mode `watchRequests`, this library provides also much more powerful (automatic requests
-abort to name a few) and flexible `sendRequest`:
+### `watchRequests`
+
+As you probably guessed, the most job is done by `watchRequests`, which is like a manager to your request actions - it sends
+requests you define in your actions and dispatches success, error and abort actions, depending on the outcome. It can also
+automatically abort requests with a proper driver (like `Axios`, for `Fetch API` it also dispatches abort actions, but requests
+are not really aborted, just ignored). Aborting requests is a very important, but often neglected topic. Lets say you have a
+paginated list and a user asked for 1st page, then 2nd and lets assume response for 1st one will come later. Or... lets say a private
+data are being fetched and before this request is finished a user logged out. You could introduce many race condition bugs like
+this, without even realizing - they won't happen on your local machine (without throthling in your browser), but they could happen
+on a production system, especially on a slow mobile internet, with a high latency. Because aborting is so important, you can pass
+a config to `watchRequests` to adjust, how different actions will be aborted. This config has following attributes:
+- `abortOn: string | string[] | action => boolean`: allows you to define actions, on which requests should be aborted, has the
+same form which you can pass to `redux-saga` `take` effect, for example `'LOGOUT'`, `['LOGOUT']`,
+`action => action.type === 'LOGOUT'`, default is `null`
+- `takeLatest: boolean`: if `true`, when a new request will be dispatched while a pending of the same type is still running,
+the previous one will be automatically aborted, default is `true`
+- `getLastActionKey: action => string`: a key generator to match actions of the same type, typically you won't need to adjust it,
+but it might come in handy when you want some actions with the same `type` to be treated as a different one,
+default is `action => action.type`.
+
+So, for instance, you could do this:
+```js
+yield watchRequests({
+  takeLatest: false,
+  abortOn: 'LOGOUT',
+});
+```
+
+Above defines a global behaviour, but what if you want to have different settings for different actions? You can use the same
+config to adjust them per action type:
+```js
+yield watchRequests(
+  { abortOn: 'LOGOUT' },
+  {
+    SAVE_STH_AND_DONT_ABORT_ACTION_WHEN_MULTIPLE: { takeLatest: false }
+  }
+);
+```
+
+Above will merge settings for `SAVE_STH_AND_DONT_ABORT_ACTION_WHEN_MULTIPLE` action with global ones, resulting in
+`{ takeLatest: false, abortOn: 'LOGOUT' }` for `SAVE_STH_AND_DONT_ABORT_ACTION_WHEN_MULTIPLE`, and
+`{ takeLatest: true, abortOn: 'LOGOUT' }` for the rest.
+
+Also, if you like the default behaviour, but just wanna change it for some actions, you can pass 1st param as `null`:
+```js
+yield watchRequests(
+  null,
+  {
+    SAVE_STH_AND_DONT_ABORT_ACTION_WHEN_MULTIPLE: { takeLatest: false }
+  }
+);
+```
+
+Last, but not least, remember that `watchRequests` is a blocking effect, so if you have more sagas, use
+`yield fork(watchRequests)`, or wrap it with something else in `all`:
+```js
+import { all, takeLatest, put } from 'redux-saga/effects';
+import { createRequestInstance, watchRequests, success } from 'redux-saga-requests';
+import axiosDriver from 'redux-saga-requests-axios';
+
+function* fetchBooksSuccessSaga() {
+  yield put(addMessage('Books have been loaded');
+}
+
+function* rootSaga() {
+  yield createRequestInstance(axios, { driver: axiosDriver });
+  yield all([
+    watchRequests(), // put it before other sagas which handle requests, otherwise watchRequests might miss some requests
+    takeLatest(success('FETCH_BOOK'), fetchBooksSuccessSaga),
+  ]);
+}
+```
+
+### `sendRequest`
+
+Under the hood, `watchRequests` uses a lower level `sendRequest`. `watchRequests` should be flexible enough, so you won't need
+to worry about `sendRequest`, but it is useful to know about it, it is handy in [Interceptors](#interceptors). Also, if you don't
+like the magic of `watchRequests`, you might use it everywhere, or... you could write your own `watchRequests`!. This is how it
+works:
 ```javascript
 import axios from 'axios';
 import { takeLatest } from 'redux-saga/effects';
@@ -232,6 +307,8 @@ The key here is, that you need to pass `{ dispatchRequestAction: true }` as seco
 dispatched - usually it is already dispatched somewhere else (from your React components `onClick` for instance),
 but here not, so we must explicitely tell `sendRequest` to dispatch it.
 
+### `getRequestInstance`
+
 Also, it is possible to get access to your request instance (like Axios) in your Saga:
 ```javascript
 import { getRequestInstance } from 'redux-saga-requests';
@@ -242,8 +319,8 @@ function* fetchBookSaga() {
   const response = yield call(requestInstance.get, '/some-url') */
 }
 ```
-You can do whatever you want with it, which gives you maximum flexibility. You could even add Axios interceptors here,
-but it is preferable to use [Interceptors](#interceptors) from this library.
+You can do whatever you want with it, which gives you maximum flexibility. Typically it is useful in [Interceptors](#interceptors),
+when you want to make some request directly, without using redux action - for redux action you would use `sendRequest`.
 
 ## Actions [:arrow_up:](#table-of-content)
 
