@@ -23,6 +23,12 @@ module.exports = {
       amd: 'redux-saga/effects',
       root: 'ReduxSaga.effects',
     },
+    'redux-saga': {
+      commonjs: 'redux-saga',
+      commonjs2: 'redux-saga',
+      amd: 'redux-saga',
+      root: 'ReduxSaga',
+    },
   },
   devtool: 'source-map',
   plugins: [
