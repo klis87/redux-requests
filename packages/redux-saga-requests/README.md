@@ -19,6 +19,7 @@ integrations could be added, as they are implemented in a plugin fashion.
 - [Reducers](#reducers-arrow_up)
 - [Interceptors](#interceptors-arrow_up)
 - [FSA](#fsa-arrow_up)
+- [Promise middleware](#promise-middleware-arrow_up)
 - [Usage with Fetch API](#usage-with-fetch-api-arrow_up)
 - [Examples](#examples-arrow_up)
 
@@ -110,6 +111,7 @@ for the example)
 you don't need to worry that Axios interceptors would be shared across multiple requests
 - `onRequest`, `onSuccess`, `onError` and `onAbort` interceptors, you can attach your sagas (or simple functions)
 to them to define a global behaviour for a given event type
+- optional `requestsPromiseMiddleware`, which promisifies requests actions dispatch, so you can wait in your react components to get request response, the same way like you can do this with `redux-thunk`
 
 ## Installation [:arrow_up:](#table-of-content)
 
@@ -666,6 +668,59 @@ const fetchBooks = () => ({
 ```
 Then, success, error and abort actions will also be FSA compliant. Moreover, `requestsReducer` will also correctly handle FSA actions.
 For details, see [redux-act example](https://github.com/klis87/redux-saga-requests/tree/master/examples/redux-act-integration).
+
+## Promise middleware [:arrow_up:](#table-of-content)
+
+One disadvantage of using sagas is that there is no way to dispatch an action which triggets a saga from React component and
+wait for this saga to complete. Because of this, integration with libraries like `Formik` are sometimes harder - for example you
+are forced to push some callbacks to Redux actions for a saga to execute later, which is not convenient. Thats why this library gives
+an optional `requestsPromiseMiddleware`:
+```js
+import { createStore, applyMiddleware } from 'redux';
+import createSagaMiddleware from 'redux-saga';
+import { requestsPromiseMiddleware } from 'redux-saga-requests';
+
+const sagaMiddleware = createSagaMiddleware();
+const store = createStore(
+  app,
+  initialState,
+  applyMiddleware(requestsPromiseMiddleware(), sagaMiddleware),
+);
+```
+
+Now, lets say you defined an action:
+```js
+const fetchBooks = () => ({
+  type: FETCH_BOOKS,
+  request: { url: '/books'},
+});
+```
+
+You can dispatch the action from a component and wait for a response:
+```js
+class Books extends Component {
+  fetch = () => {
+    this.props.fetchBooks().then(successAction => {
+      // handle successful response
+    }).catch(errorOrAbortAction => {
+      // handle error or aborted request
+    })
+  }
+
+  render() {
+    // ...
+  }
+}
+```
+
+If you adjusted how response actions are structured, you might need to configure this middleware to fit your settings by passing an
+optional config to `requestsPromiseMiddleware`:
+```js
+requestsPromiseMiddleware({
+  success: customSuccessFunction,
+  getRequestAction = action => action.meta && action.meta.requestAction ? action.meta.requestAction : null, // default
+})
+```
 
 ## Usage with Fetch API [:arrow_up:](#table-of-content)
 
