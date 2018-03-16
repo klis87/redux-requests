@@ -10,6 +10,7 @@ import {
   watchRequests,
   requestsReducer,
   createRequestsReducer,
+  requestsPromiseMiddleware,
 } from './index';
 
 success('type');
@@ -144,4 +145,10 @@ createRequestsReducer()({ actionType: 'actionType' });
 createRequestsReducer(globalConfig)({
   actionType: 'actionType',
   ...globalConfig,
+});
+
+requestsPromiseMiddleware();
+requestsPromiseMiddleware({
+  success,
+  getRequestAction: action => action.requestAction || null,
 });

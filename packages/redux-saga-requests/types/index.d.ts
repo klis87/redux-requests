@@ -1,4 +1,4 @@
-import { AnyAction, Reducer } from 'redux';
+import { AnyAction, Reducer, Middleware } from 'redux';
 
 interface ActionTypeModifier {
   (actionType: string): string;
@@ -195,3 +195,12 @@ export const requestsReducer: RequestsReducer;
 export function createRequestsReducer(
   globalConfig?: GlobalReducerConfig,
 ): RequestsReducer;
+
+type requestsPromiseMiddlewareConfig = {
+  success?: ActionTypeModifier;
+  getRequestAction?: (action: AnyAction) => any;
+};
+
+export function requestsPromiseMiddleware(
+  config?: requestsPromiseMiddlewareConfig,
+): Middleware;
