@@ -149,7 +149,7 @@ Of course, because this is Redux-Saga addon, you also need to install Redux-Saga
 
 ## Usage [:arrow_up:](#table-of-content)
 
-For a basic usage, see [Motivation](#motivation) paragraph.
+For a basic usage, see [Motivation](#motivation-arrow_up) paragraph.
 
 ### `watchRequests`
 
@@ -227,7 +227,7 @@ function* rootSaga() {
 ### `sendRequest`
 
 Under the hood, `watchRequests` uses a lower level `sendRequest`. `watchRequests` should be flexible enough, so you won't need
-to worry about `sendRequest`, but it is useful to know about it, it is handy in [Interceptors](#interceptors). Also, if you don't
+to worry about `sendRequest`, but it is useful to know about it, it is handy in [Interceptors](#interceptors-arrow_up). Also, if you don't
 like the magic of `watchRequests`, you might use it everywhere, or... you could write your own `watchRequests`!. This is how it
 works:
 ```javascript
@@ -319,7 +319,7 @@ function* fetchBookSaga() {
   const response = yield call(requestInstance.get, '/some-url') */
 }
 ```
-You can do whatever you want with it, which gives you maximum flexibility. Typically it is useful in [Interceptors](#interceptors),
+You can do whatever you want with it, which gives you maximum flexibility. Typically it is useful in [Interceptors](#interceptors-arrow_up),
 when you want to make some request directly, without using redux action - for redux action you would use `sendRequest`.
 
 ## Actions [:arrow_up:](#table-of-content)
@@ -454,7 +454,7 @@ function* rootSaga() {
 
 Except for `watchRequests` and `sendRequest`, which can simplify your actions and sagas a lot, you can also use
 `requestsReducer`, a higher order reducer, which is responsible for a portion of your state related to a given request type.
-For a general idea how it works, see [Motivation](#motivation) paragraph. This is just a minimal example, where with simple:
+For a general idea how it works, see [Motivation](#motivation-arrow_up) paragraph. This is just a minimal example, where with simple:
 ```javascript
 const reducer = requestsReducer({ actionType: `FETCH_SOMETHING` });
 ```
