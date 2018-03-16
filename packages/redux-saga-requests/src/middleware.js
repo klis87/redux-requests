@@ -1,10 +1,14 @@
 import { isRequestAction } from './helpers';
-import { success } from './actions';
+import { success as defaultSuccess } from './actions';
 
-export const requestsPromiseMiddleware = () => {
+export const requestsPromiseMiddleware = ({
+  success = defaultSuccess,
+  getRequestAction = action =>
+    action.meta && action.meta.requestAction ? action.meta.requestAction : null,
+} = {}) => {
   const requestMap = new Map();
 
-  return next => action => {
+  return () => next => action => {
     if (isRequestAction(action)) {
       return new Promise((resolve, reject) => {
         requestMap.set(
@@ -16,8 +20,9 @@ export const requestsPromiseMiddleware = () => {
       });
     }
 
-    if (action.meta && action.meta.requestAction) {
-      const { requestAction } = action.meta;
+    const requestAction = getRequestAction(action);
+
+    if (requestAction) {
       const requestActionPromise = requestMap.get(requestAction);
       requestActionPromise(action, action.type !== success(requestAction.type));
       requestMap.delete(requestAction);
