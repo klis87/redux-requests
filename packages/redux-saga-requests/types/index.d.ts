@@ -43,39 +43,21 @@ export interface Driver {
   getRequestHandlers: GetRequestHandlers;
 }
 
-type ActionWithSingleRequest = {
+type ActionWithRequest = {
   type: string;
-  request: any;
+  request: any | any[];
 };
 
-type ActionWithMultipleRequests = {
+type ActionRequestPayload = {
+  request: any | any[];
+};
+
+type ActionWithRequestAsPayload = {
   type: string;
-  requests: any[];
+  payload: ActionRequestPayload;
 };
 
-type PayloadWithRequest = {
-  request: any;
-};
-
-type PayloadWithRequests = {
-  requests: any[];
-};
-
-type ActionWithSingleRequestAsPayload = {
-  type: string;
-  payload: PayloadWithRequest;
-};
-
-type ActionWithMultipleRequestAsPayload = {
-  type: string;
-  payload: PayloadWithRequests;
-};
-
-type RequestAction =
-  | ActionWithSingleRequest
-  | ActionWithMultipleRequests
-  | ActionWithSingleRequestAsPayload
-  | ActionWithMultipleRequestAsPayload;
+type RequestAction = ActionWithRequest | ActionWithRequestAsPayload;
 
 interface SuccessAction {
   (action: RequestAction, data: any): AnyAction;

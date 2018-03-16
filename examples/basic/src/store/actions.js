@@ -9,7 +9,7 @@ export const clearPhoto = () => ({ type: CLEAR_PHOTO });
 
 export const fetchPost = id => ({
   type: FETCH_POST,
-  requests: [{ url: `/posts/${id}` }, { url: `/posts/${id}/comments` }],
+  request: [{ url: `/posts/${id}` }, { url: `/posts/${id}/comments` }],
 });
 
 export const clearPost = () => ({ type: CLEAR_POST });

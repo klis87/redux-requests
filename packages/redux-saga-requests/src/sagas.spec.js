@@ -30,10 +30,10 @@ import {
   getRequestsConfig,
   sendRequest,
   watchRequests,
-  isRequestAction,
   abortRequestIfDefined,
   voidCallback,
 } from './sagas';
+import { isRequestAction } from './helpers';
 
 // TODO: implement those tests with a saga test library
 
@@ -262,7 +262,7 @@ describe('sagas', () => {
       const config = { ...defaultConfig, driver: dummyDriver };
       const action = {
         type: 'FETCH_MULTIPLE',
-        requests: [{ url: '/url1' }, { url: '/url2' }],
+        request: [{ url: '/url1' }, { url: '/url2' }],
       };
       const gen = sendRequest(action);
       const requestInstance = () => ({ type: 'axios' });
@@ -290,14 +290,14 @@ describe('sagas', () => {
       });
 
       // it('calls onRequest', () => {
-      //   const expected = call(config.onRequest, action.requests);
+      //   const expected = call(config.onRequest, action.request);
       //   assert.deepEqual(gen.next(requestHandlers).value, expected);
       // });
 
       it('calls sendRequests', () => {
         const expected = all([
-          call(requestHandlers.sendRequest, action.requests[0]),
-          call(requestHandlers.sendRequest, action.requests[1]),
+          call(requestHandlers.sendRequest, action.request[0]),
+          call(requestHandlers.sendRequest, action.request[1]),
         ]);
         assert.deepEqual(gen.next(requestHandlers).value, expected);
       });
@@ -305,7 +305,7 @@ describe('sagas', () => {
       it('dispatches request success action when reponse is successful', () => {
         assert.deepEqual(
           gen.next(responses).value,
-          call(dummyDriver.getSuccessPayload, responses, action.requests),
+          call(dummyDriver.getSuccessPayload, responses, action.request),
         );
         const data = [responses[0].data, responses[1].data];
         const expected = put({

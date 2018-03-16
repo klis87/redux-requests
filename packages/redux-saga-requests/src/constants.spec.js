@@ -41,7 +41,7 @@ describe('constants', () => {
   describe('INCORRECT_PAYLOAD_ERROR', () => {
     it('has correct value', () => {
       const expected =
-        "Incorrect payload for request action. Action must have form of { type: 'TYPE', request: {} }, { type: 'TYPE', requests: [{}, {}] }, { type: 'TYPE', payload: { request: {} } } or { type: 'TYPE', payload: { requests: [{}, {}] } }";
+        "Incorrect payload for request action. Action must have form of { type: 'TYPE', request: {} }, { type: 'TYPE', request: [{}, {}] }, { type: 'TYPE', payload: { request: {} } } or { type: 'TYPE', payload: { request: [{}, {}] } }";
       assert.equal(INCORRECT_PAYLOAD_ERROR, expected);
     });
   });

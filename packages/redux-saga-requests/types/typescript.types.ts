@@ -52,9 +52,9 @@ getRequestInstance();
 
 sendRequest({ type: 'type', request: {} });
 sendRequest({ type: 'type', payload: { request: {} } });
-sendRequest({ type: 'type', payload: { requests: [{}] } });
+sendRequest({ type: 'type', payload: { request: [{}] } });
 sendRequest(
-  { type: 'type', requests: [{}, {}] },
+  { type: 'type', request: [{}, {}] },
   {
     dispatchRequestAction: true,
     silent: false,

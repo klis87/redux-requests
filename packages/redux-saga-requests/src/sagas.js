@@ -26,6 +26,7 @@ import {
   REQUESTS_CONFIG,
   INCORRECT_PAYLOAD_ERROR,
 } from './constants';
+import { getActionPayload, isRequestAction } from './helpers';
 
 export const voidCallback = () => {};
 
@@ -57,14 +58,6 @@ export function getRequestInstance() {
 export function getRequestsConfig() {
   return getContext(REQUESTS_CONFIG);
 }
-
-const getActionPayload = action =>
-  action.payload === undefined ? action : action.payload;
-
-export const isRequestAction = action => {
-  const actionPayload = getActionPayload(action);
-  return actionPayload.request || actionPayload.requests;
-};
 
 export const abortRequestIfDefined = abortRequest => {
   if (abortRequest) {
@@ -106,7 +99,7 @@ export function* sendRequest(
 
   const actionPayload = getActionPayload(action);
 
-  let request = actionPayload.request || actionPayload.requests;
+  let { request } = actionPayload;
 
   if (requestsConfig.onRequest && runOnRequest) {
     request = yield call(requestsConfig.onRequest, request, action);
@@ -117,7 +110,7 @@ export function* sendRequest(
     let responseError;
 
     try {
-      if (actionPayload.request) {
+      if (!Array.isArray(actionPayload.request)) {
         response = yield call(requestHandlers.sendRequest, request);
       } else {
         response = yield all(

@@ -95,7 +95,7 @@ to see how to use those functions in your reducers)
 - `requestsReducer` higher order reducer, which takes requests related state management burden from your shoulders
 - automatic request abort - when a saga is cancelled, a request made by it is automatically aborted and an abort action
 is dispatched (especially handy with `takeLatest` and `race` Redux-Saga effects)
-- sending multiple requests in one action - `{ type: FETCH_BOOKS_AND_AUTHORS, requests: [{ url: '/books' }, { url: '/authors}'] }`
+- sending multiple requests in one action - `{ type: FETCH_BOOKS_AND_AUTHORS, request: [{ url: '/books' }, { url: '/authors}'] }`
 will send two requests and wrap them in `Promise.all`
 - flexibility - you can use "auto mode" `watchRequests`
 (see [basic example](https://github.com/klis87/redux-saga-requests/tree/master/examples/basic)),
