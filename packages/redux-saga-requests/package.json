@@ -58,6 +58,7 @@
     "nodemon": "1.17.2",
     "npm-run-all": "4.1.2",
     "redux": "3.7.2",
+    "redux-mock-store": "1.5.1",
     "redux-saga": "0.16.0",
     "rimraf": "2.6.2",
     "sinon": "4.4.5",
