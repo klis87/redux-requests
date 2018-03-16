@@ -13,7 +13,14 @@ import {
 } from 'redux-saga/effects';
 import { delay } from 'redux-saga';
 
-import { success, error, abort } from './actions';
+import {
+  success,
+  error,
+  abort,
+  successAction,
+  errorAction,
+  abortAction,
+} from './actions';
 import {
   REQUEST_INSTANCE,
   REQUESTS_CONFIG,
@@ -21,46 +28,6 @@ import {
 } from './constants';
 
 export const voidCallback = () => {};
-
-const isFSA = action => !!action.payload;
-
-export const successAction = (action, data) => ({
-  ...(isFSA(action)
-    ? {
-        payload: {
-          data,
-        },
-      }
-    : {
-        data,
-      }),
-  meta: {
-    ...action.meta,
-    requestAction: action,
-  },
-});
-
-export const errorAction = (action, errorData) => ({
-  ...(isFSA(action)
-    ? {
-        payload: errorData,
-        error: true,
-      }
-    : {
-        error: errorData,
-      }),
-  meta: {
-    ...action.meta,
-    requestAction: action,
-  },
-});
-
-export const abortAction = action => ({
-  meta: {
-    ...action.meta,
-    requestAction: action,
-  },
-});
 
 export const defaultConfig = {
   driver: null,

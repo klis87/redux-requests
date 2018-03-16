@@ -10,7 +10,14 @@ import {
 } from 'redux-saga/effects';
 import { cloneableGenerator } from 'redux-saga/utils';
 
-import { success, error, abort } from './actions';
+import {
+  success,
+  error,
+  abort,
+  successAction,
+  errorAction,
+  abortAction,
+} from './actions';
 import {
   REQUEST_INSTANCE,
   REQUESTS_CONFIG,
@@ -25,9 +32,6 @@ import {
   watchRequests,
   isRequestAction,
   abortRequestIfDefined,
-  successAction,
-  errorAction,
-  abortAction,
   voidCallback,
 } from './sagas';
 
