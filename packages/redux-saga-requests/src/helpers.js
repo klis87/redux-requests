@@ -3,8 +3,8 @@ export const getActionPayload = action =>
 
 export const isRequestAction = action => {
   const actionPayload = getActionPayload(action);
-  return !!actionPayload.request;
+  return !!actionPayload.request && !!actionPayload.request.url;
 };
 
 export const mapRequest = (request, callback) =>
-  Array.isArray(request) ? request.map(callback) : callback(request);
+  Array.isArray(request) ? request.map(callback) : .callback(request);
