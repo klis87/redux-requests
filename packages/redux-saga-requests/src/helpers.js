@@ -3,7 +3,7 @@ export const getActionPayload = action =>
 
 export const isRequestAction = action => {
   const actionPayload = getActionPayload(action);
-  return !!actionPayload.request && !!actionPayload.request.url;
+  return !!actionPayload.request && !actionPayload.response;
 };
 
 export const mapRequest = (request, callback) =>
