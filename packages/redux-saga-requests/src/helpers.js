@@ -7,4 +7,4 @@ export const isRequestAction = action => {
 };
 
 export const mapRequest = (request, callback) =>
-  Array.isArray(request) ? request.map(callback) : .callback(request);
+  Array.isArray(request) ? request.map(callback) : callback(request);
