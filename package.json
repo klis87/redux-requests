@@ -1,4 +1,5 @@
 {
+  "name": "qiz-redux-saga-requests"
   "private": true,
   "workspaces": [
     "packages/*"
