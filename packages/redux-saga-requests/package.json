@@ -61,7 +61,7 @@
     "redux-mock-store": "1.5.1",
     "redux-saga": "0.16.0",
     "rimraf": "2.6.2",
-    "sinon": "4.4.6",
+    "sinon": "4.5.0",
     "typescript": "2.7.2",
     "typescript-definition-tester": "0.0.5",
     "webpack": "3.10.0"
