@@ -13,7 +13,7 @@
     "prettify": "prettier --write '{packages,examples}/**/*.{js,jsx,ts}'"
   },
   "devDependencies": {
-    "coveralls": "3.0.0",
+    "coveralls": "3.0.1",
     "lerna": "2.9.0",
     "nyc": "11.6.0",
     "prettier": "1.11.1"
