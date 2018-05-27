@@ -1,7 +1,3 @@
-const webpack = require('webpack');
-
-const DEBUG = process.env.NODE_ENV !== 'production';
-
 module.exports = {
   output: {
     library: 'ReduxSagaRequests',
@@ -31,13 +27,4 @@ module.exports = {
     },
   },
   devtool: 'source-map',
-  plugins: [
-    DEBUG
-      ? new webpack.NamedModulesPlugin()
-      : new webpack.HashedModuleIdsPlugin({
-          hashFunction: 'sha256',
-          hashDigest: 'hex',
-          hashDigestLength: 20,
-        }),
-  ],
 };

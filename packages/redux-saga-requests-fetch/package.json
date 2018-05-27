@@ -28,8 +28,8 @@
     "test:cover": "cross-env BABEL_ENV=coverage mocha -r babel-register -r babel-polyfill -r chai/register-assert 'src/**/*.spec.js' 'types/**/*.spec.js'",
     "build:commonjs": "cross-env BABEL_ENV=commonjs babel src --out-dir lib --ignore spec.js",
     "build:es": "cross-env BABEL_ENV=es babel src --out-dir es --ignore spec.js",
-    "build:umd": "cross-env BABEL_ENV=es NODE_ENV=development webpack src dist/redux-saga-requests-fetch.js",
-    "build:umd:min": "cross-env BABEL_ENV=es NODE_ENV=production webpack -p src dist/redux-saga-requests-fetch.min.js",
+    "build:umd": "cross-env BABEL_ENV=es webpack --mode development -o dist/redux-saga-requests-fetch.js",
+    "build:umd:min": "cross-env BABEL_ENV=es webpack --mode production -o dist/redux-saga-requests-fetch.min.js",
     "build": "npm-run-all clean -p build:commonjs build:es build:umd build:umd:min",
     "build:watch": "nodemon --watch src --ignore src/**/*.spec.js --exec 'yarn run build:es'",
     "prepublish": "yarn run build"
@@ -63,6 +63,7 @@
     "sinon": "5.0.10",
     "typescript": "2.8.3",
     "typescript-definition-tester": "0.0.6",
-    "webpack": "3.12.0"
+    "webpack": "4.9.1",
+    "webpack-cli": "2.1.4"
   }
 }
