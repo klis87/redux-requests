@@ -46,8 +46,8 @@ module.exports = {
     hot: true,
     overlay: true,
   },
+  mode: 'development',
   plugins: [
-    new webpack.NamedModulesPlugin(),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
     new HtmlWebpackPlugin({
