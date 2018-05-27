@@ -40,9 +40,8 @@ const defaultConfig = {
   getData: (state, action) =>
     action.payload ? action.payload.data : action.data,
   getError: (state, action) => (action.payload ? action.payload : action.error),
-  onRequest: (state, action, { dataKey, multiple, pendingKey, errorKey }) => ({
+  onRequest: (state, action, { pendingKey, errorKey }) => ({
     ...state,
-    [dataKey]: getEmptyData(multiple),
     [pendingKey]: state[pendingKey] + 1,
     [errorKey]: null,
   }),
