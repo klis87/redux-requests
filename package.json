@@ -17,7 +17,7 @@
     "bundlesize": "0.17.0",
     "coveralls": "3.0.1",
     "lerna": "2.11.0",
-    "nyc": "11.8.0",
+    "nyc": "11.9.0",
     "prettier": "1.13.2"
   },
   "nyc": {
