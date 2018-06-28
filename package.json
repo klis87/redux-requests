@@ -18,7 +18,7 @@
     "coveralls": "3.0.1",
     "lerna": "2.11.0",
     "nyc": "11.8.0",
-    "prettier": "1.13.2"
+    "prettier": "1.13.7"
   },
   "nyc": {
     "exclude": [
