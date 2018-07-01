@@ -4,6 +4,7 @@ export const getActionPayload = action =>
 export const isRequestAction = action => {
   const actionPayload = getActionPayload(action);
   return (
+    !!actionPayload &&
     !!actionPayload.request &&
     !actionPayload.response &&
     !(actionPayload instanceof Error)
