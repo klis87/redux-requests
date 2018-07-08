@@ -697,6 +697,9 @@ Now, lets say you defined an action:
 const fetchBooks = () => ({
   type: FETCH_BOOKS,
   request: { url: '/books'},
+  meta: {
+    asPromise: true,
+  },
 });
 ```
 
@@ -722,6 +725,7 @@ optional config to `requestsPromiseMiddleware`:
 ```js
 requestsPromiseMiddleware({
   success: customSuccessFunction,
+  auto: true // if you with to promisify all request actions without explicit meta.asPromise true
   getRequestAction = action => action.meta && action.meta.requestAction ? action.meta.requestAction : null, // default
 })
 ```

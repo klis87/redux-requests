@@ -198,6 +198,7 @@ export function createRequestsReducer(
 
 type requestsPromiseMiddlewareConfig = {
   success?: ActionTypeModifier;
+  auto?: Boolean;
   getRequestAction?: (action: AnyAction) => any;
 };
 

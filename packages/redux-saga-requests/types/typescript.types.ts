@@ -148,6 +148,7 @@ createRequestsReducer(globalConfig)({
 });
 
 requestsPromiseMiddleware();
+requestsPromiseMiddleware({ auto: true });
 requestsPromiseMiddleware({
   success,
   getRequestAction: action => action.requestAction || null,
