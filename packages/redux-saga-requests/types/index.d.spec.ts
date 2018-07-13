@@ -74,28 +74,6 @@ watchRequests({
 });
 watchRequests({ abortOn: ['TYPE'] });
 watchRequests({ abortOn: action => action.type === 'TYPE' });
-watchRequests(
-  {
-    takeLatest: true,
-    abortOn: 'TYPE',
-    getLastActionKey: action => action.type,
-  },
-  {
-    ACTION1: {
-      abortOn: action => action.type === 'TYPE',
-    },
-    ACTION2: {
-      takeLatest: false,
-      getLastActionKey: action => action.type,
-      abortOn: action => action.type === 'TYPE',
-    },
-  },
-);
-watchRequests(null, {
-  ACTION1: {
-    abortOn: action => action.type === 'TYPE',
-  },
-});
 
 const globalConfig = {
   success,
