@@ -91,4 +91,7 @@ const App = ({
   </div>
 );
 
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(App);
