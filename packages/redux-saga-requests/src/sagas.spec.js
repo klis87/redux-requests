@@ -346,7 +346,7 @@ describe('sagas', () => {
     });
 
     it('forks sendRequest', () => {
-      const action = { type: 'REQUEST' };
+      const action = { type: 'REQUEST', request: {} };
       assert.deepEqual(gen.next(action).value, fork(sendRequest, action));
     });
 
