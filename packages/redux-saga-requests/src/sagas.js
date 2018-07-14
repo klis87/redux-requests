@@ -188,8 +188,16 @@ export function* sendRequest(
   }
 }
 
+const isGetRequest = request =>
+  !request.method || request.method.toLowerCase() === 'get';
+
 const watchRequestsDefaultConfig = {
-  takeLatest: true,
+  takeLatest: action => {
+    const { request } = getActionPayload(action);
+    return Array.isArray(request)
+      ? request.every(isGetRequest)
+      : isGetRequest(request);
+  },
   abortOn: null,
   getLastActionKey: action => action.type,
 };
