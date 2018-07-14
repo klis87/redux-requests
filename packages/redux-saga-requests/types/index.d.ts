@@ -1,8 +1,8 @@
 import { AnyAction, Reducer, Middleware } from 'redux';
 
-interface ActionTypeModifier {
+type ActionTypeModifier = {
   (actionType: string): string;
-}
+};
 
 export const success: ActionTypeModifier;
 
@@ -10,38 +10,22 @@ export const error: ActionTypeModifier;
 
 export const abort: ActionTypeModifier;
 
-export function getActionWithSuffix(suffix: string): ActionTypeModifier;
+export const getActionWithSuffix: (suffix: string) => ActionTypeModifier;
 
-interface GetSuccessPayload {
-  (response: any, request: any): any;
-}
+type RequestsHandlers = {
+  sendRequest: (config: any) => any;
+  abortRequest?: () => void;
+};
 
-interface GetErrorPayload {
-  (error: any): any;
-}
-
-interface SendRequest {
-  (config: any): any;
-}
-
-interface AbortRequest {
-  (): void;
-}
-
-interface RequestsHandlers {
-  sendRequest: SendRequest;
-  abortRequest?: AbortRequest;
-}
-
-interface GetRequestHandlers {
+type GetRequestHandlers = {
   (requestInstance: any, config?: any): RequestsHandlers;
-}
+};
 
-export interface Driver {
-  getSuccessPayload: GetSuccessPayload;
-  getErrorPayload: GetErrorPayload;
+export type Driver = {
+  getSuccessPayload: (response: any, request: any) => any;
+  getErrorPayload: (error: any) => any;
   getRequestHandlers: GetRequestHandlers;
-}
+};
 
 type ActionWithRequest = {
   type: string;
@@ -59,54 +43,26 @@ type ActionWithRequestAsPayload = {
 
 type RequestAction = ActionWithRequest | ActionWithRequestAsPayload;
 
-interface SuccessAction {
-  (action: RequestAction, data: any): AnyAction;
-}
-
-interface ErrorAction {
-  (action: RequestAction, error: any): AnyAction;
-}
-
-interface AbortAction {
-  (action: RequestAction): AnyAction;
-}
-
-interface OnRequest {
-  (request: any, action: RequestAction): any;
-}
-
-interface OnSuccess {
-  (response: any, action: RequestAction): any;
-}
-
-interface OnError {
-  (error: any, action: RequestAction): any;
-}
-
-interface OnAbort {
-  (action: RequestAction): void;
-}
-
-interface RequestInstanceConfig {
+type RequestInstanceConfig = {
   driver: Driver;
   success?: ActionTypeModifier;
   error?: ActionTypeModifier;
   abort?: ActionTypeModifier;
-  successAction?: SuccessAction;
-  errorAction?: ErrorAction;
-  abortAction?: AbortAction;
-  onRequest?: OnRequest;
-  onSuccess?: OnSuccess;
-  onError?: OnError;
-  onAbort?: OnAbort;
-}
+  successAction?: (action: RequestAction, data: any) => AnyAction;
+  errorAction?: (action: RequestAction, error: any) => AnyAction;
+  abortAction?: (action: RequestAction) => AnyAction;
+  onRequest?: (request: any, action: RequestAction) => any;
+  onSuccess?: (response: any, action: RequestAction) => any;
+  onError?: (error: any, action: RequestAction) => any;
+  onAbort?: (action: RequestAction) => void;
+};
 
-export function createRequestInstance(
+export const createRequestInstance: (
   requestInstance: any,
   config: RequestInstanceConfig,
-): any;
+) => any;
 
-export function getRequestInstance(): any;
+export const getRequestInstance: () => any;
 
 type SendRequestConfig = {
   dispatchRequestAction?: boolean;
@@ -117,17 +73,17 @@ type SendRequestConfig = {
   runOnAbort?: boolean;
 };
 
-export function sendRequest(
+export const sendRequest: (
   action: RequestAction,
   config?: SendRequestConfig,
-): any;
+) => any;
 
-interface FilterOnActionCallback {
+type FilterOnActionCallback = {
   (action: AnyAction): boolean;
-}
+};
 
 type WatchRequestsConfig = {
-  takeLatest?: boolean;
+  takeLatest?: boolean | FilterOnActionCallback;
   abortOn?: FilterOnActionCallback | string | string[];
   getLastActionKey?: (action: AnyAction) => string;
 };
@@ -136,14 +92,14 @@ type WatchRequestsConfigPerRequestType = {
   [actionType: string]: WatchRequestsConfig;
 };
 
-export function watchRequests(
+export const watchRequests: (
   commonConfig?: WatchRequestsConfig,
   perRequestTypeConfig?: WatchRequestsConfigPerRequestType,
-): void;
+) => void;
 
-interface OnActionCallback {
+type OnActionCallback = {
   (state: any, action: AnyAction, config: MergedReducerConfig): any;
-}
+};
 
 type GlobalReducerConfig = {
   success?: ActionTypeModifier;
@@ -186,15 +142,15 @@ type MergedReducerConfig = {
   resetOn: FilterOnActionCallback | string[];
 };
 
-interface RequestsReducer {
+type RequestsReducer = {
   (localConfig: LocalReducerConfig, reducer?: Reducer<any>): Reducer<any>;
-}
+};
 
 export const requestsReducer: RequestsReducer;
 
-export function createRequestsReducer(
+export const createRequestsReducer: (
   globalConfig?: GlobalReducerConfig,
-): RequestsReducer;
+) => RequestsReducer;
 
 type requestsPromiseMiddlewareConfig = {
   success?: ActionTypeModifier;
@@ -202,6 +158,6 @@ type requestsPromiseMiddlewareConfig = {
   getRequestAction?: (action: AnyAction) => any;
 };
 
-export function requestsPromiseMiddleware(
+export const requestsPromiseMiddleware: (
   config?: requestsPromiseMiddlewareConfig,
-): Middleware;
+) => Middleware;

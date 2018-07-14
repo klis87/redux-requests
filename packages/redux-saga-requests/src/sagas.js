@@ -217,8 +217,12 @@ export function* watchRequests(common = {}, perRequestType = {}) {
       : config;
 
     const lastActionKey = localConfig.getLastActionKey(action);
+    const takeLatest =
+      typeof localConfig.takeLatest === 'function'
+        ? localConfig.takeLatest(action)
+        : localConfig.takeLatest;
 
-    if (localConfig.takeLatest) {
+    if (takeLatest) {
       const activeTask = lastTasks[lastActionKey];
 
       if (activeTask) {
@@ -228,7 +232,7 @@ export function* watchRequests(common = {}, perRequestType = {}) {
 
     const newTask = yield fork(sendRequest, action);
 
-    if (localConfig.takeLatest) {
+    if (takeLatest) {
       lastTasks[lastActionKey] = newTask;
     }
 
