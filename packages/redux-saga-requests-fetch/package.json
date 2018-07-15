@@ -1,6 +1,6 @@
 {
   "name": "redux-saga-requests-fetch",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "Fetch API driver for Redux-Saga-Requests, Redux-Saga addon to simplify AJAX requests",
   "main": "lib/index.js",
   "module": "es/index.js",
