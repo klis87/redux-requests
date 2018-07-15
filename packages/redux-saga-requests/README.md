@@ -753,7 +753,10 @@ And in order to create Fetch API requests, below:
 ```javascript
 fetch('/users', {
   method: 'POST',
-  body: data,
+  body: JSON.stringify(data),
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 ```
 should be translated to this:
@@ -763,13 +766,20 @@ const fetchUsers = () => ({
   request: {
     url: '/users/',
     method: 'POST',
-    body: data,
+    body: JSON.stringify(data),
+    headers: {
+      'Content-Type': 'application/json',
+    },
   }
 });
 ```
 The point is, you can use the same request config like you do with pure Fetch API, but you need to pass `url` in the
 config itself. Also, one additional parameter you could provide in the config is `responseType`, which is set as `json`
-as the default. Available response types are: `arraybuffer`, `blob`, `formData`, `json`, `text`.
+as the default. Available response types are: `'arraybuffer'`, `'blob'`, `'formData'`, `'json'`, `'text'`, or `null`
+(if you don't want a response stream to be read for the given response).
+
+Also, this driver reads response streams automatically for you (depending on `responseType` you choose)
+and sets it as `response.data`, so instead of doing `response.json()`, just read `response.data`.
 
 ## Examples [:arrow_up:](#table-of-content)
 

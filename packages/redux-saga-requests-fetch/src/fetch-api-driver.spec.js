@@ -1,47 +1,21 @@
-import sinon from 'sinon';
-
 import fetchApiDriver from './fetch-api-driver';
 
 describe('fetchApiDriver', () => {
   describe('getSuccessPayload', () => {
-    const request = { responseType: 'json' };
-
-    it('returns response data', async () => {
-      const response = { json: () => 'data' };
-      const actual = await fetchApiDriver.getSuccessPayload(response, request);
-      assert.equal(actual, 'data');
+    it('returns response data', () => {
+      const response = { data: 'data' };
+      assert.deepEqual(
+        fetchApiDriver.getSuccessPayload(response),
+        response.data,
+      );
     });
 
-    it('returns array of response data', async () => {
-      const response = [{ json: () => 'data1' }, { json: () => 'data2' }];
-      const actual = await fetchApiDriver.getSuccessPayload(response, [
-        request,
-        request,
+    it('returns array of response data', () => {
+      const responses = [{ data: 'data1' }, { data: 'data2' }];
+      assert.deepEqual(fetchApiDriver.getSuccessPayload(responses), [
+        responses[0].data,
+        responses[1].data,
       ]);
-      assert.deepEqual(actual, ['data1', 'data2']);
-    });
-
-    it('throws when responseType is incorrect', async () => {
-      const response = { json: () => 'data' };
-      let error;
-
-      try {
-        await fetchApiDriver.getSuccessPayload(response, {
-          responseType: 'incorrect',
-        });
-      } catch (e) {
-        error = e;
-      }
-
-      const expected =
-        "responseType must be one of the following: 'arraybuffer', 'blob', 'formData', 'json', 'text'";
-      assert.equal(error.message, expected);
-    });
-
-    it('supports default responseType as json', async () => {
-      const response = { json: sinon.spy() };
-      await fetchApiDriver.getSuccessPayload(response, {});
-      assert.isTrue(response.json.calledOnce);
     });
   });
 
@@ -73,23 +47,66 @@ describe('fetchApiDriver', () => {
     });
 
     it('returns sendRequest handler which returns response when response is ok', async () => {
-      const response = { ok: true };
+      const json = () => 'data';
+      const response = { ok: true, json };
       const { sendRequest } = fetchApiDriver.getRequestHandlers(
         (url, config) => ({ ...response, url, ...config }),
       );
       const actual = await sendRequest({ url: 'url', x: 'x', y: 'y' });
-      assert.deepEqual(actual, { ok: true, url: 'url', x: 'x', y: 'y' });
+      assert.deepEqual(actual, {
+        ok: true,
+        url: 'url',
+        x: 'x',
+        y: 'y',
+        json,
+        data: 'data',
+      });
+    });
+
+    it('returns sendRequest handler which doesnt read response stream when responseType is null', async () => {
+      const json = () => 'data';
+      const response = { ok: true, json };
+      const { sendRequest } = fetchApiDriver.getRequestHandlers(
+        (url, config) => ({ ...response, url, ...config }),
+      );
+      const actual = await sendRequest({ url: 'url', responseType: null });
+      assert.deepEqual(actual, {
+        ok: true,
+        url: 'url',
+        json,
+        data: null,
+      });
+    });
+
+    it('returns sendRequest handler which throws error when responseType is invalid', async () => {
+      const response = { ok: true };
+      const { sendRequest } = fetchApiDriver.getRequestHandlers(
+        (url, config) => ({ ...response, url, ...config }),
+      );
+
+      let error;
+
+      try {
+        await sendRequest({ url: 'url', responseType: 'invalid' });
+      } catch (e) {
+        error = e;
+      }
+
+      const expected =
+        "responseType must be one of the following: 'arraybuffer', 'blob', 'formData', 'json', 'text', null";
+      assert.equal(error.message, expected);
     });
 
     it('returns sendRequest handler which allows different domain than in baseURL', async () => {
-      const response = { ok: true };
+      const json = () => 'data';
+      const response = { ok: true, json };
       const { sendRequest } = fetchApiDriver.getRequestHandlers(
         (url, config) => ({ ...response, url, ...config }),
         { baseURL: 'http://google.com/api' },
       );
       const url = 'http://youtube.com/api';
       const actual = await sendRequest({ url });
-      assert.deepEqual(actual, { ok: true, url });
+      assert.deepEqual(actual, { ok: true, url, json, data: 'data' });
     });
   });
 });
