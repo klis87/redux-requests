@@ -24,8 +24,8 @@
   "scripts": {
     "clean": "rimraf es lib dist",
     "lint": "eslint src/**",
-    "test": "cross-env BABEL_ENV=commonjs mocha -r babel-register -r babel-polyfill -r chai/register-assert 'src/**/*.spec.js' 'types/**/*.spec.js'",
-    "test:cover": "cross-env BABEL_ENV=coverage mocha -r babel-register -r babel-polyfill -r chai/register-assert 'src/**/*.spec.js' 'types/**/*.spec.js'",
+    "test": "cross-env BABEL_ENV=commonjs mocha -r babel-register -r babel-polyfill -r chai/register-assert 'src/**/*.spec.js'",
+    "test:cover": "cross-env BABEL_ENV=coverage mocha -r babel-register -r babel-polyfill -r chai/register-assert 'src/**/*.spec.js'",
     "test-types": "tsc types/index.d.spec.ts --noEmit",
     "report": "nyc report",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
