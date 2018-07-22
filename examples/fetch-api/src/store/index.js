@@ -10,6 +10,7 @@ function* rootSaga() {
   yield createRequestInstance(window.fetch, {
     driver: fetchDriver,
     baseURL: 'https://jsonplaceholder.typicode.com',
+    AbortController: window.AbortController,
   });
   yield watchRequests(null, {
     [FETCH_PHOTO]: { abortOn: CLEAR_PHOTO },

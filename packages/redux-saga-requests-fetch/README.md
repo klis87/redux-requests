@@ -36,6 +36,7 @@ function* rootSaga() {
     {
       driver: fetchDriver,
       baseURL: 'https://my-domain.com' // optional - it works like axios baseURL, prepending all relative urls
+      AbortController: window.AbortController, // optional, if your browser supports AbortController or you use a polyfill
     },
   );
   yield watchRequests();

@@ -29,7 +29,7 @@ describe('fetchApiDriver', () => {
   describe('getRequestHandlers', () => {
     it('returns sendRequest handler', () => {
       const response = fetchApiDriver.getRequestHandlers();
-      assert.hasAllKeys(response, ['sendRequest']);
+      assert.hasAllKeys(response, ['sendRequest', 'abortRequest']);
     });
 
     it('returns sendRequest handler which throws error when response is not ok', async () => {
@@ -60,6 +60,7 @@ describe('fetchApiDriver', () => {
         y: 'y',
         json,
         data: 'data',
+        signal: undefined,
       });
     });
 
@@ -75,6 +76,7 @@ describe('fetchApiDriver', () => {
         url: 'url',
         json,
         data: null,
+        signal: undefined,
       });
     });
 
@@ -106,7 +108,13 @@ describe('fetchApiDriver', () => {
       );
       const url = 'http://youtube.com/api';
       const actual = await sendRequest({ url });
-      assert.deepEqual(actual, { ok: true, url, json, data: 'data' });
+      assert.deepEqual(actual, {
+        ok: true,
+        url,
+        json,
+        data: 'data',
+        signal: undefined,
+      });
     });
   });
 });

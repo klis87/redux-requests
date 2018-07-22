@@ -161,8 +161,7 @@ For a basic usage, see [Motivation](#motivation-arrow_up) paragraph.
 
 As you probably guessed, the most job is done by `watchRequests`, which is like a manager to your request actions - it sends
 requests you define in your actions and dispatches success, error and abort actions, depending on the outcome. It can also
-automatically abort requests with a proper driver (like `Axios`, for `Fetch API` it also dispatches abort actions, but requests
-are not really aborted, just ignored). Aborting requests is a very important, but often neglected topic. Lets say you have a
+automatically abort requests. Aborting requests is a very important, but often neglected topic. Lets say you have a
 paginated list and a user asked for 1st page, then 2nd and lets assume response for 1st one will come later. Or... lets say a private
 data are being fetched and before this request is finished a user logged out. You could introduce many race condition bugs like
 this, without even realizing - they won't happen on your local machine (without throthling in your browser), but they could happen
@@ -744,6 +743,7 @@ function* rootSaga() {
     {
       driver: fetchDriver,
       baseURL: 'https://my-domain.com' // optional - it works like axios baseURL, prepending all relative urls
+      AbortController: window.AbortController, // optional, if your browser supports AbortController or you use a polyfill like https://github.com/mo/abortcontroller-polyfill
     },
   );
   yield watchRequests();

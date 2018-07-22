@@ -28,12 +28,22 @@ const getSuccessPayload = response => {
 
 const getErrorPayload = error => error;
 
-const getRequestHandlers = (requestInstance, { baseURL = '' } = {}) => {
+class DummyAbortController {
+  /* eslint-disable-next-line class-methods-use-this */
+  abort() {}
+}
+
+const getRequestHandlers = (
+  requestInstance,
+  { baseURL = '', AbortController = DummyAbortController } = {},
+) => {
+  const controller = new AbortController();
+
   return {
     sendRequest: async ({ url, responseType = 'json', ...requestConfig }) => {
       const response = await requestInstance(
         isAbsoluteUrl(url) ? url : baseURL + url,
-        requestConfig,
+        { signal: controller.signal, ...requestConfig },
       );
 
       if (!response.ok) {
@@ -49,6 +59,7 @@ const getRequestHandlers = (requestInstance, { baseURL = '' } = {}) => {
       response.data = await getResponseData(response, responseType);
       return response;
     },
+    abortRequest: controller.abort.bind(controller),
   };
 };
 
