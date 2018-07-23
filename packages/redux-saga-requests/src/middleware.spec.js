@@ -26,7 +26,7 @@ describe('requestsPromiseMiddleware', () => {
     it('promisify dispatch result and passes action for request actions', () => {
       const action = {
         type: 'REQUEST',
-        request: {},
+        request: { url: '/' },
         meta: { asPromise: true },
       };
       const { dispatch, getActions } = mockStore({});
@@ -38,7 +38,7 @@ describe('requestsPromiseMiddleware', () => {
     it('resolves request dispatch promise for successful response', async () => {
       const requestAction = {
         type: 'REQUEST',
-        request: {},
+        request: { url: '/' },
         meta: { asPromise: true },
       };
       const responseAction = {
@@ -58,7 +58,7 @@ describe('requestsPromiseMiddleware', () => {
     it('rejects request dispatch promise for error response', async () => {
       const requestAction = {
         type: 'REQUEST',
-        request: {},
+        request: { url: '/' },
         meta: { asPromise: true },
       };
       const errorAction = {
@@ -86,7 +86,7 @@ describe('requestsPromiseMiddleware', () => {
     it('rejects request dispatch promise for abort response', async () => {
       const requestAction = {
         type: 'REQUEST',
-        request: {},
+        request: { url: '/' },
         meta: { asPromise: true },
       };
       const abortAction = {
@@ -118,7 +118,7 @@ describe('requestsPromiseMiddleware', () => {
       ]);
       const requestAction = {
         type: 'REQUEST',
-        request: {},
+        request: { url: '/' },
         meta: { asPromise: true },
       };
       const responseAction = {
@@ -140,7 +140,7 @@ describe('requestsPromiseMiddleware', () => {
       ]);
       const requestAction = {
         type: 'REQUEST',
-        request: {},
+        request: { url: '/' },
         meta: { asPromise: true },
       };
       const responseAction = {
@@ -169,7 +169,7 @@ describe('requestsPromiseMiddleware', () => {
     });
 
     it('promisify dispatch result and passes action for request actions', () => {
-      const action = { type: 'REQUEST', request: {} };
+      const action = { type: 'REQUEST', request: { url: '/' } };
       const { dispatch, getActions } = mockStore({});
       const result = dispatch(action);
       assert.instanceOf(result, Promise);
@@ -177,7 +177,7 @@ describe('requestsPromiseMiddleware', () => {
     });
 
     it('resolves request dispatch promise for successful response', async () => {
-      const requestAction = { type: 'REQUEST', request: {} };
+      const requestAction = { type: 'REQUEST', request: { url: '/' } };
       const responseAction = {
         type: success('REQUEST'),
         meta: { requestAction },
@@ -193,7 +193,7 @@ describe('requestsPromiseMiddleware', () => {
     });
 
     it('rejects request dispatch promise for error response', async () => {
-      const requestAction = { type: 'REQUEST', request: {} };
+      const requestAction = { type: 'REQUEST', request: { url: '/' } };
       const errorAction = {
         type: error('REQUEST'),
         meta: { requestAction },
@@ -217,7 +217,7 @@ describe('requestsPromiseMiddleware', () => {
     });
 
     it('rejects request dispatch promise for abort response', async () => {
-      const requestAction = { type: 'REQUEST', request: {} };
+      const requestAction = { type: 'REQUEST', request: { url: '/' } };
       const abortAction = {
         type: abort('REQUEST'),
         meta: { requestAction },
@@ -245,7 +245,7 @@ describe('requestsPromiseMiddleware', () => {
       const customMockStore = configureStore([
         requestsPromiseMiddleware({ auto: true, success: customSuccess }),
       ]);
-      const requestAction = { type: 'REQUEST', request: {} };
+      const requestAction = { type: 'REQUEST', request: { url: '/' } };
       const responseAction = {
         type: customSuccess('REQUEST'),
         meta: { requestAction },
@@ -264,7 +264,7 @@ describe('requestsPromiseMiddleware', () => {
           getRequestAction: action => action.requestAction || null,
         }),
       ]);
-      const requestAction = { type: 'REQUEST', request: {} };
+      const requestAction = { type: 'REQUEST', request: { url: '/' } };
       const responseAction = {
         type: success('REQUEST'),
         requestAction,
