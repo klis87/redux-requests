@@ -59,14 +59,6 @@ export function getRequestsConfig() {
   return getContext(REQUESTS_CONFIG);
 }
 
-export const abortRequestIfDefined = abortRequest => {
-  if (abortRequest) {
-    return call(abortRequest);
-  }
-
-  return null;
-};
-
 export function* sendRequest(
   action,
   {
@@ -172,7 +164,9 @@ export function* sendRequest(
     return { response };
   } finally {
     if (yield cancelled()) {
-      yield abortRequestIfDefined(requestHandlers.abortRequest);
+      if (requestHandlers.abortRequest) {
+        call([requestHandlers, 'abortRequest']);
+      }
 
       if (requestsConfig.onAbort && runOnAbort) {
         yield call(requestsConfig.onAbort, action);

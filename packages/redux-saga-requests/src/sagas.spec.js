@@ -1,14 +1,12 @@
 import {
   getContext,
   setContext,
-  call,
-  put,
-  all,
   fork,
   take,
   cancelled,
 } from 'redux-saga/effects';
-import { cloneableGenerator } from 'redux-saga/utils';
+import { expectSaga } from 'redux-saga-test-plan';
+// import { throwError } from 'redux-saga-test-plan/providers';
 
 import {
   success,
@@ -30,18 +28,26 @@ import {
   getRequestsConfig,
   sendRequest,
   watchRequests,
-  abortRequestIfDefined,
   voidCallback,
 } from './sagas';
 import { isRequestAction } from './helpers';
 
-// TODO: implement those tests with a saga test library
-
 const dummyDriver = {
-  getSuccessPayload: () => {},
+  getSuccessPayload: response => response.data,
   getErrorPayload: () => {},
   getRequestHandlers: () => ({
-    sendRequest: () => {},
+    sendRequest: () => ({ data: 'response' }),
+    abortRequest: () => {},
+  }),
+};
+
+const dummyErrorDriver = {
+  getSuccessPayload: response => response.data,
+  getErrorPayload: e => e,
+  getRequestHandlers: () => ({
+    sendRequest: () => {
+      throw new Error('responseError');
+    },
     abortRequest: () => {},
   }),
 };
@@ -122,219 +128,83 @@ describe('sagas', () => {
     });
   });
 
-  describe('abortRequestIfDefined', () => {
-    it('returns call effect when abortRequest defined', () => {
-      const abortRequest = () => {};
-      assert.deepEqual(abortRequestIfDefined(abortRequest), call(abortRequest));
-    });
-
-    it('returns null when abortRequest undefined', () => {
-      assert.equal(abortRequestIfDefined(undefined), null);
-    });
-  });
-
   describe('sendRequest', () => {
-    describe('with correct payload with dispatchRequestAction', () => {
-      it('dispatches request action', () => {
-        const action = { type: 'FETCH', request: { url: '/url' } };
-        const gen = sendRequest(action, { dispatchRequestAction: true });
-        gen.next();
-        gen.next();
-        assert.deepEqual(gen.next().value, put(action));
-      });
+    const config = { ...defaultConfig, driver: dummyDriver };
+
+    it('throws when request action is of incorrect type', () => {
+      const action = { type: 'TYPE' };
+      let sagaError;
+
+      try {
+        expectSaga(sendRequest, action)
+          .put(action)
+          .run();
+      } catch (e) {
+        sagaError = e.message;
+      }
+
+      assert.equal(sagaError, INCORRECT_PAYLOAD_ERROR);
     });
 
-    describe('with correct payload', () => {
-      const config = { ...defaultConfig, driver: dummyDriver };
-      const action = {
-        type: 'FETCH',
-        payload: {
-          request: { url: '/url' },
-        },
-      };
-      const gen = cloneableGenerator(sendRequest)(action);
-      const requestInstance = () => ({ type: 'axios' });
-      const response = { data: 'some response' };
-      const requestHandlers = dummyDriver.getRequestHandlers(requestInstance);
+    it('dispatches request action when dispatchRequestAction as true', () => {
+      const action = { type: 'FETCH', request: { url: '/url' } };
 
-      it('gets request instance', () => {
-        assert.deepEqual(gen.next().value, getRequestInstance());
-      });
-
-      it('gets request config', () => {
-        assert.deepEqual(gen.next(requestInstance).value, getRequestsConfig());
-      });
-
-      it('gets request handlers', () => {
-        const expected = call(
-          [dummyDriver, 'getRequestHandlers'],
-          requestInstance,
-          config,
-        );
-        assert.deepEqual(gen.next(config).value, expected);
-      });
-
-      // it('calls onRequest', () => {
-      //   const expected = call(config.onRequest, action.payload.request);
-      //   assert.deepEqual(gen.next(requestHandlers).value, expected);
-      // });
-
-      it('calls sendRequest', () => {
-        const expected = call(
-          requestHandlers.sendRequest,
-          action.payload.request,
-        );
-        assert.deepEqual(gen.next(requestHandlers).value, expected);
-      });
-
-      it('dispatches error, calls on Error and returns request error action when there is an error', () => {
-        const errorGen = gen.clone();
-        const requestError = new Error('Something went wrong');
-        const errorPayload = 'error payload';
-        assert.deepEqual(
-          errorGen.throw(requestError).value,
-          call(dummyDriver.getErrorPayload, requestError),
-        );
-        const expected = put({
-          type: error(action.type),
-          payload: errorPayload,
-          error: true,
-          meta: {
-            requestAction: action,
-          },
-        });
-        assert.deepEqual(errorGen.next(errorPayload).value, expected);
-        // assert.deepEqual(
-        //   errorGen.next(requestHandlers).value,
-        //   call(config.onError, requestError),
-        // );
-        errorGen.next(); // to fire finally yield
-        assert.deepEqual(errorGen.next().value, { error: requestError });
-      });
-
-      it('dispatches request success action when response is successful', () => {
-        assert.deepEqual(
-          gen.next(response).value,
-          call(dummyDriver.getSuccessPayload, response, action.payload.request),
-        );
-        const expected = put({
-          type: success(action.type),
-          payload: {
-            data: response.data,
-          },
-          meta: {
-            requestAction: action,
-          },
-        });
-        assert.deepEqual(gen.next(response.data).value, expected);
-      });
-
-      // it('calls onSuccess', () => {
-      //   const expected = call(config.onSuccess, response);
-      //   assert.deepEqual(gen.next().value, expected);
-      // });
-
-      it('awaits cancellation', () => {
-        assert.deepEqual(gen.next().value, cancelled());
-      });
-
-      it('handles cancellation when cancelled', () => {
-        assert.deepEqual(
-          gen.next(true).value,
-          abortRequestIfDefined(requestHandlers.abortRequest),
-        );
-        const expected = put({
-          type: abort(action.type),
-          meta: {
-            requestAction: action,
-          },
-        });
-        assert.deepEqual(gen.next().value, expected);
-        // assert.deepEqual(gen.next(requestHandlers).value, call(config.onAbort));
-      });
-
-      it('returns response', () => {
-        assert.deepEqual(gen.clone().next().value, { response });
-      });
+      return expectSaga(sendRequest, action, { dispatchRequestAction: true })
+        .provide([[getContext(REQUESTS_CONFIG), config]])
+        .put(action)
+        .run();
     });
 
-    describe('with correct payload with multiple requests', () => {
-      const config = { ...defaultConfig, driver: dummyDriver };
-      const action = {
-        type: 'FETCH_MULTIPLE',
-        request: [{ url: '/url1' }, { url: '/url2' }],
-      };
-      const gen = sendRequest(action);
-      const requestInstance = () => ({ type: 'axios' });
-      const responses = [
-        { data: 'some response' },
-        { data: 'another response' },
-      ];
-      const requestHandlers = dummyDriver.getRequestHandlers(requestInstance);
+    it('doesnt dispatch request action when dispatchRequestAction as false', () => {
+      const action = { type: 'FETCH', request: { url: '/url' } };
 
-      it('gets request instance', () => {
-        assert.deepEqual(gen.next().value, getRequestInstance());
-      });
-
-      it('gets request config', () => {
-        assert.deepEqual(gen.next(requestInstance).value, getRequestsConfig());
-      });
-
-      it('gets request handlers', () => {
-        const expected = call(
-          [dummyDriver, 'getRequestHandlers'],
-          requestInstance,
-          config,
-        );
-        assert.deepEqual(gen.next(config).value, expected);
-      });
-
-      // it('calls onRequest', () => {
-      //   const expected = call(config.onRequest, action.request);
-      //   assert.deepEqual(gen.next(requestHandlers).value, expected);
-      // });
-
-      it('calls sendRequests', () => {
-        const expected = all([
-          call(requestHandlers.sendRequest, action.request[0]),
-          call(requestHandlers.sendRequest, action.request[1]),
-        ]);
-        assert.deepEqual(gen.next(requestHandlers).value, expected);
-      });
-
-      it('dispatches request success action when reponse is successful', () => {
-        assert.deepEqual(
-          gen.next(responses).value,
-          call(dummyDriver.getSuccessPayload, responses, action.request),
-        );
-        const data = [responses[0].data, responses[1].data];
-        const expected = put({
-          type: success(action.type),
-          data,
-          meta: {
-            requestAction: action,
-          },
-        });
-        assert.deepEqual(gen.next(data).value, expected);
-      });
-
-      // it('calls onSuccess', () => {
-      //   const expected = call(config.onSuccess, responses);
-      //   assert.deepEqual(gen.next(requestHandlers).value, expected);
-      // });
-
-      it('returns response array', () => {
-        gen.next(); // to fire finally yield
-        assert.deepEqual(gen.next().value, { response: responses });
-      });
+      return expectSaga(sendRequest, action, { dispatchRequestAction: false })
+        .provide([[getContext(REQUESTS_CONFIG), config]])
+        .not.put(action)
+        .run();
     });
 
-    describe('with incorrect payload', () => {
-      it('throws error when action payload is invalid', () => {
-        const invalidAction = { type: 'FETCH' };
-        const gen = sendRequest(invalidAction);
-        assert.throws(() => gen.next(), INCORRECT_PAYLOAD_ERROR);
-      });
+    it('dispatches and returns success action', () => {
+      const action = { type: 'FETCH', request: { url: '/url' } };
+
+      return expectSaga(sendRequest, action)
+        .provide([[getContext(REQUESTS_CONFIG), config]])
+        .put({ type: 'FETCH_SUCCESS', ...successAction(action, 'response') })
+        .returns({ response: { data: 'response' } })
+        .run();
+    });
+
+    it('dispatches and returns error action on error', () => {
+      const action = { type: 'FETCH', request: { url: '/url' } };
+
+      return expectSaga(sendRequest, action)
+        .provide([
+          [
+            getContext(REQUESTS_CONFIG),
+            { ...defaultConfig, driver: dummyErrorDriver },
+          ],
+        ])
+        .put({
+          type: 'FETCH_ERROR',
+          ...errorAction(action, new Error('responseError')),
+        })
+        .returns({ error: new Error('responseError') })
+        .run();
+    });
+
+    it('dispatches abort action on cancellation', () => {
+      const action = { type: 'FETCH', request: { url: '/url' } };
+
+      return expectSaga(sendRequest, action)
+        .provide([
+          [
+            getContext(REQUESTS_CONFIG),
+            { ...defaultConfig, driver: dummyDriver },
+          ],
+          [cancelled(), true],
+        ])
+        .put({ type: 'FETCH_ABORT', ...abortAction(action) })
+        .run();
     });
   });
 
