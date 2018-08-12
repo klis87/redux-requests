@@ -21,11 +21,7 @@ import {
   errorAction,
   abortAction,
 } from './actions';
-import {
-  REQUEST_INSTANCE,
-  REQUESTS_CONFIG,
-  INCORRECT_PAYLOAD_ERROR,
-} from './constants';
+import { REQUESTS_CONFIG, INCORRECT_PAYLOAD_ERROR } from './constants';
 import { getActionPayload, isRequestAction } from './helpers';
 
 export const voidCallback = () => {};
@@ -44,19 +40,19 @@ export const defaultConfig = {
   onAbort: null,
 };
 
-export function createRequestInstance(requestInstance, config) {
+export function createRequestInstance(config) {
   return setContext({
-    [REQUEST_INSTANCE]: requestInstance,
     [REQUESTS_CONFIG]: { ...defaultConfig, ...config },
   });
 }
 
-export function getRequestInstance() {
-  return getContext(REQUEST_INSTANCE);
-}
-
 export function getRequestsConfig() {
   return getContext(REQUESTS_CONFIG);
+}
+
+export function* getRequestInstance() {
+  const config = yield getRequestsConfig();
+  return config.driver.requestInstance;
 }
 
 export function* sendRequest(
@@ -74,7 +70,6 @@ export function* sendRequest(
     throw new Error(INCORRECT_PAYLOAD_ERROR);
   }
 
-  const requestInstance = yield getRequestInstance();
   const requestsConfig = yield getRequestsConfig();
 
   if (dispatchRequestAction && !silent) {
@@ -82,20 +77,14 @@ export function* sendRequest(
   }
 
   const { driver } = requestsConfig;
-
-  const requestHandlers = yield call(
-    [driver, 'getRequestHandlers'],
-    requestInstance,
-    requestsConfig,
-  );
-
   const actionPayload = getActionPayload(action);
-
   let { request } = actionPayload;
 
   if (requestsConfig.onRequest && runOnRequest) {
     request = yield call(requestsConfig.onRequest, request, action);
   }
+
+  const abortSource = driver.getAbortSource();
 
   try {
     let response;
@@ -103,11 +92,11 @@ export function* sendRequest(
 
     try {
       if (!Array.isArray(actionPayload.request)) {
-        response = yield call(requestHandlers.sendRequest, request);
+        response = yield call([driver, 'sendRequest'], request, abortSource);
       } else {
         response = yield all(
           request.map(requestItem =>
-            call(requestHandlers.sendRequest, requestItem),
+            call([driver, 'sendRequest'], requestItem, abortSource),
           ),
         );
       }
@@ -164,9 +153,7 @@ export function* sendRequest(
     return { response };
   } finally {
     if (yield cancelled()) {
-      if (requestHandlers.abortRequest) {
-        call([requestHandlers, 'abortRequest']);
-      }
+      yield call([driver, 'abortRequest'], abortSource);
 
       if (requestsConfig.onAbort && runOnAbort) {
         yield call(requestsConfig.onAbort, action);

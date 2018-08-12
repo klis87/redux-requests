@@ -18,55 +18,52 @@ const getResponseData = (response, responseType) => {
 
 const prepareSuccessPayload = response => response.data;
 
-const getSuccessPayload = response => {
-  if (Array.isArray(response)) {
-    return response.map(prepareSuccessPayload);
-  }
-
-  return prepareSuccessPayload(response);
-};
-
-const getErrorPayload = error => error;
-
 class DummyAbortController {
   /* eslint-disable-next-line class-methods-use-this */
   abort() {}
 }
 
-const getRequestHandlers = (
-  requestInstance,
+export const createDriver = (
+  fetchInstance,
   { baseURL = '', AbortController = DummyAbortController } = {},
-) => {
-  const controller = new AbortController();
+) => ({
+  requestInstance: fetchInstance,
+  getAbortSource() {
+    return new AbortController();
+  },
+  abortRequest(abortSource) {
+    abortSource.abort();
+  },
+  sendRequest: async (
+    { url, responseType = 'json', ...requestConfig },
+    abortSource,
+  ) => {
+    const response = await fetchInstance(
+      isAbsoluteUrl(url) ? url : baseURL + url,
+      { signal: abortSource.signal, ...requestConfig },
+    );
 
-  return {
-    sendRequest: async ({ url, responseType = 'json', ...requestConfig }) => {
-      const response = await requestInstance(
-        isAbsoluteUrl(url) ? url : baseURL + url,
-        { signal: controller.signal, ...requestConfig },
-      );
-
-      if (!response.ok) {
-        try {
-          response.data = await response.json();
-        } catch (e) {
-          // no response data from server
-        }
-
-        throw response;
+    if (!response.ok) {
+      try {
+        response.data = await response.json();
+      } catch (e) {
+        // no response data from server
       }
 
-      response.data = await getResponseData(response, responseType);
-      return response;
-    },
-    abortRequest: controller.abort.bind(controller),
-  };
-};
+      throw response;
+    }
 
-const fetchApiDriver = {
-  getSuccessPayload,
-  getErrorPayload,
-  getRequestHandlers,
-};
+    response.data = await getResponseData(response, responseType);
+    return response;
+  },
+  getSuccessPayload(response) {
+    if (Array.isArray(response)) {
+      return response.map(prepareSuccessPayload);
+    }
 
-export default fetchApiDriver;
+    return prepareSuccessPayload(response);
+  },
+  getErrorPayload(error) {
+    return error;
+  },
+});

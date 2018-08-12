@@ -16,11 +16,7 @@ import {
   errorAction,
   abortAction,
 } from './actions';
-import {
-  REQUEST_INSTANCE,
-  REQUESTS_CONFIG,
-  INCORRECT_PAYLOAD_ERROR,
-} from './constants';
+import { REQUESTS_CONFIG, INCORRECT_PAYLOAD_ERROR } from './constants';
 import {
   defaultConfig,
   createRequestInstance,
@@ -32,25 +28,45 @@ import {
 } from './sagas';
 import { isRequestAction } from './helpers';
 
-const dummyDriver = {
-  getSuccessPayload: response => response.data,
-  getErrorPayload: () => {},
-  getRequestHandlers: () => ({
-    sendRequest: () => ({ data: 'response' }),
-    abortRequest: () => {},
-  }),
-};
+const nullback = () => {};
 
-const dummyErrorDriver = {
-  getSuccessPayload: response => response.data,
-  getErrorPayload: e => e,
-  getRequestHandlers: () => ({
-    sendRequest: () => {
-      throw new Error('responseError');
-    },
-    abortRequest: () => {},
-  }),
-};
+const dummyDriver = requestInstance => ({
+  requestInstance,
+  getAbortSource() {
+    return { token: 'token', cancel: nullback };
+  },
+  abortRequest(abortSource) {
+    abortSource.cancel();
+  },
+  sendRequest() {
+    return { data: 'response' };
+  },
+  getSuccessPayload(response) {
+    return response.data;
+  },
+  getErrorPayload(e) {
+    return e;
+  },
+});
+
+const dummyErrorDriver = requestInstance => ({
+  requestInstance,
+  getAbortSource() {
+    return { token: 'token', cancel: nullback };
+  },
+  abortRequest(abortSource) {
+    abortSource.cancel();
+  },
+  sendRequest() {
+    throw new Error('responseError');
+  },
+  getSuccessPayload(response) {
+    return response.data;
+  },
+  getErrorPayload(e) {
+    return e;
+  },
+});
 
 describe('sagas', () => {
   describe('voidCallback', () => {
@@ -80,14 +96,11 @@ describe('sagas', () => {
   });
 
   describe('createRequestInstance', () => {
-    const requestInstance = { type: 'axios' };
-
     it('returns correct effect with default config', () => {
       const expected = setContext({
-        [REQUEST_INSTANCE]: requestInstance,
         [REQUESTS_CONFIG]: defaultConfig,
       });
-      assert.deepEqual(createRequestInstance(requestInstance), expected);
+      assert.deepEqual(createRequestInstance(), expected);
     });
 
     it('returns correct effect with overwritten config', () => {
@@ -106,19 +119,9 @@ describe('sagas', () => {
       };
 
       const expected = setContext({
-        [REQUEST_INSTANCE]: requestInstance,
         [REQUESTS_CONFIG]: config,
       });
-      assert.deepEqual(
-        createRequestInstance(requestInstance, config),
-        expected,
-      );
-    });
-  });
-
-  describe('getRequestInstance', () => {
-    it('returns correct effect', () => {
-      assert.deepEqual(getRequestInstance(), getContext(REQUEST_INSTANCE));
+      assert.deepEqual(createRequestInstance(config), expected);
     });
   });
 
@@ -128,16 +131,29 @@ describe('sagas', () => {
     });
   });
 
-  describe('sendRequest', () => {
-    const config = { ...defaultConfig, driver: dummyDriver };
+  describe('getRequestInstance', () => {
+    it('returns correct effect', () => {
+      return expectSaga(getRequestInstance)
+        .provide([
+          [
+            getContext(REQUESTS_CONFIG),
+            { driver: { requestInstance: 'requestInstance' } },
+          ],
+        ])
+        .returns('requestInstance');
+    });
+  });
 
-    it('throws when request action is of incorrect type', () => {
+  describe('sendRequest', () => {
+    const config = { ...defaultConfig, driver: dummyDriver() };
+
+    it('throws when request action is of incorrect type', async () => {
       const action = { type: 'TYPE' };
       let sagaError;
 
       try {
-        expectSaga(sendRequest, action)
-          .put(action)
+        await expectSaga(sendRequest, action)
+          .provide([[getContext(REQUESTS_CONFIG), config]])
           .run();
       } catch (e) {
         sagaError = e.message;
@@ -181,7 +197,7 @@ describe('sagas', () => {
         .provide([
           [
             getContext(REQUESTS_CONFIG),
-            { ...defaultConfig, driver: dummyErrorDriver },
+            { ...defaultConfig, driver: dummyErrorDriver() },
           ],
         ])
         .put({
@@ -199,7 +215,7 @@ describe('sagas', () => {
         .provide([
           [
             getContext(REQUESTS_CONFIG),
-            { ...defaultConfig, driver: dummyDriver },
+            { ...defaultConfig, driver: dummyDriver() },
           ],
           [cancelled(), true],
         ])

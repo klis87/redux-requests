@@ -1,1 +1,1 @@
-export { default } from './axios-driver';
+export { createDriver } from './axios-driver';

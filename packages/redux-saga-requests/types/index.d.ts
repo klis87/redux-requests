@@ -12,20 +12,16 @@ export const abort: ActionTypeModifier;
 
 export const getActionWithSuffix: (suffix: string) => ActionTypeModifier;
 
-type RequestsHandlers = {
-  sendRequest: (config: any) => any;
-  abortRequest?: () => void;
-};
-
-type GetRequestHandlers = {
-  (requestInstance: any, config?: any): RequestsHandlers;
-};
-
 export type Driver = {
+  requestInstance: any;
+  getAbortSource: () => any;
+  abortRequest: (abortSource: any) => void;
+  sendRequest: (requestConfig: any, abortSource: any) => any;
   getSuccessPayload: (response: any, request: any) => any;
   getErrorPayload: (error: any) => any;
-  getRequestHandlers: GetRequestHandlers;
 };
+
+export type DriverCreator = (requestInstance: any, config?: any) => Driver;
 
 type ActionWithRequest = {
   type: string;
@@ -57,10 +53,7 @@ type RequestInstanceConfig = {
   onAbort?: (action: RequestAction) => void;
 };
 
-export const createRequestInstance: (
-  requestInstance: any,
-  config: RequestInstanceConfig,
-) => any;
+export const createRequestInstance: (config: RequestInstanceConfig) => any;
 
 export const getRequestInstance: () => any;
 

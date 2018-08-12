@@ -1,9 +1,58 @@
 import sinon from 'sinon';
 import axios from 'axios';
 
-import axiosDriver from './axios-driver';
+import { createDriver } from './axios-driver';
 
 describe('axiosDriver', () => {
+  const axiosInstance = requestConfig => requestConfig;
+  const axiosDriver = createDriver(axiosInstance);
+
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  describe('requestInstance', () => {
+    it('has correct value', () => {
+      assert.equal(axiosDriver.requestInstance, axiosInstance);
+    });
+  });
+
+  describe('getAbortSource', () => {
+    it('returns new source', () => {
+      const tokenSource = {
+        token: 'token',
+        cancel: () => 'cancelled',
+      };
+
+      sinon.replace(
+        axios.CancelToken,
+        'source',
+        sinon.fake.returns(tokenSource),
+      );
+      assert.equal(axiosDriver.getAbortSource(), tokenSource);
+    });
+  });
+
+  describe('abortRequest', () => {
+    it('calls cancel method', () => {
+      const abortSource = { cancel: sinon.fake() };
+      axiosDriver.abortRequest(abortSource);
+      assert.equal(abortSource.cancel.callCount, 1);
+    });
+  });
+
+  describe('sendRequest', () => {
+    it('returns correct response', () => {
+      assert.deepEqual(
+        axiosDriver.sendRequest({ url: '/' }, { token: 'token' }),
+        {
+          url: '/',
+          cancelToken: 'token',
+        },
+      );
+    });
+  });
+
   describe('getSuccessPayload', () => {
     it('returns response data', () => {
       const response = { data: 'data' };
@@ -23,35 +72,6 @@ describe('axiosDriver', () => {
     it('returns error', () => {
       const error = 'error';
       assert.equal(axiosDriver.getErrorPayload(error), error);
-    });
-  });
-
-  describe('getRequestHandlers', () => {
-    after(() => {
-      axios.CancelToken.source.restore();
-    });
-
-    it('returns request handlers', () => {
-      const tokenSource = {
-        token: 'token',
-        cancel: () => 'cancelled',
-      };
-
-      sinon.stub(axios.CancelToken, 'source').returns(tokenSource);
-      const config = { myKey: 'myValue' };
-      const requestInstance = requestConfig => requestConfig;
-      const expected = {
-        sendRequest: requestConfig =>
-          requestInstance({ cancelToken: tokenSource.token, ...requestConfig }),
-        abortRequest: tokenSource.cancel,
-      };
-      const result = axiosDriver.getRequestHandlers(requestInstance);
-      assert.hasAllKeys(result, ['sendRequest', 'abortRequest']);
-      assert.deepEqual(result.abortRequest, expected.abortRequest);
-      assert.deepEqual(
-        result.sendRequest(config),
-        expected.sendRequest(config),
-      );
     });
   });
 });

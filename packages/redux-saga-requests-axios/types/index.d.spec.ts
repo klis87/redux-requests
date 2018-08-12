@@ -1,8 +1,6 @@
-import axiosDriver from './index';
+import { createDriver } from './index';
 
-let axiosDriverInstance: axiosDriver;
-axiosDriverInstance.getSuccessPayload({}, {});
-axiosDriverInstance.getErrorPayload({});
-const requestHandlers = axiosDriverInstance.getRequestHandlers({}, {});
-requestHandlers.sendRequest({});
-requestHandlers.abortRequest();
+const axiosDriver = createDriver({});
+axiosDriver.getSuccessPayload({}, {});
+axiosDriver.getErrorPayload({});
+axiosDriver.sendRequest({}, {});

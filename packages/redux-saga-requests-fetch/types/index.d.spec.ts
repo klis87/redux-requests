@@ -1,7 +1,6 @@
-import fetchDriver from './index';
+import { createDriver } from './index';
 
-let axiosDriverInstance: fetchDriver;
-axiosDriverInstance.getSuccessPayload({}, {});
-axiosDriverInstance.getErrorPayload({});
-const requestHandlers = axiosDriverInstance.getRequestHandlers({}, {});
-requestHandlers.sendRequest({});
+const fetchDriver = createDriver({});
+fetchDriver.getSuccessPayload({}, {});
+fetchDriver.getErrorPayload({});
+fetchDriver.sendRequest({}, {});

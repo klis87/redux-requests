@@ -2,12 +2,12 @@ import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import axios from 'axios';
 import { createRequestInstance, watchRequests } from 'redux-saga-requests';
-import axiosDriver from 'redux-saga-requests-axios';
+import { createDriver } from 'redux-saga-requests-axios';
 
 import { photoReducer, postReducer } from './reducers';
 
 function* rootSaga(axiosInstance) {
-  yield createRequestInstance(axiosInstance, { driver: axiosDriver });
+  yield createRequestInstance({ driver: createDriver(axiosInstance) });
   yield watchRequests();
 }
 

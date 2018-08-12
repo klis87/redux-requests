@@ -2,7 +2,6 @@ import {
   SUCCESS_SUFFIX,
   ERROR_SUFFIX,
   ABORT_SUFFIX,
-  REQUEST_INSTANCE,
   REQUESTS_CONFIG,
   INCORRECT_PAYLOAD_ERROR,
 } from './constants';
@@ -23,12 +22,6 @@ describe('constants', () => {
   describe('ABORT_SUFFIX', () => {
     it('has correct value', () => {
       assert.equal(ABORT_SUFFIX, '_ABORT');
-    });
-  });
-
-  describe('REQUEST_INSTANCE', () => {
-    it('has correct value', () => {
-      assert.equal(REQUEST_INSTANCE, 'REDUX_SAGA_REQUESTS_REQUEST_INSTANCE');
     });
   });
 

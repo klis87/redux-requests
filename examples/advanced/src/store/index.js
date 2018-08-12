@@ -2,7 +2,7 @@ import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import axios from 'axios';
 import { createRequestInstance, watchRequests } from 'redux-saga-requests';
-import axiosDriver from 'redux-saga-requests-axios';
+import { createDriver } from 'redux-saga-requests-axios';
 
 import {
   photoReducer,
@@ -20,11 +20,11 @@ import {
 import { FETCH_PHOTO, CLEAR_PHOTO, FETCH_POST, CLEAR_POST } from './constants';
 
 function* rootSaga(axiosInstance) {
-  yield createRequestInstance(axiosInstance, {
+  yield createRequestInstance({
     onRequest: requestCounterSaga,
     onSuccess: responseCounterSaga,
     onError: errorCounterSaga,
-    driver: axiosDriver,
+    driver: createDriver(axiosInstance),
   });
   yield watchRequests(null, {
     [FETCH_PHOTO]: { abortOn: CLEAR_PHOTO },

@@ -4,6 +4,7 @@ import {
   abort,
   getActionWithSuffix,
   Driver,
+  DriverCreator,
   createRequestInstance,
   getRequestInstance,
   sendRequest,
@@ -21,13 +22,17 @@ const actionModifier = getActionWithSuffix('suffix');
 actionModifier('type');
 
 let dummyDriver: Driver;
-
+dummyDriver.requestInstance = {};
+dummyDriver.getAbortSource();
+dummyDriver.abortRequest({});
+dummyDriver.sendRequest({}, {});
 dummyDriver.getSuccessPayload({}, {});
 dummyDriver.getErrorPayload({});
-const requestHandlers = dummyDriver.getRequestHandlers({}, {});
-requestHandlers.sendRequest({});
 
-createRequestInstance({}, { driver: dummyDriver });
+const driverCreator: DriverCreator = () => dummyDriver;
+driverCreator({});
+
+createRequestInstance({ driver: dummyDriver });
 
 const successAction = (action, data) => ({ type: 'SUCCESS', data });
 const errorAction = (action, data) => ({ type: 'ERROR', data });
@@ -47,7 +52,7 @@ const requestInstanceConfig = {
   onAbort: action => {},
 };
 
-createRequestInstance({}, requestInstanceConfig);
+createRequestInstance(requestInstanceConfig);
 
 getRequestInstance();
 

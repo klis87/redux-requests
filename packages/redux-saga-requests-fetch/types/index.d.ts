@@ -1,1 +1,3 @@
-export { Driver as default } from 'redux-saga-requests';
+import { DriverCreator } from 'redux-saga-requests';
+
+export const createDriver: DriverCreator;

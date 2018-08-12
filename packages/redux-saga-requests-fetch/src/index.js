@@ -1,1 +1,1 @@
-export { default } from './fetch-api-driver';
+export { createDriver } from './fetch-api-driver';

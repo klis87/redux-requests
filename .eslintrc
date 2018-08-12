@@ -21,7 +21,10 @@
     "operator-linebreak": 0,
     "implicit-arrow-linebreak": 0,
     "import/prefer-default-export": 0,
-    "import/no-extraneous-dependencies": [2, {"peerDependencies": true, "devDependencies": false}],
+    "import/no-extraneous-dependencies": [
+      2,
+      { "peerDependencies": true, "devDependencies": false }
+    ],
     "import/named": 2,
     "react/jsx-filename-extension": 0,
     "react/prop-types": 0
@@ -30,7 +33,10 @@
     {
       "files": ["packages/**/*.spec.js"],
       "rules": {
-        "import/no-extraneous-dependencies": [2, {"peerDependencies": false, "devDependencies": true}]
+        "import/no-extraneous-dependencies": [
+          2,
+          { "peerDependencies": false, "devDependencies": true }
+        ]
       }
     }
   ]
