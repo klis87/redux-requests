@@ -7,6 +7,7 @@ export const isRequestAction = action => {
   return (
     !!actionPayload &&
     !!actionPayload.request &&
+    !!(actionPayload.request.length || actionPayload.request.url) &&
     !actionPayload.response &&
     !(actionPayload instanceof Error)
   );
