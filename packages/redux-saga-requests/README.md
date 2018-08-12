@@ -34,7 +34,7 @@ With `redux-saga-requests`, assuming you use `axios` you could refactor a code i
   import axios from 'axios';
 - import { takeEvery, put, call } from 'redux-saga/effects';
 + import { createRequestInstance, watchRequests, requestsReducer } from 'redux-saga-requests';
-+ import axiosDriver from 'redux-saga-requests-axios';
++ import { createDriver } from 'redux-saga-requests-axios';
 
   const FETCH_BOOKS = 'FETCH_BOOKS';
 - const FETCH_BOOKS_SUCCESS = 'FETCH_BOOKS_SUCCESS';
@@ -84,7 +84,7 @@ With `redux-saga-requests`, assuming you use `axios` you could refactor a code i
 -
   function* rootSaga() {
 -   yield takeEvery(FETCH_BOOKS, fetchBooksSaga);
-+   yield createRequestInstance(axios, { driver: axiosDriver });
++   yield createRequestInstance({ driver: createDriver(axios) });
 +   yield watchRequests();
   }
 ```
@@ -214,14 +214,14 @@ Last, but not least, remember that `watchRequests` is a blocking effect, so if y
 ```js
 import { all, takeLatest, put } from 'redux-saga/effects';
 import { createRequestInstance, watchRequests, success } from 'redux-saga-requests';
-import axiosDriver from 'redux-saga-requests-axios';
+import { createDriver } from 'redux-saga-requests-axios';
 
 function* fetchBooksSuccessSaga() {
   yield put(addMessage('Books have been loaded');
 }
 
 function* rootSaga() {
-  yield createRequestInstance(axios, { driver: axiosDriver });
+  yield createRequestInstance({ driver: createDriver(axios) });
   yield all([
     watchRequests(), // put it before other sagas which handle requests, otherwise watchRequests might miss some requests
     takeLatest(success('FETCH_BOOK'), fetchBooksSuccessSaga),
@@ -239,7 +239,7 @@ works:
 import axios from 'axios';
 import { takeLatest } from 'redux-saga/effects';
 import { createRequestInstance, sendRequest } from 'redux-saga-requests';
-import axiosDriver from 'redux-saga-requests-axios'; // or a different driver
+import { createDriver } from 'redux-saga-requests-axios'; // or a different driver
 
 const FETCH_BOOKS = 'FETCH_BOOKS';
 
@@ -249,7 +249,7 @@ const fetchBooks = () => ({
 });
 
 function* rootSaga() {
-  yield createRequestInstance(axios, { driver: axiosDriver });
+  yield createRequestInstance({ driver: createDriver(axios) });
   yield takeLatest(FETCH_POST, sendRequest);
 }
 ```
@@ -265,7 +265,7 @@ You could also use `race` effect:
 import axios from 'axios';
 import { call, race, take, takeLatest } from 'redux-saga/effects';
 import { createRequestInstance, sendRequest } from 'redux-saga-requests';
-import axiosDriver from 'redux-saga-requests-axios'; // or a different driver
+import { createDriver } from 'redux-saga-requests-axios'; // or a different driver
 
 const FETCH_BOOKS = 'FETCH_BOOKS';
 const CANCEL_REQUEST = 'CANCEL_REQUEST';
@@ -285,7 +285,7 @@ function* fetchBookSaga(fetchBookAction) {
 }
 
 function* rootSaga() {
-  yield createRequestInstance(axios, { driver: axiosDriver });
+  yield createRequestInstance({ driver: createDriver(axios) });
   yield takeLatest(FETCH_BOOKS, fetchBookSaga);
 }
 ```
@@ -419,15 +419,15 @@ If you don't like the way how success, error and abort are structured, it is pos
 ```javascript
 import axios from 'axios';
 import { getActionWithSuffix, watchRequests, createRequestInstance, createRequestsReducer } from 'redux-saga-requests';
-import axiosDriver from 'redux-saga-requests-axios'; // or a different driver
+import { createDriver } from 'redux-saga-requests-axios'; // or a different driver
 
 const success = getActionWithSuffix('MY_SUCCESS_SUFFIX');
 const error = getActionWithSuffix('MY_ERROR_SUFFIX');
 const abort = getActionWithSuffix('MY_ABORT_SUFFIX');
 
 function* rootSaga() {
-  yield createRequestInstance(axios, {
-    driver: axiosDriver,
+  yield createRequestInstance({
+    driver: createDriver(axios),
     success,
     error,
     abort,
@@ -447,8 +447,8 @@ const successAction = (action, data) => ({
 });
 
 function* rootSaga() {
-  yield createRequestInstance(axios, {
-    driver: axiosDriver,
+  yield createRequestInstance({
+    driver: createDriver(axios),
     successAction,
   });
   yield watchRequests();
@@ -735,17 +735,18 @@ All of the above examples show Axios usage, in order to use Fetch API, use below
 ```javascript
 import 'isomorphic-fetch'; // or a different fetch polyfill
 import { createRequestInstance, watchRequests } from 'redux-saga-requests';
-import fetchDriver from 'redux-saga-requests-fetch';
+import { createDriver } from 'redux-saga-requests-fetch';
 
 function* rootSaga() {
-  yield createRequestInstance(
-    window.fetch,
-    {
-      driver: fetchDriver,
-      baseURL: 'https://my-domain.com' // optional - it works like axios baseURL, prepending all relative urls
-      AbortController: window.AbortController, // optional, if your browser supports AbortController or you use a polyfill like https://github.com/mo/abortcontroller-polyfill
-    },
-  );
+  yield createRequestInstance({
+    driver: createDriver(
+      window.fetch,
+      {
+        baseURL: 'https://my-domain.com' // optional - it works like axios baseURL, prepending all relative urls
+        AbortController: window.AbortController, // optional, if your browser supports AbortController or you use a polyfill like https://github.com/mo/abortcontroller-polyfill
+      }
+    ),
+  });
   yield watchRequests();
 }
 ```

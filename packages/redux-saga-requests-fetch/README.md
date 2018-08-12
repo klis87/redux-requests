@@ -28,17 +28,18 @@ Regarding Fetch API related usage, here you can see a typical setup:
 ```javascript
 import 'isomorphic-fetch'; // or a different fetch polyfill
 import { createRequestInstance, watchRequests } from 'redux-saga-requests';
-import fetchDriver from 'redux-saga-requests-fetch';
+import { createDriver } from 'redux-saga-requests-fetch';
 
 function* rootSaga() {
-  yield createRequestInstance(
-    window.fetch,
-    {
-      driver: fetchDriver,
-      baseURL: 'https://my-domain.com' // optional - it works like axios baseURL, prepending all relative urls
-      AbortController: window.AbortController, // optional, if your browser supports AbortController or you use a polyfill
-    },
-  );
+  yield createRequestInstance({
+    driver: createDriver(
+      window.fetch,
+      {
+        baseURL: 'https://my-domain.com' // optional - it works like axios baseURL, prepending all relative urls
+        AbortController: window.AbortController, // optional, if your browser supports AbortController or you use a polyfill like https://github.com/mo/abortcontroller-polyfill
+      }
+    ),
+  });
   yield watchRequests();
 }
 ```
