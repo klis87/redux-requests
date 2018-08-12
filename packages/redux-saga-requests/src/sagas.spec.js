@@ -140,7 +140,8 @@ describe('sagas', () => {
             { driver: { requestInstance: 'requestInstance' } },
           ],
         ])
-        .returns('requestInstance');
+        .returns('requestInstance')
+        .run();
     });
   });
 
