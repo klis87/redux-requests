@@ -42,6 +42,10 @@ const dummyDriver = requestInstance => ({
     return { data: 'response' };
   },
   getSuccessPayload(response) {
+    if (Array.isArray(response)) {
+      return response.map(r => r.data);
+    }
+
     return response.data;
   },
   getErrorPayload(e) {
@@ -163,7 +167,7 @@ describe('sagas', () => {
       assert.equal(sagaError, INCORRECT_PAYLOAD_ERROR);
     });
 
-    it('dispatches request action when dispatchRequestAction as true', () => {
+    it('dispatches request action when dispatchRequestAction is true', () => {
       const action = { type: 'FETCH', request: { url: '/url' } };
 
       return expectSaga(sendRequest, action, { dispatchRequestAction: true })
@@ -172,10 +176,22 @@ describe('sagas', () => {
         .run();
     });
 
-    it('doesnt dispatch request action when dispatchRequestAction as false', () => {
+    it('doesnt dispatch request action when dispatchRequestAction is false', () => {
       const action = { type: 'FETCH', request: { url: '/url' } };
 
       return expectSaga(sendRequest, action, { dispatchRequestAction: false })
+        .provide([[getContext(REQUESTS_CONFIG), config]])
+        .not.put(action)
+        .run();
+    });
+
+    it('doesnt dispatch request action when silent is true', () => {
+      const action = { type: 'FETCH', request: { url: '/url' } };
+
+      return expectSaga(sendRequest, action, {
+        dispatchRequestAction: true,
+        silent: true,
+      })
         .provide([[getContext(REQUESTS_CONFIG), config]])
         .not.put(action)
         .run();
@@ -188,6 +204,34 @@ describe('sagas', () => {
         .provide([[getContext(REQUESTS_CONFIG), config]])
         .put({ type: 'FETCH_SUCCESS', ...successAction(action, 'response') })
         .returns({ response: { data: 'response' } })
+        .run();
+    });
+
+    it('dispatches and returns success action for batch requests', () => {
+      const action = {
+        type: 'FETCH',
+        request: [{ url: '/' }, { url: '/path' }],
+      };
+
+      return expectSaga(sendRequest, action)
+        .provide([[getContext(REQUESTS_CONFIG), config]])
+        .put({
+          type: 'FETCH_SUCCESS',
+          ...successAction(action, ['response', 'response']),
+        })
+        .returns({ response: [{ data: 'response' }, { data: 'response' }] })
+        .run();
+    });
+
+    it('doesnt dispatch success action when silent is true', () => {
+      const action = { type: 'FETCH', request: { url: '/url' } };
+
+      return expectSaga(sendRequest, action, { silent: true })
+        .provide([[getContext(REQUESTS_CONFIG), config]])
+        .not.put({
+          type: 'FETCH_SUCCESS',
+          ...successAction(action, 'response'),
+        })
         .run();
     });
 
@@ -209,6 +253,23 @@ describe('sagas', () => {
         .run();
     });
 
+    it('doesnt dispatch error action on error when silent is true', () => {
+      const action = { type: 'FETCH', request: { url: '/url' } };
+
+      return expectSaga(sendRequest, action, { silent: true })
+        .provide([
+          [
+            getContext(REQUESTS_CONFIG),
+            { ...defaultConfig, driver: dummyErrorDriver() },
+          ],
+        ])
+        .not.put({
+          type: 'FETCH_ERROR',
+          ...errorAction(action, new Error('responseError')),
+        })
+        .run();
+    });
+
     it('dispatches abort action on cancellation', () => {
       const action = { type: 'FETCH', request: { url: '/url' } };
 
@@ -221,6 +282,149 @@ describe('sagas', () => {
           [cancelled(), true],
         ])
         .put({ type: 'FETCH_ABORT', ...abortAction(action) })
+        .run();
+    });
+
+    it('doesnt dispatch abort action on cancellation when silent is true', () => {
+      const action = { type: 'FETCH', request: { url: '/url' } };
+
+      return expectSaga(sendRequest, action, { silent: true })
+        .provide([
+          [
+            getContext(REQUESTS_CONFIG),
+            { ...defaultConfig, driver: dummyDriver() },
+          ],
+          [cancelled(), true],
+        ])
+        .not.put({ type: 'FETCH_ABORT', ...abortAction(action) })
+        .run();
+    });
+
+    it('calls onRequest interceptor when defined', () => {
+      const action = { type: 'FETCH', request: { url: '/url' } };
+      const onRequest = request => request;
+
+      return expectSaga(sendRequest, action)
+        .provide([[getContext(REQUESTS_CONFIG), { ...config, onRequest }]])
+        .call(onRequest, action.request, action)
+        .run();
+    });
+
+    it('doesnt calls onRequest interceptor when runOnRequest is false', () => {
+      const action = { type: 'FETCH', request: { url: '/url' } };
+      const onRequest = request => request;
+
+      return expectSaga(sendRequest, action, { runOnRequest: false })
+        .provide([[getContext(REQUESTS_CONFIG), { ...config, onRequest }]])
+        .not.call(onRequest, action.request, action)
+        .run();
+    });
+
+    it('calls onSuccess interceptor when defined', () => {
+      const action = { type: 'FETCH', request: { url: '/url' } };
+      const onSuccess = response => response;
+
+      return expectSaga(sendRequest, action)
+        .provide([[getContext(REQUESTS_CONFIG), { ...config, onSuccess }]])
+        .call(onSuccess, { data: 'response' }, action)
+        .run();
+    });
+
+    it('doesnt calls onSuccess interceptor when runOnSuccess is false', () => {
+      const action = { type: 'FETCH', request: { url: '/url' } };
+      const onSuccess = response => response;
+
+      return expectSaga(sendRequest, action, { runOnSuccess: false })
+        .provide([[getContext(REQUESTS_CONFIG), { ...config, onSuccess }]])
+        .not.call(onSuccess, { data: 'response' }, action)
+        .run();
+    });
+
+    it('calls onError interceptor when defined', () => {
+      const action = { type: 'FETCH', request: { url: '/url' } };
+      const onError = e => ({ error: e });
+
+      return expectSaga(sendRequest, action)
+        .provide([
+          [
+            getContext(REQUESTS_CONFIG),
+            { ...config, onError, driver: dummyErrorDriver() },
+          ],
+        ])
+        .call(onError, new Error('responseError'), action)
+        .run();
+    });
+
+    it('doesnt call onError when runOnError is false', () => {
+      const action = { type: 'FETCH', request: { url: '/url' } };
+      const onError = e => ({ error: e });
+
+      return expectSaga(sendRequest, action, { runOnError: false })
+        .provide([
+          [
+            getContext(REQUESTS_CONFIG),
+            { ...config, onError, driver: dummyErrorDriver() },
+          ],
+        ])
+        .not.call(onError, new Error('responseError'), action)
+        .run();
+    });
+
+    it('doesnt call onSuccess when onError doesnt catch error', () => {
+      const action = { type: 'FETCH', request: { url: '/url' } };
+      const onError = e => ({ error: e });
+      const onSuccess = response => response;
+
+      return expectSaga(sendRequest, action)
+        .provide([
+          [
+            getContext(REQUESTS_CONFIG),
+            { ...config, onError, onSuccess, driver: dummyErrorDriver() },
+          ],
+        ])
+        .not.call.fn(onSuccess)
+        .run();
+    });
+
+    it('calls onSuccess when onError catches error', () => {
+      const action = { type: 'FETCH', request: { url: '/url' } };
+      const onError = () => ({ response: { data: 'response' } });
+      const onSuccess = response => response;
+
+      return expectSaga(sendRequest, action)
+        .provide([
+          [
+            getContext(REQUESTS_CONFIG),
+            { ...config, onError, onSuccess, driver: dummyErrorDriver() },
+          ],
+        ])
+        .call(onSuccess, { data: 'response' }, action)
+        .run();
+    });
+
+    it('calls onAbort interceptor when defined', () => {
+      const action = { type: 'FETCH', request: { url: '/url' } };
+      const onAbort = () => {};
+
+      return expectSaga(sendRequest, action)
+        .provide([
+          [getContext(REQUESTS_CONFIG), { ...config, onAbort }],
+          [cancelled(), true],
+        ])
+        .call(onAbort, action)
+        .run();
+    });
+
+    it('doesnt call onAbort interceptor when runOnAbort is false', () => {
+      const action = { type: 'FETCH', request: { url: '/url' } };
+      const onAbort = () => {};
+
+      return expectSaga(sendRequest, action, { runOnAbort: false })
+        .provide([
+          [getContext(REQUESTS_CONFIG), { ...config, onAbort }],
+          [cancelled(), true],
+        ])
+        .not.call(onAbort, action)
         .run();
     });
   });
