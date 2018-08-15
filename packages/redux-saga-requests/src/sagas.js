@@ -175,6 +175,7 @@ const isGetRequest = request =>
 const watchRequestsDefaultConfig = {
   takeLatest: action => {
     const { request } = getActionPayload(action);
+
     return Array.isArray(request)
       ? request.every(isGetRequest)
       : isGetRequest(request);
@@ -183,7 +184,7 @@ const watchRequestsDefaultConfig = {
   getLastActionKey: action => action.type,
 };
 
-function* cancelSendRequestOnAction(abortOn, task) {
+export function* cancelSendRequestOnAction(abortOn, task) {
   const { abortingAction } = yield race({
     abortingAction: take(abortOn),
     taskFinished: join(task),

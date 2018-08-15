@@ -1,12 +1,5 @@
-import {
-  getContext,
-  setContext,
-  fork,
-  take,
-  cancelled,
-} from 'redux-saga/effects';
+import { getContext, setContext, cancelled } from 'redux-saga/effects';
 import { expectSaga } from 'redux-saga-test-plan';
-// import { throwError } from 'redux-saga-test-plan/providers';
 
 import {
   success,
@@ -23,12 +16,14 @@ import {
   getRequestInstance,
   getRequestsConfig,
   sendRequest,
+  cancelSendRequestOnAction,
   watchRequests,
   voidCallback,
 } from './sagas';
-import { isRequestAction } from './helpers';
 
 const nullback = () => {};
+
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 const dummyDriver = requestInstance => ({
   requestInstance,
@@ -38,7 +33,8 @@ const dummyDriver = requestInstance => ({
   abortRequest(abortSource) {
     abortSource.cancel();
   },
-  sendRequest() {
+  async sendRequest() {
+    await sleep(0); // necessary to test cancelled tasks in watch requests
     return { data: 'response' };
   },
   getSuccessPayload(response) {
@@ -430,19 +426,126 @@ describe('sagas', () => {
   });
 
   describe('watchRequests', () => {
-    const gen = watchRequests();
+    const config = { ...defaultConfig, driver: dummyDriver() };
+    const action = { type: 'FETCH', request: { url: '/url' } };
 
-    it('waits for a request action', () => {
-      assert.deepEqual(gen.next().value, take(isRequestAction));
+    it('forks sendRequests for request action', () => {
+      return expectSaga(watchRequests)
+        .provide([[getContext(REQUESTS_CONFIG), config]])
+        .fork(sendRequest, action)
+        .dispatch(action)
+        .silentRun(100);
     });
 
-    it('forks sendRequest', () => {
-      const action = { type: 'REQUEST', request: {} };
-      assert.deepEqual(gen.next(action).value, fork(sendRequest, action));
+    it('forks sendRequests for batch request action', () => {
+      const batchAction = {
+        type: 'FETCH',
+        request: [{ url: '/' }, { url: '/path' }],
+      };
+
+      return expectSaga(watchRequests)
+        .provide([[getContext(REQUESTS_CONFIG), config]])
+        .fork(sendRequest, batchAction)
+        .dispatch(batchAction)
+        .silentRun(100);
     });
 
-    it('waits for another request action', () => {
-      assert.deepEqual(gen.next().value, take(isRequestAction));
+    it('doesnt fork sendRequests for not request action', () => {
+      return expectSaga(watchRequests)
+        .provide([[getContext(REQUESTS_CONFIG), config]])
+        .not.fork.fn(sendRequest)
+        .dispatch({ type: 'NOT_REQUEST' })
+        .silentRun(100);
+    });
+
+    it('forks cancelSendRequestOnAction on abort action', () => {
+      return expectSaga(watchRequests, { abortOn: 'ABORT' })
+        .provide([[getContext(REQUESTS_CONFIG), config]])
+        .fork.fn(cancelSendRequestOnAction)
+        .dispatch(action)
+        .silentRun(100);
+    });
+
+    it('cancells request on abort action', () => {
+      return expectSaga(watchRequests, { abortOn: 'ABORT' })
+        .provide([[getContext(REQUESTS_CONFIG), config]])
+        .put.actionType('FETCH_ABORT')
+        .dispatch(action)
+        .dispatch({ type: 'ABORT' })
+        .silentRun(100);
+    });
+
+    it('doesnt cancell request without abort action', () => {
+      return expectSaga(watchRequests, { abortOn: 'ABORT' })
+        .provide([[getContext(REQUESTS_CONFIG), config]])
+        .not.put.actionType('FETCH_ABORT')
+        .dispatch(action)
+        .dispatch({ type: 'ACTION' })
+        .silentRun(100);
+    });
+
+    it('uses takeLatest for get requests', () => {
+      return expectSaga(watchRequests)
+        .provide([[getContext(REQUESTS_CONFIG), config]])
+        .put.actionType('FETCH_ABORT')
+        .dispatch(action)
+        .dispatch(action)
+        .silentRun(100);
+    });
+
+    it('uses takeEvery for post requests', () => {
+      const postAction = {
+        type: 'FETCH',
+        request: { url: '/url', method: 'post' },
+      };
+
+      return expectSaga(watchRequests)
+        .provide([[getContext(REQUESTS_CONFIG), config]])
+        .not.put.actionType('FETCH_ABORT')
+        .dispatch(postAction)
+        .dispatch(postAction)
+        .silentRun(100);
+    });
+
+    it('allows override takeLatest config', () => {
+      return expectSaga(watchRequests, { takeLatest: false })
+        .provide([[getContext(REQUESTS_CONFIG), config]])
+        .not.put.actionType('FETCH_ABORT')
+        .dispatch(action)
+        .dispatch(action)
+        .silentRun(100);
+    });
+
+    it('allows overriding config per action type', () => {
+      return expectSaga(
+        watchRequests,
+        { takeLatest: false },
+        { FETCH: { takeLatest: true } },
+      )
+        .provide([[getContext(REQUESTS_CONFIG), config]])
+        .put.actionType('FETCH_ABORT')
+        .dispatch(action)
+        .dispatch(action)
+        .silentRun(100);
+    });
+
+    it('respects getLastActionKey override to distinguish actions of the same type', () => {
+      return expectSaga(watchRequests, {
+        getLastActionKey: a => a.type + a.meta.as,
+      })
+        .provide([[getContext(REQUESTS_CONFIG), config]])
+        .not.put.actionType('FETCH_ABORT')
+        .dispatch({
+          type: 'FETCH',
+          request: { url: '/url' },
+          meta: { as: 'version1' },
+        })
+        .dispatch({
+          type: 'FETCH',
+          request: { url: '/url' },
+          meta: { as: 'version2' },
+        })
+        .silentRun(100);
     });
   });
 });
