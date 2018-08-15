@@ -196,8 +196,7 @@ yield watchRequests(
 ```
 
 Above will merge settings for `SAVE_STH_AND_DONT_ABORT_ACTION_WHEN_MULTIPLE` action with global ones, resulting in
-`{ takeLatest: false, abortOn: 'LOGOUT' }` for `SAVE_STH_AND_DONT_ABORT_ACTION_WHEN_MULTIPLE`, and
-`{ takeLatest: true, abortOn: 'LOGOUT' }` for the rest.
+`{ takeLatest: false, abortOn: 'LOGOUT' }` for `SAVE_STH_AND_DONT_ABORT_ACTION_WHEN_MULTIPLE` action.
 
 Also, if you like the default behaviour, but just wanna change it for some actions, you can pass 1st param as `null`:
 ```js
@@ -223,7 +222,9 @@ function* fetchBooksSuccessSaga() {
 function* rootSaga() {
   yield createRequestInstance({ driver: createDriver(axios) });
   yield all([
-    watchRequests(), // put it before other sagas which handle requests, otherwise watchRequests might miss some requests
+    // put it before other sagas which handle requests, otherwise watchRequests might miss some requests...
+    // or your sagas might miss requests actions, like success
+    watchRequests(),
     takeLatest(success('FETCH_BOOK'), fetchBooksSuccessSaga),
   ]);
 }
@@ -250,15 +251,11 @@ const fetchBooks = () => ({
 
 function* rootSaga() {
   yield createRequestInstance({ driver: createDriver(axios) });
-  yield takeLatest(FETCH_POST, sendRequest);
+  yield takeLatest(FETCH_BOOKS, sendRequest);
 }
 ```
-Now, if `/books` request is pending and another `fetchPost` action is triggered, the previous request will be aborted
-and `FETCH_BOOKS_ABORT` will be dispatched. Please note, that requests aborts are working only for `axios` driver,
-request cannot be really aborted for Fetch API according to their specifications, at least
-[not yet](https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort),
-but you won't notice it in your application (apart from unnecessary request overhead) - `FETCH_BOOKS_ABORT` actions
-will still be fired.
+Now, if `/books` request is pending and another `fetchBooks` action is triggered, the previous request will be aborted
+and `FETCH_BOOKS_ABORT` will be dispatched.
 
 You could also use `race` effect:
 ```javascript
@@ -333,7 +330,7 @@ No matter whether you use `watchRequests` or `sendRequest`, you only need to def
 calls for you, as well as dispatch success, error or abort actions. Lets say you defined a following request
 action:
 ```js
-const fetchBooks = (id) => ({
+const deleteBook = id => ({
   type: 'DELETE_BOOK',
   request: {
     url: `/books/${id}`,
@@ -482,18 +479,16 @@ instead of `null`
 - `dataKey: string`: default to `'data'`, change it, if for some reason you want your data to be kept in a different key
 - `errorKey: string`: default to `'error'`, change it, if for some reason you want your errors to be kept in a different key
 - `pendingKey: string`: default to `'pending'`, change it, if for some reason you want your pending state to be kept in a different key
-- `getData: (state, action, config) => data`: describes how to get data from `action` object, returns `action.data` or `action.payload.data`
-when action is FSA compliant
-- `getError: (state, action, config) => data`: describes how to get error from `action` object, returns `action.error` or `action.payload`
-when action is FSA compliant
+- `getData: (state, action, config) => data`: describes how to get data from `action` object, by default returns `action.data` or `action.payload.data` when action is FSA compliant
+- `getError: (state, action, config) => data`: describes how to get error from `action` object, by default returns `action.error` or `action.payload` when action is FSA compliant
 - `onRequest: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles request actions
 - `onSuccess: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles success actions
 - `onError: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles error actions
 - `onAbort: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles abort actions
-- `success: (actionType: string) => string`: override when using not standard success action suffix, handles `_SUCCESS` as a default
-- `error: (actionType: string) => string`: override when using not standard error action suffix, handles `_ERROR` as a default
-- `abort: (actionType: string) => string`: override when using not standard abort action suffix, handles `_ABORT` as a default
-- `resetOn: action => boolean or string[]`: callback or array of action types on which reducer will reset its state to initial one, for instance `['LOGOUT']` or `action => action.type === 'TYPE'`, `[]` as a default
+- `success: (actionType: string) => string`: override when using not standard success action suffix, handles `_SUCCESS` by default
+- `error: (actionType: string) => string`: override when using not standard error action suffix, handles `_ERROR` by default
+- `abort: (actionType: string) => string`: override when using not standard abort action suffix, handles `_ABORT` by default
+- `resetOn: action => boolean or string[]`: callback or array of action types on which reducer will reset its state to initial one, for instance `['LOGOUT']` or `action => action.type === 'LOGOUT'`, `[]` by default
 
 For example:
 ```javascript
@@ -640,8 +635,8 @@ function* onAbortSaga(action) {
 }
 
 function* rootSaga() {
-  yield createRequestInstance(axios, {
-    driver: axiosDriver,
+  yield createRequestInstance({
+    driver: createDriver(axios),
     onRequest: onRequestSaga,
     onSuccess: onResponseSaga,
     onError: onErrorSaga,
@@ -674,7 +669,7 @@ For details, see [redux-act example](https://github.com/klis87/redux-saga-reques
 
 ## Promise middleware [:arrow_up:](#table-of-content)
 
-One disadvantage of using sagas is that there is no way to dispatch an action which triggets a saga from React component and
+One disadvantage of using sagas is that there is no way to dispatch an action which triggers a saga from React component and
 wait for this saga to complete. Because of this, integration with libraries like `Formik` are sometimes harder - for example you
 are forced to push some callbacks to Redux actions for a saga to execute later, which is not convenient. Thats why this library gives
 an optional `requestsPromiseMiddleware`:
