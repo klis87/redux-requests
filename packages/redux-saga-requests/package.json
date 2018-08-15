@@ -1,6 +1,6 @@
 {
   "name": "redux-saga-requests",
-  "version": "0.15.0",
+  "version": "0.16.0",
   "description": "Redux-Saga addon to simplify AJAX requests",
   "main": "lib/index.js",
   "module": "es/index.js",
