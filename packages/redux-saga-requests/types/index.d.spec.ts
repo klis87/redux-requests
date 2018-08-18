@@ -21,11 +21,17 @@ abort('type');
 const actionModifier = getActionWithSuffix('suffix');
 actionModifier('type');
 
+const requestAction = {
+  type: 'FETCH',
+  request: { url: '/' },
+  meta: { driver: 'default' },
+};
+
 let dummyDriver: Driver;
 dummyDriver.requestInstance = {};
 dummyDriver.getAbortSource();
 dummyDriver.abortRequest({});
-dummyDriver.sendRequest({}, {});
+dummyDriver.sendRequest({}, {}, requestAction);
 dummyDriver.getSuccessPayload({}, {});
 dummyDriver.getErrorPayload({});
 
@@ -60,7 +66,7 @@ createRequestInstance(requestInstanceConfig);
 getRequestInstance();
 getRequestInstance('notDefault');
 
-sendRequest({ type: 'type', request: {} });
+sendRequest(requestAction);
 sendRequest({ type: 'type', payload: { request: {} } });
 sendRequest({ type: 'type', payload: { request: [{}] } });
 sendRequest(

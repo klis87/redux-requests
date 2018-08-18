@@ -100,11 +100,16 @@ export function* sendRequest(
 
     try {
       if (!Array.isArray(actionPayload.request)) {
-        response = yield call([driver, 'sendRequest'], request, abortSource);
+        response = yield call(
+          [driver, 'sendRequest'],
+          request,
+          abortSource,
+          action,
+        );
       } else {
         response = yield all(
           request.map(requestItem =>
-            call([driver, 'sendRequest'], requestItem, abortSource),
+            call([driver, 'sendRequest'], requestItem, abortSource, action),
           ),
         );
       }
