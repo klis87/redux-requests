@@ -1,5 +1,21 @@
 import { AnyAction, Reducer, Middleware } from 'redux';
 
+type ActionWithRequest = {
+  type: string;
+  request: any | any[];
+  meta?: any;
+};
+
+type ActionWithRequestAsPayload = {
+  type: string;
+  payload: {
+    request: any | any[];
+  };
+  meta?: any;
+};
+
+type RequestAction = ActionWithRequest | ActionWithRequestAsPayload;
+
 type ActionTypeModifier = (actionType: string) => string;
 
 export const success: ActionTypeModifier;
@@ -14,26 +30,16 @@ export type Driver = {
   requestInstance: any;
   getAbortSource: () => any;
   abortRequest: (abortSource: any) => void;
-  sendRequest: (requestConfig: any, abortSource: any) => any;
+  sendRequest: (
+    requestConfig: any,
+    abortSource: any,
+    requestAction: RequestAction,
+  ) => any;
   getSuccessPayload: (response: any, request: any) => any;
   getErrorPayload: (error: any) => any;
 };
 
 export type DriverCreator = (requestInstance: any, config?: any) => Driver;
-
-type ActionWithRequest = {
-  type: string;
-  request: any | any[];
-};
-
-type ActionWithRequestAsPayload = {
-  type: string;
-  payload: {
-    request: any | any[];
-  };
-};
-
-type RequestAction = ActionWithRequest | ActionWithRequestAsPayload;
 
 type RequestInstanceConfig = {
   driver: Driver | { default: Driver; [driverType: string]: Driver };
