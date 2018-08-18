@@ -86,10 +86,13 @@ export function* sendRequest(
 
   const driver = yield call(getDriver, requestsConfig, action);
   const actionPayload = getActionPayload(action);
-  let { request } = actionPayload;
 
   if (requestsConfig.onRequest && runOnRequest) {
-    request = yield call(requestsConfig.onRequest, request, action);
+    actionPayload.request = yield call(
+      requestsConfig.onRequest,
+      actionPayload.request,
+      action,
+    );
   }
 
   const abortSource = driver.getAbortSource();
@@ -102,13 +105,13 @@ export function* sendRequest(
       if (!Array.isArray(actionPayload.request)) {
         response = yield call(
           [driver, 'sendRequest'],
-          request,
+          actionPayload.request,
           abortSource,
           action,
         );
       } else {
         response = yield all(
-          request.map(requestItem =>
+          actionPayload.request.map(requestItem =>
             call([driver, 'sendRequest'], requestItem, abortSource, action),
           ),
         );
@@ -153,7 +156,7 @@ export function* sendRequest(
     const successPayload = yield call(
       driver.getSuccessPayload,
       response,
-      request,
+      actionPayload.request,
     );
 
     if (!silent) {
