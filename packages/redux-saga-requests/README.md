@@ -25,6 +25,7 @@ integrations could be added, as they are implemented in a plugin fashion.
 - [FSA](#fsa-arrow_up)
 - [Promise middleware](#promise-middleware-arrow_up)
 - [Usage with Fetch API](#usage-with-fetch-api-arrow_up)
+- [Multiple drivers](#multiple-drivers-arrow_up)
 - [Examples](#examples-arrow_up)
 
 ## Motivation [:arrow_up:](#table-of-content)
@@ -110,6 +111,7 @@ or... you could even access your request instance with `getRequestInstance`
 - support for Axios and Fetch API - additional clients could be added, you could even write your own client
 integration as a `driver` (see [./packages/redux-saga-requests-axios/src/axios-driver.js](https://github.com/klis87/redux-saga-requests/blob/master/packages/redux-saga-requests-axios/src/axios-driver.js)
 for the example)
+- multiple driver support - for example you can use Axios for one part of your requests and Fetch Api for another part
 - compatible with FSA, `redux-act` and `redux-actions` libraries (see [redux-act example](https://github.com/klis87/redux-saga-requests/tree/master/examples/redux-act-integration))
 - simple to use with server side rendering - for example you could pass Axios instance to `createRequestInstance` and
 you don't need to worry that Axios interceptors would be shared across multiple requests
@@ -236,7 +238,7 @@ Under the hood, `watchRequests` uses a lower level `sendRequest`. `watchRequests
 to worry about `sendRequest`, but it is useful to know about it, it is handy in [Interceptors](#interceptors-arrow_up). Also, if you don't
 like the magic of `watchRequests`, you might use it everywhere, or... you could write your own `watchRequests`!. This is how it
 works:
-```javascript
+```js
 import axios from 'axios';
 import { takeLatest } from 'redux-saga/effects';
 import { createRequestInstance, sendRequest } from 'redux-saga-requests';
@@ -258,7 +260,7 @@ Now, if `/books` request is pending and another `fetchBooks` action is triggered
 and `FETCH_BOOKS_ABORT` will be dispatched.
 
 You could also use `race` effect:
-```javascript
+```js
 import axios from 'axios';
 import { call, race, take, takeLatest } from 'redux-saga/effects';
 import { createRequestInstance, sendRequest } from 'redux-saga-requests';
@@ -290,7 +292,7 @@ In above case, not only the last `/books` request could be successful, but also 
 action, as `sendRequest` would be aborted as it would lose with `take(CANCEL_REQUEST)` effect.
 
 Of course, you can send requests directly also from your sagas:
-```javascript
+```js
 function* fetchBookSaga() {
   const { response, error } = yield call(
     sendRequest,
@@ -312,7 +314,7 @@ but here not, so we must explicitely tell `sendRequest` to dispatch it.
 ### `getRequestInstance`
 
 Also, it is possible to get access to your request instance (like Axios) in your Saga:
-```javascript
+```js
 import { getRequestInstance } from 'redux-saga-requests';
 
 function* fetchBookSaga() {
@@ -413,7 +415,7 @@ With this request action, assuming `id = 1`, following actions will be dispatche
 
 If you don't like the way how success, error and abort are structured, it is possible to adjust them. You can change `_SUCCESS`, `_ERROR` and `_ABORT` default suffixes with `success`, `error` and `abort` in `createRequestInstance` config:
 
-```javascript
+```js
 import axios from 'axios';
 import { getActionWithSuffix, watchRequests, createRequestInstance, createRequestsReducer } from 'redux-saga-requests';
 import { createDriver } from 'redux-saga-requests-axios'; // or a different driver
@@ -491,7 +493,7 @@ instead of `null`
 - `resetOn: action => boolean or string[]`: callback or array of action types on which reducer will reset its state to initial one, for instance `['LOGOUT']` or `action => action.type === 'LOGOUT'`, `[]` by default
 
 For example:
-```javascript
+```js
 const reducer = requestsReducer({ actionType: `FETCH_SOMETHING`, multiple: true });
 ```
 which will keep your empty data as `[]`, not `null`.
@@ -500,7 +502,7 @@ For inspiration how you could override any of those attributes, see default conf
 [source](https://github.com/klis87/redux-saga-requests/blob/master/packages/redux-saga-requests/src/reducers.js#L19).
 
 You might also want to adjust any configuration for all your requests reducers globally. Here is how you can do this:
-```javascript
+```js
 import { createRequestsReducer } from 'redux-saga-requests';
 
 const requestsReducer = createRequestsReducer({ errorKey: 'fail' });
@@ -510,7 +512,7 @@ key in your state, not `error`.
 
 If you need to have an additional state next to built-in state in `requestsReducer`, or additional actions you would like
 it to handle, you can pass an optional custom reducer as a 2nd pararameter to `requestsReducer`:
-```javascript
+```js
 const activeReducer = (state = { active: false }, action) => {
   switch (action.type) {
     case `SET_ACTIVE`:
@@ -524,7 +526,7 @@ const activeReducer = (state = { active: false }, action) => {
 const reducer = requestsReducer({ actionType }, activeReducer);
 ```
 which effectively will merge `activeReducer` with `requestsReducer`, giving you initial state:
-```javascript
+```js
 const state = {
   data: null,
   error: null,
@@ -537,7 +539,7 @@ logic you need.
 
 However, if `requestsReducer` seems too magical for you, this is totally fine, you can write your reducers in a standard
 way too, but you might consider using `success`, `error` and `abort` helpers, which can add proper suffixes for you:
-```javascript
+```js
 import { success, error, abort } from 'redux-saga-requests';
 
 const initialState = {
@@ -570,7 +572,7 @@ const booksReducer = (state = initialState, action) => {
 ## Interceptors [:arrow_up:](#table-of-content)
 
 You can add global handlers to `onRequest`, `onSuccess`, `onError` add `onAbort`, like so:
-```javascript
+```js
 import { sendRequest, getRequestInstance } from 'redux-saga-requests';
 
 function* onRequestSaga(request, action) {
@@ -727,7 +729,7 @@ requestsPromiseMiddleware({
 ## Usage with Fetch API [:arrow_up:](#table-of-content)
 
 All of the above examples show Axios usage, in order to use Fetch API, use below snippet:
-```javascript
+```js
 import 'isomorphic-fetch'; // or a different fetch polyfill
 import { createRequestInstance, watchRequests } from 'redux-saga-requests';
 import { createDriver } from 'redux-saga-requests-fetch';
@@ -746,7 +748,7 @@ function* rootSaga() {
 }
 ```
 And in order to create Fetch API requests, below:
-```javascript
+```js
 fetch('/users', {
   method: 'POST',
   body: JSON.stringify(data),
@@ -776,6 +778,62 @@ as the default. Available response types are: `'arraybuffer'`, `'blob'`, `'formD
 
 Also, this driver reads response streams automatically for you (depending on `responseType` you choose)
 and sets it as `response.data`, so instead of doing `response.json()`, just read `response.data`.
+
+## Multiple drivers [:arrow_up:](#table-of-content)
+
+You can use multiple drivers if you need it. For example, if you want to use Axios by default, but also Fetch API
+sometimes, you can do it like this:
+```js
+import axios from 'axios';
+import 'isomorphic-fetch';
+import { createRequestInstance, watchRequests } from 'redux-saga-requests';
+import { createDriver as createAxiosDriver } from 'redux-saga-requests-axios';
+import { createDriver as createFetchDriver } from 'redux-saga-requests-fetch';
+
+function* rootSaga() {
+  yield createRequestInstance({
+    driver: {
+      default: createAxiosDriver(axios),
+      fetch: createFetchDriver(
+        window.fetch,
+        {
+          baseURL: 'https://my-domain.com',
+          AbortController: window.AbortController,
+        },
+      ),
+    },
+  });
+  yield watchRequests();
+}
+```
+
+As you can see, the default driver is Axios, so how to mark a request to be run by Fetch driver?
+Just pass the key you assigned Fetch driver to (`fetch` in our case) in `action.meta.driver`, for instance:
+```js
+const fetchUsers = () => ({
+  type: 'FETCH_USERS',
+  request: {
+    url: '/users/',
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  },
+  meta: {
+    driver: 'fetch',
+  },
+});
+```
+
+Also, if you want to use `getRequestInstance` with Fetch driver, just pass a proper driver key to it:
+```js
+import { getRequestInstance } from 'redux-saga-requests';
+
+function* fetchBookSaga() {
+  const requestInstance = yield getRequestInstance('fetch');
+}
+```
 
 ## Examples [:arrow_up:](#table-of-content)
 

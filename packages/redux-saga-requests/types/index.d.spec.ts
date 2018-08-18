@@ -33,6 +33,9 @@ const driverCreator: DriverCreator = () => dummyDriver;
 driverCreator({});
 
 createRequestInstance({ driver: dummyDriver });
+createRequestInstance({
+  driver: { default: dummyDriver, anotherDriver: dummyDriver },
+});
 
 const successAction = (action, data) => ({ type: 'SUCCESS', data });
 const errorAction = (action, data) => ({ type: 'ERROR', data });
@@ -55,6 +58,7 @@ const requestInstanceConfig = {
 createRequestInstance(requestInstanceConfig);
 
 getRequestInstance();
+getRequestInstance('notDefault');
 
 sendRequest({ type: 'type', request: {} });
 sendRequest({ type: 'type', payload: { request: {} } });

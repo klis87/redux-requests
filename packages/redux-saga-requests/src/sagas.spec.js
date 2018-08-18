@@ -143,6 +143,41 @@ describe('sagas', () => {
         .returns('requestInstance')
         .run();
     });
+
+    it('handles driver as object', () => {
+      return expectSaga(getRequestInstance)
+        .provide([
+          [
+            getContext(REQUESTS_CONFIG),
+            {
+              driver: {
+                default: {
+                  requestInstance: 'requestInstance',
+                },
+              },
+            },
+          ],
+        ])
+        .returns('requestInstance')
+        .run();
+    });
+
+    it('handles not default driver as object', () => {
+      return expectSaga(getRequestInstance, 'another')
+        .provide([
+          [
+            getContext(REQUESTS_CONFIG),
+            {
+              driver: {
+                default: { requestInstance: 'requestInstance' },
+                another: { requestInstance: 'anotherRequestInstance' },
+              },
+            },
+          ],
+        ])
+        .returns('anotherRequestInstance')
+        .run();
+    });
   });
 
   describe('sendRequest', () => {
@@ -198,6 +233,43 @@ describe('sagas', () => {
 
       return expectSaga(sendRequest, action)
         .provide([[getContext(REQUESTS_CONFIG), config]])
+        .put({ type: 'FETCH_SUCCESS', ...successAction(action, 'response') })
+        .returns({ response: { data: 'response' } })
+        .run();
+    });
+
+    it('uses default driver from driver config object', () => {
+      const action = { type: 'FETCH', request: { url: '/url' } };
+
+      return expectSaga(sendRequest, action)
+        .provide([
+          [
+            getContext(REQUESTS_CONFIG),
+            { ...config, driver: { default: dummyDriver() } },
+          ],
+        ])
+        .put({ type: 'FETCH_SUCCESS', ...successAction(action, 'response') })
+        .returns({ response: { data: 'response' } })
+        .run();
+    });
+
+    it('uses not default driver when defined in action meta driver', () => {
+      const action = {
+        type: 'FETCH',
+        request: { url: '/url' },
+        meta: { driver: 'another' },
+      };
+
+      return expectSaga(sendRequest, action)
+        .provide([
+          [
+            getContext(REQUESTS_CONFIG),
+            {
+              ...config,
+              driver: { default: dummyErrorDriver(), another: dummyDriver() },
+            },
+          ],
+        ])
         .put({ type: 'FETCH_SUCCESS', ...successAction(action, 'response') })
         .returns({ response: { data: 'response' } })
         .run();
