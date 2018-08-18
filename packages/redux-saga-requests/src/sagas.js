@@ -50,10 +50,18 @@ export function getRequestsConfig() {
   return getContext(REQUESTS_CONFIG);
 }
 
-export function* getRequestInstance() {
+export function* getRequestInstance(driverType = null) {
   const config = yield getRequestsConfig();
-  return config.driver.requestInstance;
+  const driver = driverType
+    ? config.driver[driverType]
+    : config.driver.default || config.driver;
+  return driver.requestInstance;
 }
+
+const getDriver = (requestsConfig, action) =>
+  action.meta && action.meta.driver
+    ? requestsConfig.driver[action.meta.driver]
+    : requestsConfig.driver.default || requestsConfig.driver;
 
 export function* sendRequest(
   action,
@@ -76,7 +84,7 @@ export function* sendRequest(
     yield put(action);
   }
 
-  const { driver } = requestsConfig;
+  const driver = yield call(getDriver, requestsConfig, action);
   const actionPayload = getActionPayload(action);
   let { request } = actionPayload;
 
