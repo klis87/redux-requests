@@ -25,6 +25,7 @@ integrations could be added, as they are implemented in a plugin fashion.
 - [FSA](#fsa-arrow_up)
 - [Promise middleware](#promise-middleware-arrow_up)
 - [Usage with Fetch API](#usage-with-fetch-api-arrow_up)
+- [Mocking](#mocking-arrow_up)
 - [Multiple drivers](#multiple-drivers-arrow_up)
 - [Examples](#examples-arrow_up)
 
@@ -111,6 +112,7 @@ or... you could even access your request instance with `getRequestInstance`
 - support for Axios and Fetch API - additional clients could be added, you could even write your own client
 integration as a `driver` (see [./packages/redux-saga-requests-axios/src/axios-driver.js](https://github.com/klis87/redux-saga-requests/blob/master/packages/redux-saga-requests-axios/src/axios-driver.js)
 for the example)
+- mocking - mock driver, which use can use for test purposes or when you would like to integrate with API not yet implemented (and once API is finished, you could just change driver to Axios or Fetch and magicaly everything will work!)
 - multiple driver support - for example you can use Axios for one part of your requests and Fetch Api for another part
 - compatible with FSA, `redux-act` and `redux-actions` libraries (see [redux-act example](https://github.com/klis87/redux-saga-requests/tree/master/examples/redux-act-integration))
 - simple to use with server side rendering - for example you could pass Axios instance to `createRequestInstance` and
@@ -779,6 +781,57 @@ as the default. Available response types are: `'arraybuffer'`, `'blob'`, `'formD
 Also, this driver reads response streams automatically for you (depending on `responseType` you choose)
 and sets it as `response.data`, so instead of doing `response.json()`, just read `response.data`.
 
+## Mocking [:arrow_up:](#table-of-content)
+
+Probably you are sometimes in a situation when you would like to start working on a feature which needs some integration with
+an API. What you can do then? Probably you just wait or start writing some prototype which then you will polish once API is finished. You can do better with `redux-saga-requests-mock`, especially with multi driver support, which you can read about in the
+next paragraph. With this driver, you can define expected responses and errors which you would get from server and write your app
+normally. Then, after API is finished, you will just need to replace the driver with a real one, like Axios or Fetch API, without
+any additional refactoring necessary, which could save you a lot of time!
+
+You can use it like this:
+```js
+import { createRequestInstance, watchRequests } from 'redux-saga-requests';
+import { createDriver } from 'redux-saga-requests-mock';
+
+const FETCH_PHOTO = 'FETCH_PHOTO';
+
+const fetchPhoto = id => ({
+  type: FETCH_PHOTO,
+  request: { url: `/photos/${id}` },
+});
+
+function* rootSaga() {
+  yield createRequestInstance({
+    driver: createDriver(
+      {
+        [FETCH_PHOTO]: (requestConfig, requestAction) => {
+          // mock normal response for id 1 and 404 error fot the rest
+          const id = requestConfig.url.split('/')[2];
+
+          if (id === '1') {
+            return {
+              data: {
+                albumId: 1,
+                id: 1,
+                title: 'accusamus beatae ad facilis cum similique qui sunt',
+              },
+            };
+          }
+
+          throw { status: 404 };
+        },
+      },
+      {
+        timeout: 1000, // optional, in ms, defining how much time mock request would take, useful for testing spinners
+        getDataFromResponse: response => response.data // optional, if you mock Axios or Fetch API, you dont need to worry about it
+      },
+    ),
+  });
+  yield watchRequests();
+}
+```
+
 ## Multiple drivers [:arrow_up:](#table-of-content)
 
 You can use multiple drivers if you need it. For example, if you want to use Axios by default, but also Fetch API
@@ -846,6 +899,7 @@ There are following examples currently:
 - [Fetch API](https://github.com/klis87/redux-saga-requests/tree/master/examples/fetch-api)
 - [redux-act integration](https://github.com/klis87/redux-saga-requests/tree/master/examples/redux-act-integration)
 - [low-level-reducers](https://github.com/klis87/redux-saga-requests/tree/master/examples/low-level-reducers)
+- [mock-and-multiple-drivers](https://github.com/klis87/redux-saga-requests/tree/master/examples/mock-and-multiple-drivers)
 
 ## Credits [:arrow_up:](#table-of-content)
 
