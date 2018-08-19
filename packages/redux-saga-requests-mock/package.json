@@ -39,7 +39,7 @@
     "prepublish": "yarn run build"
   },
   "peerDependencies": {
-    "redux-saga-requests": ">=0.16.1"
+    "redux-saga-requests": ">=0.17.0"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
