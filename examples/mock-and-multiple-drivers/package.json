@@ -1,0 +1,31 @@
+{
+  "name": "redux-saga-requests-mock-and-multiple-drivers-example",
+  "version": "1.0.0",
+  "description": "redux-saga-requests mock and multiple drivers example",
+  "main": "src/index.js",
+  "repository": "git@github.com:klis87/redux-saga-requests.git",
+  "author": "Konrad Lisiczynski <klisiczynski@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "webpack-dev-server"
+  },
+  "dependencies": {
+    "axios": "0.18.0",
+    "babel-polyfill": "6.26.0",
+    "react": "16.4.2",
+    "react-dom": "16.4.2",
+    "react-redux": "5.0.7",
+    "redux": "4.0.0",
+    "redux-saga": "0.16.0"
+  },
+  "devDependencies": {
+    "babel-core": "6.26.3",
+    "babel-loader": "7.1.5",
+    "babel-preset-env": "1.7.0",
+    "babel-preset-react": "6.24.1",
+    "babel-preset-stage-2": "6.24.1",
+    "html-webpack-plugin": "3.2.0",
+    "webpack": "4.16.5",
+    "webpack-dev-server": "3.1.5"
+  }
+}

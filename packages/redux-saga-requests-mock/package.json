@@ -1,0 +1,69 @@
+{
+  "name": "redux-saga-requests-mock",
+  "version": "0.0.1",
+  "description": "Mocking driver for Redux-Saga-Requests, Redux-Saga addon to simplify AJAX requests",
+  "main": "lib/index.js",
+  "module": "es/index.js",
+  "jsnext:main": "es/index.js",
+  "unpkg": "dist/redux-saga-requests-mock.min.js",
+  "repository": "git@github.com:klis87/redux-saga-requests.git",
+  "author": "Konrad Lisiczynski <klisiczynski@gmail.com>",
+  "license": "MIT",
+  "typings": "types/index.d.ts",
+  "keywords": [
+    "redux",
+    "redux-saga",
+    "axios",
+    "fetch",
+    "ajax",
+    "mock"
+  ],
+  "homepage": "https://github.com/klis87/redux-saga-requests",
+  "bugs": {
+    "url": "https://github.com/klis87/redux-saga-requests/issues"
+  },
+  "scripts": {
+    "clean": "rimraf es lib dist",
+    "lint": "eslint src/**",
+    "test": "cross-env BABEL_ENV=commonjs mocha -r babel-register -r babel-polyfill -r chai/register-assert 'src/**/*.spec.js'",
+    "test:cover": "cross-env BABEL_ENV=coverage mocha -r babel-register -r babel-polyfill -r chai/register-assert 'src/**/*.spec.js'",
+    "test-types": "tsc types/index.d.spec.ts --noEmit",
+    "report": "nyc report",
+    "coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "build:commonjs": "cross-env BABEL_ENV=commonjs babel src --out-dir lib --ignore spec.js",
+    "build:es": "cross-env BABEL_ENV=es babel src --out-dir es --ignore spec.js",
+    "build:umd": "cross-env BABEL_ENV=es webpack --mode development -o dist/redux-saga-requests-mock.js",
+    "build:umd:min": "cross-env BABEL_ENV=es webpack --mode production -o dist/redux-saga-requests-mock.min.js",
+    "build": "npm-run-all clean -p build:commonjs build:es build:umd build:umd:min",
+    "build:watch": "nodemon --watch src --ignore src/**/*.spec.js --exec 'yarn run build:es'",
+    "prepublish": "yarn run build"
+  },
+  "peerDependencies": {
+    "redux-saga-requests": ">=0.16.1"
+  },
+  "devDependencies": {
+    "babel-cli": "6.26.0",
+    "babel-core": "6.26.3",
+    "babel-loader": "7.1.5",
+    "babel-plugin-istanbul": "4.1.6",
+    "babel-polyfill": "6.26.0",
+    "babel-preset-env": "1.7.0",
+    "babel-preset-stage-3": "6.24.1",
+    "babel-register": "6.26.0",
+    "chai": "4.1.2",
+    "cross-env": "5.2.0",
+    "eslint": "5.4.0",
+    "eslint-config-airbnb": "17.1.0",
+    "eslint-plugin-import": "2.14.0",
+    "eslint-plugin-jsx-a11y": "6.1.1",
+    "eslint-plugin-react": "7.11.1",
+    "mocha": "5.2.0",
+    "nodemon": "1.18.3",
+    "npm-run-all": "4.1.3",
+    "rimraf": "2.6.2",
+    "sinon": "6.1.5",
+    "typescript": "3.0.1",
+    "webpack": "4.16.5",
+    "webpack-cli": "3.1.0"
+  }
+}
