@@ -5,9 +5,6 @@ module.exports = {
       {
         loose: true,
         modules: process.env.BABEL_ENV === 'es' ? false : 'commonjs',
-        exclude: ['coverage', 'test'].includes(process.env.BABEL_ENV)
-          ? ['transform-regenerator']
-          : [],
       },
     ],
   ],

@@ -45,6 +45,7 @@
     "@babel/cli": "7.0.0",
     "@babel/core": "7.0.0",
     "@babel/plugin-proposal-object-rest-spread": "7.0.0",
+    "@babel/plugin-transform-runtime": "7.0.0",
     "@babel/preset-env": "7.0.0",
     "@babel/register": "7.0.0",
     "babel-loader": "8.0.1",
@@ -64,5 +65,8 @@
     "typescript": "3.0.1",
     "webpack": "4.16.5",
     "webpack-cli": "3.1.0"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.0.0"
   }
 }
