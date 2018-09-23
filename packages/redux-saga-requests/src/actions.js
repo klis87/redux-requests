@@ -48,3 +48,7 @@ export const createAbortAction = action => ({
     requestAction: action,
   },
 });
+
+export const isSuccessAction = action => action.endsWith(SUCCESS_SUFFIX);
+export const isErrorAction = action => action.endsWith(ERROR_SUFFIX);
+export const isAbortAction = action => action.endsWith(ABORT_SUFFIX);

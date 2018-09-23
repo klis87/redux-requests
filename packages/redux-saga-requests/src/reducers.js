@@ -1,4 +1,11 @@
-import { success, error, abort } from './actions';
+import {
+  success,
+  error,
+  abort,
+  isSuccessAction,
+  isErrorAction,
+  isAbortAction,
+} from './actions';
 
 // to support libraries like redux-act and redux-actions
 const normalizeActionType = actionType =>
@@ -6,11 +13,62 @@ const normalizeActionType = actionType =>
 
 const getEmptyData = multiple => (multiple ? [] : null);
 
-const getInitialRequestState = ({ multiple }) => ({
+const getInitialRequestState = ({ multiple, operations }) => ({
   data: getEmptyData(multiple),
   pending: 0,
   error: null,
+  operations:
+    operations &&
+    Object.keys(operations).reduce(
+      (prev, k) => ({ ...prev, [k]: { error: null, pending: 0 } }),
+      {},
+    ),
 });
+
+/*
+const conf = {
+  updateData: (state, action) => action.payload.data,
+  operations: {
+    UPDATE_NODE: (state, action) => action.payload.data,
+    FETCH_AGAIN_NODE: true,
+    EDIT_NODE: {
+      updateData: (state, action) => action.payload.data,
+      requestKey: action => action.meta.id,
+    },
+    DONT_UPDATE_DATA: false,
+  },
+};
+
+const state = {
+  data: 'dwdwd',
+  pending: 0,
+  error: false,
+  operations: {
+    UPDATE_NODE: {
+      error: null,
+      pending: 0,
+    },
+    FETCH_AGAIN_NODE: {
+      error: null,
+      pending: 0,
+    },
+    EDIT_NODE: {
+      1: {
+        error: true,
+        pending: 0,
+      },
+      2: {
+        error: false,
+        pending: 1,
+      },
+    },
+    DONT_UPDATE_DATA: {
+      error: null,
+      pending: 0,
+    },
+  },
+};
+*/
 
 const getInitialState = (state, reducer, config) => {
   if (!reducer) {
@@ -47,6 +105,7 @@ const defaultConfig = {
     pending: state.pending - 1,
   }),
   resetOn: [],
+  operations: null,
 };
 
 export const createRequestsReducer = (globalConfig = {}) => (
@@ -63,6 +122,8 @@ export const createRequestsReducer = (globalConfig = {}) => (
     onError,
     onAbort,
     resetOn,
+    getData,
+    operations,
     actionType,
   } = config;
 
@@ -76,6 +137,41 @@ export const createRequestsReducer = (globalConfig = {}) => (
     return {
       ...getInitialState(state, reducer, config),
       pending: state.pending,
+    };
+  }
+
+  if (
+    operations &&
+    (action.type in operations ||
+      (action.meta &&
+        (action.meta.requestAction &&
+          action.meta.requestAction.type in operations)))
+  ) {
+    if (isSuccessAction(action.type)) {
+      const requestActionType = action.meta.requestAction.type;
+      console.log('action type is', requestActionType);
+      return {
+        ...state,
+        data: getData(state, action, config),
+        operations: {
+          ...state.operations,
+          [requestActionType]: {
+            error: null,
+            pending: state.operations[requestActionType].pending - 1,
+          },
+        },
+      };
+    }
+
+    return {
+      ...state,
+      operations: {
+        ...state.operations,
+        [action.type]: {
+          error: null,
+          pending: state.operations[action.type].pending + 1,
+        },
+      },
     };
   }
 
