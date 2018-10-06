@@ -5,22 +5,11 @@ import { createRequestInstance, watchRequests } from 'redux-saga-requests';
 import { createDriver } from 'redux-saga-requests-axios';
 
 import { photoReducer, postReducer, abortCounterReducer } from './reducers';
-import {
-  success,
-  error,
-  abort,
-  fetchPhoto,
-  clearPhoto,
-  fetchPost,
-  clearPost,
-} from './actions';
+import { fetchPhoto, clearPhoto, fetchPost, clearPost } from './actions';
 
 function* rootSaga(axiosInstance) {
   yield createRequestInstance({
     driver: createDriver(axiosInstance),
-    success,
-    error,
-    abort,
   });
   yield watchRequests(null, {
     [fetchPhoto]: { abortOn: clearPhoto },

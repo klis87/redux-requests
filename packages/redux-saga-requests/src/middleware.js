@@ -1,15 +1,13 @@
 import { isRequestAction } from './helpers';
-import { success as defaultSuccess } from './actions';
+import { success } from './actions';
 
 const shouldActionBePromisified = (action, auto) =>
   auto || (action.meta && action.meta.asPromise);
 
-export const requestsPromiseMiddleware = ({
-  success = defaultSuccess,
-  auto = false,
-  getRequestAction = action =>
-    action.meta && action.meta.requestAction ? action.meta.requestAction : null,
-} = {}) => {
+const getRequestAction = action =>
+  action.meta && action.meta.requestAction ? action.meta.requestAction : null;
+
+export const requestsPromiseMiddleware = ({ auto = false } = {}) => {
   const requestMap = new Map();
 
   return () => next => action => {

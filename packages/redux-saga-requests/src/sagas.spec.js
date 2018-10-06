@@ -2,12 +2,9 @@ import { getContext, setContext, cancelled } from 'redux-saga/effects';
 import { expectSaga } from 'redux-saga-test-plan';
 
 import {
-  success,
-  error,
-  abort,
-  successAction,
-  errorAction,
-  abortAction,
+  createSuccessAction,
+  createErrorAction,
+  createAbortAction,
 } from './actions';
 import { REQUESTS_CONFIG, INCORRECT_PAYLOAD_ERROR } from './constants';
 import {
@@ -78,12 +75,6 @@ describe('sagas', () => {
   describe('defaultConfig', () => {
     it('has correct value', () => {
       const expected = {
-        success,
-        error,
-        abort,
-        successAction,
-        errorAction,
-        abortAction,
         driver: null,
         onRequest: null,
         onSuccess: null,
@@ -105,12 +96,6 @@ describe('sagas', () => {
 
     it('returns correct effect with overwritten config', () => {
       const config = {
-        success: 'success',
-        successAction,
-        error: 'error',
-        errorAction,
-        abort: 'abort',
-        abortAction: voidCallback,
         driver: 'some driver',
         onRequest: voidCallback,
         onSuccess: voidCallback,
@@ -233,7 +218,7 @@ describe('sagas', () => {
 
       return expectSaga(sendRequest, action)
         .provide([[getContext(REQUESTS_CONFIG), config]])
-        .put({ type: 'FETCH_SUCCESS', ...successAction(action, 'response') })
+        .put(createSuccessAction(action, 'response'))
         .returns({ response: { data: 'response' } })
         .run();
     });
@@ -248,7 +233,7 @@ describe('sagas', () => {
             { ...config, driver: { default: dummyDriver() } },
           ],
         ])
-        .put({ type: 'FETCH_SUCCESS', ...successAction(action, 'response') })
+        .put(createSuccessAction(action, 'response'))
         .returns({ response: { data: 'response' } })
         .run();
     });
@@ -270,7 +255,7 @@ describe('sagas', () => {
             },
           ],
         ])
-        .put({ type: 'FETCH_SUCCESS', ...successAction(action, 'response') })
+        .put(createSuccessAction(action, 'response'))
         .returns({ response: { data: 'response' } })
         .run();
     });
@@ -283,10 +268,7 @@ describe('sagas', () => {
 
       return expectSaga(sendRequest, action)
         .provide([[getContext(REQUESTS_CONFIG), config]])
-        .put({
-          type: 'FETCH_SUCCESS',
-          ...successAction(action, ['response', 'response']),
-        })
+        .put(createSuccessAction(action, ['response', 'response']))
         .returns({ response: [{ data: 'response' }, { data: 'response' }] })
         .run();
     });
@@ -296,10 +278,7 @@ describe('sagas', () => {
 
       return expectSaga(sendRequest, action, { silent: true })
         .provide([[getContext(REQUESTS_CONFIG), config]])
-        .not.put({
-          type: 'FETCH_SUCCESS',
-          ...successAction(action, 'response'),
-        })
+        .not.put(createSuccessAction(action, 'response'))
         .run();
     });
 
@@ -313,10 +292,7 @@ describe('sagas', () => {
             { ...defaultConfig, driver: dummyErrorDriver() },
           ],
         ])
-        .put({
-          type: 'FETCH_ERROR',
-          ...errorAction(action, new Error('responseError')),
-        })
+        .put(createErrorAction(action, new Error('responseError')))
         .returns({ error: new Error('responseError') })
         .run();
     });
@@ -331,10 +307,7 @@ describe('sagas', () => {
             { ...defaultConfig, driver: dummyErrorDriver() },
           ],
         ])
-        .not.put({
-          type: 'FETCH_ERROR',
-          ...errorAction(action, new Error('responseError')),
-        })
+        .not.put(createErrorAction(action, new Error('responseError')))
         .run();
     });
 
@@ -349,7 +322,7 @@ describe('sagas', () => {
           ],
           [cancelled(), true],
         ])
-        .put({ type: 'FETCH_ABORT', ...abortAction(action) })
+        .put(createAbortAction(action))
         .run();
     });
 
@@ -364,7 +337,7 @@ describe('sagas', () => {
           ],
           [cancelled(), true],
         ])
-        .not.put({ type: 'FETCH_ABORT', ...abortAction(action) })
+        .not.put(createAbortAction(action))
         .run();
     });
 

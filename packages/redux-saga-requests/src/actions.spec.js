@@ -2,9 +2,9 @@ import {
   success,
   error,
   abort,
-  successAction,
-  errorAction,
-  abortAction,
+  createSuccessAction,
+  createErrorAction,
+  createAbortAction,
 } from './actions';
 
 describe('actions', () => {
@@ -31,10 +31,12 @@ describe('actions', () => {
   describe('successAction', () => {
     it('should correctly transform action payload', () => {
       const requestAction = {
+        type: 'REQUEST',
         request: { url: '/' },
       };
 
-      assert.deepEqual(successAction(requestAction, 'data'), {
+      assert.deepEqual(createSuccessAction(requestAction, 'data'), {
+        type: 'REQUEST_SUCCESS',
         data: 'data',
         meta: {
           requestAction,
@@ -44,12 +46,14 @@ describe('actions', () => {
 
     it('handles FSA actions', () => {
       const requestAction = {
+        type: 'REQUEST',
         payload: {
           request: { url: '/' },
         },
       };
 
-      assert.deepEqual(successAction(requestAction, 'data'), {
+      assert.deepEqual(createSuccessAction(requestAction, 'data'), {
+        type: 'REQUEST_SUCCESS',
         payload: {
           data: 'data',
         },
@@ -61,13 +65,15 @@ describe('actions', () => {
 
     it('should merge request meta', () => {
       const requestAction = {
+        type: 'REQUEST',
         request: { url: '/' },
         meta: {
           asPromise: true,
         },
       };
 
-      assert.deepEqual(successAction(requestAction, 'data'), {
+      assert.deepEqual(createSuccessAction(requestAction, 'data'), {
+        type: 'REQUEST_SUCCESS',
         data: 'data',
         meta: {
           requestAction,
@@ -80,10 +86,12 @@ describe('actions', () => {
   describe('errorAction', () => {
     it('should correctly transform action payload', () => {
       const requestAction = {
+        type: 'REQUEST',
         request: { url: '/' },
       };
 
-      assert.deepEqual(errorAction(requestAction, 'errorData'), {
+      assert.deepEqual(createErrorAction(requestAction, 'errorData'), {
+        type: 'REQUEST_ERROR',
         error: 'errorData',
         meta: {
           requestAction,
@@ -93,12 +101,14 @@ describe('actions', () => {
 
     it('handles FSA actions', () => {
       const requestAction = {
+        type: 'REQUEST',
         payload: {
           request: { url: '/' },
         },
       };
 
-      assert.deepEqual(errorAction(requestAction, 'errorData'), {
+      assert.deepEqual(createErrorAction(requestAction, 'errorData'), {
+        type: 'REQUEST_ERROR',
         payload: 'errorData',
         error: true,
         meta: {
@@ -109,13 +119,15 @@ describe('actions', () => {
 
     it('should merge request meta', () => {
       const requestAction = {
+        type: 'REQUEST',
         request: { url: '/' },
         meta: {
           asPromise: true,
         },
       };
 
-      assert.deepEqual(errorAction(requestAction, 'errorData'), {
+      assert.deepEqual(createErrorAction(requestAction, 'errorData'), {
+        type: 'REQUEST_ERROR',
         error: 'errorData',
         meta: {
           requestAction,
@@ -128,10 +140,12 @@ describe('actions', () => {
   describe('abortAction', () => {
     it('should correctly transform action payload', () => {
       const requestAction = {
+        type: 'REQUEST',
         request: { url: '/' },
       };
 
-      assert.deepEqual(abortAction(requestAction), {
+      assert.deepEqual(createAbortAction(requestAction), {
+        type: 'REQUEST_ABORT',
         meta: {
           requestAction,
         },
@@ -140,13 +154,15 @@ describe('actions', () => {
 
     it('should merge request meta', () => {
       const requestAction = {
+        type: 'REQUEST',
         request: { url: '/' },
         meta: {
           asPromise: true,
         },
       };
 
-      assert.deepEqual(abortAction(requestAction), {
+      assert.deepEqual(createAbortAction(requestAction), {
+        type: 'REQUEST_ABORT',
         meta: {
           requestAction,
           asPromise: true,
