@@ -413,49 +413,6 @@ With this request action, assuming `id = 1`, following actions will be dispatche
 }
 ```
 
-### Custom actions
-
-If you don't like the way how success, error and abort are structured, it is possible to adjust them. You can change `_SUCCESS`, `_ERROR` and `_ABORT` default suffixes with `success`, `error` and `abort` in `createRequestInstance` config:
-
-```js
-import axios from 'axios';
-import { getActionWithSuffix, watchRequests, createRequestInstance, createRequestsReducer } from 'redux-saga-requests';
-import { createDriver } from 'redux-saga-requests-axios'; // or a different driver
-
-const success = getActionWithSuffix('MY_SUCCESS_SUFFIX');
-const error = getActionWithSuffix('MY_ERROR_SUFFIX');
-const abort = getActionWithSuffix('MY_ABORT_SUFFIX');
-
-function* rootSaga() {
-  yield createRequestInstance({
-    driver: createDriver(axios),
-    success,
-    error,
-    abort,
-  });
-  yield watchRequests();
-}
-```
-
-If you need even more control, you can define how the rest of actions payloads look like by passing
-`successAction`, `errorAction`, `abortAction`, for example:
-```js
-const successAction = (action, data) => ({
-  responseData: data,
-  meta: {
-    requestAction: action,
-  },
-});
-
-function* rootSaga() {
-  yield createRequestInstance({
-    driver: createDriver(axios),
-    successAction,
-  });
-  yield watchRequests();
-}
-```
-
 ## Reducers [:arrow_up:](#table-of-content)
 
 Except for `watchRequests` and `sendRequest`, which can simplify your actions and sagas a lot, you can also use
@@ -480,18 +437,12 @@ In order to be flexible, apart from `actionType` passed in `requestsReducer` con
 following attributes:
 - `multiple: boolean`: default to `false`, change it to `true` if you want your not loaded data to be stored as `[]`
 instead of `null`
-- `dataKey: string`: default to `'data'`, change it, if for some reason you want your data to be kept in a different key
-- `errorKey: string`: default to `'error'`, change it, if for some reason you want your errors to be kept in a different key
-- `pendingKey: string`: default to `'pending'`, change it, if for some reason you want your pending state to be kept in a different key
 - `getData: (state, action, config) => data`: describes how to get data from `action` object, by default returns `action.data` or `action.payload.data` when action is FSA compliant
 - `getError: (state, action, config) => data`: describes how to get error from `action` object, by default returns `action.error` or `action.payload` when action is FSA compliant
 - `onRequest: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles request actions
 - `onSuccess: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles success actions
 - `onError: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles error actions
 - `onAbort: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles abort actions
-- `success: (actionType: string) => string`: override when using not standard success action suffix, handles `_SUCCESS` by default
-- `error: (actionType: string) => string`: override when using not standard error action suffix, handles `_ERROR` by default
-- `abort: (actionType: string) => string`: override when using not standard abort action suffix, handles `_ABORT` by default
 - `resetOn: action => boolean or string[]`: callback or array of action types on which reducer will reset its state to initial one, for instance `['LOGOUT']` or `action => action.type === 'LOGOUT'`, `[]` by default
 
 For example:
@@ -507,10 +458,9 @@ You might also want to adjust any configuration for all your requests reducers g
 ```js
 import { createRequestsReducer } from 'redux-saga-requests';
 
-const requestsReducer = createRequestsReducer({ errorKey: 'fail' });
+const requestsReducer = createRequestsReducer({ multiple: true });
 ```
-Now, instead of built-in `requestsReducer`, you can use your own one, and from now on all errors will be kept in `fail`
-key in your state, not `error`.
+Now, instead of built-in `requestsReducer`, you can use your own one, and from now on all reducers will have `multiple` set as `true` by default.
 
 If you need to have an additional state next to built-in state in `requestsReducer`, or additional actions you would like
 it to handle, you can pass an optional custom reducer as a 2nd pararameter to `requestsReducer`:
@@ -718,13 +668,10 @@ class Books extends Component {
 }
 ```
 
-If you adjusted how response actions are structured, you might need to configure this middleware to fit your settings by passing an
-optional config to `requestsPromiseMiddleware`:
+Also, you can pass an optional `auto` flag to `requestsPromiseMiddleware`:
 ```js
 requestsPromiseMiddleware({
-  success: customSuccessFunction,
   auto: true // if you with to promisify all request actions without explicit meta.asPromise true
-  getRequestAction = action => action.meta && action.meta.requestAction ? action.meta.requestAction : null, // default
 })
 ```
 

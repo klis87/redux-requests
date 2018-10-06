@@ -2,7 +2,6 @@ import {
   success,
   error,
   abort,
-  getActionWithSuffix,
   Driver,
   DriverCreator,
   createRequestInstance,
@@ -18,13 +17,10 @@ success('type');
 error('type');
 abort('type');
 
-const actionModifier = getActionWithSuffix('suffix');
-actionModifier('type');
-
 const requestAction = {
   type: 'FETCH',
   request: { url: '/' },
-  meta: { driver: 'default' },
+  meta: { driver: 'default', asPromise: true, customKey: 'customValue' },
 };
 
 let dummyDriver: Driver;
@@ -43,17 +39,7 @@ createRequestInstance({
   driver: { default: dummyDriver, anotherDriver: dummyDriver },
 });
 
-const successAction = (action, data) => ({ type: 'SUCCESS', data });
-const errorAction = (action, data) => ({ type: 'ERROR', data });
-const abortAction = action => ({ type: 'ABORT' });
-
 const requestInstanceConfig = {
-  success: actionModifier,
-  error: actionModifier,
-  abort: actionModifier,
-  successAction,
-  errorAction,
-  abortAction,
   driver: dummyDriver,
   onRequest: (request, action) => request,
   onSuccess: (response, action) => response,
@@ -106,36 +92,30 @@ watchRequests(
 );
 
 const globalConfig = {
-  success,
-  error,
-  abort,
-  dataKey: 'data',
-  errorKey: 'error',
-  pendingKey: 'pending',
   multiple: false,
   getData: (state, action) => action.payload.data,
   getError: (state, action) => action.payload,
-  onRequest: (state, action, { dataKey, multiple, pendingKey, errorKey }) => ({
+  onRequest: (state, action, { multiple }) => ({
     ...state,
-    [dataKey]: null,
-    [pendingKey]: state[pendingKey] + 1,
-    [errorKey]: null,
+    data: null,
+    pending: state.pending + 1,
+    error: null,
   }),
-  onSuccess: (state, action, { dataKey, pendingKey, errorKey, getData }) => ({
+  onSuccess: (state, action, { getData }) => ({
     ...state,
-    [dataKey]: getData(state, action),
-    [pendingKey]: state[pendingKey] - 1,
-    [errorKey]: null,
+    data: getData(state, action),
+    pending: state.pending - 1,
+    error: null,
   }),
-  onError: (state, action, { dataKey, multiple, pendingKey, errorKey }) => ({
+  onError: (state, action, { multiple }) => ({
     ...state,
-    [dataKey]: null,
-    [pendingKey]: state[pendingKey] - 1,
-    [errorKey]: action.payload.error,
+    data: null,
+    pending: state.pending - 1,
+    error: action.payload.error,
   }),
-  onAbort: (state, action, { pendingKey }) => ({
+  onAbort: (state, action) => ({
     ...state,
-    [pendingKey]: state[pendingKey] - 1,
+    pending: state.pending - 1,
   }),
   resetOn: ['RESET'],
 };
@@ -157,7 +137,3 @@ createRequestsReducer(globalConfig)({
 
 requestsPromiseMiddleware();
 requestsPromiseMiddleware({ auto: true });
-requestsPromiseMiddleware({
-  success,
-  getRequestAction: action => action.requestAction || null,
-});

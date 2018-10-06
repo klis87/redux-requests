@@ -14,12 +14,9 @@ import {
 import { delay } from 'redux-saga';
 
 import {
-  success,
-  error,
-  abort,
-  successAction,
-  errorAction,
-  abortAction,
+  createSuccessAction,
+  createErrorAction,
+  createAbortAction,
 } from './actions';
 import { REQUESTS_CONFIG, INCORRECT_PAYLOAD_ERROR } from './constants';
 import { getActionPayload, isRequestAction } from './helpers';
@@ -28,12 +25,6 @@ export const voidCallback = () => {};
 
 export const defaultConfig = {
   driver: null,
-  success,
-  error,
-  abort,
-  successAction,
-  errorAction,
-  abortAction,
   onRequest: null,
   onSuccess: null,
   onError: null,
@@ -139,10 +130,7 @@ export function* sendRequest(
         const errorPayload = yield call(driver.getErrorPayload, responseError);
 
         if (!silent) {
-          yield put({
-            type: requestsConfig.error(action.type),
-            ...requestsConfig.errorAction(action, errorPayload),
-          });
+          yield put(createErrorAction(action, errorPayload));
         }
 
         return { error: responseError };
@@ -160,10 +148,7 @@ export function* sendRequest(
     );
 
     if (!silent) {
-      yield put({
-        type: requestsConfig.success(action.type),
-        ...requestsConfig.successAction(action, successPayload),
-      });
+      yield put(createSuccessAction(action, successPayload));
     }
 
     return { response };
@@ -176,10 +161,7 @@ export function* sendRequest(
       }
 
       if (!silent) {
-        yield put({
-          type: requestsConfig.abort(action.type),
-          ...requestsConfig.abortAction(action),
-        });
+        yield put(createAbortAction(action));
       }
     }
   }

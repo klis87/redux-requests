@@ -1,4 +1,4 @@
-import { success, error, abort, getActionWithSuffix } from './actions';
+import { success, error, abort } from './actions';
 import { requestsReducer } from './reducers';
 
 const actionType = 'ACTION';
@@ -89,56 +89,35 @@ describe('reducers', () => {
     });
 
     describe('without passed reducer with local config override', () => {
-      const localSuccess = getActionWithSuffix('success');
-      const localError = getActionWithSuffix('error');
-      const localAbort = getActionWithSuffix('abort');
       const RESET = 'RESET';
       const reducer = requestsReducer({
         actionType,
-        success: localSuccess,
-        error: localError,
-        abort: localAbort,
-        dataKey: 'items',
-        errorKey: 'fail',
-        pendingKey: 'fetching',
         multiple: true,
         getData: (state, action) => ({ nested: action.payload.data }),
-        onRequest: (
-          state,
-          action,
-          { dataKey, multiple, pendingKey, errorKey },
-        ) => ({
+        onRequest: (state, action, { multiple }) => ({
           ...state,
-          [dataKey]: multiple ? [] : null,
-          [pendingKey]: state[pendingKey] + 1,
-          [errorKey]: null,
+          data: multiple ? [] : null,
+          pending: state.pending + 1,
+          error: null,
           multiple,
         }),
-        onSuccess: (
-          state,
-          action,
-          { dataKey, multiple, pendingKey, errorKey, getData },
-        ) => ({
+        onSuccess: (state, action, { multiple, getData }) => ({
           ...state,
-          [dataKey]: getData(state, action),
-          [pendingKey]: state[pendingKey] - 1,
-          [errorKey]: null,
+          data: getData(state, action),
+          pending: state.pending - 1,
+          error: null,
           multiple,
         }),
-        onError: (
-          state,
-          action,
-          { dataKey, multiple, pendingKey, errorKey },
-        ) => ({
+        onError: (state, action, { multiple }) => ({
           ...state,
-          [dataKey]: multiple ? [] : null,
-          [pendingKey]: state[pendingKey] - 1,
-          [errorKey]: action.payload,
+          data: multiple ? [] : null,
+          pending: state.pending - 1,
+          error: action.payload,
           multiple,
         }),
-        onAbort: (state, action, { pendingKey, multiple }) => ({
+        onAbort: (state, action, { multiple }) => ({
           ...state,
-          [pendingKey]: state[pendingKey] - 1,
+          pending: state.pending - 1,
           multiple,
         }),
         resetOn: action => action.type === RESET,
@@ -148,18 +127,18 @@ describe('reducers', () => {
       it('returns correct default state', () => {
         const state = reducer(undefined, {});
         const expected = {
-          items: [],
-          fail: null,
-          fetching: 0,
+          data: [],
+          error: null,
+          pending: 0,
         };
         assert.deepEqual(state, expected);
       });
 
       it('returns correct state for request action', () => {
         const expected = {
-          items: [],
-          fail: null,
-          fetching: 1,
+          data: [],
+          error: null,
+          pending: 1,
           multiple: true,
         };
         assert.deepEqual(reducer(initialState, { type: actionType }), expected);
@@ -168,13 +147,13 @@ describe('reducers', () => {
       it('returns correct state for success action', () => {
         const data = ['data'];
         const expected = {
-          items: { nested: data },
-          fail: null,
-          fetching: -1,
+          data: { nested: data },
+          error: null,
+          pending: -1,
           multiple: true,
         };
         const action = {
-          type: localSuccess(actionType),
+          type: success(actionType),
           payload: { data },
         };
         assert.deepEqual(reducer(initialState, action), expected);
@@ -183,13 +162,13 @@ describe('reducers', () => {
       it('returns correct state for error action', () => {
         const someError = 'error';
         const expected = {
-          items: [],
-          fail: someError,
-          fetching: -1,
+          data: [],
+          error: someError,
+          pending: -1,
           multiple: true,
         };
         const action = {
-          type: localError(actionType),
+          type: error(actionType),
           payload: someError,
         };
         assert.deepEqual(reducer(initialState, action), expected);
@@ -197,20 +176,20 @@ describe('reducers', () => {
 
       it('returns correct state for abort action', () => {
         const expected = {
-          items: [],
-          fail: null,
-          fetching: -1,
+          data: [],
+          error: null,
+          pending: -1,
           multiple: true,
         };
-        const action = { type: localAbort(actionType) };
+        const action = { type: abort(actionType) };
         assert.deepEqual(reducer(initialState, action), expected);
       });
 
       it('handles reset action when resetOn is function', () => {
         const expected = {
-          items: [],
-          fail: null,
-          fetching: 2,
+          data: [],
+          error: null,
+          pending: 2,
         };
 
         let nextState = reducer(initialState, { type: actionType });

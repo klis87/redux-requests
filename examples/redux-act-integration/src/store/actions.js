@@ -1,9 +1,4 @@
-import { getActionWithSuffix } from 'redux-saga-requests';
 import { createAction } from 'redux-act';
-
-export const success = getActionWithSuffix(' success');
-export const error = getActionWithSuffix(' error');
-export const abort = getActionWithSuffix(' abort');
 
 export const fetchPhoto = createAction('fetch photo', id => ({
   request: { url: `/photos/${id}` },

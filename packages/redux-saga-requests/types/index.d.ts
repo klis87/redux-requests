@@ -1,20 +1,24 @@
 import { AnyAction, Reducer, Middleware } from 'redux';
 
-type ActionWithRequest = {
-  type: string;
-  request: any | any[];
-  meta?: any;
-};
-
-type ActionWithRequestAsPayload = {
-  type: string;
-  payload: {
-    request: any | any[];
-  };
-  meta?: any;
-};
-
-type RequestAction = ActionWithRequest | ActionWithRequestAsPayload;
+type RequestAction =
+  | {
+      type: string;
+      request: any | any[];
+      meta?: {
+        asPromise?: boolean;
+        driver?: string;
+      };
+    }
+  | {
+      type: string;
+      payload: {
+        request: any | any[];
+      };
+      meta?: {
+        asPromise?: boolean;
+        driver?: string;
+      };
+    };
 
 type ActionTypeModifier = (actionType: string) => string;
 
@@ -23,8 +27,6 @@ export const success: ActionTypeModifier;
 export const error: ActionTypeModifier;
 
 export const abort: ActionTypeModifier;
-
-export const getActionWithSuffix: (suffix: string) => ActionTypeModifier;
 
 export type Driver = {
   requestInstance: any;
@@ -43,12 +45,6 @@ export type DriverCreator = (requestInstance: any, config?: any) => Driver;
 
 type RequestInstanceConfig = {
   driver: Driver | { default: Driver; [driverType: string]: Driver };
-  success?: ActionTypeModifier;
-  error?: ActionTypeModifier;
-  abort?: ActionTypeModifier;
-  successAction?: (action: RequestAction, data: any) => AnyAction;
-  errorAction?: (action: RequestAction, error: any) => AnyAction;
-  abortAction?: (action: RequestAction) => AnyAction;
   onRequest?: (request: any, action: RequestAction) => any;
   onSuccess?: (response: any, action: RequestAction) => any;
   onError?: (error: any, action: RequestAction) => any;
@@ -97,12 +93,6 @@ type OnActionCallback = {
 };
 
 type GlobalReducerConfig = {
-  success?: ActionTypeModifier;
-  error?: ActionTypeModifier;
-  abort?: ActionTypeModifier;
-  dataKey?: string;
-  errorKey?: string;
-  pendingKey?: string;
   multiple?: boolean;
   getData?: OnActionCallback;
   getError?: OnActionCallback;
@@ -121,12 +111,6 @@ type LocalReducerConfig = GlobalReducerConfig & ActionTypeReducerConfig;
 
 type MergedReducerConfig = {
   actionType: string;
-  success: ActionTypeModifier;
-  error: ActionTypeModifier;
-  abort: ActionTypeModifier;
-  dataKey: string;
-  errorKey: string;
-  pendingKey: string;
   multiple: boolean;
   getData: OnActionCallback;
   getError: OnActionCallback;
@@ -148,9 +132,7 @@ export const createRequestsReducer: (
 ) => RequestsReducer;
 
 type RequestsPromiseMiddlewareConfig = {
-  success?: ActionTypeModifier;
   auto?: Boolean;
-  getRequestAction?: (action: AnyAction) => any;
 };
 
 export const requestsPromiseMiddleware: (

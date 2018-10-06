@@ -1,6 +1,6 @@
 import configureStore from 'redux-mock-store';
 
-import { success, error, abort, getActionWithSuffix } from './actions';
+import { success, error, abort } from './actions';
 import { requestsPromiseMiddleware } from './middleware';
 
 describe('requestsPromiseMiddleware', () => {
@@ -110,49 +110,6 @@ describe('requestsPromiseMiddleware', () => {
 
       assert.deepEqual(requestResult, abortAction);
     });
-
-    it('handles custom success', async () => {
-      const customSuccess = getActionWithSuffix(' success');
-      const customMockStore = configureStore([
-        requestsPromiseMiddleware({ success: customSuccess }),
-      ]);
-      const requestAction = {
-        type: 'REQUEST',
-        request: { url: '/' },
-        meta: { asPromise: true },
-      };
-      const responseAction = {
-        type: customSuccess('REQUEST'),
-        meta: { requestAction },
-      };
-      const { dispatch } = customMockStore({});
-      const requestResultPromise = dispatch(requestAction);
-      dispatch(responseAction);
-      const requestResult = await requestResultPromise;
-      assert.deepEqual(requestResult, responseAction);
-    });
-
-    it('handles custom getRequestAction', async () => {
-      const customMockStore = configureStore([
-        requestsPromiseMiddleware({
-          getRequestAction: action => action.requestAction || null,
-        }),
-      ]);
-      const requestAction = {
-        type: 'REQUEST',
-        request: { url: '/' },
-        meta: { asPromise: true },
-      };
-      const responseAction = {
-        type: success('REQUEST'),
-        requestAction,
-      };
-      const { dispatch } = customMockStore({});
-      const requestResultPromise = dispatch(requestAction);
-      dispatch(responseAction);
-      const requestResult = await requestResultPromise;
-      assert.deepEqual(requestResult, responseAction);
-    });
   });
 
   describe('withAutoMode', () => {
@@ -238,42 +195,6 @@ describe('requestsPromiseMiddleware', () => {
       }
 
       assert.deepEqual(requestResult, abortAction);
-    });
-
-    it('handles custom success', async () => {
-      const customSuccess = getActionWithSuffix(' success');
-      const customMockStore = configureStore([
-        requestsPromiseMiddleware({ auto: true, success: customSuccess }),
-      ]);
-      const requestAction = { type: 'REQUEST', request: { url: '/' } };
-      const responseAction = {
-        type: customSuccess('REQUEST'),
-        meta: { requestAction },
-      };
-      const { dispatch } = customMockStore({});
-      const requestResultPromise = dispatch(requestAction);
-      dispatch(responseAction);
-      const requestResult = await requestResultPromise;
-      assert.deepEqual(requestResult, responseAction);
-    });
-
-    it('handles custom getRequestAction', async () => {
-      const customMockStore = configureStore([
-        requestsPromiseMiddleware({
-          auto: true,
-          getRequestAction: action => action.requestAction || null,
-        }),
-      ]);
-      const requestAction = { type: 'REQUEST', request: { url: '/' } };
-      const responseAction = {
-        type: success('REQUEST'),
-        requestAction,
-      };
-      const { dispatch } = customMockStore({});
-      const requestResultPromise = dispatch(requestAction);
-      dispatch(responseAction);
-      const requestResult = await requestResultPromise;
-      assert.deepEqual(requestResult, responseAction);
     });
   });
 });

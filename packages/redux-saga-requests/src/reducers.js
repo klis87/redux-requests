@@ -1,8 +1,4 @@
-import {
-  success as defaultSuccess,
-  error as defaultError,
-  abort as defaultAbort,
-} from './actions';
+import { success, error, abort } from './actions';
 
 // to support libraries like redux-act and redux-actions
 const normalizeActionType = actionType =>
@@ -10,15 +6,10 @@ const normalizeActionType = actionType =>
 
 const getEmptyData = multiple => (multiple ? [] : null);
 
-const getInitialRequestState = ({
-  dataKey,
-  errorKey,
-  pendingKey,
-  multiple,
-}) => ({
-  [dataKey]: getEmptyData(multiple),
-  [pendingKey]: 0,
-  [errorKey]: null,
+const getInitialRequestState = ({ multiple }) => ({
+  data: getEmptyData(multiple),
+  pending: 0,
+  error: null,
 });
 
 const getInitialState = (state, reducer, config) => {
@@ -30,44 +21,30 @@ const getInitialState = (state, reducer, config) => {
 };
 
 const defaultConfig = {
-  success: defaultSuccess,
-  error: defaultError,
-  abort: defaultAbort,
-  dataKey: 'data',
-  errorKey: 'error',
-  pendingKey: 'pending',
   multiple: false,
   getData: (state, action) =>
     action.payload ? action.payload.data : action.data,
   getError: (state, action) => (action.payload ? action.payload : action.error),
-  onRequest: (state, action, { pendingKey, errorKey }) => ({
+  onRequest: state => ({
     ...state,
-    [pendingKey]: state[pendingKey] + 1,
-    [errorKey]: null,
+    pending: state.pending + 1,
+    error: null,
   }),
-  onSuccess: (state, action, config) => {
-    const { dataKey, pendingKey, errorKey, getData } = config;
-
-    return {
-      ...state,
-      [dataKey]: getData(state, action, config),
-      [pendingKey]: state[pendingKey] - 1,
-      [errorKey]: null,
-    };
-  },
-  onError: (state, action, config) => {
-    const { dataKey, multiple, pendingKey, errorKey, getError } = config;
-
-    return {
-      ...state,
-      [dataKey]: getEmptyData(multiple),
-      [pendingKey]: state[pendingKey] - 1,
-      [errorKey]: getError(state, action, config),
-    };
-  },
-  onAbort: (state, action, { pendingKey }) => ({
+  onSuccess: (state, action, config) => ({
     ...state,
-    [pendingKey]: state[pendingKey] - 1,
+    data: config.getData(state, action, config),
+    pending: state.pending - 1,
+    error: null,
+  }),
+  onError: (state, action, config) => ({
+    ...state,
+    data: getEmptyData(config.multiple),
+    pending: state.pending - 1,
+    error: config.getError(state, action, config),
+  }),
+  onAbort: state => ({
+    ...state,
+    pending: state.pending - 1,
   }),
   resetOn: [],
 };
@@ -85,11 +62,7 @@ export const createRequestsReducer = (globalConfig = {}) => (
     onSuccess,
     onError,
     onAbort,
-    success,
-    error,
-    abort,
     resetOn,
-    pendingKey,
     actionType,
   } = config;
 
@@ -102,7 +75,7 @@ export const createRequestsReducer = (globalConfig = {}) => (
   ) {
     return {
       ...getInitialState(state, reducer, config),
-      [pendingKey]: state[pendingKey],
+      pending: state.pending,
     };
   }
 
