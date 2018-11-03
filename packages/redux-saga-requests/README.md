@@ -438,12 +438,16 @@ following attributes:
 - `multiple: boolean`: default to `false`, change it to `true` if you want your not loaded data to be stored as `[]`
 instead of `null`
 - `getData: (state, action, config) => data`: describes how to get data from `action` object, by default returns `action.data` or `action.payload.data` when action is FSA compliant
+- `updateData: (state, action, config) => data`: optional, useful together with operations to overwrite `getData` default, see more
+information in `operations`
 - `getError: (state, action, config) => data`: describes how to get error from `action` object, by default returns `action.error` or `action.payload` when action is FSA compliant
 - `onRequest: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles request actions
 - `onSuccess: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles success actions
 - `onError: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles error actions
 - `onAbort: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles abort actions
 - `resetOn: action => boolean or string[]`: callback or array of action types on which reducer will reset its state to initial one, for instance `['LOGOUT']` or `action => action.type === 'LOGOUT'`, `[]` by default
+- `operations`: optional object which you can use to map write actions like update/delete to `data` update, which also adds pending
+state and errors for each defined operation, see more details below
 
 For example:
 ```js
@@ -452,7 +456,7 @@ const reducer = requestsReducer({ actionType: `FETCH_SOMETHING`, multiple: true 
 which will keep your empty data as `[]`, not `null`.
 
 For inspiration how you could override any of those attributes, see default config
-[source](https://github.com/klis87/redux-saga-requests/blob/master/packages/redux-saga-requests/src/reducers.js#L19).
+[source](https://github.com/klis87/redux-saga-requests/blob/master/packages/redux-saga-requests/src/reducers.js#L43).
 
 You might also want to adjust any configuration for all your requests reducers globally. Here is how you can do this:
 ```js
@@ -486,7 +490,145 @@ const state = {
   active: false,
 };
 ```
-Basically, you can use `requestsReducer`, which will handle requests related logic in a configurable way with any custom
+
+Another big feature of reducers are operations. They allow you to add additional actions to update `data`, with extra
+information kept in state useful to render button spinners or error messages. For example, lets say you have following request
+actions:
+```js
+const fetchBooks = () => ({
+  type: 'FETCH_BOOKS',
+  request: { url: '/books' },
+})
+
+const deleteAllBooks = () => ({
+  type: 'DELETE_ALL_BOOKS',
+  request: { url: '/books', method: 'delete' },
+})
+```
+
+You can create a following reducer:
+```js
+const booksReducer = requestsReducer({
+  actionType: 'FETCH_BOOKS',
+  multiple: true,
+  operations: {
+    DELETE_ALL_BOOKS: { updateData: (state, action) => [] } // or just (state, action) => []
+  },
+});
+```
+which will give you the following initial state:
+```js
+{
+  data: [],
+  error: null,
+  pending: 0,
+  operations: {
+    DELETE_ALL_BOOKS: {
+      error: null,
+      pending: 0,
+    },
+  },
+};
+```
+
+Notice that `operations` structure resembles the one from config we just passed, giving you
+useful `error` and `pending` state per operation. You can use them for example to show spinner or to disable `DELETE` button
+or to show a request error. Also, after a successful delete operation, `data` will be set to `[]` as defined in `updateData`.
+
+It is also good to know, that you can set `updateData` to `false`, which would disable `data` manipulation and such an operation
+would be responsible only for `pending` and `error` state. Moreover, you can set `updateData` as `true`, which is useful to avoid
+duplication, as often your server responses are the same for multiple operations. Setting to `true` will fallback to top level
+`updateData` defined in `requestsReducer` config, and if `updateData` is not defined, global `getData` will be used.
+
+There is one more case to cover in operations. Imagine we need another action:
+```js
+const deleteBook = id => ({
+  type: 'DELETE_BOOK',
+  request: { url: `/book/${id}`, method: 'delete' },
+})
+```
+
+Now, lets say we have a view with multiple books on one page and we want to show independent spinners for each
+corresponding `DELETE` button. Can you see the problem? If we just add `DELETE_BOOK` operation like `DELETE_ALL_BOOKS`,
+`pending` counter would be aggregated and all buttons would spin. We need to divide `DELETE_BOOK` per id, here is how we can
+achieve this:
+```js
+const deleteBook = id => ({
+  type: 'DELETE_BOOK',
+  request: { url: `/book/${id}`, method: 'delete' },
+  meta: {
+    id, // we will need this id in reducer
+  },
+})
+
+const booksReducer = requestsReducer({
+  actionType: 'FETCH_BOOKS',
+  multiple: true,
+  operations: {
+    DELETE_ALL_BOOKS: (state, action) => []
+    DELETE_BOOK: {
+      updateData: (state, action) => state.data.filter(book => book.id !== action.meta.id),
+      getRequestKey: requestAction => String(requestAction.meta.id), // you need to use string if id is an integer
+    }
+  }
+});
+```
+which will give you the following initial state:
+```js
+{
+  data: [],
+  error: null,
+  pending: 0,
+  operations: {
+    DELETE_ALL_BOOKS: {
+      error: null,
+      pending: 0,
+    },
+    DELETE_BOOK: {},
+  },
+};
+```
+... and if a `deleteBook` with `id` `1` and `2` are running, state would be:
+{
+  data: [],
+  error: null,
+  pending: 0,
+  operations: {
+    DELETE_ALL_BOOKS: {
+      error: null,
+      pending: 0,
+    },
+    DELETE_BOOK: {
+      1: {
+        error: null,
+        pending: 1,
+      },
+      2: {
+        error: null,
+        pending: 1,
+      },
+    },
+  },
+};
+
+So, `DELETE_BOOK` state is one lever deeper, with state divided per `id`. Be careful though to always check whether
+object with a given `id` exists before reading `pending` or `error` state, even after successful response, as
+you will never see below state:
+```js
+DELETE_BOOK: {
+  1: {
+    error: null,
+    pending: 0,
+  },
+  2: {
+    error: null,
+    pending: 0,
+  },
+},
+```
+as instead of resetting `pending` to `0`, a given object is just removed to release memory.
+
+As you can see, you can use `requestsReducer`, which will handle requests related logic in a configurable way with any custom
 logic you need.
 
 However, if `requestsReducer` seems too magical for you, this is totally fine, you can write your reducers in a standard
@@ -843,6 +985,7 @@ and see what actions are being sent with [redux-devtools](https://github.com/zal
 There are following examples currently:
 - [basic](https://github.com/klis87/redux-saga-requests/tree/master/examples/basic)
 - [advanced](https://github.com/klis87/redux-saga-requests/tree/master/examples/advanced)
+- [operations](https://github.com/klis87/redux-saga-requests/tree/master/examples/advanced)
 - [Fetch API](https://github.com/klis87/redux-saga-requests/tree/master/examples/fetch-api)
 - [redux-act integration](https://github.com/klis87/redux-saga-requests/tree/master/examples/redux-act-integration)
 - [low-level-reducers](https://github.com/klis87/redux-saga-requests/tree/master/examples/low-level-reducers)

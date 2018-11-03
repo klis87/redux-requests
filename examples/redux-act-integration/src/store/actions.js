@@ -1,13 +1,25 @@
 import { createAction } from 'redux-act';
 
-export const fetchPhoto = createAction('fetch photo', id => ({
+export const fetchPhotoAction = createAction('fetch photo', id => ({
   request: { url: `/photos/${id}` },
 }));
 
-export const clearPhoto = createAction('clear photo');
-
-export const fetchPost = createAction('fetch post', id => ({
-  request: [{ url: `/posts/${id}` }, { url: `/posts/${id}/comments` }],
+export const deletePhotoAction = createAction('delete photo', id => ({
+  request: { url: `/photos/${id}`, method: 'delete' },
 }));
 
-export const clearPost = createAction('clear post');
+export const clearPhotoAction = createAction('clear photo');
+
+export const fetchPostsAction = createAction('fetch posts', () => ({
+  request: { url: '/posts/' },
+}));
+
+export const deletePostAction = createAction(
+  'delete post',
+  id => ({
+    request: { url: `/posts/${id}`, method: 'delete' },
+  }),
+  id => ({ id }),
+);
+
+export const clearPostsAction = createAction('clear posts');

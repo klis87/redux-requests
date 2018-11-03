@@ -92,15 +92,27 @@ type OnActionCallback = {
   (state: any, action: AnyAction, config: MergedReducerConfig): any;
 };
 
+type Operations = {
+  [actionType: string]:
+    | boolean
+    | OnActionCallback
+    | {
+        updateData: boolean | OnActionCallback;
+        getRequestKey?: (action: RequestAction) => string;
+      };
+};
+
 type GlobalReducerConfig = {
   multiple?: boolean;
   getData?: OnActionCallback;
+  updateData?: OnActionCallback;
   getError?: OnActionCallback;
   onRequest?: OnActionCallback;
   onSuccess?: OnActionCallback;
   onError?: OnActionCallback;
   onAbort?: OnActionCallback;
   resetOn?: FilterOnActionCallback | string[];
+  operations?: Operations;
 };
 
 type ActionTypeReducerConfig = {
@@ -113,12 +125,14 @@ type MergedReducerConfig = {
   actionType: string;
   multiple: boolean;
   getData: OnActionCallback;
+  updateData?: OnActionCallback;
   getError: OnActionCallback;
   onRequest: OnActionCallback;
   onSuccess: OnActionCallback;
   onError: OnActionCallback;
   onAbort: OnActionCallback;
   resetOn: FilterOnActionCallback | string[];
+  operations: Operations;
 };
 
 type RequestsReducer = {

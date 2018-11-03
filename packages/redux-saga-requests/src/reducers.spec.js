@@ -320,72 +320,630 @@ describe('reducers', () => {
         assert.deepEqual(reducer(nextState, { type: RESET }), expected);
       });
     });
-  });
 
-  describe('with operations', () => {
-    const OPERATION_ACTION = 'OPERATION_ACTION';
-    const reducer = requestsReducer({
-      actionType,
-      operations: {
-        [OPERATION_ACTION]: true,
-      },
-    });
-    const defaultState = {
-      data: null,
-      error: null,
-      pending: 0,
-      operations: {
-        [OPERATION_ACTION]: {
-          error: null,
-          pending: 0,
+    describe('with operations', () => {
+      const OPERATION_ACTION = 'OPERATION_ACTION';
+      const commonReducer = requestsReducer({
+        actionType,
+        operations: {
+          [OPERATION_ACTION]: true,
         },
-      },
-    };
-
-    it('returns default state containing operation default data', () => {
-      assert.deepEqual(reducer(undefined, {}), defaultState);
-    });
-
-    it('increases pending counter on operation request', () => {
-      const expectedState = {
+      });
+      const defaultState = {
         data: null,
         error: null,
         pending: 0,
         operations: {
           [OPERATION_ACTION]: {
             error: null,
-            pending: 1,
+            pending: 0,
           },
         },
       };
 
-      assert.deepEqual(
-        reducer(defaultState, { type: OPERATION_ACTION }),
-        expectedState,
-      );
-    });
+      it('returns default state containing operation default data', () => {
+        assert.deepEqual(commonReducer(undefined, {}), defaultState);
+      });
 
-    it('handles operation successful response', () => {
-      const expectedState = {
-        data: 'response',
-        error: null,
-        pending: 0,
-        operations: {
-          [OPERATION_ACTION]: {
-            error: null,
-            pending: -1,
+      it('returns default state containing operation default data with defined requestKey', () => {
+        const reducer = requestsReducer({
+          actionType,
+          operations: {
+            [OPERATION_ACTION]: {
+              updateData: (state, action) => action.data,
+              getRequestKey: action => action.meta.id,
+            },
           },
-        },
-      };
+        });
+        assert.deepEqual(reducer(undefined, {}), {
+          ...defaultState,
+          operations: {
+            [OPERATION_ACTION]: {},
+          },
+        });
+      });
 
-      assert.deepEqual(
-        reducer(defaultState, {
-          type: success(OPERATION_ACTION),
+      it('increases pending counter on operation request', () => {
+        const expectedState = {
+          data: null,
+          error: null,
+          pending: 0,
+          operations: {
+            [OPERATION_ACTION]: {
+              error: null,
+              pending: 1,
+            },
+          },
+        };
+
+        assert.deepEqual(
+          commonReducer(defaultState, { type: OPERATION_ACTION }),
+          expectedState,
+        );
+      });
+
+      it('increases pending counter on operation request with defined requestKey', () => {
+        const reducer = requestsReducer({
+          actionType,
+          operations: {
+            [OPERATION_ACTION]: {
+              updateData: true,
+              getRequestKey: action => action.meta.id,
+            },
+          },
+        });
+        const initialState = reducer(undefined, {});
+
+        let nextState = reducer(initialState, {
+          type: OPERATION_ACTION,
+          meta: { id: 'a' },
+        });
+        assert.deepEqual(nextState, {
+          data: null,
+          error: null,
+          pending: 0,
+          operations: {
+            [OPERATION_ACTION]: {
+              a: {
+                error: null,
+                pending: 1,
+              },
+            },
+          },
+        });
+
+        nextState = reducer(nextState, {
+          type: OPERATION_ACTION,
+          meta: { id: 'b' },
+        });
+        assert.deepEqual(nextState, {
+          data: null,
+          error: null,
+          pending: 0,
+          operations: {
+            [OPERATION_ACTION]: {
+              a: {
+                error: null,
+                pending: 1,
+              },
+              b: {
+                error: null,
+                pending: 1,
+              },
+            },
+          },
+        });
+
+        nextState = reducer(nextState, {
+          type: OPERATION_ACTION,
+          meta: { id: 'a' },
+        });
+        assert.deepEqual(nextState, {
+          data: null,
+          error: null,
+          pending: 0,
+          operations: {
+            [OPERATION_ACTION]: {
+              a: {
+                error: null,
+                pending: 2,
+              },
+              b: {
+                error: null,
+                pending: 1,
+              },
+            },
+          },
+        });
+      });
+
+      it('handles operation success response', () => {
+        const expectedState = {
           data: 'response',
-          meta: { requestAction: { type: OPERATION_ACTION } },
-        }),
-        expectedState,
-      );
+          error: null,
+          pending: 0,
+          operations: {
+            [OPERATION_ACTION]: {
+              error: null,
+              pending: -1,
+            },
+          },
+        };
+
+        assert.deepEqual(
+          commonReducer(defaultState, {
+            type: success(OPERATION_ACTION),
+            data: 'response',
+            meta: { requestAction: { type: OPERATION_ACTION } },
+          }),
+          expectedState,
+        );
+      });
+
+      it('handles operation success response defined as updateData true', () => {
+        const reducer = requestsReducer({
+          actionType,
+          operations: {
+            [OPERATION_ACTION]: { updateData: true },
+          },
+        });
+        const expectedState = {
+          data: 'response',
+          error: null,
+          pending: 0,
+          operations: {
+            [OPERATION_ACTION]: {
+              error: null,
+              pending: -1,
+            },
+          },
+        };
+
+        assert.deepEqual(
+          reducer(defaultState, {
+            type: success(OPERATION_ACTION),
+            data: 'response',
+            meta: { requestAction: { type: OPERATION_ACTION } },
+          }),
+          expectedState,
+        );
+      });
+
+      it('doesnt override data when a defined operation is false', () => {
+        const reducer = requestsReducer({
+          actionType,
+          operations: {
+            [OPERATION_ACTION]: false,
+          },
+        });
+
+        const expectedState = {
+          data: null,
+          error: null,
+          pending: 0,
+          operations: {
+            [OPERATION_ACTION]: {
+              error: null,
+              pending: -1,
+            },
+          },
+        };
+
+        assert.deepEqual(
+          reducer(defaultState, {
+            type: success(OPERATION_ACTION),
+            data: 'response',
+            meta: { requestAction: { type: OPERATION_ACTION } },
+          }),
+          expectedState,
+        );
+      });
+
+      it('doesnt override data when a defined operation is object with key updateData as false', () => {
+        const reducer = requestsReducer({
+          actionType,
+          operations: {
+            [OPERATION_ACTION]: { updateData: false },
+          },
+        });
+
+        const expectedState = {
+          data: null,
+          error: null,
+          pending: 0,
+          operations: {
+            [OPERATION_ACTION]: {
+              error: null,
+              pending: -1,
+            },
+          },
+        };
+
+        assert.deepEqual(
+          reducer(defaultState, {
+            type: success(OPERATION_ACTION),
+            data: 'response',
+            meta: { requestAction: { type: OPERATION_ACTION } },
+          }),
+          expectedState,
+        );
+      });
+
+      it('uses updateData not getData when defined', () => {
+        const reducer = requestsReducer({
+          actionType,
+          getData: () => null,
+          updateData: (state, action) => action.data,
+          operations: {
+            [OPERATION_ACTION]: true,
+          },
+        });
+
+        const expectedState = {
+          data: 'response',
+          error: null,
+          pending: 0,
+          operations: {
+            [OPERATION_ACTION]: {
+              error: null,
+              pending: -1,
+            },
+          },
+        };
+
+        assert.deepEqual(
+          reducer(defaultState, {
+            type: success(OPERATION_ACTION),
+            data: 'response',
+            meta: { requestAction: { type: OPERATION_ACTION } },
+          }),
+          expectedState,
+        );
+      });
+
+      it('handles updateData customized per operation', () => {
+        const reducer = requestsReducer({
+          actionType,
+          getData: () => null,
+          updateData: (state, action) => action.data,
+          operations: {
+            [OPERATION_ACTION]: (state, action) => action.data.nested,
+          },
+        });
+
+        const expectedState = {
+          data: 'response',
+          error: null,
+          pending: 0,
+          operations: {
+            [OPERATION_ACTION]: {
+              error: null,
+              pending: -1,
+            },
+          },
+        };
+
+        assert.deepEqual(
+          reducer(defaultState, {
+            type: success(OPERATION_ACTION),
+            data: { nested: 'response' },
+            meta: { requestAction: { type: OPERATION_ACTION } },
+          }),
+          expectedState,
+        );
+      });
+
+      it('handles updateData customized per operation defined in updateData object key', () => {
+        const reducer = requestsReducer({
+          actionType,
+          getData: () => null,
+          updateData: (state, action) => action.data,
+          operations: {
+            [OPERATION_ACTION]: {
+              updateData: (state, action) => action.data.nested,
+            },
+          },
+        });
+
+        const expectedState = {
+          data: 'response',
+          error: null,
+          pending: 0,
+          operations: {
+            [OPERATION_ACTION]: {
+              error: null,
+              pending: -1,
+            },
+          },
+        };
+
+        assert.deepEqual(
+          reducer(defaultState, {
+            type: success(OPERATION_ACTION),
+            data: { nested: 'response' },
+            meta: { requestAction: { type: OPERATION_ACTION } },
+          }),
+          expectedState,
+        );
+      });
+
+      it('handles updateData customized per operation with defined requestKey', () => {
+        const reducer = requestsReducer({
+          actionType,
+          getData: () => null,
+          updateData: (state, action) => action.data,
+          operations: {
+            [OPERATION_ACTION]: {
+              updateData: (state, action) => action.data.nested,
+              getRequestKey: action => action.meta.id,
+            },
+          },
+        });
+
+        let state = {
+          data: null,
+          error: null,
+          pending: 0,
+          operations: {
+            [OPERATION_ACTION]: {
+              1: {
+                error: null,
+                pending: 2,
+              },
+              2: {
+                error: null,
+                pending: 1,
+              },
+            },
+          },
+        };
+
+        state = reducer(state, {
+          type: success(OPERATION_ACTION),
+          data: { nested: 'response' },
+          meta: {
+            requestAction: { type: OPERATION_ACTION, meta: { id: '1' } },
+            id: '1',
+          },
+        });
+
+        assert.deepEqual(state, {
+          data: 'response',
+          error: null,
+          pending: 0,
+          operations: {
+            [OPERATION_ACTION]: {
+              1: {
+                error: null,
+                pending: 1,
+              },
+              2: {
+                error: null,
+                pending: 1,
+              },
+            },
+          },
+        });
+
+        state = reducer(state, {
+          type: success(OPERATION_ACTION),
+          data: { nested: 'response2' },
+          meta: {
+            requestAction: { type: OPERATION_ACTION, meta: { id: '1' } },
+            id: '1',
+          },
+        });
+
+        assert.deepEqual(state, {
+          data: 'response2',
+          error: null,
+          pending: 0,
+          operations: {
+            [OPERATION_ACTION]: {
+              2: {
+                error: null,
+                pending: 1,
+              },
+            },
+          },
+        });
+
+        state = reducer(state, {
+          type: success(OPERATION_ACTION),
+          data: { nested: 'response2' },
+          meta: {
+            requestAction: { type: OPERATION_ACTION, meta: { id: '2' } },
+            id: '2',
+          },
+        });
+
+        assert.deepEqual(state, {
+          data: 'response2',
+          error: null,
+          pending: 0,
+          operations: {
+            [OPERATION_ACTION]: {},
+          },
+        });
+      });
+
+      it('handles operation error response', () => {
+        const expectedState = {
+          data: null,
+          error: null,
+          pending: 0,
+          operations: {
+            [OPERATION_ACTION]: {
+              error: 'error',
+              pending: -1,
+            },
+          },
+        };
+
+        assert.deepEqual(
+          commonReducer(defaultState, {
+            type: error(OPERATION_ACTION),
+            error: 'error',
+            meta: { requestAction: { type: OPERATION_ACTION } },
+          }),
+          expectedState,
+        );
+      });
+
+      it('handles operation error response with defined requestKey', () => {
+        const reducer = requestsReducer({
+          actionType,
+          operations: {
+            [OPERATION_ACTION]: {
+              updateData: true,
+              getRequestKey: action => action.meta.id,
+            },
+          },
+        });
+
+        let state = {
+          data: null,
+          error: null,
+          pending: 0,
+          operations: {
+            [OPERATION_ACTION]: {
+              1: {
+                error: null,
+                pending: 2,
+              },
+            },
+          },
+        };
+
+        state = reducer(state, {
+          type: error(OPERATION_ACTION),
+          error: 'error',
+          meta: {
+            requestAction: { type: OPERATION_ACTION, meta: { id: '1' } },
+          },
+        });
+
+        assert.deepEqual(state, {
+          data: null,
+          error: null,
+          pending: 0,
+          operations: {
+            [OPERATION_ACTION]: {
+              1: {
+                error: 'error',
+                pending: 1,
+              },
+            },
+          },
+        });
+
+        state = reducer(state, {
+          type: error(OPERATION_ACTION),
+          error: 'error2',
+          meta: {
+            requestAction: { type: OPERATION_ACTION, meta: { id: '1' } },
+          },
+        });
+
+        assert.deepEqual(state, {
+          data: null,
+          error: null,
+          pending: 0,
+          operations: {
+            [OPERATION_ACTION]: {
+              1: {
+                error: 'error2',
+                pending: 0,
+              },
+            },
+          },
+        });
+      });
+
+      it('handles operation abort response', () => {
+        const expectedState = {
+          data: null,
+          error: null,
+          pending: 0,
+          operations: {
+            [OPERATION_ACTION]: {
+              error: null,
+              pending: -1,
+            },
+          },
+        };
+
+        assert.deepEqual(
+          commonReducer(defaultState, {
+            type: abort(OPERATION_ACTION),
+            meta: { requestAction: { type: OPERATION_ACTION } },
+          }),
+          expectedState,
+        );
+      });
+
+      it('handles operation abort response with defined requestKey', () => {
+        const reducer = requestsReducer({
+          actionType,
+          operations: {
+            [OPERATION_ACTION]: {
+              updateData: true,
+              getRequestKey: action => action.meta.id,
+            },
+          },
+        });
+
+        let state = {
+          data: null,
+          error: null,
+          pending: 0,
+          operations: {
+            [OPERATION_ACTION]: {
+              1: {
+                error: null,
+                pending: 2,
+              },
+            },
+          },
+        };
+
+        state = reducer(state, {
+          type: abort(OPERATION_ACTION),
+          meta: {
+            requestAction: { type: OPERATION_ACTION, meta: { id: '1' } },
+          },
+        });
+
+        assert.deepEqual(state, {
+          data: null,
+          error: null,
+          pending: 0,
+          operations: {
+            [OPERATION_ACTION]: {
+              1: {
+                error: null,
+                pending: 1,
+              },
+            },
+          },
+        });
+
+        state = reducer(state, {
+          type: abort(OPERATION_ACTION),
+          meta: {
+            requestAction: { type: OPERATION_ACTION, meta: { id: '1' } },
+          },
+        });
+
+        assert.deepEqual(state, {
+          data: null,
+          error: null,
+          pending: 0,
+          operations: {
+            [OPERATION_ACTION]: {},
+          },
+        });
+      });
     });
   });
 });

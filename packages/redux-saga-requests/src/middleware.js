@@ -1,11 +1,12 @@
-import { isRequestAction } from './helpers';
-import { success } from './actions';
+import {
+  success,
+  isRequestAction,
+  isResponseAction,
+  getRequestActionFromResponse,
+} from './actions';
 
 const shouldActionBePromisified = (action, auto) =>
   auto || (action.meta && action.meta.asPromise);
-
-const getRequestAction = action =>
-  action.meta && action.meta.requestAction ? action.meta.requestAction : null;
 
 export const requestsPromiseMiddleware = ({ auto = false } = {}) => {
   const requestMap = new Map();
@@ -22,12 +23,17 @@ export const requestsPromiseMiddleware = ({ auto = false } = {}) => {
       });
     }
 
-    const requestAction = getRequestAction(action);
+    if (isResponseAction(action)) {
+      const requestAction = getRequestActionFromResponse(action);
 
-    if (requestAction && shouldActionBePromisified(requestAction, auto)) {
-      const requestActionPromise = requestMap.get(requestAction);
-      requestActionPromise(action, action.type !== success(requestAction.type));
-      requestMap.delete(requestAction);
+      if (shouldActionBePromisified(requestAction, auto)) {
+        const requestActionPromise = requestMap.get(requestAction);
+        requestActionPromise(
+          action,
+          action.type !== success(requestAction.type),
+        );
+        requestMap.delete(requestAction);
+      }
     }
 
     return next(action);

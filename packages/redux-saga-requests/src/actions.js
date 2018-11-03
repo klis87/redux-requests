@@ -3,7 +3,9 @@ import { SUCCESS_SUFFIX, ERROR_SUFFIX, ABORT_SUFFIX } from './constants';
 const getActionWithSuffix = suffix => actionType => actionType + suffix;
 
 export const success = getActionWithSuffix(SUCCESS_SUFFIX);
+
 export const error = getActionWithSuffix(ERROR_SUFFIX);
+
 export const abort = getActionWithSuffix(ABORT_SUFFIX);
 
 const isFSA = action => !!action.payload;
@@ -49,6 +51,31 @@ export const createAbortAction = action => ({
   },
 });
 
-export const isSuccessAction = action => action.endsWith(SUCCESS_SUFFIX);
-export const isErrorAction = action => action.endsWith(ERROR_SUFFIX);
-export const isAbortAction = action => action.endsWith(ABORT_SUFFIX);
+export const getActionPayload = action =>
+  action.payload === undefined ? action : action.payload;
+
+export const isRequestAction = action => {
+  const actionPayload = getActionPayload(action);
+
+  return (
+    !!actionPayload &&
+    !!actionPayload.request &&
+    !!(Array.isArray(actionPayload.request) || actionPayload.request.url) &&
+    !actionPayload.response &&
+    !(actionPayload instanceof Error)
+  );
+};
+
+export const isResponseAction = action =>
+  !!(action.meta && action.meta.requestAction);
+
+export const getRequestActionFromResponse = action => action.meta.requestAction;
+
+export const isSuccessAction = action =>
+  isResponseAction(action) && action.type.endsWith(SUCCESS_SUFFIX);
+
+export const isErrorAction = action =>
+  isResponseAction(action) && action.type.endsWith(ERROR_SUFFIX);
+
+export const isAbortAction = action =>
+  isResponseAction(action) && action.type.endsWith(ABORT_SUFFIX);

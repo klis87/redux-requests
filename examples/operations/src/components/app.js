@@ -2,13 +2,12 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import {
-  fetchPhotoAction,
-  clearPhotoAction,
-  deletePhotoAction,
-  fetchPostsAction,
-  clearPostsAction,
-  deletePostAction,
+  fetchPhoto,
+  deletePhoto,
+  fetchPosts,
+  deletePost,
 } from '../store/actions';
+import { DELETE_PHOTO, DELETE_POST } from '../store/constants';
 import EntityContainer from './entity-container';
 import Photo from './photo';
 import Post from './post';
@@ -17,52 +16,36 @@ import Post from './post';
 const mapStateToProps = state => ({
   photo: state.photo,
   posts: state.posts,
-  abortCounter: state.abortCounter,
 });
 
 const mapDispatchToProps = {
-  fetchPhoto: fetchPhotoAction,
-  clearPhoto: clearPhotoAction,
-  deletePhoto: deletePhotoAction,
-  fetchPosts: fetchPostsAction,
-  clearPosts: clearPostsAction,
-  deletePost: deletePostAction,
+  fetchPhoto,
+  deletePhoto,
+  fetchPosts,
+  deletePost,
 };
 
 const buttonStyle = { marginRight: 10 };
 
 const App = ({
   photo,
-  posts,
   fetchPhoto,
-  clearPhoto,
   deletePhoto,
+  posts,
   fetchPosts,
-  clearPosts,
   deletePost,
-  abortCounter,
 }) => (
   <div>
-    <h1>Redux Saga Requests integration with Redux Act example</h1>
+    <h1>Redux Saga Requests operations example</h1>
     <p>
       In order to see aborts in action, you should set network throttling in
       your browser
     </p>
     <hr />
     <div>
-      <span>Abort counter: {abortCounter}</span>
-    </div>
-    <hr />
-    <div>
       <h2>Photo</h2>
-      <button style={buttonStyle} onClick={() => clearPhoto()}>
-        Clear
-      </button>
       <button style={buttonStyle} onClick={() => fetchPhoto(1)}>
         Fetch photo with id 1
-      </button>
-      <button style={buttonStyle} onClick={() => fetchPhoto(10001)}>
-        Fetch non-existent photo
       </button>
       <EntityContainer
         error={photo.error}
@@ -72,17 +55,14 @@ const App = ({
         <Photo
           data={photo.data}
           deletePhoto={deletePhoto}
-          deleting={photo.operations[deletePhotoAction].pending > 0}
+          deleting={photo.operations[DELETE_PHOTO].pending > 0}
         />
       </EntityContainer>
     </div>
     <hr />
     <div>
-      <h2>Post</h2>
-      <button style={buttonStyle} onClick={() => clearPosts()}>
-        Clear
-      </button>
-      <button style={buttonStyle} onClick={() => fetchPosts()}>
+      <h2>Posts</h2>
+      <button style={buttonStyle} onClick={fetchPosts}>
         Fetch posts
       </button>
       <EntityContainer
@@ -91,7 +71,7 @@ const App = ({
         isFetched={posts.data.length > 0}
       >
         {posts.data.map(post => {
-          const operation = posts.operations[deletePostAction][post.id];
+          const operation = posts.operations[DELETE_POST][post.id];
 
           return (
             <Post

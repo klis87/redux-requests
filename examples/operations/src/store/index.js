@@ -4,29 +4,17 @@ import axios from 'axios';
 import { createRequestInstance, watchRequests } from 'redux-saga-requests';
 import { createDriver } from 'redux-saga-requests-axios';
 
-import { photoReducer, postsReducer, abortCounterReducer } from './reducers';
-import {
-  fetchPhotoAction,
-  clearPhotoAction,
-  fetchPostsAction,
-  clearPostsAction,
-} from './actions';
+import { photoReducer, postsReducer } from './reducers';
 
 function* rootSaga(axiosInstance) {
-  yield createRequestInstance({
-    driver: createDriver(axiosInstance),
-  });
-  yield watchRequests(null, {
-    [fetchPhotoAction]: { abortOn: clearPhotoAction },
-    [fetchPostsAction]: { abortOn: clearPostsAction },
-  });
+  yield createRequestInstance({ driver: createDriver(axiosInstance) });
+  yield watchRequests();
 }
 
 export const configureStore = () => {
   const reducers = combineReducers({
     photo: photoReducer,
     posts: postsReducer,
-    abortCounter: abortCounterReducer,
   });
 
   const sagaMiddleware = createSagaMiddleware();

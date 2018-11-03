@@ -5,6 +5,12 @@ import {
   createSuccessAction,
   createErrorAction,
   createAbortAction,
+  getActionPayload,
+  isRequestAction,
+  getRequestActionFromResponse,
+  isSuccessAction,
+  isErrorAction,
+  isAbortAction,
 } from './actions';
 
 describe('actions', () => {
@@ -28,7 +34,7 @@ describe('actions', () => {
     });
   });
 
-  describe('successAction', () => {
+  describe('createSuccessAction', () => {
     it('should correctly transform action payload', () => {
       const requestAction = {
         type: 'REQUEST',
@@ -83,7 +89,7 @@ describe('actions', () => {
     });
   });
 
-  describe('errorAction', () => {
+  describe('createErrorAction', () => {
     it('should correctly transform action payload', () => {
       const requestAction = {
         type: 'REQUEST',
@@ -137,7 +143,7 @@ describe('actions', () => {
     });
   });
 
-  describe('abortAction', () => {
+  describe('createAbortAction', () => {
     it('should correctly transform action payload', () => {
       const requestAction = {
         type: 'REQUEST',
@@ -168,6 +174,157 @@ describe('actions', () => {
           asPromise: true,
         },
       });
+    });
+  });
+
+  describe('getActionPayload', () => {
+    it('just returns not FSA action', () => {
+      const action = { type: 'ACTION' };
+      assert.deepEqual(getActionPayload(action), action);
+    });
+
+    it('returns payload of FSA action', () => {
+      const action = { type: 'ACTION', payload: 'payload' };
+      assert.deepEqual(getActionPayload(action), 'payload');
+    });
+  });
+
+  describe('isRequestAction', () => {
+    it('recognizes request action', () => {
+      assert.isTrue(isRequestAction({ type: 'ACTION', request: { url: '/' } }));
+    });
+
+    it('recognizes request FSA action', () => {
+      assert.isTrue(
+        isRequestAction({
+          type: 'ACTION',
+          payload: { request: { url: '/' } },
+        }),
+      );
+    });
+
+    it('recognizes request action with multiple requests', () => {
+      assert.isTrue(
+        isRequestAction({
+          type: 'ACTION',
+          request: [{ url: '/' }, { url: '/path' }],
+        }),
+      );
+    });
+
+    it('rejects actions without request object', () => {
+      assert.isFalse(
+        isRequestAction({
+          type: 'ACTION',
+          attr: 'value',
+        }),
+      );
+    });
+
+    it('rejects actions with request without url', () => {
+      assert.isFalse(
+        isRequestAction({
+          type: 'ACTION',
+          request: { headers: {} },
+        }),
+      );
+    });
+
+    it('rejects actions with response object', () => {
+      assert.isFalse(
+        isRequestAction({
+          type: 'ACTION',
+          request: { url: '/' },
+          response: {},
+        }),
+      );
+    });
+
+    it('rejects actions with payload which is instance of error', () => {
+      const responseError = new Error();
+      responseError.request = { request: { url: '/' } };
+      assert.isFalse(
+        isRequestAction({
+          type: 'ACTION',
+          payload: responseError,
+          response: {},
+        }),
+      );
+    });
+  });
+
+  describe('getRequestActionFromResponse', () => {
+    it('should return request action', () => {
+      const requestAction = { type: 'REQUEST', request: { url: '/' } };
+      const responseAction = {
+        type: success('REQUEST'),
+        data: 'data',
+        meta: { requestAction },
+      };
+      assert.deepEqual(
+        getRequestActionFromResponse(responseAction),
+        requestAction,
+      );
+    });
+  });
+
+  describe('isSuccessAction', () => {
+    it('should return true for success action', () => {
+      assert.isTrue(
+        isSuccessAction({
+          type: success('REQUEST'),
+          meta: { requestAction: { type: 'REQUEST' } },
+        }),
+      );
+    });
+
+    it('should return false for error action', () => {
+      assert.isFalse(
+        isSuccessAction({
+          type: error('REQUEST'),
+          meta: { requestAction: { type: 'REQUEST' } },
+        }),
+      );
+    });
+  });
+
+  describe('isErrorAction', () => {
+    it('should return true for error action', () => {
+      assert.isTrue(
+        isErrorAction({
+          type: error('REQUEST'),
+          meta: { requestAction: { type: 'REQUEST' } },
+        }),
+      );
+    });
+
+    it('should return false for success action', () => {
+      assert.isFalse(
+        isErrorAction({
+          type: success('REQUEST'),
+          meta: { requestAction: { type: 'REQUEST' } },
+        }),
+      );
+    });
+  });
+
+  describe('isAbortAction', () => {
+    it('should return true for abort action', () => {
+      assert.isTrue(
+        isAbortAction({
+          type: abort('REQUEST'),
+          meta: { requestAction: { type: 'REQUEST' } },
+        }),
+      );
+    });
+
+    it('should return false for error action', () => {
+      assert.isFalse(
+        isAbortAction({
+          type: error('REQUEST'),
+          meta: { requestAction: { type: 'REQUEST' } },
+        }),
+      );
     });
   });
 });

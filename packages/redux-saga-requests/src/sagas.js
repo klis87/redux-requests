@@ -17,9 +17,10 @@ import {
   createSuccessAction,
   createErrorAction,
   createAbortAction,
+  getActionPayload,
+  isRequestAction,
 } from './actions';
 import { REQUESTS_CONFIG, INCORRECT_PAYLOAD_ERROR } from './constants';
-import { getActionPayload, isRequestAction } from './helpers';
 
 export const voidCallback = () => {};
 
