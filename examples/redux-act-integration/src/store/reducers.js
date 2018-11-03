@@ -1,42 +1,42 @@
-import { createRequestsReducer } from 'redux-saga-requests';
+import { requestsReducer, abort } from 'redux-saga-requests';
 import { createReducer } from 'redux-act';
 
 import {
-  success,
-  error,
-  abort,
-  fetchPhoto,
-  clearPhoto,
-  fetchPost,
-  clearPost,
+  fetchPhotoAction,
+  clearPhotoAction,
+  deletePhotoAction,
+  fetchPostsAction,
+  clearPostsAction,
+  deletePostAction,
 } from './actions';
 
 const increment = number => number + 1;
 
 export const abortCounterReducer = createReducer(
   {
-    [abort(fetchPhoto)]: increment,
-    [abort(fetchPost)]: increment,
+    [abort(fetchPhotoAction)]: increment,
+    [abort(fetchPostsAction)]: increment,
   },
   0,
 );
 
-const requestsReducer = createRequestsReducer({
-  success,
-  error,
-  abort,
-});
-
 export const photoReducer = requestsReducer({
-  actionType: fetchPhoto,
-  resetOn: [clearPhoto],
+  actionType: fetchPhotoAction,
+  resetOn: [clearPhotoAction],
+  operations: {
+    [deletePhotoAction]: () => null,
+  },
 });
 
-export const postReducer = requestsReducer({
-  actionType: fetchPost,
-  resetOn: [clearPost],
-  getData: (state, action) => ({
-    ...action.payload.data[0],
-    comments: action.payload.data[1],
-  }),
+export const postsReducer = requestsReducer({
+  actionType: fetchPostsAction,
+  resetOn: [clearPostsAction],
+  multiple: true,
+  operations: {
+    [deletePostAction]: {
+      updateData: (state, action) =>
+        state.data.filter(v => v.id !== action.meta.id),
+      getRequestKey: action => String(action.meta.id),
+    },
+  },
 });

@@ -42,14 +42,14 @@
     "redux-saga-requests": ">=0.17.0"
   },
   "devDependencies": {
-    "@babel/cli": "7.0.0",
-    "@babel/core": "7.0.0",
+    "@babel/cli": "7.1.2",
+    "@babel/core": "7.1.2",
     "@babel/plugin-proposal-object-rest-spread": "7.0.0",
-    "@babel/plugin-transform-runtime": "7.0.0",
-    "@babel/preset-env": "7.0.0",
+    "@babel/plugin-transform-runtime": "7.1.0",
+    "@babel/preset-env": "7.1.0",
     "@babel/register": "7.0.0",
-    "babel-loader": "8.0.1",
-    "babel-plugin-istanbul": "5.0.1",
+    "babel-loader": "8.0.4",
+    "babel-plugin-istanbul": "5.1.0",
     "chai": "4.1.2",
     "cross-env": "5.2.0",
     "eslint": "5.4.0",
@@ -67,6 +67,6 @@
     "webpack-cli": "3.1.0"
   },
   "dependencies": {
-    "@babel/runtime": "^7.0.0"
+    "@babel/runtime": "^7.1.2"
   }
 }

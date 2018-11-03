@@ -4,7 +4,8 @@ import {
   abort,
   isSuccessAction,
   isErrorAction,
-  isAbortAction,
+  isResponseAction,
+  getRequestActionFromResponse,
 } from './actions';
 
 // to support libraries like redux-act and redux-actions
@@ -13,62 +14,23 @@ const normalizeActionType = actionType =>
 
 const getEmptyData = multiple => (multiple ? [] : null);
 
+const operationConfigHasRequestKey = config =>
+  typeof config !== 'boolean' && !!config.getRequestKey;
+
 const getInitialRequestState = ({ multiple, operations }) => ({
   data: getEmptyData(multiple),
   pending: 0,
   error: null,
   operations:
     operations &&
-    Object.keys(operations).reduce(
-      (prev, k) => ({ ...prev, [k]: { error: null, pending: 0 } }),
+    Object.entries(operations).reduce(
+      (prev, [k, v]) => ({
+        ...prev,
+        [k]: operationConfigHasRequestKey(v) ? {} : { error: null, pending: 0 },
+      }),
       {},
     ),
 });
-
-/*
-const conf = {
-  updateData: (state, action) => action.payload.data,
-  operations: {
-    UPDATE_NODE: (state, action) => action.payload.data,
-    FETCH_AGAIN_NODE: true,
-    EDIT_NODE: {
-      updateData: (state, action) => action.payload.data,
-      requestKey: action => action.meta.id,
-    },
-    DONT_UPDATE_DATA: false,
-  },
-};
-
-const state = {
-  data: 'dwdwd',
-  pending: 0,
-  error: false,
-  operations: {
-    UPDATE_NODE: {
-      error: null,
-      pending: 0,
-    },
-    FETCH_AGAIN_NODE: {
-      error: null,
-      pending: 0,
-    },
-    EDIT_NODE: {
-      1: {
-        error: true,
-        pending: 0,
-      },
-      2: {
-        error: false,
-        pending: 1,
-      },
-    },
-    DONT_UPDATE_DATA: {
-      error: null,
-      pending: 0,
-    },
-  },
-};
-*/
 
 const getInitialState = (state, reducer, config) => {
   if (!reducer) {
@@ -82,6 +44,7 @@ const defaultConfig = {
   multiple: false,
   getData: (state, action) =>
     action.payload ? action.payload.data : action.data,
+  updateData: null,
   getError: (state, action) => (action.payload ? action.payload : action.error),
   onRequest: state => ({
     ...state,
@@ -115,7 +78,6 @@ export const createRequestsReducer = (globalConfig = {}) => (
   const config = { ...defaultConfig, ...globalConfig, ...localConfig };
   const nextState =
     state === undefined ? getInitialState(state, reducer, config) : state;
-
   const {
     onRequest,
     onSuccess,
@@ -123,10 +85,11 @@ export const createRequestsReducer = (globalConfig = {}) => (
     onAbort,
     resetOn,
     getData,
+    updateData,
+    getError,
     operations,
     actionType,
   } = config;
-
   const normalizedActionType = normalizeActionType(actionType);
 
   if (
@@ -140,37 +103,160 @@ export const createRequestsReducer = (globalConfig = {}) => (
     };
   }
 
-  if (
-    operations &&
-    (action.type in operations ||
-      (action.meta &&
-        (action.meta.requestAction &&
-          action.meta.requestAction.type in operations)))
-  ) {
-    if (isSuccessAction(action.type)) {
-      const requestActionType = action.meta.requestAction.type;
-      console.log('action type is', requestActionType);
-      return {
-        ...state,
-        data: getData(state, action, config),
-        operations: {
-          ...state.operations,
-          [requestActionType]: {
-            error: null,
-            pending: state.operations[requestActionType].pending - 1,
-          },
-        },
-      };
-    }
+  if (operations && action.type in operations) {
+    const operationConfig = operations[action.type];
 
     return {
       ...state,
       operations: {
         ...state.operations,
-        [action.type]: {
-          error: null,
-          pending: state.operations[action.type].pending + 1,
+        [action.type]: operationConfigHasRequestKey(operationConfig)
+          ? {
+              ...state.operations[action.type],
+              [operationConfig.getRequestKey(action)]: {
+                error: null,
+                pending: state.operations[action.type][
+                  operationConfig.getRequestKey(action)
+                ]
+                  ? state.operations[action.type][
+                      operationConfig.getRequestKey(action)
+                    ].pending + 1
+                  : 1,
+              },
+            }
+          : {
+              error: null,
+              pending: state.operations[action.type].pending + 1,
+            },
+      },
+    };
+  }
+
+  if (
+    operations &&
+    isResponseAction(action) &&
+    getRequestActionFromResponse(action).type in operations
+  ) {
+    const requestAction = getRequestActionFromResponse(action);
+    const operationConfig = operations[requestAction.type];
+    const {
+      [requestAction.type]: currentOperation,
+      ...otherOperations
+    } = state.operations;
+
+    if (isSuccessAction(action)) {
+      let dataUpdater = null;
+
+      if (
+        (typeof operationConfig === 'boolean' && operationConfig) ||
+        (typeof operationConfig !== 'boolean' &&
+          typeof operationConfig.updateData === 'boolean' &&
+          operationConfig.updateData)
+      ) {
+        dataUpdater = updateData || getData;
+      } else if (typeof operationConfig === 'function') {
+        dataUpdater = operationConfig;
+      } else if (
+        typeof operationConfig !== 'boolean' &&
+        typeof operationConfig.updateData !== 'boolean'
+      ) {
+        dataUpdater = operationConfig.updateData;
+      }
+
+      const getUpdatedCurrentOperation = () => {
+        if (!operationConfigHasRequestKey(operationConfig)) {
+          return {
+            error: null,
+            pending: currentOperation.pending - 1,
+          };
+        }
+
+        const currentRequestKey = operationConfig.getRequestKey(requestAction);
+        const {
+          [currentRequestKey]: operationForRequestKey,
+          ...remainingOperations
+        } = currentOperation;
+
+        if (operationForRequestKey.pending !== 1) {
+          return {
+            ...remainingOperations,
+            [currentRequestKey]: {
+              error: null,
+              pending: operationForRequestKey.pending - 1,
+            },
+          };
+        }
+
+        return remainingOperations;
+      };
+
+      return {
+        ...state,
+        data: dataUpdater ? dataUpdater(state, action, config) : state.data,
+        operations: {
+          ...otherOperations,
+          [requestAction.type]: getUpdatedCurrentOperation(),
         },
+      };
+    }
+
+    if (isErrorAction(action)) {
+      return {
+        ...state,
+        operations: {
+          ...otherOperations,
+          [requestAction.type]: operationConfigHasRequestKey(operationConfig)
+            ? {
+                ...currentOperation,
+                [operationConfig.getRequestKey(requestAction)]: {
+                  error: getError(state, action, config),
+                  pending:
+                    currentOperation[
+                      operationConfig.getRequestKey(requestAction)
+                    ].pending - 1,
+                },
+              }
+            : {
+                error: getError(state, action, config),
+                pending: currentOperation.pending - 1,
+              },
+        },
+      };
+    }
+
+    // abort case
+    const getUpdatedCurrentOperation = () => {
+      if (!operationConfigHasRequestKey(operationConfig)) {
+        return {
+          ...currentOperation,
+          pending: currentOperation.pending - 1,
+        };
+      }
+
+      const currentRequestKey = operationConfig.getRequestKey(requestAction);
+      const {
+        [currentRequestKey]: operationForRequestKey,
+        ...remainingOperations
+      } = currentOperation;
+
+      if (operationForRequestKey.pending !== 1) {
+        return {
+          ...remainingOperations,
+          [currentRequestKey]: {
+            ...operationForRequestKey,
+            pending: operationForRequestKey.pending - 1,
+          },
+        };
+      }
+
+      return remainingOperations;
+    };
+
+    return {
+      ...state,
+      operations: {
+        ...otherOperations,
+        [requestAction.type]: getUpdatedCurrentOperation(),
       },
     };
   }

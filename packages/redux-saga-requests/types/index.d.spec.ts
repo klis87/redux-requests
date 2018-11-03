@@ -127,6 +127,33 @@ requestsReducer({
   actionType: 'actionType',
   ...globalConfig,
 });
+requestsReducer({
+  actionType: 'actionType',
+  operations: {
+    OPERATION: true,
+  },
+});
+requestsReducer({
+  actionType: 'actionType',
+  operations: {
+    OPERATION: { updateData: true },
+  },
+});
+requestsReducer({
+  actionType: 'actionType',
+  operations: {
+    OPERATION: { updateData: (state, action) => state },
+  },
+});
+requestsReducer({
+  actionType: 'actionType',
+  operations: {
+    OPERATION: {
+      getRequestKey: action => 'id',
+      updateData: (state, action) => state,
+    },
+  },
+});
 requestsReducer({ actionType: 'actionType' }, (state, action) => state);
 
 createRequestsReducer()({ actionType: 'actionType' });
