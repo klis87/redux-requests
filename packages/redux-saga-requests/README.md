@@ -985,7 +985,7 @@ and see what actions are being sent with [redux-devtools](https://github.com/zal
 There are following examples currently:
 - [basic](https://github.com/klis87/redux-saga-requests/tree/master/examples/basic)
 - [advanced](https://github.com/klis87/redux-saga-requests/tree/master/examples/advanced)
-- [operations](https://github.com/klis87/redux-saga-requests/tree/master/examples/advanced)
+- [operations](https://github.com/klis87/redux-saga-requests/tree/master/examples/operations)
 - [Fetch API](https://github.com/klis87/redux-saga-requests/tree/master/examples/fetch-api)
 - [redux-act integration](https://github.com/klis87/redux-saga-requests/tree/master/examples/redux-act-integration)
 - [low-level-reducers](https://github.com/klis87/redux-saga-requests/tree/master/examples/low-level-reducers)
