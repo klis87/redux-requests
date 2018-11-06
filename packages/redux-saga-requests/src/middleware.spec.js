@@ -143,6 +143,24 @@ describe('requestsPromiseMiddleware', () => {
       assert.deepEqual(getActions(), [action]);
     });
 
+    it('doesnt affect response with meta asPromise false', () => {
+      const requestAction = {
+        type: 'REQUEST',
+        request: { url: '/' },
+        meta: { asPromise: false },
+      };
+      const responseAction = {
+        type: success('REQUEST'),
+        meta: { requestAction },
+      };
+      const { dispatch, getActions } = mockStore({});
+      const requestResult = dispatch(requestAction);
+      const responseResult = dispatch(responseAction);
+      assert.notInstanceOf(requestResult, Promise);
+      assert.deepEqual(responseResult, responseAction);
+      assert.deepEqual(getActions(), [requestAction, responseAction]);
+    });
+
     it('promisify dispatch result and passes action for request actions', () => {
       const action = { type: 'REQUEST', request: { url: '/' } };
       const { dispatch, getActions } = mockStore({});
