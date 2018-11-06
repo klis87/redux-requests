@@ -589,6 +589,7 @@ which will give you the following initial state:
 };
 ```
 ... and if a `deleteBook` with `id` `1` and `2` are running, state would be:
+```js
 {
   data: [],
   error: null,
@@ -610,6 +611,7 @@ which will give you the following initial state:
     },
   },
 };
+```
 
 So, `DELETE_BOOK` state is one lever deeper, with state divided per `id`. Be careful though to always check whether
 object with a given `id` exists before reading `pending` or `error` state, even after successful response, as
