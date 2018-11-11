@@ -73,6 +73,7 @@ export function* sendRequest(
   const requestsConfig = yield getRequestsConfig();
 
   if (dispatchRequestAction && !silent) {
+    action = { ...action, meta: { ...action.meta, runByWatcher: false } };
     yield put(action);
   }
 
@@ -195,12 +196,15 @@ export function* cancelSendRequestOnAction(abortOn, task) {
   }
 }
 
+const isWatchable = a =>
+  isRequestAction(a) && (!a.meta || a.meta.runByWatcher !== false);
+
 export function* watchRequests(common = {}, perRequestType = {}) {
   const lastTasks = {};
   const config = { ...watchRequestsDefaultConfig, ...common };
 
   while (true) {
-    const action = yield take(isRequestAction);
+    const action = yield take(isWatchable);
     const localConfig = perRequestType[action.type]
       ? { ...config, ...perRequestType[action.type] }
       : config;

@@ -21,6 +21,7 @@
     "operator-linebreak": 0,
     "no-throw-literal": 0,
     "implicit-arrow-linebreak": 0,
+    "no-param-reassign": 0,
     "import/prefer-default-export": 0,
     "import/no-extraneous-dependencies": [
       2,

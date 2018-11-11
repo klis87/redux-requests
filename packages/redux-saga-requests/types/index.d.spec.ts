@@ -11,16 +11,22 @@ import {
   requestsReducer,
   createRequestsReducer,
   requestsPromiseMiddleware,
+  RequestAction,
 } from './index';
 
 success('type');
 error('type');
 abort('type');
 
-const requestAction = {
+const requestAction: RequestAction = {
   type: 'FETCH',
   request: { url: '/' },
-  meta: { driver: 'default', asPromise: true, customKey: 'customValue' },
+  meta: {
+    driver: 'default',
+    asPromise: true,
+    runByWatcher: false,
+    customKey: 'customValue',
+  },
 };
 
 let dummyDriver: Driver;
