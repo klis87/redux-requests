@@ -183,12 +183,16 @@ describe('sagas', () => {
       assert.equal(sagaError, INCORRECT_PAYLOAD_ERROR);
     });
 
-    it('dispatches request action when dispatchRequestAction is true', () => {
+    it('dispatches unwatchable request action when dispatchRequestAction is true', () => {
       const action = { type: 'FETCH', request: { url: '/url' } };
 
       return expectSaga(sendRequest, action, { dispatchRequestAction: true })
         .provide([[getContext(REQUESTS_CONFIG), config]])
-        .put(action)
+        .put({
+          type: 'FETCH',
+          request: { url: '/url' },
+          meta: { runByWatcher: false },
+        })
         .run();
     });
 
@@ -503,6 +507,14 @@ describe('sagas', () => {
         .silentRun(100);
     });
 
+    it('doesnt fork sendRequests for request action with meta runByWatcher as false', () => {
+      return expectSaga(watchRequests)
+        .provide([[getContext(REQUESTS_CONFIG), config]])
+        .not.fork.fn(sendRequest)
+        .dispatch({ ...action, meta: { runByWatcher: false } })
+        .silentRun(100);
+    });
+
     it('forks cancelSendRequestOnAction on abort action', () => {
       return expectSaga(watchRequests, { abortOn: 'ABORT' })
         .provide([[getContext(REQUESTS_CONFIG), config]])
@@ -511,7 +523,7 @@ describe('sagas', () => {
         .silentRun(100);
     });
 
-    it('cancells request on abort action', () => {
+    it('cancels request on abort action', () => {
       return expectSaga(watchRequests, { abortOn: 'ABORT' })
         .provide([[getContext(REQUESTS_CONFIG), config]])
         .put.actionType('FETCH_ABORT')
@@ -520,7 +532,7 @@ describe('sagas', () => {
         .silentRun(100);
     });
 
-    it('doesnt cancell request without abort action', () => {
+    it('doesnt cancel request without abort action', () => {
       return expectSaga(watchRequests, { abortOn: 'ABORT' })
         .provide([[getContext(REQUESTS_CONFIG), config]])
         .not.put.actionType('FETCH_ABORT')

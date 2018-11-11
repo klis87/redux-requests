@@ -7,6 +7,7 @@ type RequestAction =
       meta?: {
         asPromise?: boolean;
         driver?: string;
+        runByWatcher?: boolean;
       };
     }
   | {
@@ -17,6 +18,7 @@ type RequestAction =
       meta?: {
         asPromise?: boolean;
         driver?: string;
+        runByWatcher?: boolean;
       };
     };
 

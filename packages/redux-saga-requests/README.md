@@ -212,7 +212,7 @@ yield watchRequests(
 );
 ```
 
-Last, but not least, remember that `watchRequests` is a blocking effect, so if you have more sagas, use
+Moreover, remember that `watchRequests` is a blocking effect, so if you have more sagas, use
 `yield fork(watchRequests)`, or wrap it with something else in `all`:
 ```js
 import { all, takeLatest, put } from 'redux-saga/effects';
@@ -232,6 +232,20 @@ function* rootSaga() {
     takeLatest(success('FETCH_BOOK'), fetchBooksSuccessSaga),
   ]);
 }
+```
+
+Last, but not least, if for some reason you don't want your request action to be handled by `watchRequests`,
+you can use `meta.runByWatcher`: like:
+```js
+const fetchBooks = () => ({
+  type: FETCH_BOOKS,
+  request: {
+    url: '/books',
+  },
+  meta: {
+    runByWatcher: false,
+  },
+});
 ```
 
 ### `sendRequest`
@@ -311,7 +325,9 @@ function* fetchBookSaga() {
 ```
 The key here is, that you need to pass `{ dispatchRequestAction: true }` as second argument to `sendRequest`, so that `fetchBooks` action will be
 dispatched - usually it is already dispatched somewhere else (from your React components `onClick` for instance),
-but here not, so we must explicitely tell `sendRequest` to dispatch it.
+but here not, so we must explicitely tell `sendRequest` to dispatch it. Also, setting `dispatchRequestAction` as `true`
+will set your request action meta `runByWatcher` as `false`, so if you happen to use `watchRequests`, you won't end up with
+duplicated requests.
 
 ### `getRequestInstance`
 
