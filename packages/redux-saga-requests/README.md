@@ -188,28 +188,19 @@ yield watchRequests({
 });
 ```
 
-Above defines a global behaviour, but what if you want to have different settings for different actions? You can use the same
-config to adjust them per action type:
+Above defines a global behaviour, but what if you want to have different settings for different actions?
+Just define `takeLatest` or `abortOn` in action `meta`, for example:
 ```js
-yield watchRequests(
-  { abortOn: 'LOGOUT' },
-  {
-    SAVE_STH_AND_DONT_ABORT_ACTION_WHEN_MULTIPLE: { takeLatest: false }
-  }
-);
-```
-
-Above will merge settings for `SAVE_STH_AND_DONT_ABORT_ACTION_WHEN_MULTIPLE` action with global ones, resulting in
-`{ takeLatest: false, abortOn: 'LOGOUT' }` for `SAVE_STH_AND_DONT_ABORT_ACTION_WHEN_MULTIPLE` action.
-
-Also, if you like the default behaviour, but just wanna change it for some actions, you can pass 1st param as `null`:
-```js
-yield watchRequests(
-  null,
-  {
-    SAVE_STH_AND_DONT_ABORT_ACTION_WHEN_MULTIPLE: { takeLatest: false }
-  }
-);
+const fetchBooks = () => ({
+  type: FETCH_BOOKS,
+  request: {
+    url: '/books',
+  },
+  meta: {
+    takeLatest: false,
+    abortOn: 'LOGOUT',
+  },
+});
 ```
 
 Moreover, remember that `watchRequests` is a blocking effect, so if you have more sagas, use

@@ -5,21 +5,12 @@ import { createRequestInstance, watchRequests } from 'redux-saga-requests';
 import { createDriver } from 'redux-saga-requests-axios';
 
 import { photoReducer, postsReducer, abortCounterReducer } from './reducers';
-import {
-  fetchPhotoAction,
-  clearPhotoAction,
-  fetchPostsAction,
-  clearPostsAction,
-} from './actions';
 
 function* rootSaga(axiosInstance) {
   yield createRequestInstance({
     driver: createDriver(axiosInstance),
   });
-  yield watchRequests(null, {
-    [fetchPhotoAction]: { abortOn: clearPhotoAction },
-    [fetchPostsAction]: { abortOn: clearPostsAction },
-  });
+  yield watchRequests();
 }
 
 export const configureStore = () => {

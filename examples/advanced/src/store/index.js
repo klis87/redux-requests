@@ -17,7 +17,6 @@ import {
   responseCounterSaga,
   errorCounterSaga,
 } from './sagas';
-import { FETCH_PHOTO, CLEAR_PHOTO, FETCH_POST, CLEAR_POST } from './constants';
 
 function* rootSaga(axiosInstance) {
   yield createRequestInstance({
@@ -26,10 +25,7 @@ function* rootSaga(axiosInstance) {
     onError: errorCounterSaga,
     driver: createDriver(axiosInstance),
   });
-  yield watchRequests(null, {
-    [FETCH_PHOTO]: { abortOn: CLEAR_PHOTO },
-    [FETCH_POST]: { abortOn: CLEAR_POST },
-  });
+  yield watchRequests();
 }
 
 export const configureStore = () => {
