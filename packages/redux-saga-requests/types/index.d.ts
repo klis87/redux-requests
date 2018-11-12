@@ -1,25 +1,29 @@
 import { AnyAction, Reducer, Middleware } from 'redux';
 
-type RequestAction =
+type FilterOnActionCallback = {
+  (action: AnyAction): boolean;
+};
+
+type RequestActionMeta = {
+  asPromise?: boolean;
+  driver?: string;
+  runByWatcher?: boolean;
+  takeLatest?: boolean;
+  abortOn?: FilterOnActionCallback | string | string[];
+};
+
+export type RequestAction =
   | {
       type: string;
       request: any | any[];
-      meta?: {
-        asPromise?: boolean;
-        driver?: string;
-        runByWatcher?: boolean;
-      };
+      meta?: RequestActionMeta;
     }
   | {
       type: string;
       payload: {
         request: any | any[];
       };
-      meta?: {
-        asPromise?: boolean;
-        driver?: string;
-        runByWatcher?: boolean;
-      };
+      meta?: RequestActionMeta;
     };
 
 type ActionTypeModifier = (actionType: string) => string;
@@ -71,24 +75,13 @@ export const sendRequest: (
   config?: SendRequestConfig,
 ) => any;
 
-type FilterOnActionCallback = {
-  (action: AnyAction): boolean;
-};
-
 type WatchRequestsConfig = {
   takeLatest?: boolean | FilterOnActionCallback;
   abortOn?: FilterOnActionCallback | string | string[];
   getLastActionKey?: (action: AnyAction) => string;
 };
 
-type WatchRequestsConfigPerRequestType = {
-  [actionType: string]: WatchRequestsConfig;
-};
-
-export const watchRequests: (
-  commonConfig?: WatchRequestsConfig,
-  perRequestTypeConfig?: WatchRequestsConfigPerRequestType,
-) => void;
+export const watchRequests: (config?: WatchRequestsConfig) => void;
 
 type OnActionCallback = {
   (state: any, action: AnyAction, config: MergedReducerConfig): any;

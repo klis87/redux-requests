@@ -199,21 +199,19 @@ export function* cancelSendRequestOnAction(abortOn, task) {
 const isWatchable = a =>
   isRequestAction(a) && (!a.meta || a.meta.runByWatcher !== false);
 
-export function* watchRequests(common = {}, perRequestType = {}) {
+export function* watchRequests(commonConfig = {}) {
   const lastTasks = {};
-  const config = { ...watchRequestsDefaultConfig, ...common };
+  const config = { ...watchRequestsDefaultConfig, ...commonConfig };
 
   while (true) {
     const action = yield take(isWatchable);
-    const localConfig = perRequestType[action.type]
-      ? { ...config, ...perRequestType[action.type] }
-      : config;
-
-    const lastActionKey = localConfig.getLastActionKey(action);
+    const lastActionKey = config.getLastActionKey(action);
     const takeLatest =
-      typeof localConfig.takeLatest === 'function'
-        ? localConfig.takeLatest(action)
-        : localConfig.takeLatest;
+      action.meta && action.meta.takeLatest !== undefined
+        ? action.meta.takeLatest
+        : typeof config.takeLatest === 'function'
+          ? config.takeLatest(action)
+          : config.takeLatest;
 
     if (takeLatest) {
       const activeTask = lastTasks[lastActionKey];
@@ -229,8 +227,11 @@ export function* watchRequests(common = {}, perRequestType = {}) {
       lastTasks[lastActionKey] = newTask;
     }
 
-    if (localConfig.abortOn) {
-      yield fork(cancelSendRequestOnAction, localConfig.abortOn, newTask);
+    const abortOn =
+      action.meta && action.meta.abortOn ? action.meta.abortOn : config.abortOn;
+
+    if (abortOn) {
+      yield fork(cancelSendRequestOnAction, abortOn, newTask);
     }
   }
 }

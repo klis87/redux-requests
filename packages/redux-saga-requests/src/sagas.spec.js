@@ -532,6 +532,15 @@ describe('sagas', () => {
         .silentRun(100);
     });
 
+    it('cancels request on abort action defined in action meta', () => {
+      return expectSaga(watchRequests)
+        .provide([[getContext(REQUESTS_CONFIG), config]])
+        .put.actionType('FETCH_ABORT')
+        .dispatch({ ...action, meta: { abortOn: 'ABORT' } })
+        .dispatch({ type: 'ABORT' })
+        .silentRun(100);
+    });
+
     it('doesnt cancel request without abort action', () => {
       return expectSaga(watchRequests, { abortOn: 'ABORT' })
         .provide([[getContext(REQUESTS_CONFIG), config]])
@@ -573,16 +582,17 @@ describe('sagas', () => {
         .silentRun(100);
     });
 
-    it('allows overriding config per action type', () => {
-      return expectSaga(
-        watchRequests,
-        { takeLatest: false },
-        { FETCH: { takeLatest: true } },
-      )
+    it('allows overriding takeLatest per action', () => {
+      const actionWithMeta = {
+        ...action,
+        meta: { takeLatest: false },
+      };
+
+      return expectSaga(watchRequests, { takeLatest: true })
         .provide([[getContext(REQUESTS_CONFIG), config]])
-        .put.actionType('FETCH_ABORT')
-        .dispatch(action)
-        .dispatch(action)
+        .not.put.actionType('FETCH_ABORT')
+        .dispatch(actionWithMeta)
+        .dispatch(actionWithMeta)
         .silentRun(100);
     });
 
