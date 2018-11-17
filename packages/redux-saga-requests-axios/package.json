@@ -1,6 +1,6 @@
 {
   "name": "redux-saga-requests-axios",
-  "version": "0.7.3",
+  "version": "0.7.4",
   "description": "Axios driver for Redux-Saga-Requests, Redux-Saga addon to simplify AJAX requests",
   "main": "lib/index.js",
   "module": "es/index.js",
