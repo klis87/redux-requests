@@ -849,6 +849,7 @@ requestsPromiseMiddleware({
   auto: true // if you with to promisify all request actions without explicit meta.asPromise true
 })
 ```
+Note auto mode `true` will NOT promisify action with explicit `meta.asPromise: false`.
 
 ## Usage with Fetch API [:arrow_up:](#table-of-content)
 
