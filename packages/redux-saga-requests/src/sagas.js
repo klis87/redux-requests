@@ -20,7 +20,12 @@ import {
   getActionPayload,
   isRequestAction,
 } from './actions';
-import { REQUESTS_CONFIG, INCORRECT_PAYLOAD_ERROR } from './constants';
+import {
+  REQUESTS_CONFIG,
+  INCORRECT_PAYLOAD_ERROR,
+  RUN_BY_INTERCEPTOR,
+  INTERCEPTORS,
+} from './constants';
 
 export const voidCallback = () => {};
 
@@ -60,16 +65,16 @@ export function* sendRequest(
   {
     dispatchRequestAction = false,
     silent = false,
-    runOnRequest = true,
-    runOnSuccess = true,
-    runOnError = true,
-    runOnAbort = true,
+    runOnRequest = null,
+    runOnSuccess = null,
+    runOnError = null,
+    runOnAbort = null,
   } = {},
 ) {
   if (!isRequestAction(action)) {
     throw new Error(INCORRECT_PAYLOAD_ERROR);
   }
-
+  const runByInterceptor = yield getContext(RUN_BY_INTERCEPTOR);
   const requestsConfig = yield getRequestsConfig();
 
   if (dispatchRequestAction && !silent) {
@@ -80,7 +85,14 @@ export function* sendRequest(
   const driver = yield call(getDriver, requestsConfig, action);
   const actionPayload = getActionPayload(action);
 
-  if (requestsConfig.onRequest && runOnRequest) {
+  if (
+    requestsConfig.onRequest &&
+    (runOnRequest !== null
+      ? runOnRequest
+      : runByInterceptor !== INTERCEPTORS.ON_REQUEST)
+  ) {
+    yield setContext({ [RUN_BY_INTERCEPTOR]: INTERCEPTORS.ON_REQUEST });
+
     actionPayload.request = yield call(
       requestsConfig.onRequest,
       actionPayload.request,
@@ -114,7 +126,14 @@ export function* sendRequest(
     }
 
     if (responseError) {
-      if (requestsConfig.onError && runOnError) {
+      if (
+        requestsConfig.onError &&
+        (runOnError !== null
+          ? runOnError
+          : runByInterceptor !== INTERCEPTORS.ON_ERROR)
+      ) {
+        yield setContext({ [RUN_BY_INTERCEPTOR]: INTERCEPTORS.ON_ERROR });
+
         const { response: onErrorResponse, error: onErrorError } = yield call(
           requestsConfig.onError,
           responseError,
@@ -139,7 +158,14 @@ export function* sendRequest(
       }
     }
 
-    if (requestsConfig.onSuccess && runOnSuccess) {
+    if (
+      requestsConfig.onSuccess &&
+      (runOnSuccess !== null
+        ? runOnSuccess
+        : runByInterceptor !== INTERCEPTORS.ON_SUCCESS &&
+          runByInterceptor !== INTERCEPTORS.ON_ERROR)
+    ) {
+      yield setContext({ [RUN_BY_INTERCEPTOR]: INTERCEPTORS.ON_SUCCESS });
       response = yield call(requestsConfig.onSuccess, response, action);
     }
 
@@ -158,7 +184,13 @@ export function* sendRequest(
     if (yield cancelled()) {
       yield call([driver, 'abortRequest'], abortSource);
 
-      if (requestsConfig.onAbort && runOnAbort) {
+      if (
+        requestsConfig.onAbort &&
+        (runOnAbort !== null
+          ? runOnAbort
+          : runByInterceptor !== INTERCEPTORS.ON_ABORT)
+      ) {
+        yield setContext({ [RUN_BY_INTERCEPTOR]: INTERCEPTORS.ON_ABORT });
         yield call(requestsConfig.onAbort, action);
       }
 
