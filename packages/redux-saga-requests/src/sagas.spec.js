@@ -6,7 +6,12 @@ import {
   createErrorAction,
   createAbortAction,
 } from './actions';
-import { REQUESTS_CONFIG, INCORRECT_PAYLOAD_ERROR } from './constants';
+import {
+  REQUESTS_CONFIG,
+  INCORRECT_PAYLOAD_ERROR,
+  RUN_BY_INTERCEPTOR,
+  INTERCEPTORS,
+} from './constants';
 import {
   defaultConfig,
   createRequestInstance,
@@ -355,13 +360,39 @@ describe('sagas', () => {
         .run();
     });
 
-    it('doesnt calls onRequest interceptor when runOnRequest is false', () => {
+    it('doesnt call onRequest interceptor when runOnRequest is false', () => {
       const action = { type: 'FETCH', request: { url: '/url' } };
       const onRequest = request => request;
 
       return expectSaga(sendRequest, action, { runOnRequest: false })
         .provide([[getContext(REQUESTS_CONFIG), { ...config, onRequest }]])
         .not.call(onRequest, action.request, action)
+        .run();
+    });
+
+    it('doesnt call onRequest interceptor when run by another onRequest interceptor', () => {
+      const action = { type: 'FETCH', request: { url: '/url' } };
+      const onRequest = request => request;
+
+      return expectSaga(sendRequest, action)
+        .provide([
+          [getContext(REQUESTS_CONFIG), { ...config, onRequest }],
+          [getContext(RUN_BY_INTERCEPTOR), INTERCEPTORS.ON_REQUEST],
+        ])
+        .not.call(onRequest, action.request, action)
+        .run();
+    });
+
+    it('calls onRequest interceptor when run by another onRequest interceptor when runOnRequest is true', () => {
+      const action = { type: 'FETCH', request: { url: '/url' } };
+      const onRequest = request => request;
+
+      return expectSaga(sendRequest, action, { runOnRequest: true })
+        .provide([
+          [getContext(REQUESTS_CONFIG), { ...config, onRequest }],
+          [getContext(RUN_BY_INTERCEPTOR), INTERCEPTORS.ON_REQUEST],
+        ])
+        .call(onRequest, action.request, action)
         .run();
     });
 
@@ -375,12 +406,38 @@ describe('sagas', () => {
         .run();
     });
 
-    it('doesnt calls onSuccess interceptor when runOnSuccess is false', () => {
+    it('doesnt call onSuccess interceptor when runOnSuccess is false', () => {
       const action = { type: 'FETCH', request: { url: '/url' } };
       const onSuccess = response => response;
 
       return expectSaga(sendRequest, action, { runOnSuccess: false })
         .provide([[getContext(REQUESTS_CONFIG), { ...config, onSuccess }]])
+        .not.call(onSuccess, { data: 'response' }, action)
+        .run();
+    });
+
+    it('doesnt call onSuccess interceptor when run by another onSuccess interceptor', () => {
+      const action = { type: 'FETCH', request: { url: '/url' } };
+      const onSuccess = response => response;
+
+      return expectSaga(sendRequest, action)
+        .provide([
+          [getContext(REQUESTS_CONFIG), { ...config, onSuccess }],
+          [getContext(RUN_BY_INTERCEPTOR), INTERCEPTORS.ON_SUCCESS],
+        ])
+        .not.call(onSuccess, { data: 'response' }, action)
+        .run();
+    });
+
+    it('doesnt call onSuccess interceptor when run by onError interceptor', () => {
+      const action = { type: 'FETCH', request: { url: '/url' } };
+      const onSuccess = response => response;
+
+      return expectSaga(sendRequest, action)
+        .provide([
+          [getContext(REQUESTS_CONFIG), { ...config, onSuccess }],
+          [getContext(RUN_BY_INTERCEPTOR), INTERCEPTORS.ON_ERROR],
+        ])
         .not.call(onSuccess, { data: 'response' }, action)
         .run();
     });
@@ -467,6 +524,20 @@ describe('sagas', () => {
       return expectSaga(sendRequest, action, { runOnAbort: false })
         .provide([
           [getContext(REQUESTS_CONFIG), { ...config, onAbort }],
+          [cancelled(), true],
+        ])
+        .not.call(onAbort, action)
+        .run();
+    });
+
+    it('doesnt call onAbort interceptor when run by onAbort interceptor', () => {
+      const action = { type: 'FETCH', request: { url: '/url' } };
+      const onAbort = () => {};
+
+      return expectSaga(sendRequest, action)
+        .provide([
+          [getContext(REQUESTS_CONFIG), { ...config, onAbort }],
+          [getContext(RUN_BY_INTERCEPTOR), INTERCEPTORS.ON_ABORT],
           [cancelled(), true],
         ])
         .not.call(onAbort, action)

@@ -27,11 +27,7 @@ export function* errorCounterSaga(error, action) {
     error.response.status === 404 &&
     action.type === FETCH_PHOTO
   ) {
-    return yield sendRequest(fetchPhoto(1), {
-      silent: true,
-      runOnSuccess: false, // to prevent duplicated incrementResponseCounter
-      runOnError: false, // to prevent endless loop in case photo with id 1 also doesnt exist
-    });
+    return yield sendRequest(fetchPhoto(1), { silent: true });
   }
 
   return { error };
