@@ -6,8 +6,8 @@ import {
 } from './actions';
 
 const shouldActionBePromisified = (action, auto) =>
-  (auto && !(action.meta && action.meta.asPromise === false))
-  || (action.meta && action.meta.asPromise);
+  (auto && !(action.meta && action.meta.asPromise === false)) ||
+  (action.meta && action.meta.asPromise);
 
 export const requestsPromiseMiddleware = ({ auto = false } = {}) => {
   const requestMap = new Map();
@@ -15,9 +15,8 @@ export const requestsPromiseMiddleware = ({ auto = false } = {}) => {
   return () => next => action => {
     if (isRequestAction(action) && shouldActionBePromisified(action, auto)) {
       return new Promise((resolve, reject) => {
-        requestMap.set(
-          action,
-          (response, error) => (error ? reject(response) : resolve(response)),
+        requestMap.set(action, (response, error) =>
+          error ? reject(response) : resolve(response),
         );
 
         next(action);
