@@ -69,6 +69,7 @@
     "webpack-cli": "3.1.2"
   },
   "dependencies": {
-    "@babel/runtime": "^7.1.5"
+    "@babel/runtime": "^7.1.5",
+    "@redux-saga/delay-p": "1.0.0-beta.2"
   }
 }

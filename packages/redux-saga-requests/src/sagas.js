@@ -11,7 +11,6 @@ import {
   getContext,
   setContext,
 } from 'redux-saga/effects';
-import { delay } from 'redux-saga';
 
 import {
   createSuccessAction,
@@ -26,6 +25,11 @@ import {
   RUN_BY_INTERCEPTOR,
   INTERCEPTORS,
 } from './constants';
+
+/* eslint-disable */
+let delay =
+  require('redux-saga').delay || require('@redux-saga/delay-p').default;
+/* eslint-enable */
 
 export const voidCallback = () => {};
 
@@ -242,8 +246,8 @@ export function* watchRequests(commonConfig = {}) {
       action.meta && action.meta.takeLatest !== undefined
         ? action.meta.takeLatest
         : typeof config.takeLatest === 'function'
-          ? config.takeLatest(action)
-          : config.takeLatest;
+        ? config.takeLatest(action)
+        : config.takeLatest;
 
     if (takeLatest) {
       const activeTask = lastTasks[lastActionKey];
