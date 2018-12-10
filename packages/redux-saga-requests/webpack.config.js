@@ -13,6 +13,11 @@ module.exports = {
     ],
   },
   externals: {
+    '@redux-saga/delay-p': {
+      commonjs: '@redux-saga/delay-p',
+      commonjs2: '@redux-saga/delay-p',
+      amd: '@redux-saga/delay-p',
+    },
     'redux-saga/effects': {
       commonjs: 'redux-saga/effects',
       commonjs2: 'redux-saga/effects',
