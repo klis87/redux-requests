@@ -27,7 +27,7 @@ import {
 } from './constants';
 
 /* eslint-disable */
-let delay =
+const delay =
   require('redux-saga').delay || require('@redux-saga/delay-p').default;
 /* eslint-enable */
 
