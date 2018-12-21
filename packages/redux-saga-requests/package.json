@@ -70,6 +70,6 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.1.5",
-    "@redux-saga/delay-p": "1.0.0-beta.2"
+    "@redux-saga/delay-p": "1.0.0-rc.0"
   }
 }
