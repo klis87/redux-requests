@@ -1,3 +1,5 @@
+import { assert } from 'chai';
+
 import { mapRequest } from './helpers';
 
 describe('helpers', () => {

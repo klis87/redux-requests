@@ -1,0 +1,9 @@
+{
+  "presets": [["@babel/preset-env", { "loose": true, "modules": false }]],
+  "env": {
+    "test": {
+      "presets": [["@babel/preset-env", { "loose": true }]]
+    }
+  },
+  "plugins": [["@babel/plugin-proposal-object-rest-spread", { "loose": true }]]
+}

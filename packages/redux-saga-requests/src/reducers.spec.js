@@ -1,3 +1,5 @@
+import { assert } from 'chai';
+
 import { success, error, abort } from './actions';
 import { requestsReducer } from './reducers';
 

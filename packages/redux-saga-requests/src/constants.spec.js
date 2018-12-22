@@ -1,3 +1,5 @@
+import { assert } from 'chai';
+
 import {
   SUCCESS_SUFFIX,
   ERROR_SUFFIX,

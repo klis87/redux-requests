@@ -7,6 +7,8 @@
     "build": "lerna run build",
     "clean": "lerna run clean",
     "lint": "lerna run lint",
+    "test": "jest",
+    "test:cover": "jest --coverage",
     "cover": "nyc --reporter=lcov --reporter=text lerna run test:cover",
     "report": "nyc report",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",

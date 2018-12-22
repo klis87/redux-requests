@@ -1,3 +1,4 @@
+import { assert } from 'chai';
 import configureStore from 'redux-mock-store';
 
 import { success, error, abort } from './actions';

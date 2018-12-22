@@ -1,3 +1,4 @@
+import { assert } from 'chai';
 import { getContext, setContext, cancelled } from 'redux-saga/effects';
 import { expectSaga } from 'redux-saga-test-plan';
 

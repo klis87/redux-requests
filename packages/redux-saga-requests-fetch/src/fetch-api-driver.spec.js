@@ -1,3 +1,4 @@
+import { assert } from 'chai';
 import sinon from 'sinon';
 
 import { createDriver } from './fetch-api-driver';
