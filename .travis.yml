@@ -4,7 +4,6 @@ node_js:
 script:
   - yarn run lint
   - yarn run test:cover
-  - yarn run coveralls
   - yarn run test-types
   - yarn run build
   - yarn run bundlesize
