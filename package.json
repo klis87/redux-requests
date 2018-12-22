@@ -9,9 +9,7 @@
     "lint": "lerna run lint",
     "test": "jest",
     "test:cover": "jest --coverage",
-    "cover": "nyc --reporter=lcov --reporter=text lerna run test:cover",
-    "report": "nyc report",
-    "coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "coveralls": "jest --coverage --coverageReporters=text-lcov | coveralls",
     "test-types": "lerna run test-types",
     "prettify": "prettier --write '{packages,examples}/**/*.{js,jsx,ts}'",
     "bundlesize": "bundlesize"
@@ -20,15 +18,7 @@
     "bundlesize": "0.17.0",
     "coveralls": "3.0.2",
     "lerna": "3.4.3",
-    "nyc": "13.1.0",
     "prettier": "1.15.2"
-  },
-  "nyc": {
-    "exclude": [
-      "**/*.spec.js"
-    ],
-    "sourceMap": false,
-    "instrument": false
   },
   "bundlesize": [
     {

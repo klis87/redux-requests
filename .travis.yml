@@ -3,7 +3,7 @@ node_js:
   - node
 script:
   - yarn run lint
-  - yarn run cover
+  - yarn run coveralls
   - yarn run test-types
   - yarn run build
   - yarn run bundlesize
