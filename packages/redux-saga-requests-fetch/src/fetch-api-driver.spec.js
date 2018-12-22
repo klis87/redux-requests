@@ -1,4 +1,3 @@
-import { assert } from 'chai';
 import sinon from 'sinon';
 
 import { createDriver } from './fetch-api-driver';
@@ -20,16 +19,13 @@ describe('fetchApiDriver', () => {
 
   describe('requestInstance', () => {
     it('has correct value', () => {
-      assert.equal(fetchDriver.requestInstance, fetchInstance);
+      expect(fetchDriver.requestInstance).toBe(fetchInstance);
     });
   });
 
   describe('getAbortSource', () => {
     it('returns new source', () => {
-      assert.deepEqual(
-        fetchDriver.getAbortSource(),
-        new DummyAbortController(),
-      );
+      expect(fetchDriver.getAbortSource()).toEqual(new DummyAbortController());
     });
   });
 
@@ -37,7 +33,7 @@ describe('fetchApiDriver', () => {
     it('calls cancel method', () => {
       const abortSource = { abort: sinon.fake() };
       fetchDriver.abortRequest(abortSource);
-      assert.equal(abortSource.abort.callCount, 1);
+      expect(abortSource.abort.callCount).toBe(1);
     });
 
     it('doesnt crash when AbortController not provided', () => {
@@ -66,8 +62,7 @@ describe('fetchApiDriver', () => {
         error = e;
       }
 
-      assert.deepEqual(
-        error.message,
+      expect(error.message).toBe(
         "responseType must be one of the following: 'arraybuffer', 'blob', 'formData', 'json', 'text', null",
       );
     });
@@ -84,7 +79,7 @@ describe('fetchApiDriver', () => {
         { signal: 'signal' },
       );
 
-      assert.deepEqual(response, {
+      expect(response).toEqual({
         ok: true,
         json: getResponse,
         data: 'data',
@@ -101,7 +96,7 @@ describe('fetchApiDriver', () => {
         { signal: 'signal' },
       );
 
-      assert.deepEqual(response, {
+      expect(response).toEqual({
         ok: true,
         data: null,
       });
@@ -122,7 +117,7 @@ describe('fetchApiDriver', () => {
         error = e;
       }
 
-      assert.deepEqual(error, {
+      expect(error).toEqual({
         ok: false,
         json: getResponse,
         data: 'error',
@@ -136,9 +131,9 @@ describe('fetchApiDriver', () => {
       });
       const driver = createDriver(requestInstance);
       await driver.sendRequest({ url: '/' }, { signal: 'signal' });
-      assert.isTrue(
+      expect(
         requestInstance.calledOnceWithExactly('/', { signal: 'signal' }),
-      );
+      ).toBe(true);
     });
 
     it('uses baseURL for relative urls', async () => {
@@ -150,11 +145,11 @@ describe('fetchApiDriver', () => {
         baseURL: 'http://domain.com',
       });
       await driver.sendRequest({ url: '/' }, { signal: 'signal' });
-      assert.isTrue(
+      expect(
         requestInstance.calledOnceWithExactly('http://domain.com/', {
           signal: 'signal',
         }),
-      );
+      ).toBe(true);
     });
 
     it('doesnt use baseURL for absolute urls', async () => {
@@ -169,23 +164,23 @@ describe('fetchApiDriver', () => {
         { url: 'http://another-domain.com/' },
         { signal: 'signal' },
       );
-      assert.isTrue(
+      expect(
         requestInstance.calledOnceWithExactly('http://another-domain.com/', {
           signal: 'signal',
         }),
-      );
+      ).toBe(true);
     });
   });
 
   describe('getSuccessPayload', () => {
     it('returns response data', () => {
       const response = { data: 'data' };
-      assert.deepEqual(fetchDriver.getSuccessPayload(response), response.data);
+      expect(fetchDriver.getSuccessPayload(response)).toEqual(response.data);
     });
 
     it('returns array of response data', () => {
       const responses = [{ data: 'data1' }, { data: 'data2' }];
-      assert.deepEqual(fetchDriver.getSuccessPayload(responses), [
+      expect(fetchDriver.getSuccessPayload(responses)).toEqual([
         responses[0].data,
         responses[1].data,
       ]);
@@ -195,7 +190,7 @@ describe('fetchApiDriver', () => {
   describe('getErrorPayload', () => {
     it('returns error', () => {
       const error = 'error';
-      assert.equal(fetchDriver.getErrorPayload(error), error);
+      expect(fetchDriver.getErrorPayload(error)).toBe(error);
     });
   });
 });

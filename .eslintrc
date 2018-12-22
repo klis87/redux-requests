@@ -1,11 +1,8 @@
 {
   "extends": "airbnb",
   "env": {
-    "mocha": true,
+    "jest": true,
     "browser": true
-  },
-  "globals": {
-    "assert": true
   },
   "rules": {
     "max-len": [0, 80],

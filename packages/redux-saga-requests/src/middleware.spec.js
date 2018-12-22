@@ -1,4 +1,3 @@
-import { assert } from 'chai';
 import configureStore from 'redux-mock-store';
 
 import { success, error, abort } from './actions';
@@ -12,16 +11,16 @@ describe('requestsPromiseMiddleware', () => {
       const action = { type: 'NOT_REQUEST' };
       const { dispatch, getActions } = mockStore({});
       const result = dispatch(action);
-      assert.deepEqual(result, action);
-      assert.deepEqual(getActions(), [action]);
+      expect(result).toEqual(action);
+      expect(getActions()).toEqual([action]);
     });
 
     it('doesnt affect request actions without meta asPromise true', () => {
       const action = { type: 'NOT_REQUEST', meta: { asPromise: true } };
       const { dispatch, getActions } = mockStore({});
       const result = dispatch(action);
-      assert.deepEqual(result, action);
-      assert.deepEqual(getActions(), [action]);
+      expect(result).toEqual(action);
+      expect(getActions()).toEqual([action]);
     });
 
     it('promisify dispatch result and passes action for request actions', () => {
@@ -32,8 +31,8 @@ describe('requestsPromiseMiddleware', () => {
       };
       const { dispatch, getActions } = mockStore({});
       const result = dispatch(action);
-      assert.instanceOf(result, Promise);
-      assert.deepEqual(getActions(), [action]);
+      expect(result).toBeInstanceOf(Promise);
+      expect(getActions()).toEqual([action]);
     });
 
     it('doesnt affect response with meta asPromise false', () => {
@@ -49,9 +48,9 @@ describe('requestsPromiseMiddleware', () => {
       const { dispatch, getActions } = mockStore({});
       const requestResult = dispatch(requestAction);
       const responseResult = dispatch(responseAction);
-      assert.notInstanceOf(requestResult, Promise);
-      assert.deepEqual(responseResult, responseAction);
-      assert.deepEqual(getActions(), [requestAction, responseAction]);
+      expect(requestResult).not.toBeInstanceOf(Promise);
+      expect(responseResult).toEqual(responseAction);
+      expect(getActions()).toEqual([requestAction, responseAction]);
     });
 
     it('resolves request dispatch promise for successful response', async () => {
@@ -67,11 +66,11 @@ describe('requestsPromiseMiddleware', () => {
       const { dispatch, getActions } = mockStore({});
       const requestResultPromise = dispatch(requestAction);
       const responseResult = dispatch(responseAction);
-      assert.instanceOf(requestResultPromise, Promise);
-      assert.deepEqual(responseResult, responseAction);
-      assert.deepEqual(getActions(), [requestAction, responseAction]);
+      expect(requestResultPromise).toBeInstanceOf(Promise);
+      expect(responseResult).toEqual(responseAction);
+      expect(getActions()).toEqual([requestAction, responseAction]);
       const requestResult = await requestResultPromise;
-      assert.deepEqual(requestResult, responseAction);
+      expect(requestResult).toEqual(responseAction);
     });
 
     it('rejects request dispatch promise for error response', async () => {
@@ -87,9 +86,9 @@ describe('requestsPromiseMiddleware', () => {
       const { dispatch, getActions } = mockStore({});
       const requestResultPromise = dispatch(requestAction);
       const errorResult = dispatch(errorAction);
-      assert.instanceOf(requestResultPromise, Promise);
-      assert.deepEqual(errorResult, errorAction);
-      assert.deepEqual(getActions(), [requestAction, errorAction]);
+      expect(requestResultPromise).toBeInstanceOf(Promise);
+      expect(errorResult).toEqual(errorAction);
+      expect(getActions()).toEqual([requestAction, errorAction]);
 
       let requestResult;
 
@@ -99,7 +98,7 @@ describe('requestsPromiseMiddleware', () => {
         requestResult = e;
       }
 
-      assert.deepEqual(requestResult, errorAction);
+      expect(requestResult).toEqual(errorAction);
     });
 
     it('rejects request dispatch promise for abort response', async () => {
@@ -115,9 +114,9 @@ describe('requestsPromiseMiddleware', () => {
       const { dispatch, getActions } = mockStore({});
       const requestResultPromise = dispatch(requestAction);
       const abortResult = dispatch(abortAction);
-      assert.instanceOf(requestResultPromise, Promise);
-      assert.deepEqual(abortResult, abortAction);
-      assert.deepEqual(getActions(), [requestAction, abortAction]);
+      expect(requestResultPromise).toBeInstanceOf(Promise);
+      expect(abortResult).toEqual(abortAction);
+      expect(getActions()).toEqual([requestAction, abortAction]);
 
       let requestResult;
 
@@ -127,7 +126,7 @@ describe('requestsPromiseMiddleware', () => {
         requestResult = e;
       }
 
-      assert.deepEqual(requestResult, abortAction);
+      expect(requestResult).toEqual(abortAction);
     });
   });
 
@@ -140,8 +139,8 @@ describe('requestsPromiseMiddleware', () => {
       const action = { type: 'NOT_REQUEST' };
       const { dispatch, getActions } = mockStore({});
       const result = dispatch(action);
-      assert.deepEqual(result, action);
-      assert.deepEqual(getActions(), [action]);
+      expect(result).toEqual(action);
+      expect(getActions()).toEqual([action]);
     });
 
     it('doesnt affect response with meta asPromise false', () => {
@@ -152,16 +151,16 @@ describe('requestsPromiseMiddleware', () => {
       };
       const { dispatch, getActions } = mockStore({});
       const result = dispatch(action);
-      assert.deepEqual(result, action);
-      assert.deepEqual(getActions(), [action]);
+      expect(result).toEqual(action);
+      expect(getActions()).toEqual([action]);
     });
 
     it('promisify dispatch result and passes action for request actions', () => {
       const action = { type: 'REQUEST', request: { url: '/' } };
       const { dispatch, getActions } = mockStore({});
       const result = dispatch(action);
-      assert.instanceOf(result, Promise);
-      assert.deepEqual(getActions(), [action]);
+      expect(result).toBeInstanceOf(Promise);
+      expect(getActions()).toEqual([action]);
     });
 
     it('resolves request dispatch promise for successful response', async () => {
@@ -173,11 +172,11 @@ describe('requestsPromiseMiddleware', () => {
       const { dispatch, getActions } = mockStore({});
       const requestResultPromise = dispatch(requestAction);
       const responseResult = dispatch(responseAction);
-      assert.instanceOf(requestResultPromise, Promise);
-      assert.deepEqual(responseResult, responseAction);
-      assert.deepEqual(getActions(), [requestAction, responseAction]);
+      expect(requestResultPromise).toBeInstanceOf(Promise);
+      expect(responseResult).toEqual(responseAction);
+      expect(getActions()).toEqual([requestAction, responseAction]);
       const requestResult = await requestResultPromise;
-      assert.deepEqual(requestResult, responseAction);
+      expect(requestResult).toEqual(responseAction);
     });
 
     it('rejects request dispatch promise for error response', async () => {
@@ -189,9 +188,9 @@ describe('requestsPromiseMiddleware', () => {
       const { dispatch, getActions } = mockStore({});
       const requestResultPromise = dispatch(requestAction);
       const errorResult = dispatch(errorAction);
-      assert.instanceOf(requestResultPromise, Promise);
-      assert.deepEqual(errorResult, errorAction);
-      assert.deepEqual(getActions(), [requestAction, errorAction]);
+      expect(requestResultPromise).toBeInstanceOf(Promise);
+      expect(errorResult).toEqual(errorAction);
+      expect(getActions()).toEqual([requestAction, errorAction]);
 
       let requestResult;
 
@@ -201,7 +200,7 @@ describe('requestsPromiseMiddleware', () => {
         requestResult = e;
       }
 
-      assert.deepEqual(requestResult, errorAction);
+      expect(requestResult).toEqual(errorAction);
     });
 
     it('rejects request dispatch promise for abort response', async () => {
@@ -213,9 +212,9 @@ describe('requestsPromiseMiddleware', () => {
       const { dispatch, getActions } = mockStore({});
       const requestResultPromise = dispatch(requestAction);
       const abortResult = dispatch(abortAction);
-      assert.instanceOf(requestResultPromise, Promise);
-      assert.deepEqual(abortResult, abortAction);
-      assert.deepEqual(getActions(), [requestAction, abortAction]);
+      expect(requestResultPromise).toBeInstanceOf(Promise);
+      expect(abortResult).toEqual(abortAction);
+      expect(getActions()).toEqual([requestAction, abortAction]);
 
       let requestResult;
 
@@ -225,7 +224,7 @@ describe('requestsPromiseMiddleware', () => {
         requestResult = e;
       }
 
-      assert.deepEqual(requestResult, abortAction);
+      expect(requestResult).toEqual(abortAction);
     });
   });
 });

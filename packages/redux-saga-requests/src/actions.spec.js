@@ -1,5 +1,3 @@
-import { assert } from 'chai';
-
 import {
   success,
   error,
@@ -20,19 +18,19 @@ describe('actions', () => {
 
   describe('success', () => {
     it('should add success suffix', () => {
-      assert.equal(success(SOME_ACTION), `${SOME_ACTION}_SUCCESS`);
+      expect(success(SOME_ACTION)).toBe(`${SOME_ACTION}_SUCCESS`);
     });
   });
 
   describe('error', () => {
     it('should add error suffix', () => {
-      assert.equal(error(SOME_ACTION), `${SOME_ACTION}_ERROR`);
+      expect(error(SOME_ACTION)).toBe(`${SOME_ACTION}_ERROR`);
     });
   });
 
   describe('abort', () => {
     it('should add abort suffix', () => {
-      assert.equal(abort(SOME_ACTION), `${SOME_ACTION}_ABORT`);
+      expect(abort(SOME_ACTION)).toBe(`${SOME_ACTION}_ABORT`);
     });
   });
 
@@ -43,7 +41,7 @@ describe('actions', () => {
         request: { url: '/' },
       };
 
-      assert.deepEqual(createSuccessAction(requestAction, 'data'), {
+      expect(createSuccessAction(requestAction, 'data')).toEqual({
         type: 'REQUEST_SUCCESS',
         data: 'data',
         meta: {
@@ -60,7 +58,7 @@ describe('actions', () => {
         },
       };
 
-      assert.deepEqual(createSuccessAction(requestAction, 'data'), {
+      expect(createSuccessAction(requestAction, 'data')).toEqual({
         type: 'REQUEST_SUCCESS',
         payload: {
           data: 'data',
@@ -80,7 +78,7 @@ describe('actions', () => {
         },
       };
 
-      assert.deepEqual(createSuccessAction(requestAction, 'data'), {
+      expect(createSuccessAction(requestAction, 'data')).toEqual({
         type: 'REQUEST_SUCCESS',
         data: 'data',
         meta: {
@@ -98,7 +96,7 @@ describe('actions', () => {
         request: { url: '/' },
       };
 
-      assert.deepEqual(createErrorAction(requestAction, 'errorData'), {
+      expect(createErrorAction(requestAction, 'errorData')).toEqual({
         type: 'REQUEST_ERROR',
         error: 'errorData',
         meta: {
@@ -115,7 +113,7 @@ describe('actions', () => {
         },
       };
 
-      assert.deepEqual(createErrorAction(requestAction, 'errorData'), {
+      expect(createErrorAction(requestAction, 'errorData')).toEqual({
         type: 'REQUEST_ERROR',
         payload: 'errorData',
         error: true,
@@ -134,7 +132,7 @@ describe('actions', () => {
         },
       };
 
-      assert.deepEqual(createErrorAction(requestAction, 'errorData'), {
+      expect(createErrorAction(requestAction, 'errorData')).toEqual({
         type: 'REQUEST_ERROR',
         error: 'errorData',
         meta: {
@@ -152,7 +150,7 @@ describe('actions', () => {
         request: { url: '/' },
       };
 
-      assert.deepEqual(createAbortAction(requestAction), {
+      expect(createAbortAction(requestAction)).toEqual({
         type: 'REQUEST_ABORT',
         meta: {
           requestAction,
@@ -169,7 +167,7 @@ describe('actions', () => {
         },
       };
 
-      assert.deepEqual(createAbortAction(requestAction), {
+      expect(createAbortAction(requestAction)).toEqual({
         type: 'REQUEST_ABORT',
         meta: {
           requestAction,
@@ -182,76 +180,78 @@ describe('actions', () => {
   describe('getActionPayload', () => {
     it('just returns not FSA action', () => {
       const action = { type: 'ACTION' };
-      assert.deepEqual(getActionPayload(action), action);
+      expect(getActionPayload(action)).toEqual(action);
     });
 
     it('returns payload of FSA action', () => {
       const action = { type: 'ACTION', payload: 'payload' };
-      assert.deepEqual(getActionPayload(action), 'payload');
+      expect(getActionPayload(action)).toBe('payload');
     });
   });
 
   describe('isRequestAction', () => {
     it('recognizes request action', () => {
-      assert.isTrue(isRequestAction({ type: 'ACTION', request: { url: '/' } }));
+      expect(isRequestAction({ type: 'ACTION', request: { url: '/' } })).toBe(
+        true,
+      );
     });
 
     it('recognizes request FSA action', () => {
-      assert.isTrue(
+      expect(
         isRequestAction({
           type: 'ACTION',
           payload: { request: { url: '/' } },
         }),
-      );
+      ).toBe(true);
     });
 
     it('recognizes request action with multiple requests', () => {
-      assert.isTrue(
+      expect(
         isRequestAction({
           type: 'ACTION',
           request: [{ url: '/' }, { url: '/path' }],
         }),
-      );
+      ).toBe(true);
     });
 
     it('rejects actions without request object', () => {
-      assert.isFalse(
+      expect(
         isRequestAction({
           type: 'ACTION',
           attr: 'value',
         }),
-      );
+      ).toBe(false);
     });
 
     it('rejects actions with request without url', () => {
-      assert.isFalse(
+      expect(
         isRequestAction({
           type: 'ACTION',
           request: { headers: {} },
         }),
-      );
+      ).toBe(false);
     });
 
     it('rejects actions with response object', () => {
-      assert.isFalse(
+      expect(
         isRequestAction({
           type: 'ACTION',
           request: { url: '/' },
           response: {},
         }),
-      );
+      ).toBe(false);
     });
 
     it('rejects actions with payload which is instance of error', () => {
       const responseError = new Error();
       responseError.request = { request: { url: '/' } };
-      assert.isFalse(
+      expect(
         isRequestAction({
           type: 'ACTION',
           payload: responseError,
           response: {},
         }),
-      );
+      ).toBe(false);
     });
   });
 
@@ -263,8 +263,7 @@ describe('actions', () => {
         data: 'data',
         meta: { requestAction },
       };
-      assert.deepEqual(
-        getRequestActionFromResponse(responseAction),
+      expect(getRequestActionFromResponse(responseAction)).toEqual(
         requestAction,
       );
     });
@@ -272,61 +271,61 @@ describe('actions', () => {
 
   describe('isSuccessAction', () => {
     it('should return true for success action', () => {
-      assert.isTrue(
+      expect(
         isSuccessAction({
           type: success('REQUEST'),
           meta: { requestAction: { type: 'REQUEST' } },
         }),
-      );
+      ).toBe(true);
     });
 
     it('should return false for error action', () => {
-      assert.isFalse(
+      expect(
         isSuccessAction({
           type: error('REQUEST'),
           meta: { requestAction: { type: 'REQUEST' } },
         }),
-      );
+      ).toBe(false);
     });
   });
 
   describe('isErrorAction', () => {
     it('should return true for error action', () => {
-      assert.isTrue(
+      expect(
         isErrorAction({
           type: error('REQUEST'),
           meta: { requestAction: { type: 'REQUEST' } },
         }),
-      );
+      ).toBe(true);
     });
 
     it('should return false for success action', () => {
-      assert.isFalse(
+      expect(
         isErrorAction({
           type: success('REQUEST'),
           meta: { requestAction: { type: 'REQUEST' } },
         }),
-      );
+      ).toBe(false);
     });
   });
 
   describe('isAbortAction', () => {
     it('should return true for abort action', () => {
-      assert.isTrue(
+      expect(
         isAbortAction({
           type: abort('REQUEST'),
           meta: { requestAction: { type: 'REQUEST' } },
         }),
-      );
+      ).toBe(true);
     });
 
     it('should return false for error action', () => {
-      assert.isFalse(
+      expect(
         isAbortAction({
           type: error('REQUEST'),
           meta: { requestAction: { type: 'REQUEST' } },
         }),
-      );
+      ).toBe(false);
     });
   });
 });

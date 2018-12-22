@@ -1,5 +1,3 @@
-import { assert } from 'chai';
-
 import {
   SUCCESS_SUFFIX,
   ERROR_SUFFIX,
@@ -11,33 +9,33 @@ import {
 describe('constants', () => {
   describe('SUCCESS_SUFFIX', () => {
     it('has correct value', () => {
-      assert.equal(SUCCESS_SUFFIX, '_SUCCESS');
+      expect(SUCCESS_SUFFIX).toBe('_SUCCESS');
     });
   });
 
   describe('ERROR_SUFFIX', () => {
     it('has correct value', () => {
-      assert.equal(ERROR_SUFFIX, '_ERROR');
+      expect(ERROR_SUFFIX).toBe('_ERROR');
     });
   });
 
   describe('ABORT_SUFFIX', () => {
     it('has correct value', () => {
-      assert.equal(ABORT_SUFFIX, '_ABORT');
+      expect(ABORT_SUFFIX).toBe('_ABORT');
     });
   });
 
   describe('REQUESTS_CONFIG', () => {
     it('has correct value', () => {
-      assert.equal(REQUESTS_CONFIG, 'REDUX_SAGA_REQUESTS_CONFIG');
+      expect(REQUESTS_CONFIG).toBe('REDUX_SAGA_REQUESTS_CONFIG');
     });
   });
 
   describe('INCORRECT_PAYLOAD_ERROR', () => {
     it('has correct value', () => {
-      const expected =
-        "Incorrect payload for request action. Action must have form of { type: 'TYPE', request: {} }, { type: 'TYPE', request: [{}, {}] }, { type: 'TYPE', payload: { request: {} } } or { type: 'TYPE', payload: { request: [{}, {}] } }";
-      assert.equal(INCORRECT_PAYLOAD_ERROR, expected);
+      expect(INCORRECT_PAYLOAD_ERROR).toBe(
+        "Incorrect payload for request action. Action must have form of { type: 'TYPE', request: {} }, { type: 'TYPE', request: [{}, {}] }, { type: 'TYPE', payload: { request: {} } } or { type: 'TYPE', payload: { request: [{}, {}] } }",
+      );
     });
   });
 });

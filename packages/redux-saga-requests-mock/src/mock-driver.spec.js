@@ -1,4 +1,3 @@
-import { assert } from 'chai';
 import sinon from 'sinon';
 
 import { createDriver } from './mock-driver';
@@ -22,13 +21,13 @@ describe('mockDriver', () => {
 
   describe('requestInstance', () => {
     it('has correct value', () => {
-      assert.equal(mockDriver.requestInstance, mockInstance);
+      expect(mockDriver.requestInstance).toBe(mockInstance);
     });
   });
 
   describe('getAbortSource', () => {
     it('returns new source', () => {
-      assert.equal(mockDriver.getAbortSource().cancel(), true);
+      expect(mockDriver.getAbortSource().cancel()).toBe(true);
     });
   });
 
@@ -36,7 +35,7 @@ describe('mockDriver', () => {
     it('calls cancel method', () => {
       const abortSource = { cancel: sinon.fake() };
       mockDriver.abortRequest(abortSource);
-      assert.equal(abortSource.cancel.callCount, 1);
+      expect(abortSource.cancel.callCount).toBe(1);
     });
   });
 
@@ -46,7 +45,7 @@ describe('mockDriver', () => {
         type: 'FETCH_LIST',
         request: { url: '/' },
       });
-      assert.deepEqual(response, { data: ['item1', 'item2'] });
+      expect(response).toEqual({ data: ['item1', 'item2'] });
     });
 
     it('returns correct dynamic response based on request action params', async () => {
@@ -58,7 +57,7 @@ describe('mockDriver', () => {
         type: 'FETCH_DETAIL',
         request: requestConfig,
       });
-      assert.deepEqual(response, { data: { id: 1, type: 'FETCH_DETAIL' } });
+      expect(response).toEqual({ data: { id: 1, type: 'FETCH_DETAIL' } });
     });
 
     it('handles error response', async () => {
@@ -72,19 +71,19 @@ describe('mockDriver', () => {
       } catch (e) {
         error = e;
       }
-      assert.deepEqual(error, 'responseError');
+      expect(error).toBe('responseError');
     });
   });
 
   describe('getSuccessPayload', () => {
     it('returns response data', () => {
       const response = { data: 'data' };
-      assert.deepEqual(mockDriver.getSuccessPayload(response), response.data);
+      expect(mockDriver.getSuccessPayload(response)).toEqual(response.data);
     });
 
     it('returns array of response data', () => {
       const responses = [{ data: 'data1' }, { data: 'data2' }];
-      assert.deepEqual(mockDriver.getSuccessPayload(responses), [
+      expect(mockDriver.getSuccessPayload(responses)).toEqual([
         responses[0].data,
         responses[1].data,
       ]);
@@ -94,7 +93,7 @@ describe('mockDriver', () => {
   describe('getErrorPayload', () => {
     it('returns error', () => {
       const error = 'error';
-      assert.equal(mockDriver.getErrorPayload(error), error);
+      expect(mockDriver.getErrorPayload(error)).toBe(error);
     });
   });
 });

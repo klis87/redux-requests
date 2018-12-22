@@ -1,4 +1,3 @@
-import { assert } from 'chai';
 import sinon from 'sinon';
 import axios from 'axios';
 
@@ -14,7 +13,7 @@ describe('axiosDriver', () => {
 
   describe('requestInstance', () => {
     it('has correct value', () => {
-      assert.equal(axiosDriver.requestInstance, axiosInstance);
+      expect(axiosDriver.requestInstance).toBe(axiosInstance);
     });
   });
 
@@ -30,7 +29,7 @@ describe('axiosDriver', () => {
         'source',
         sinon.fake.returns(tokenSource),
       );
-      assert.equal(axiosDriver.getAbortSource(), tokenSource);
+      expect(axiosDriver.getAbortSource()).toBe(tokenSource);
     });
   });
 
@@ -38,14 +37,13 @@ describe('axiosDriver', () => {
     it('calls cancel method', () => {
       const abortSource = { cancel: sinon.fake() };
       axiosDriver.abortRequest(abortSource);
-      assert.equal(abortSource.cancel.callCount, 1);
+      expect(abortSource.cancel.callCount).toBe(1);
     });
   });
 
   describe('sendRequest', () => {
     it('returns correct response', () => {
-      assert.deepEqual(
-        axiosDriver.sendRequest({ url: '/' }, { token: 'token' }),
+      expect(axiosDriver.sendRequest({ url: '/' }, { token: 'token' })).toEqual(
         {
           url: '/',
           cancelToken: 'token',
@@ -57,12 +55,12 @@ describe('axiosDriver', () => {
   describe('getSuccessPayload', () => {
     it('returns response data', () => {
       const response = { data: 'data' };
-      assert.deepEqual(axiosDriver.getSuccessPayload(response), response.data);
+      expect(axiosDriver.getSuccessPayload(response)).toEqual(response.data);
     });
 
     it('returns array of response data', () => {
       const responses = [{ data: 'data1' }, { data: 'data2' }];
-      assert.deepEqual(axiosDriver.getSuccessPayload(responses), [
+      expect(axiosDriver.getSuccessPayload(responses)).toEqual([
         responses[0].data,
         responses[1].data,
       ]);
@@ -72,7 +70,7 @@ describe('axiosDriver', () => {
   describe('getErrorPayload', () => {
     it('returns error', () => {
       const error = 'error';
-      assert.equal(axiosDriver.getErrorPayload(error), error);
+      expect(axiosDriver.getErrorPayload(error)).toBe(error);
     });
   });
 });

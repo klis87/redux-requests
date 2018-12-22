@@ -1,4 +1,3 @@
-import { assert } from 'chai';
 import { getContext, setContext, cancelled } from 'redux-saga/effects';
 import { expectSaga } from 'redux-saga-test-plan';
 
@@ -74,30 +73,29 @@ const dummyErrorDriver = requestInstance => ({
 describe('sagas', () => {
   describe('voidCallback', () => {
     it('returns undefined', () => {
-      assert.equal(voidCallback(), undefined);
+      expect(voidCallback()).toBe(undefined);
     });
   });
 
   describe('defaultConfig', () => {
     it('has correct value', () => {
-      const expected = {
+      expect(defaultConfig).toEqual({
         driver: null,
         onRequest: null,
         onSuccess: null,
         onError: null,
         onAbort: null,
-      };
-
-      assert.deepEqual(defaultConfig, expected);
+      });
     });
   });
 
   describe('createRequestInstance', () => {
     it('returns correct effect with default config', () => {
-      const expected = setContext({
-        [REQUESTS_CONFIG]: defaultConfig,
-      });
-      assert.deepEqual(createRequestInstance(), expected);
+      expect(createRequestInstance()).toEqual(
+        setContext({
+          [REQUESTS_CONFIG]: defaultConfig,
+        }),
+      );
     });
 
     it('returns correct effect with overwritten config', () => {
@@ -109,16 +107,17 @@ describe('sagas', () => {
         onAbort: voidCallback,
       };
 
-      const expected = setContext({
-        [REQUESTS_CONFIG]: config,
-      });
-      assert.deepEqual(createRequestInstance(config), expected);
+      expect(createRequestInstance(config)).toEqual(
+        setContext({
+          [REQUESTS_CONFIG]: config,
+        }),
+      );
     });
   });
 
   describe('getRequestsConfig', () => {
     it('returns correct effect', () => {
-      assert.deepEqual(getRequestsConfig(), getContext(REQUESTS_CONFIG));
+      expect(getRequestsConfig()).toEqual(getContext(REQUESTS_CONFIG));
     });
   });
 
@@ -186,7 +185,7 @@ describe('sagas', () => {
         sagaError = e.message;
       }
 
-      assert.equal(sagaError, INCORRECT_PAYLOAD_ERROR);
+      expect(sagaError).toEqual(INCORRECT_PAYLOAD_ERROR);
     });
 
     it('dispatches unwatchable request action when dispatchRequestAction is true', () => {

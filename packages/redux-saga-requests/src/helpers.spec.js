@@ -1,5 +1,3 @@
-import { assert } from 'chai';
-
 import { mapRequest } from './helpers';
 
 describe('helpers', () => {
@@ -7,14 +5,14 @@ describe('helpers', () => {
     const addBody = request => ({ ...request, body: { x: 1 } });
 
     it('maps single request', () => {
-      assert.deepEqual(mapRequest({ url: '/' }, addBody), {
+      expect(mapRequest({ url: '/' }, addBody)).toEqual({
         url: '/',
         body: { x: 1 },
       });
     });
 
     it('maps multiple requests', () => {
-      assert.deepEqual(mapRequest([{ url: '/' }, { url: '/path' }], addBody), [
+      expect(mapRequest([{ url: '/' }, { url: '/path' }], addBody)).toEqual([
         {
           url: '/',
           body: { x: 1 },

@@ -1,5 +1,3 @@
-import { assert } from 'chai';
-
 import { success, error, abort } from './actions';
 import { requestsReducer } from './reducers';
 
@@ -17,77 +15,71 @@ describe('reducers', () => {
       const reducer = requestsReducer({ actionType });
 
       it('returns correct default state', () => {
-        const state = reducer(undefined, {});
-        assert.deepEqual(state, defaultState);
+        expect(reducer(undefined, {})).toEqual(defaultState);
       });
 
       it('returns correct state for not handled action', () => {
         const state = 'some_state';
-        assert.equal(reducer(state, {}), state);
+        expect(reducer(state, {})).toBe(state);
       });
 
       it('returns correct state for request action', () => {
-        const expected = {
+        expect(reducer(defaultState, { type: actionType })).toEqual({
           data: null,
           error: null,
           pending: 1,
           operations: null,
-        };
-        assert.deepEqual(reducer(defaultState, { type: actionType }), expected);
+        });
       });
 
       it('returns correct state for success action', () => {
         const data = 'data';
-        const expected = {
-          data,
-          error: null,
-          pending: -1,
-          operations: null,
-        };
         const action = {
           type: success(actionType),
           data,
         };
-        assert.deepEqual(reducer(defaultState, action), expected);
+        expect(reducer(defaultState, action)).toEqual({
+          data,
+          error: null,
+          pending: -1,
+          operations: null,
+        });
       });
 
       it('returns correct state for error action', () => {
         const someError = 'error';
-        const expected = {
-          data: null,
-          error: someError,
-          pending: -1,
-          operations: null,
-        };
         const action = {
           type: error(actionType),
           error: someError,
         };
-        assert.deepEqual(reducer(defaultState, action), expected);
+        expect(reducer(defaultState, action)).toEqual({
+          data: null,
+          error: someError,
+          pending: -1,
+          operations: null,
+        });
       });
 
       it('returns correct state for abort action', () => {
-        const expected = {
+        const action = { type: abort(actionType) };
+        expect(reducer(defaultState, action)).toEqual({
           data: null,
           error: null,
           pending: -1,
           operations: null,
-        };
-        const action = { type: abort(actionType) };
-        assert.deepEqual(reducer(defaultState, action), expected);
+        });
       });
 
       it('supports action creator libraries', () => {
-        const expected = {
+        const action = () => ({ type: actionType });
+        action.toString = () => actionType;
+        const reduxActReducer = requestsReducer({ actionType: action });
+        expect(reduxActReducer(defaultState, action())).toEqual({
           data: null,
           error: null,
           pending: 1,
           operations: null,
-        };
-        const action = () => ({ type: actionType });
-        action.toString = () => actionType;
-        const reduxActReducer = requestsReducer({ actionType: action });
-        assert.deepEqual(reduxActReducer(defaultState, action()), expected);
+        });
       });
     });
 
@@ -128,82 +120,74 @@ describe('reducers', () => {
       const initialState = reducer(undefined, {});
 
       it('returns correct default state', () => {
-        const state = reducer(undefined, {});
-        const expected = {
+        expect(reducer(undefined, {})).toEqual({
           data: [],
           error: null,
           pending: 0,
           operations: null,
-        };
-        assert.deepEqual(state, expected);
+        });
       });
 
       it('returns correct state for request action', () => {
-        const expected = {
+        expect(reducer(initialState, { type: actionType })).toEqual({
           data: [],
           error: null,
           pending: 1,
           operations: null,
           multiple: true,
-        };
-        assert.deepEqual(reducer(initialState, { type: actionType }), expected);
+        });
       });
 
       it('returns correct state for success action', () => {
         const data = ['data'];
-        const expected = {
+        const action = {
+          type: success(actionType),
+          payload: { data },
+        };
+        expect(reducer(initialState, action)).toEqual({
           data: { nested: data },
           error: null,
           pending: -1,
           operations: null,
           multiple: true,
-        };
-        const action = {
-          type: success(actionType),
-          payload: { data },
-        };
-        assert.deepEqual(reducer(initialState, action), expected);
+        });
       });
 
       it('returns correct state for error action', () => {
         const someError = 'error';
-        const expected = {
+        const action = {
+          type: error(actionType),
+          payload: someError,
+        };
+        expect(reducer(initialState, action)).toEqual({
           data: [],
           error: someError,
           pending: -1,
           operations: null,
           multiple: true,
-        };
-        const action = {
-          type: error(actionType),
-          payload: someError,
-        };
-        assert.deepEqual(reducer(initialState, action), expected);
+        });
       });
 
       it('returns correct state for abort action', () => {
-        const expected = {
+        const action = { type: abort(actionType) };
+        expect(reducer(initialState, action)).toEqual({
           data: [],
           error: null,
           pending: -1,
           operations: null,
           multiple: true,
-        };
-        const action = { type: abort(actionType) };
-        assert.deepEqual(reducer(initialState, action), expected);
+        });
       });
 
       it('handles reset action when resetOn is function', () => {
-        const expected = {
+        let nextState = reducer(initialState, { type: actionType });
+        nextState = reducer(nextState, { type: actionType });
+        expect(reducer(nextState, { type: 'RESET' })).toEqual({
           data: [],
           error: null,
           pending: 2,
           operations: null,
-        };
-
-        let nextState = reducer(initialState, { type: actionType });
-        nextState = reducer(nextState, { type: actionType });
-        assert.deepEqual(reducer(nextState, { type: 'RESET' }), expected);
+        });
       });
     });
 
@@ -225,101 +209,92 @@ describe('reducers', () => {
       const initialState = reducer(undefined, {});
 
       it('returns correct default state', () => {
-        const state = reducer(undefined, {});
-        const expected = {
+        expect(reducer(undefined, {})).toEqual({
           data: null,
           error: null,
           pending: 0,
           operations: null,
           counter: 0,
-        };
-        assert.deepEqual(state, expected);
+        });
       });
 
       it('returns correct state for not handled action', () => {
         const state = 'some_state';
-        assert.equal(reducer(state, {}), state);
+        expect(reducer(state, {})).toBe(state);
       });
 
       it('returns correct state for request action', () => {
-        const expected = {
+        expect(reducer(initialState, { type: actionType })).toEqual({
           data: null,
           error: null,
           pending: 1,
           operations: null,
           counter: 0,
-        };
-        assert.deepEqual(reducer(initialState, { type: actionType }), expected);
+        });
       });
 
       it('returns correct state for success action', () => {
         const data = 'data';
-        const expected = {
+        const action = {
+          type: success(actionType),
+          payload: { data },
+        };
+        expect(reducer(initialState, action)).toEqual({
           data,
           error: null,
           pending: -1,
           operations: null,
           counter: 0,
-        };
-        const action = {
-          type: success(actionType),
-          payload: { data },
-        };
-        assert.deepEqual(reducer(initialState, action), expected);
+        });
       });
 
       it('returns correct state for error action', () => {
         const someError = 'error';
-        const expected = {
+        const action = {
+          type: error(actionType),
+          payload: someError,
+        };
+        expect(reducer(initialState, action)).toEqual({
           data: null,
           error: someError,
           pending: -1,
           operations: null,
           counter: 0,
-        };
-        const action = {
-          type: error(actionType),
-          payload: someError,
-        };
-        assert.deepEqual(reducer(initialState, action), expected);
+        });
       });
 
       it('returns correct state for abort action', () => {
-        const expected = {
+        const action = { type: abort(actionType) };
+        expect(reducer(initialState, action)).toEqual({
           data: null,
           error: null,
           pending: -1,
           operations: null,
           counter: 0,
-        };
-        const action = { type: abort(actionType) };
-        assert.deepEqual(reducer(initialState, action), expected);
+        });
       });
 
       it('handles action type from passed reducer', () => {
-        const expected = {
+        const action = { type: INCREMENT };
+        expect(reducer(initialState, action)).toEqual({
           data: null,
           error: null,
           pending: 0,
           operations: null,
           counter: 1,
-        };
-        const action = { type: INCREMENT };
-        assert.deepEqual(reducer(initialState, action), expected);
+        });
       });
 
       it('handles reset action when resetOn is string array', () => {
-        const expected = {
+        let nextState = reducer(initialState, { type: INCREMENT });
+        nextState = reducer(nextState, { type: actionType });
+        expect(reducer(nextState, { type: RESET })).toEqual({
           data: null,
           error: null,
           pending: 1,
           operations: null,
           counter: 0,
-        };
-
-        let nextState = reducer(initialState, { type: INCREMENT });
-        nextState = reducer(nextState, { type: actionType });
-        assert.deepEqual(reducer(nextState, { type: RESET }), expected);
+        });
       });
     });
 
@@ -344,7 +319,7 @@ describe('reducers', () => {
       };
 
       it('returns default state containing operation default data', () => {
-        assert.deepEqual(commonReducer(undefined, {}), defaultState);
+        expect(commonReducer(undefined, {})).toEqual(defaultState);
       });
 
       it('returns default state containing operation default data with defined requestKey', () => {
@@ -357,7 +332,7 @@ describe('reducers', () => {
             },
           },
         });
-        assert.deepEqual(reducer(undefined, {}), {
+        expect(reducer(undefined, {})).toEqual({
           ...defaultState,
           operations: {
             [OPERATION_ACTION]: {},
@@ -366,21 +341,18 @@ describe('reducers', () => {
       });
 
       it('increases pending counter on operation request', () => {
-        const expectedState = {
-          data: null,
-          error: null,
-          pending: 0,
-          operations: {
-            [OPERATION_ACTION]: {
-              error: null,
-              pending: 1,
+        expect(commonReducer(defaultState, { type: OPERATION_ACTION })).toEqual(
+          {
+            data: null,
+            error: null,
+            pending: 0,
+            operations: {
+              [OPERATION_ACTION]: {
+                error: null,
+                pending: 1,
+              },
             },
           },
-        };
-
-        assert.deepEqual(
-          commonReducer(defaultState, { type: OPERATION_ACTION }),
-          expectedState,
         );
       });
 
@@ -400,7 +372,7 @@ describe('reducers', () => {
           type: OPERATION_ACTION,
           meta: { id: 'a' },
         });
-        assert.deepEqual(nextState, {
+        expect(nextState).toEqual({
           data: null,
           error: null,
           pending: 0,
@@ -418,7 +390,7 @@ describe('reducers', () => {
           type: OPERATION_ACTION,
           meta: { id: 'b' },
         });
-        assert.deepEqual(nextState, {
+        expect(nextState).toEqual({
           data: null,
           error: null,
           pending: 0,
@@ -440,7 +412,7 @@ describe('reducers', () => {
           type: OPERATION_ACTION,
           meta: { id: 'a' },
         });
-        assert.deepEqual(nextState, {
+        expect(nextState).toEqual({
           data: null,
           error: null,
           pending: 0,
@@ -460,7 +432,13 @@ describe('reducers', () => {
       });
 
       it('handles operation success response', () => {
-        const expectedState = {
+        expect(
+          commonReducer(defaultState, {
+            type: success(OPERATION_ACTION),
+            data: 'response',
+            meta: { requestAction: { type: OPERATION_ACTION } },
+          }),
+        ).toEqual({
           data: 'response',
           error: null,
           pending: 0,
@@ -470,16 +448,7 @@ describe('reducers', () => {
               pending: -1,
             },
           },
-        };
-
-        assert.deepEqual(
-          commonReducer(defaultState, {
-            type: success(OPERATION_ACTION),
-            data: 'response',
-            meta: { requestAction: { type: OPERATION_ACTION } },
-          }),
-          expectedState,
-        );
+        });
       });
 
       it('handles operation success response defined as updateData true', () => {
@@ -489,7 +458,13 @@ describe('reducers', () => {
             [OPERATION_ACTION]: { updateData: true },
           },
         });
-        const expectedState = {
+        expect(
+          reducer(defaultState, {
+            type: success(OPERATION_ACTION),
+            data: 'response',
+            meta: { requestAction: { type: OPERATION_ACTION } },
+          }),
+        ).toEqual({
           data: 'response',
           error: null,
           pending: 0,
@@ -499,16 +474,7 @@ describe('reducers', () => {
               pending: -1,
             },
           },
-        };
-
-        assert.deepEqual(
-          reducer(defaultState, {
-            type: success(OPERATION_ACTION),
-            data: 'response',
-            meta: { requestAction: { type: OPERATION_ACTION } },
-          }),
-          expectedState,
-        );
+        });
       });
 
       it('doesnt override data when a defined operation is false', () => {
@@ -519,7 +485,13 @@ describe('reducers', () => {
           },
         });
 
-        const expectedState = {
+        expect(
+          reducer(defaultState, {
+            type: success(OPERATION_ACTION),
+            data: 'response',
+            meta: { requestAction: { type: OPERATION_ACTION } },
+          }),
+        ).toEqual({
           data: null,
           error: null,
           pending: 0,
@@ -529,16 +501,7 @@ describe('reducers', () => {
               pending: -1,
             },
           },
-        };
-
-        assert.deepEqual(
-          reducer(defaultState, {
-            type: success(OPERATION_ACTION),
-            data: 'response',
-            meta: { requestAction: { type: OPERATION_ACTION } },
-          }),
-          expectedState,
-        );
+        });
       });
 
       it('doesnt override data when a defined operation is object with key updateData as false', () => {
@@ -549,7 +512,13 @@ describe('reducers', () => {
           },
         });
 
-        const expectedState = {
+        expect(
+          reducer(defaultState, {
+            type: success(OPERATION_ACTION),
+            data: 'response',
+            meta: { requestAction: { type: OPERATION_ACTION } },
+          }),
+        ).toEqual({
           data: null,
           error: null,
           pending: 0,
@@ -559,16 +528,7 @@ describe('reducers', () => {
               pending: -1,
             },
           },
-        };
-
-        assert.deepEqual(
-          reducer(defaultState, {
-            type: success(OPERATION_ACTION),
-            data: 'response',
-            meta: { requestAction: { type: OPERATION_ACTION } },
-          }),
-          expectedState,
-        );
+        });
       });
 
       it('uses updateData not getData when defined', () => {
@@ -581,7 +541,13 @@ describe('reducers', () => {
           },
         });
 
-        const expectedState = {
+        expect(
+          reducer(defaultState, {
+            type: success(OPERATION_ACTION),
+            data: 'response',
+            meta: { requestAction: { type: OPERATION_ACTION } },
+          }),
+        ).toEqual({
           data: 'response',
           error: null,
           pending: 0,
@@ -591,16 +557,7 @@ describe('reducers', () => {
               pending: -1,
             },
           },
-        };
-
-        assert.deepEqual(
-          reducer(defaultState, {
-            type: success(OPERATION_ACTION),
-            data: 'response',
-            meta: { requestAction: { type: OPERATION_ACTION } },
-          }),
-          expectedState,
-        );
+        });
       });
 
       it('handles updateData customized per operation', () => {
@@ -613,7 +570,13 @@ describe('reducers', () => {
           },
         });
 
-        const expectedState = {
+        expect(
+          reducer(defaultState, {
+            type: success(OPERATION_ACTION),
+            data: { nested: 'response' },
+            meta: { requestAction: { type: OPERATION_ACTION } },
+          }),
+        ).toEqual({
           data: 'response',
           error: null,
           pending: 0,
@@ -623,16 +586,7 @@ describe('reducers', () => {
               pending: -1,
             },
           },
-        };
-
-        assert.deepEqual(
-          reducer(defaultState, {
-            type: success(OPERATION_ACTION),
-            data: { nested: 'response' },
-            meta: { requestAction: { type: OPERATION_ACTION } },
-          }),
-          expectedState,
-        );
+        });
       });
 
       it('handles updateData customized per operation defined in updateData object key', () => {
@@ -647,7 +601,13 @@ describe('reducers', () => {
           },
         });
 
-        const expectedState = {
+        expect(
+          reducer(defaultState, {
+            type: success(OPERATION_ACTION),
+            data: { nested: 'response' },
+            meta: { requestAction: { type: OPERATION_ACTION } },
+          }),
+        ).toEqual({
           data: 'response',
           error: null,
           pending: 0,
@@ -657,16 +617,7 @@ describe('reducers', () => {
               pending: -1,
             },
           },
-        };
-
-        assert.deepEqual(
-          reducer(defaultState, {
-            type: success(OPERATION_ACTION),
-            data: { nested: 'response' },
-            meta: { requestAction: { type: OPERATION_ACTION } },
-          }),
-          expectedState,
-        );
+        });
       });
 
       it('handles updateData customized per operation with defined requestKey', () => {
@@ -709,7 +660,7 @@ describe('reducers', () => {
           },
         });
 
-        assert.deepEqual(state, {
+        expect(state).toEqual({
           data: 'response',
           error: null,
           pending: 0,
@@ -736,7 +687,7 @@ describe('reducers', () => {
           },
         });
 
-        assert.deepEqual(state, {
+        expect(state).toEqual({
           data: 'response2',
           error: null,
           pending: 0,
@@ -759,7 +710,7 @@ describe('reducers', () => {
           },
         });
 
-        assert.deepEqual(state, {
+        expect(state).toEqual({
           data: 'response2',
           error: null,
           pending: 0,
@@ -770,7 +721,13 @@ describe('reducers', () => {
       });
 
       it('handles operation error response', () => {
-        const expectedState = {
+        expect(
+          commonReducer(defaultState, {
+            type: error(OPERATION_ACTION),
+            error: 'error',
+            meta: { requestAction: { type: OPERATION_ACTION } },
+          }),
+        ).toEqual({
           data: null,
           error: null,
           pending: 0,
@@ -780,16 +737,7 @@ describe('reducers', () => {
               pending: -1,
             },
           },
-        };
-
-        assert.deepEqual(
-          commonReducer(defaultState, {
-            type: error(OPERATION_ACTION),
-            error: 'error',
-            meta: { requestAction: { type: OPERATION_ACTION } },
-          }),
-          expectedState,
-        );
+        });
       });
 
       it('handles operation error response with defined requestKey', () => {
@@ -825,7 +773,7 @@ describe('reducers', () => {
           },
         });
 
-        assert.deepEqual(state, {
+        expect(state).toEqual({
           data: null,
           error: null,
           pending: 0,
@@ -847,7 +795,7 @@ describe('reducers', () => {
           },
         });
 
-        assert.deepEqual(state, {
+        expect(state).toEqual({
           data: null,
           error: null,
           pending: 0,
@@ -863,7 +811,12 @@ describe('reducers', () => {
       });
 
       it('handles operation abort response', () => {
-        const expectedState = {
+        expect(
+          commonReducer(defaultState, {
+            type: abort(OPERATION_ACTION),
+            meta: { requestAction: { type: OPERATION_ACTION } },
+          }),
+        ).toEqual({
           data: null,
           error: null,
           pending: 0,
@@ -873,15 +826,7 @@ describe('reducers', () => {
               pending: -1,
             },
           },
-        };
-
-        assert.deepEqual(
-          commonReducer(defaultState, {
-            type: abort(OPERATION_ACTION),
-            meta: { requestAction: { type: OPERATION_ACTION } },
-          }),
-          expectedState,
-        );
+        });
       });
 
       it('handles operation abort response with defined requestKey', () => {
@@ -916,7 +861,7 @@ describe('reducers', () => {
           },
         });
 
-        assert.deepEqual(state, {
+        expect(state).toEqual({
           data: null,
           error: null,
           pending: 0,
@@ -937,7 +882,7 @@ describe('reducers', () => {
           },
         });
 
-        assert.deepEqual(state, {
+        expect(state).toEqual({
           data: null,
           error: null,
           pending: 0,
