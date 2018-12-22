@@ -9,7 +9,7 @@
     "lint": "lerna run lint",
     "test": "jest",
     "test:cover": "jest --coverage",
-    "coveralls": "jest --coverage --coverageReporters=text-lcov | coveralls",
+    "coveralls": "cat ./coverage/lcov.info | coveralls",
     "test-types": "lerna run test-types",
     "prettify": "prettier --write '{packages,examples}/**/*.{js,jsx,ts}'",
     "bundlesize": "bundlesize"
