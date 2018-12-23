@@ -1,5 +1,3 @@
-import sinon from 'sinon';
-
 import { createDriver } from './mock-driver';
 
 describe('mockDriver', () => {
@@ -15,10 +13,6 @@ describe('mockDriver', () => {
 
   const mockDriver = createDriver(mockInstance);
 
-  afterEach(() => {
-    sinon.restore();
-  });
-
   describe('requestInstance', () => {
     it('has correct value', () => {
       expect(mockDriver.requestInstance).toBe(mockInstance);
@@ -33,9 +27,9 @@ describe('mockDriver', () => {
 
   describe('abortRequest', () => {
     it('calls cancel method', () => {
-      const abortSource = { cancel: sinon.fake() };
+      const abortSource = { cancel: jest.fn() };
       mockDriver.abortRequest(abortSource);
-      expect(abortSource.cancel.callCount).toBe(1);
+      expect(abortSource.cancel).toBeCalledTimes(1);
     });
   });
 

@@ -1,5 +1,3 @@
-import sinon from 'sinon';
-
 import { createDriver } from './fetch-api-driver';
 
 describe('fetchApiDriver', () => {
@@ -11,10 +9,6 @@ describe('fetchApiDriver', () => {
   const fetchInstance = requestConfig => requestConfig;
   const fetchDriver = createDriver(fetchInstance, {
     AbortController: DummyAbortController,
-  });
-
-  afterEach(() => {
-    sinon.restore();
   });
 
   describe('requestInstance', () => {
@@ -31,9 +25,9 @@ describe('fetchApiDriver', () => {
 
   describe('abortRequest', () => {
     it('calls cancel method', () => {
-      const abortSource = { abort: sinon.fake() };
+      const abortSource = { abort: jest.fn() };
       fetchDriver.abortRequest(abortSource);
-      expect(abortSource.abort.callCount).toBe(1);
+      expect(abortSource.abort).toBeCalledTimes(1);
     });
 
     it('doesnt crash when AbortController not provided', () => {
@@ -45,8 +39,8 @@ describe('fetchApiDriver', () => {
 
   describe('sendRequest', () => {
     it('throws when responseType is of incorrect type', async () => {
-      const getResponse = sinon.fake.resolves('error');
-      const requestInstance = sinon.fake.resolves({
+      const getResponse = jest.fn().mockResolvedValue('error');
+      const requestInstance = jest.fn().mockResolvedValue({
         ok: true,
         json: getResponse,
       });
@@ -68,8 +62,8 @@ describe('fetchApiDriver', () => {
     });
 
     it('returns response with data for successful request', async () => {
-      const getResponse = sinon.fake.resolves('data');
-      const requestInstance = sinon.fake.resolves({
+      const getResponse = jest.fn().mockResolvedValue('data');
+      const requestInstance = jest.fn().mockResolvedValue({
         ok: true,
         json: getResponse,
       });
@@ -87,7 +81,7 @@ describe('fetchApiDriver', () => {
     });
 
     it('returns response with data null for successful request when responseType as null', async () => {
-      const requestInstance = sinon.fake.resolves({
+      const requestInstance = jest.fn().mockResolvedValue({
         ok: true,
       });
       const driver = createDriver(requestInstance);
@@ -103,8 +97,8 @@ describe('fetchApiDriver', () => {
     });
 
     it('throws response with data for error request', async () => {
-      const getResponse = sinon.fake.resolves('error');
-      const requestInstance = sinon.fake.resolves({
+      const getResponse = jest.fn().mockResolvedValue('error');
+      const requestInstance = jest.fn().mockResolvedValue({
         ok: false,
         json: getResponse,
       });
@@ -125,19 +119,17 @@ describe('fetchApiDriver', () => {
     });
 
     it('calls fetchInstance with proper object', async () => {
-      const requestInstance = sinon.fake.resolves({
+      const requestInstance = jest.fn().mockResolvedValue({
         ok: true,
         json: () => {},
       });
       const driver = createDriver(requestInstance);
       await driver.sendRequest({ url: '/' }, { signal: 'signal' });
-      expect(
-        requestInstance.calledOnceWithExactly('/', { signal: 'signal' }),
-      ).toBe(true);
+      expect(requestInstance).toBeCalledWith('/', { signal: 'signal' });
     });
 
     it('uses baseURL for relative urls', async () => {
-      const requestInstance = sinon.fake.resolves({
+      const requestInstance = jest.fn().mockResolvedValue({
         ok: true,
         json: () => {},
       });
@@ -145,15 +137,13 @@ describe('fetchApiDriver', () => {
         baseURL: 'http://domain.com',
       });
       await driver.sendRequest({ url: '/' }, { signal: 'signal' });
-      expect(
-        requestInstance.calledOnceWithExactly('http://domain.com/', {
-          signal: 'signal',
-        }),
-      ).toBe(true);
+      expect(requestInstance).toBeCalledWith('http://domain.com/', {
+        signal: 'signal',
+      });
     });
 
     it('doesnt use baseURL for absolute urls', async () => {
-      const requestInstance = sinon.fake.resolves({
+      const requestInstance = jest.fn().mockResolvedValue({
         ok: true,
         json: () => {},
       });
@@ -164,11 +154,9 @@ describe('fetchApiDriver', () => {
         { url: 'http://another-domain.com/' },
         { signal: 'signal' },
       );
-      expect(
-        requestInstance.calledOnceWithExactly('http://another-domain.com/', {
-          signal: 'signal',
-        }),
-      ).toBe(true);
+      expect(requestInstance).toBeCalledWith('http://another-domain.com/', {
+        signal: 'signal',
+      });
     });
   });
 

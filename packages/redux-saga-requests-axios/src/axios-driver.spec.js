@@ -1,15 +1,12 @@
-import sinon from 'sinon';
 import axios from 'axios';
 
 import { createDriver } from './axios-driver';
 
+jest.mock('axios');
+
 describe('axiosDriver', () => {
   const axiosInstance = requestConfig => requestConfig;
   const axiosDriver = createDriver(axiosInstance);
-
-  afterEach(() => {
-    sinon.restore();
-  });
 
   describe('requestInstance', () => {
     it('has correct value', () => {
@@ -24,20 +21,16 @@ describe('axiosDriver', () => {
         cancel: () => 'cancelled',
       };
 
-      sinon.replace(
-        axios.CancelToken,
-        'source',
-        sinon.fake.returns(tokenSource),
-      );
+      axios.CancelToken.source.mockReturnValue(tokenSource);
       expect(axiosDriver.getAbortSource()).toBe(tokenSource);
     });
   });
 
   describe('abortRequest', () => {
     it('calls cancel method', () => {
-      const abortSource = { cancel: sinon.fake() };
+      const abortSource = { cancel: jest.fn() };
       axiosDriver.abortRequest(abortSource);
-      expect(abortSource.cancel.callCount).toBe(1);
+      expect(abortSource.cancel).toBeCalledTimes(1);
     });
   });
 
