@@ -40,6 +40,25 @@ const getInitialState = (state, reducer, config) => {
   return { ...getInitialRequestState(config), ...reducer(undefined, {}) };
 };
 
+const getDataUpdaterForSuccess = (reducerConfig, operationConfig) => {
+  if (
+    operationConfig === true ||
+    (typeof operationConfig !== 'boolean' &&
+      operationConfig.updateData === true)
+  ) {
+    return reducerConfig.updateData || reducerConfig.getData;
+  } else if (typeof operationConfig === 'function') {
+    return operationConfig;
+  } else if (
+    typeof operationConfig !== 'boolean' &&
+    typeof operationConfig.updateData !== 'boolean'
+  ) {
+    return operationConfig.updateData;
+  }
+
+  return null;
+};
+
 const defaultConfig = {
   multiple: false,
   getData: (state, action) =>
@@ -84,8 +103,6 @@ export const createRequestsReducer = (globalConfig = {}) => (
     onError,
     onAbort,
     resetOn,
-    getData,
-    updateData,
     getError,
     operations,
     actionType,
@@ -108,6 +125,9 @@ export const createRequestsReducer = (globalConfig = {}) => (
 
     return {
       ...state,
+      data: operationConfig.updateDataOptimistic
+        ? operationConfig.updateDataOptimistic(state, action, config)
+        : state.data,
       operations: {
         ...state.operations,
         [action.type]: operationConfigHasRequestKey(operationConfig)
@@ -145,24 +165,7 @@ export const createRequestsReducer = (globalConfig = {}) => (
     } = state.operations;
 
     if (isSuccessAction(action)) {
-      let dataUpdater = null;
-
-      if (
-        (typeof operationConfig === 'boolean' && operationConfig) ||
-        (typeof operationConfig !== 'boolean' &&
-          typeof operationConfig.updateData === 'boolean' &&
-          operationConfig.updateData)
-      ) {
-        dataUpdater = updateData || getData;
-      } else if (typeof operationConfig === 'function') {
-        dataUpdater = operationConfig;
-      } else if (
-        typeof operationConfig !== 'boolean' &&
-        typeof operationConfig.updateData !== 'boolean'
-      ) {
-        dataUpdater = operationConfig.updateData;
-      }
-
+      const dataUpdater = getDataUpdaterForSuccess(config, operationConfig);
       const getUpdatedCurrentOperation = () => {
         if (!operationConfigHasRequestKey(operationConfig)) {
           return {
@@ -203,6 +206,9 @@ export const createRequestsReducer = (globalConfig = {}) => (
     if (isErrorAction(action)) {
       return {
         ...state,
+        data: operationConfig.revertData
+          ? operationConfig.revertData(state, action, config)
+          : state.data,
         operations: {
           ...otherOperations,
           [requestAction.type]: operationConfigHasRequestKey(operationConfig)
@@ -254,6 +260,9 @@ export const createRequestsReducer = (globalConfig = {}) => (
 
     return {
       ...state,
+      data: operationConfig.revertData
+        ? operationConfig.revertData(state, action, config)
+        : state.data,
       operations: {
         ...otherOperations,
         [requestAction.type]: getUpdatedCurrentOperation(),

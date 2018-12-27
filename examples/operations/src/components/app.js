@@ -4,8 +4,10 @@ import { connect } from 'react-redux';
 import {
   fetchPhoto,
   deletePhoto,
+  deletePhotoOptimistic,
   fetchPosts,
   deletePost,
+  deletePostOptimistic,
 } from '../store/actions';
 import { DELETE_PHOTO, DELETE_POST } from '../store/constants';
 import EntityContainer from './entity-container';
@@ -21,8 +23,10 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   fetchPhoto,
   deletePhoto,
+  deletePhotoOptimistic,
   fetchPosts,
   deletePost,
+  deletePostOptimistic,
 };
 
 const buttonStyle = { marginRight: 10 };
@@ -31,9 +35,11 @@ const App = ({
   photo,
   fetchPhoto,
   deletePhoto,
+  deletePhotoOptimistic,
   posts,
   fetchPosts,
   deletePost,
+  deletePostOptimistic,
 }) => (
   <div>
     <h1>Redux Saga Requests operations example</h1>
@@ -55,6 +61,7 @@ const App = ({
         <Photo
           data={photo.data}
           deletePhoto={deletePhoto}
+          deletePhotoOptimistic={deletePhotoOptimistic}
           deleting={photo.operations[DELETE_PHOTO].pending > 0}
         />
       </EntityContainer>
@@ -78,6 +85,7 @@ const App = ({
               key={post.id}
               data={post}
               deletePost={() => deletePost(post.id)}
+              deletePostOptimistic={() => deletePostOptimistic(post)}
               deleting={operation && operation.pending > 0}
             />
           );

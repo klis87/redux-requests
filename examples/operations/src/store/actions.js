@@ -1,8 +1,10 @@
 import {
   FETCH_PHOTO,
   DELETE_PHOTO,
+  DELETE_PHOTO_OPTIMISTIC,
   FETCH_POSTS,
   DELETE_POST,
+  DELETE_POST_OPTIMISTIC,
 } from './constants';
 
 export const fetchPhoto = id => ({
@@ -15,6 +17,17 @@ export const deletePhoto = id => ({
   request: {
     url: `/photos/${id}`,
     method: 'delete',
+  },
+});
+
+export const deletePhotoOptimistic = photo => ({
+  type: DELETE_PHOTO_OPTIMISTIC,
+  request: {
+    url: `/photos/${photo.id}`,
+    method: 'delete',
+  },
+  meta: {
+    deletedPhoto: photo,
   },
 });
 
@@ -31,5 +44,16 @@ export const deletePost = id => ({
   },
   meta: {
     id,
+  },
+});
+
+export const deletePostOptimistic = post => ({
+  type: DELETE_POST_OPTIMISTIC,
+  request: {
+    url: `/posts/${post.ids}`,
+    method: 'delete',
+  },
+  meta: {
+    deletedPost: post,
   },
 });

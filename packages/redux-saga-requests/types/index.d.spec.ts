@@ -146,6 +146,26 @@ requestsReducer({
     },
   },
 });
+requestsReducer({
+  actionType: 'actionType',
+  operations: {
+    OPERATION: {
+      updateDataOptimistic: (state, action) => state,
+      revertData: (state, action) => state,
+    },
+  },
+});
+requestsReducer({
+  actionType: 'actionType',
+  operations: {
+    OPERATION: {
+      updateData: (state, action) => state,
+      updateDataOptimistic: (state, action) => state,
+      revertData: (state, action) => state,
+      getRequestKey: action => 'id',
+    },
+  },
+});
 requestsReducer({ actionType: 'actionType' }, (state, action) => state);
 
 createRequestsReducer()({ actionType: 'actionType' });

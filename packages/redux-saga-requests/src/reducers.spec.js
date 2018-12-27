@@ -356,6 +356,31 @@ describe('reducers', () => {
         );
       });
 
+      it('can update data optimistic', () => {
+        const reducer = requestsReducer({
+          actionType,
+          operations: {
+            [OPERATION_ACTION]: {
+              updateDataOptimistic: (state, action) => action.data,
+            },
+          },
+        });
+
+        expect(
+          reducer(defaultState, { type: OPERATION_ACTION, data: 'data' }),
+        ).toEqual({
+          data: 'data',
+          error: null,
+          pending: 0,
+          operations: {
+            [OPERATION_ACTION]: {
+              error: null,
+              pending: 1,
+            },
+          },
+        });
+      });
+
       it('increases pending counter on operation request with defined requestKey', () => {
         const reducer = requestsReducer({
           actionType,
@@ -740,6 +765,38 @@ describe('reducers', () => {
         });
       });
 
+      it('reverts optimistic update on operation error', () => {
+        const reducer = requestsReducer({
+          actionType,
+          operations: {
+            [OPERATION_ACTION]: {
+              updateDataOptimistic: (state, action) => action.data,
+              revertData: (state, action) => action.meta.requestAction.oldData,
+            },
+          },
+        });
+
+        expect(
+          reducer(defaultState, {
+            type: error(OPERATION_ACTION),
+            error: 'error',
+            meta: {
+              requestAction: { type: OPERATION_ACTION, oldData: 'oldData' },
+            },
+          }),
+        ).toEqual({
+          data: 'oldData',
+          error: null,
+          pending: 0,
+          operations: {
+            [OPERATION_ACTION]: {
+              error: 'error',
+              pending: -1,
+            },
+          },
+        });
+      });
+
       it('handles operation error response with defined requestKey', () => {
         const reducer = requestsReducer({
           actionType,
@@ -818,6 +875,37 @@ describe('reducers', () => {
           }),
         ).toEqual({
           data: null,
+          error: null,
+          pending: 0,
+          operations: {
+            [OPERATION_ACTION]: {
+              error: null,
+              pending: -1,
+            },
+          },
+        });
+      });
+
+      it('reverts optimistic update on operation abort', () => {
+        const reducer = requestsReducer({
+          actionType,
+          operations: {
+            [OPERATION_ACTION]: {
+              updateDataOptimistic: (state, action) => action.data,
+              revertData: (state, action) => action.meta.requestAction.oldData,
+            },
+          },
+        });
+
+        expect(
+          reducer(defaultState, {
+            type: abort(OPERATION_ACTION),
+            meta: {
+              requestAction: { type: OPERATION_ACTION, oldData: 'oldData' },
+            },
+          }),
+        ).toEqual({
+          data: 'oldData',
           error: null,
           pending: 0,
           operations: {

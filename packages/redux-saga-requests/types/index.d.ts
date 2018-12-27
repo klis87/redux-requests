@@ -94,6 +94,12 @@ type Operations = {
     | {
         updateData: boolean | OnActionCallback;
         getRequestKey?: (action: RequestAction) => string;
+      }
+    | {
+        updateData?: OnActionCallback;
+        updateDataOptimistic: OnActionCallback;
+        revertData: OnActionCallback;
+        getRequestKey?: (action: RequestAction) => string;
       };
 };
 

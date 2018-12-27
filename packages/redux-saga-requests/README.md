@@ -112,6 +112,7 @@ or... you could even access your request instance with `getRequestInstance`
 - support for Axios and Fetch API - additional clients could be added, you could even write your own client
 integration as a `driver` (see [./packages/redux-saga-requests-axios/src/axios-driver.js](https://github.com/klis87/redux-saga-requests/blob/master/packages/redux-saga-requests-axios/src/axios-driver.js)
 for the example)
+- optimistic updates support, so your views can be updated even before requests are finished, while you still keep consistency in case of errors by reverting optimistic updates
 - mocking - mock driver, which use can use for test purposes or when you would like to integrate with API not yet implemented (and once API is finished, you could just change driver to Axios or Fetch and magicaly everything will work!)
 - multiple driver support - for example you can use Axios for one part of your requests and Fetch Api for another part
 - compatible with FSA, `redux-act` and `redux-actions` libraries (see [redux-act example](https://github.com/klis87/redux-saga-requests/tree/master/examples/redux-act-integration))
@@ -454,7 +455,7 @@ information in `operations`
 - `onAbort: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles abort actions
 - `resetOn: action => boolean or string[]`: callback or array of action types on which reducer will reset its state to initial one, for instance `['LOGOUT']` or `action => action.type === 'LOGOUT'`, `[]` by default
 - `operations`: optional object which you can use to map write actions like update/delete to `data` update, which also adds pending
-state and errors for each defined operation, see more details below
+state and errors for each defined operation and allows optimistic updates, see more details below
 
 For example:
 ```js
@@ -572,7 +573,7 @@ const booksReducer = requestsReducer({
   actionType: 'FETCH_BOOKS',
   multiple: true,
   operations: {
-    DELETE_ALL_BOOKS: (state, action) => []
+    DELETE_ALL_BOOKS: (state, action) => [],
     DELETE_BOOK: {
       updateData: (state, action) => state.data.filter(book => book.id !== action.meta.id),
       getRequestKey: requestAction => String(requestAction.meta.id), // you need to use string if id is an integer
@@ -636,6 +637,41 @@ DELETE_BOOK: {
 },
 ```
 as instead of resetting `pending` to `0`, a given object is just removed to release memory.
+
+As a bonus, operations come with optimistic updates support, so `data` can be updated even before requests are finished! Of course only if you can predict
+server response. Let's update `DELETE_BOOK` operation to support optimistic updates:
+```js
+const deleteBook = book => ({
+  type: 'DELETE_BOOK',
+  request: { url: `/book/${book.id}`, method: 'delete' },
+  meta: {
+    book, // we will need the whole book
+  },
+})
+
+const booksReducer = requestsReducer({
+  actionType: 'FETCH_BOOKS',
+  multiple: true,
+  operations: {
+    DELETE_ALL_BOOKS: (state, action) => [],
+    DELETE_BOOK: {
+      updateDataOptimistic: (state, action) => state.data.filter(book => book.id !== action.meta.book.id),
+      revertData: (state, action) => [action.meta.book, ...state.data],
+      getRequestKey: requestAction => String(requestAction.meta.book.id),
+    }
+  }
+});
+```
+So what changed? We pass the whole `book` object, not only `id` to `deleteBook`, which is used in `revertData` later.
+We replaced `updateData` with `updateDataOptimistic`, which updates `data` immediately after `DELETE_BOOK` request
+is fired, so even if this request was slow, your view would be updated at once anyway! What in case of errors though?
+We need to revert the state by putting the cancelled book back to `data` array. So, in case of an error, `DELETE_BOOK_ERROR`
+would be dispatched and `revertData` would be called. Optionally, it is possible to define `updateData` next to
+`updateDataOptimistic`, for example to replace a mocked id generated during an optimistic insert action with a server id. Also,
+note that `revertData` would be also called for aborted requests, like `DELETE_BOOK_ABORT` in our example. Usually you won't get
+aborted operations though, unless you use `takeLatest: true` for an operation. This is not recommended to use together with
+optimistic update though, because for an aborted request there is no way to tell whether an operation succedded or not, so
+it is impossible to tell whether we should revert or not.
 
 As you can see, you can use `requestsReducer`, which will handle requests related logic in a configurable way with any custom
 logic you need.
