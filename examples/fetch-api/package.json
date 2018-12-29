@@ -10,22 +10,22 @@
     "start": "webpack-dev-server"
   },
   "dependencies": {
-    "@babel/polyfill": "7.0.0",
+    "@babel/polyfill": "7.2.5",
     "isomorphic-fetch": "2.2.1",
-    "react": "16.6.3",
-    "react-dom": "16.6.3",
-    "react-redux": "5.1.1",
+    "react": "16.7.0",
+    "react-dom": "16.7.0",
+    "react-redux": "6.0.0",
     "redux": "4.0.1",
     "redux-saga": "0.16.2"
   },
   "devDependencies": {
-    "@babel/core": "7.1.6",
-    "@babel/plugin-proposal-object-rest-spread": "7.0.0",
-    "@babel/preset-env": "7.1.6",
+    "@babel/core": "7.2.2",
+    "@babel/plugin-proposal-object-rest-spread": "7.2.0",
+    "@babel/preset-env": "7.2.3",
     "@babel/preset-react": "7.0.0",
     "babel-loader": "8.0.4",
     "html-webpack-plugin": "3.2.0",
-    "webpack": "4.25.1",
-    "webpack-dev-server": "3.1.10"
+    "webpack": "4.28.3",
+    "webpack-dev-server": "3.1.14"
   }
 }
