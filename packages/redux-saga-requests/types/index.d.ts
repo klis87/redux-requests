@@ -10,6 +10,7 @@ type RequestActionMeta = {
   runByWatcher?: boolean;
   takeLatest?: boolean;
   abortOn?: FilterOnActionCallback | string | string[];
+  cache?: boolean | number;
 };
 
 export type RequestAction =
@@ -153,3 +154,9 @@ type RequestsPromiseMiddlewareConfig = {
 export const requestsPromiseMiddleware: (
   config?: RequestsPromiseMiddlewareConfig,
 ) => Middleware;
+
+export const requestsCacheMiddleware: () => Middleware;
+
+export const clearRequestsCache: (
+  ...actionTypes: string[]
+) => { type: string; actionTypes: string[] };

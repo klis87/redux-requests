@@ -24,6 +24,7 @@ integrations could be added, as they are implemented in a plugin fashion.
 - [Interceptors](#interceptors-arrow_up)
 - [FSA](#fsa-arrow_up)
 - [Promise middleware](#promise-middleware-arrow_up)
+- [Cache middleware](#cache-middleware-arrow_up)
 - [Usage with Fetch API](#usage-with-fetch-api-arrow_up)
 - [Mocking](#mocking-arrow_up)
 - [Multiple drivers](#multiple-drivers-arrow_up)
@@ -113,6 +114,7 @@ or... you could even access your request instance with `getRequestInstance`
 integration as a `driver` (see [./packages/redux-saga-requests-axios/src/axios-driver.js](https://github.com/klis87/redux-saga-requests/blob/master/packages/redux-saga-requests-axios/src/axios-driver.js)
 for the example)
 - optimistic updates support, so your views can be updated even before requests are finished, while you still keep consistency in case of errors by reverting optimistic updates
+- cache support with optional `requestsCacheMiddleware`
 - mocking - mock driver, which use can use for test purposes or when you would like to integrate with API not yet implemented (and once API is finished, you could just change driver to Axios or Fetch and magicaly everything will work!)
 - multiple driver support - for example you can use Axios for one part of your requests and Fetch Api for another part
 - compatible with FSA, `redux-act` and `redux-actions` libraries (see [redux-act example](https://github.com/klis87/redux-saga-requests/tree/master/examples/redux-act-integration))
@@ -846,7 +848,6 @@ import { requestsPromiseMiddleware } from 'redux-saga-requests';
 const sagaMiddleware = createSagaMiddleware();
 const store = createStore(
   app,
-  initialState,
   applyMiddleware(requestsPromiseMiddleware(), sagaMiddleware),
 );
 ```
@@ -886,6 +887,69 @@ requestsPromiseMiddleware({
 })
 ```
 Note auto mode `true` will NOT promisify action with explicit `meta.asPromise: false`.
+
+## Cache middleware [:arrow_up:](#table-of-content)
+
+Sometimes you might want your responses to be cached for an amount of time or even forever (until the page is not reloaded at least).
+Or, putting it another way, you would like to send a given request no more often than once for an amount of time. You can easily
+achieve it with an optional `requestsCacheMiddleware`:
+```js
+import { createStore, applyMiddleware } from 'redux';
+import createSagaMiddleware from 'redux-saga';
+import { requestsCacheMiddleware } from 'redux-saga-requests';
+
+const sagaMiddleware = createSagaMiddleware();
+const store = createStore(
+  app,
+  applyMiddleware(requestsCacheMiddleware(), sagaMiddleware),
+);
+```
+... or together with `requestsPromiseMiddleware`:
+```js
+import { createStore, applyMiddleware } from 'redux';
+import createSagaMiddleware from 'redux-saga';
+import { requestsCacheMiddleware, requestsPromiseMiddleware } from 'redux-saga-requests';
+
+const sagaMiddleware = createSagaMiddleware();
+const store = createStore(
+  app,
+  applyMiddleware(
+    requestsCacheMiddleware(), // put before requestsPromiseMiddleware
+    requestsPromiseMiddleware(),
+    sagaMiddleware,
+  ),
+);
+```
+
+After this setup, you can use `meta.cache`:
+```js
+const fetchBooks = () => ({
+  type: FETCH_BOOKS,
+  request: { url: '/books'},
+  meta: {
+    cache: 10, // in seconds
+  },
+});
+```
+
+What will happen now, is that after a succesfull book fetch (to be specific after `FETCH_BOOKS_SUCCESS` is dispatched),
+any `FETCH_BOOKS` actions for `10` seconds will be totally ignored, they won't touch your reducers and no request will be sent.
+You could also use `cache: true` to cache forever.
+
+If you need to clear the cache for some reason, you can use `clearRequestsCache` action:
+```js
+import { put } from 'redux-saga/effects';
+import { clearRequestsCache } from 'redux-saga-requests';
+
+function* cacheSaga() {
+  yield put(clearRequestsCache()) // clear the whole cache
+  yield put(clearRequestsCache(FETCH_BOOKS)) // clear only FETCH_BOOKS cache
+  yield put(clearRequestsCache(FETCH_BOOKS, FETCH_AUTHORS)) // clear only FETCH_BOOKS and FETCH_AUTHORS cache
+}
+```
+
+Also, if you happen to use `sendRequest` with cacheable action with `dispatchRequestAction: true`,
+be aware that it could return `{ cacheHit: true }` instead of object with `error` or `response` key.
 
 ## Usage with Fetch API [:arrow_up:](#table-of-content)
 

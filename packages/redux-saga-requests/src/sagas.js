@@ -83,7 +83,12 @@ export function* sendRequest(
 
   if (dispatchRequestAction && !silent) {
     action = { ...action, meta: { ...action.meta, runByWatcher: false } };
-    yield put(action);
+    const requestResponse = yield put(action);
+
+    // only possible when using requestsCacheMiddleware
+    if (requestResponse === null) {
+      return { cacheHit: true };
+    }
   }
 
   const driver = yield call(getDriver, requestsConfig, action);

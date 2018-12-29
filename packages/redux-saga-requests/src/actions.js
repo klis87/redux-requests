@@ -1,4 +1,9 @@
-import { SUCCESS_SUFFIX, ERROR_SUFFIX, ABORT_SUFFIX } from './constants';
+import {
+  SUCCESS_SUFFIX,
+  ERROR_SUFFIX,
+  ABORT_SUFFIX,
+  CLEAR_REQUESTS_CACHE,
+} from './constants';
 
 const getActionWithSuffix = suffix => actionType => actionType + suffix;
 
@@ -79,3 +84,8 @@ export const isErrorAction = action =>
 
 export const isAbortAction = action =>
   isResponseAction(action) && action.type.endsWith(ABORT_SUFFIX);
+
+export const clearRequestsCache = (...actionTypes) => ({
+  type: CLEAR_REQUESTS_CACHE,
+  actionTypes,
+});

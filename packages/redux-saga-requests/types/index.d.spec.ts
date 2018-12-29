@@ -11,6 +11,8 @@ import {
   requestsReducer,
   createRequestsReducer,
   requestsPromiseMiddleware,
+  requestsCacheMiddleware,
+  clearRequestsCache,
   RequestAction,
 } from './index';
 
@@ -27,6 +29,7 @@ const requestAction: RequestAction = {
     runByWatcher: false,
     abortOn: ['ABORT'],
     takeLatest: false,
+    cache: 1,
     customKey: 'customValue',
   },
 };
@@ -176,3 +179,9 @@ createRequestsReducer(globalConfig)({
 
 requestsPromiseMiddleware();
 requestsPromiseMiddleware({ auto: true });
+
+requestsCacheMiddleware();
+
+clearRequestsCache();
+clearRequestsCache('TYPE');
+clearRequestsCache('TYPE', 'ANOTHER_TYPE');

@@ -1,5 +1,6 @@
 import { getContext, setContext, cancelled } from 'redux-saga/effects';
 import { expectSaga } from 'redux-saga-test-plan';
+import * as matchers from 'redux-saga-test-plan/matchers';
 
 import {
   createSuccessAction,
@@ -186,6 +187,18 @@ describe('sagas', () => {
       }
 
       expect(sagaError).toEqual(INCORRECT_PAYLOAD_ERROR);
+    });
+
+    it('returns cache hit when request action dispatch returns null', () => {
+      const action = { type: 'FETCH', request: { url: '/url' } };
+
+      return expectSaga(sendRequest, action, { dispatchRequestAction: true })
+        .provide([
+          [getContext(REQUESTS_CONFIG), config],
+          [matchers.put.actionType(action.type), null],
+        ])
+        .returns({ cacheHit: true })
+        .run();
     });
 
     it('dispatches unwatchable request action when dispatchRequestAction is true', () => {
