@@ -227,7 +227,7 @@ function* rootSaga() {
 ```
 
 Last, but not least, if for some reason you don't want your request action to be handled by `watchRequests`,
-you can use `meta.runByWatcher`: like:
+you can use `meta.runByWatcher`, like:
 ```js
 const fetchBooks = () => ({
   type: FETCH_BOOKS,
@@ -244,7 +244,7 @@ const fetchBooks = () => ({
 
 Under the hood, `watchRequests` uses a lower level `sendRequest`. `watchRequests` should be flexible enough, so you won't need
 to worry about `sendRequest`, but it is useful to know about it, it is handy in [Interceptors](#interceptors-arrow_up). Also, if you don't
-like the magic of `watchRequests`, you might use it everywhere, or... you could write your own `watchRequests`!. This is how it
+like the magic of `watchRequests`, you might use it everywhere, or... you could write your own `watchRequests`! This is how it
 works:
 ```js
 import axios from 'axios';
