@@ -6,6 +6,8 @@ const requestAction = {
   meta: { driver: 'default' },
 };
 const fetchDriver = createDriver({});
+createDriver({}, { AbortController: {} });
+createDriver({}, { AbortController: {}, baseURL: '/' });
 fetchDriver.getSuccessPayload({}, {});
 fetchDriver.getErrorPayload({});
 fetchDriver.sendRequest({}, {}, requestAction);

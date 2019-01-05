@@ -3,7 +3,6 @@ import {
   error,
   abort,
   Driver,
-  DriverCreator,
   createRequestInstance,
   getRequestInstance,
   sendRequest,
@@ -41,9 +40,6 @@ dummyDriver.abortRequest({});
 dummyDriver.sendRequest({}, {}, requestAction);
 dummyDriver.getSuccessPayload({}, {});
 dummyDriver.getErrorPayload({});
-
-const driverCreator: DriverCreator = () => dummyDriver;
-driverCreator({});
 
 createRequestInstance({ driver: dummyDriver });
 createRequestInstance({

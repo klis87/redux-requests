@@ -48,8 +48,6 @@ export type Driver = {
   getErrorPayload: (error: any) => any;
 };
 
-export type DriverCreator = (requestInstance: any, config?: any) => Driver;
-
 type RequestInstanceConfig = {
   driver: Driver | { default: Driver; [driverType: string]: Driver };
   onRequest?: (request: any, action: RequestAction) => any;

@@ -1,3 +1,11 @@
-import { DriverCreator } from 'redux-saga-requests';
+import { Driver } from 'redux-saga-requests';
 
-export const createDriver: DriverCreator;
+type FetchDriverConfig = {
+  baseURL?: string;
+  AbortController?: any;
+};
+
+export const createDriver: (
+  fetchInstance: any,
+  fetchDriverConfig?: FetchDriverConfig,
+) => Driver;
