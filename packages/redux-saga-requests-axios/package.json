@@ -23,7 +23,7 @@
   },
   "scripts": {
     "clean": "rimraf es lib dist",
-    "lint": "eslint src/**",
+    "lint": "eslint 'src/**'",
     "test": "jest",
     "test:cover": "jest --coverage",
     "test-types": "tsc types/index.d.spec.ts --noEmit",
