@@ -11,7 +11,7 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
-Redux-Saga addon to simplify handling of AJAX requests. It supports Axios and Fetch API, but different
+Redux-Saga addon to simplify handling of AJAX requests. It supports Axios, Fetch API and GraphQL, but different
 integrations could be added, as they are implemented in a plugin fashion.
 
 ## Table of content
@@ -26,6 +26,7 @@ integrations could be added, as they are implemented in a plugin fashion.
 - [Promise middleware](#promise-middleware-arrow_up)
 - [Cache middleware](#cache-middleware-arrow_up)
 - [Usage with Fetch API](#usage-with-fetch-api-arrow_up)
+- [Usage with GraphQL](#usage-with-graphql-arrow_up)
 - [Mocking](#mocking-arrow_up)
 - [Multiple drivers](#multiple-drivers-arrow_up)
 - [Examples](#examples-arrow_up)
@@ -110,7 +111,7 @@ will send two requests and wrap them in `Promise.all`
 or lower level `sendRequest`
 (see [advanced example](https://github.com/klis87/redux-saga-requests/tree/master/examples/advanced)),
 or... you could even access your request instance with `getRequestInstance`
-- support for Axios and Fetch API - additional clients could be added, you could even write your own client
+- support for Axios, Fetch API and GraphQL - additional clients could be added, you could even write your own client
 integration as a `driver` (see [./packages/redux-saga-requests-axios/src/axios-driver.js](https://github.com/klis87/redux-saga-requests/blob/master/packages/redux-saga-requests-axios/src/axios-driver.js)
 for the example)
 - optimistic updates support, so your views can be updated even before requests are finished, while you still keep consistency in case of errors by reverting optimistic updates
@@ -178,7 +179,8 @@ a config to `watchRequests` to adjust, how different actions will be aborted. Th
 same form which you can pass to `redux-saga` `take` effect, for example `'LOGOUT'`, `['LOGOUT']`,
 `action => action.type === 'LOGOUT'`, default is `null`
 - `takeLatest: boolean | action => boolean`: if `true`, when a new request will be dispatched while a pending of the same type is still running,
-the previous one will be automatically aborted, default is `true` for `GET` requests and `false` for the rest ones
+the previous one will be automatically aborted, default is `true` for `GET` requests and `false` for the rest ones, or,
+for GraphQL, `true` for queries and `false` for mutations
 - `getLastActionKey: action => string`: a key generator to match actions of the same type, typically you won't need to adjust it,
 but it might come in handy when you want some actions with the same `type` to be treated as a different one,
 default is `action => action.type`.
@@ -1004,6 +1006,12 @@ as the default. Available response types are: `'arraybuffer'`, `'blob'`, `'formD
 Also, this driver reads response streams automatically for you (depending on `responseType` you choose)
 and sets it as `response.data`, so instead of doing `response.json()`, just read `response.data`.
 
+## Usage with GraphQL [:arrow_up:](#table-of-content)
+
+Just install `redux-saga-requests-graphql` driver. See
+[docs](https://github.com/klis87/redux-saga-requests/tree/master/packages/redux-saga-requests-graphql)
+for more info.
+
 ## Mocking [:arrow_up:](#table-of-content)
 
 Probably you are sometimes in a situation when you would like to start working on a feature which needs some integration with
@@ -1121,6 +1129,7 @@ There are following examples currently:
 - [advanced](https://github.com/klis87/redux-saga-requests/tree/master/examples/advanced)
 - [operations](https://github.com/klis87/redux-saga-requests/tree/master/examples/operations)
 - [Fetch API](https://github.com/klis87/redux-saga-requests/tree/master/examples/fetch-api)
+- [GraphQL](https://github.com/klis87/redux-saga-requests/tree/master/examples/graphql)
 - [redux-act integration](https://github.com/klis87/redux-saga-requests/tree/master/examples/redux-act-integration)
 - [low-level-reducers](https://github.com/klis87/redux-saga-requests/tree/master/examples/low-level-reducers)
 - [mock-and-multiple-drivers](https://github.com/klis87/redux-saga-requests/tree/master/examples/mock-and-multiple-drivers)

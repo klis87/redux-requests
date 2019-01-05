@@ -210,16 +210,18 @@ export function* sendRequest(
   }
 }
 
-const isGetRequest = request =>
-  !request.method || request.method.toLowerCase() === 'get';
+const isRequestReadOnly = request =>
+  (!request.query &&
+    (!request.method || request.method.toLowerCase() === 'get')) ||
+  (request.query && !request.query.trim().startsWith('mutation'));
 
 const watchRequestsDefaultConfig = {
   takeLatest: action => {
     const { request } = getActionPayload(action);
 
     return Array.isArray(request)
-      ? request.every(isGetRequest)
-      : isGetRequest(request);
+      ? request.every(isRequestReadOnly)
+      : isRequestReadOnly(request);
   },
   abortOn: null,
   getLastActionKey: action => action.type,

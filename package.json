@@ -34,6 +34,10 @@
       "maxSize": "4 kB"
     },
     {
+      "path": "./packages/redux-saga-requests-graphql/dist/redux-saga-requests-graphql.min.js",
+      "maxSize": "6 kB"
+    },
+    {
       "path": "./packages/redux-saga-requests-mock/dist/redux-saga-requests-mock.min.js",
       "maxSize": "4 kB"
     }

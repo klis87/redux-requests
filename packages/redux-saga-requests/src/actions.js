@@ -65,7 +65,11 @@ export const isRequestAction = action => {
   return (
     !!actionPayload &&
     !!actionPayload.request &&
-    !!(Array.isArray(actionPayload.request) || actionPayload.request.url) &&
+    !!(
+      Array.isArray(actionPayload.request) ||
+      actionPayload.request.url ||
+      actionPayload.request.query
+    ) &&
     !actionPayload.response &&
     !(actionPayload instanceof Error)
   );

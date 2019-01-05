@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`gql handles fragments 1`] = `
+"query($id: ID!) {
+        book(id: $id) {
+          ...BookFragment
+        }
+      }
+      fragment BookFragment on Book {
+        id
+        title
+      }"
+`;
+
+exports[`gql handles queries with variables 1`] = `
+"query($id: ID!) {
+        x(id: $id) {
+          y
+        }
+      }"
+`;
+
+exports[`gql handles queries without variables 1`] = `
+"query {
+        x
+      }"
+`;

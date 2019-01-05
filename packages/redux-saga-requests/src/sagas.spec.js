@@ -643,10 +643,52 @@ describe('sagas', () => {
         .silentRun(100);
     });
 
+    it('uses takeLatest for queries', () => {
+      const postAction = {
+        type: 'FETCH',
+        request: {
+          query: `
+            {
+              x
+            }
+          `,
+        },
+      };
+
+      return expectSaga(watchRequests)
+        .provide([[getContext(REQUESTS_CONFIG), config]])
+        .put.actionType('FETCH_ABORT')
+        .dispatch(postAction)
+        .dispatch(postAction)
+        .silentRun(100);
+    });
+
     it('uses takeEvery for post requests', () => {
       const postAction = {
         type: 'FETCH',
         request: { url: '/url', method: 'post' },
+      };
+
+      return expectSaga(watchRequests)
+        .provide([[getContext(REQUESTS_CONFIG), config]])
+        .not.put.actionType('FETCH_ABORT')
+        .dispatch(postAction)
+        .dispatch(postAction)
+        .silentRun(100);
+    });
+
+    it('uses takeEvery for mutations', () => {
+      const postAction = {
+        type: 'FETCH',
+        request: {
+          query: `
+            mutation($id: ID!) {
+              x(id: $id) {
+                y
+              }
+            }
+          `,
+        },
       };
 
       return expectSaga(watchRequests)

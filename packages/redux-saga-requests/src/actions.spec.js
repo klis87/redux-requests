@@ -214,6 +214,15 @@ describe('actions', () => {
       ).toBe(true);
     });
 
+    it('recognizes request action with graphql query', () => {
+      expect(
+        isRequestAction({
+          type: 'ACTION',
+          request: { query: '{ x }' },
+        }),
+      ).toBe(true);
+    });
+
     it('rejects actions without request object', () => {
       expect(
         isRequestAction({
