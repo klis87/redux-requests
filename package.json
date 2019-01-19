@@ -17,7 +17,7 @@
   "devDependencies": {
     "bundlesize": "0.17.0",
     "coveralls": "3.0.2",
-    "lerna": "3.8.0",
+    "lerna": "3.10.6",
     "prettier": "1.15.3"
   },
   "bundlesize": [
