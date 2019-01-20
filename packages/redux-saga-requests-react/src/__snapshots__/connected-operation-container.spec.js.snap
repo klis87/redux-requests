@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ConnectedOperationContainer maps requestSelector to operation with operationActionCreator and passes sendOperation 1`] = `
+<div>
+  loading
+  error
+  <button
+    onClick={[Function]}
+    type="button"
+  >
+    Send operation
+  </button>
+</div>
+`;
+
+exports[`ConnectedOperationContainer maps requestSelector to operation with operationType 1`] = `
+<div>
+  loading
+  error
+</div>
+`;

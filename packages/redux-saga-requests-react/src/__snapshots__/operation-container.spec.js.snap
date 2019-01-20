@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`OperationContainer doesnt crush if an operation with a requestKey doesnt exist 1`] = `<div />`;
+
+exports[`OperationContainer renders custom component as prop with extra prop 1`] = `
+<div>
+  loading
+   
+  error
+   
+  extra
+</div>
+`;
+
+exports[`OperationContainer renders loading and error 1`] = `
+<div>
+  loading
+  error
+</div>
+`;
+
+exports[`OperationContainer renders loading and error of operation with requestKey 1`] = `
+<div>
+  loading
+  error
+</div>
+`;

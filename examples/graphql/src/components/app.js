@@ -1,5 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import {
+  ConnectedRequestContainer,
+  ConnectedOperationContainer,
+} from 'redux-saga-requests-react';
 
 import {
   fetchBooks,
@@ -11,39 +15,27 @@ import {
   uploadFiles,
 } from '../store/actions';
 import { LIKE_BOOK, UNLIKE_BOOK } from '../store/constants';
-import EntityContainer from './entity-container';
-
-// You should use selectors here in your real projects, here we don't for simplicity
-const mapStateToProps = state => ({
-  books: state.books,
-  book: state.book,
-  file: state.file,
-  files: state.files,
-});
+import Spinner from './spinner';
 
 const mapDispatchToProps = {
   fetchBooks,
   fetchBook,
   deleteBook,
-  likeBook,
-  unlikeBook,
   uploadFile,
   uploadFiles,
 };
 
 const buttonStyle = { marginRight: 10 };
 
+const RequestError = () => (
+  <p>There was some error during fetching. Please try again.</p>
+);
+
 const App = ({
-  books,
   fetchBooks,
-  book,
-  fetchBook,
   deleteBook,
-  likeBook,
-  unlikeBook,
-  file,
+  fetchBook,
   uploadFile,
-  files,
   uploadFiles,
 }) => (
   <div>
@@ -55,60 +47,65 @@ const App = ({
     <hr />
     <div>
       <h2>Books</h2>
-      <button style={buttonStyle} onClick={() => fetchBooks()}>
+      <button type="button" style={buttonStyle} onClick={() => fetchBooks()}>
         Fetch books
       </button>
-      <EntityContainer
-        error={books.error}
-        isFetching={books.pending > 0}
-        isFetched={!!books.data}
+      <ConnectedRequestContainer
+        requestSelector={state => state.books}
+        errorComponent={RequestError}
+        loadingComponent={Spinner}
+        noDataMessage={<p>There is no entity currently.</p>}
       >
-        {books.data &&
-          books.data.books.map(book => {
-            const operation =
-              books.operations[book.liked ? UNLIKE_BOOK : LIKE_BOOK][book.id];
-            const pending = operation && operation.pending > 0;
-
+        {({ data, operations }) =>
+          data.books.map(book => {
             return (
               <div key={book.id}>
                 <h1>{book.title}</h1>
                 <div>{book.author}</div>
-                <button onClick={() => deleteBook(book)}>
+                <button type="button" onClick={() => deleteBook(book)}>
                   Delete optimistic
                 </button>
-                <button
-                  onClick={() =>
-                    book.liked ? unlikeBook(book.id) : likeBook(book.id)
-                  }
-                  disabled={pending}
+                <ConnectedOperationContainer
+                  operation={operations[book.liked ? UNLIKE_BOOK : LIKE_BOOK]}
+                  requestKey={book.id}
+                  operationCreator={book.liked ? unlikeBook : likeBook}
                 >
-                  {book.liked ? 'Unlike' : 'Like'}
-                  {pending && '...'}
-                </button>
+                  {({ loading, sendOperation }) => (
+                    <button
+                      type="button"
+                      onClick={() => sendOperation(book.id)}
+                      disabled={loading}
+                    >
+                      {book.liked ? 'Unlike' : 'Like'}
+                      {loading && '...'}
+                    </button>
+                  )}
+                </ConnectedOperationContainer>
               </div>
             );
-          })}
-      </EntityContainer>
+          })
+        }
+      </ConnectedRequestContainer>
     </div>
-
     <hr />
     <div>
       <h2>Book</h2>
-      <button style={buttonStyle} onClick={() => fetchBook('1')}>
+      <button type="button" style={buttonStyle} onClick={() => fetchBook('1')}>
         Fetch book with id 1
       </button>
-      <EntityContainer
-        error={book.error}
-        isFetching={book.pending > 0}
-        isFetched={!!book.data}
+      <ConnectedRequestContainer
+        requestSelector={state => state.book}
+        errorComponent={RequestError}
+        loadingComponent={Spinner}
+        noDataMessage={<p>There is no entity currently.</p>}
       >
-        {book.data && (
+        {({ data }) => (
           <div>
-            <h1>{book.data.book.title}</h1>
-            <div>{book.data.book.author}</div>
+            <h1>{data.book.title}</h1>
+            <div>{data.book.author}</div>
           </div>
         )}
-      </EntityContainer>
+      </ConnectedRequestContainer>
     </div>
     <hr />
     <div>
@@ -123,18 +120,19 @@ const App = ({
           },
         }) => validity.valid && uploadFile(file)}
       />
-      <EntityContainer
-        error={file.error}
-        isFetching={file.pending > 0}
-        isFetched={!!file.data}
+      <ConnectedRequestContainer
+        requestSelector={state => state.file}
+        errorComponent={RequestError}
+        loadingComponent={Spinner}
+        noDataMessage={<p>There is no entity currently.</p>}
       >
-        {file.data && (
+        {({ data }) => (
           <div>
-            <h1>{file.data.singleUpload.filename}</h1>
-            <div>Mimetype: {file.data.singleUpload.mimetype}</div>
+            <h1>{data.singleUpload.filename}</h1>
+            <div>Mimetype: {data.singleUpload.mimetype}</div>
           </div>
         )}
-      </EntityContainer>
+      </ConnectedRequestContainer>
     </div>
     <hr />
     <div>
@@ -147,24 +145,26 @@ const App = ({
           validity.valid && uploadFiles(files)
         }
       />
-      <EntityContainer
-        error={files.error}
-        isFetching={files.pending > 0}
-        isFetched={!!files.data}
+      <ConnectedRequestContainer
+        requestSelector={state => state.files}
+        errorComponent={RequestError}
+        loadingComponent={Spinner}
+        noDataMessage={<p>There is no entity currently.</p>}
       >
-        {files.data &&
-          files.data.multipleUpload.map((file, i) => (
+        {({ data }) =>
+          data.multipleUpload.map((file, i) => (
             <div key={i}>
               <h1>{file.filename}</h1>
               <div>Mimetype: {file.mimetype}</div>
             </div>
-          ))}
-      </EntityContainer>
+          ))
+        }
+      </ConnectedRequestContainer>
     </div>
   </div>
 );
 
 export default connect(
-  mapStateToProps,
+  null,
   mapDispatchToProps,
 )(App);

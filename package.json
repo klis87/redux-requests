@@ -40,6 +40,10 @@
     {
       "path": "./packages/redux-saga-requests-mock/dist/redux-saga-requests-mock.min.js",
       "maxSize": "4 kB"
+    },
+    {
+      "path": "./packages/redux-saga-requests-react/dist/redux-saga-requests-react.min.js",
+      "maxSize": "3 kB"
     }
   ]
 }

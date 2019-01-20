@@ -1,21 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { ConnectedRequestContainer } from 'redux-saga-requests-react';
 
 import { fetchPhoto, clearPhoto, fetchPost, clearPost } from '../store/actions';
-import EntityContainer from './entity-container';
+import Spinner from './spinner';
 import Photo from './photo';
 import Post from './post';
 
 // You should use selectors here in your real projects, here we don't for simplicity
 const mapStateToProps = state => ({
-  photo: state.photo.data,
-  photoIsFetched: state.photo.data !== null,
-  photoIsFetching: state.photo.pending > 0,
-  photoFetchError: state.photo.error,
-  post: state.post.data,
-  postIsFetched: state.post.data !== null,
-  postIsFetching: state.post.pending > 0,
-  postFetchError: state.post.error,
   abortCounter: state.abortCounter,
   requestCounter: state.requestCounter,
   responseCounter: state.responseCounter,
@@ -31,15 +24,11 @@ const mapDispatchToProps = {
 
 const buttonStyle = { marginRight: 10 };
 
+const RequestError = () => (
+  <p>There was some error during fetching. Please try again.</p>
+);
+
 const App = ({
-  photo,
-  photoIsFetched,
-  photoIsFetching,
-  photoFetchError,
-  post,
-  postIsFetched,
-  postIsFetching,
-  postFetchError,
   fetchPhoto,
   clearPhoto,
   fetchPost,
@@ -75,13 +64,14 @@ const App = ({
         Fetch non-existent photo, with id 1 as fallback (with onError
         interceptor)
       </button>
-      <EntityContainer
-        error={photoFetchError}
-        isFetching={photoIsFetching}
-        isFetched={photoIsFetched}
+      <ConnectedRequestContainer
+        requestSelector={state => state.photo}
+        errorComponent={RequestError}
+        loadingComponent={Spinner}
+        noDataMessage={<p>There is no entity currently.</p>}
       >
-        <Photo data={photo} />
-      </EntityContainer>
+        {({ data }) => <Photo data={data} />}
+      </ConnectedRequestContainer>
     </div>
     <hr />
     <div>
@@ -95,13 +85,14 @@ const App = ({
       <button style={buttonStyle} onClick={() => fetchPost(1001)}>
         Fetch non-existent post
       </button>
-      <EntityContainer
-        error={postFetchError}
-        isFetching={postIsFetching}
-        isFetched={postIsFetched}
+      <ConnectedRequestContainer
+        requestSelector={state => state.post}
+        errorComponent={RequestError}
+        loadingComponent={Spinner}
+        noDataMessage={<p>There is no entity currently.</p>}
       >
-        <Post data={post} />
-      </EntityContainer>
+        {({ data }) => <Post data={data} />}
+      </ConnectedRequestContainer>
     </div>
     <hr />
   </div>

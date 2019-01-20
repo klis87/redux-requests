@@ -50,7 +50,7 @@ export const deletePost = id => ({
 export const deletePostOptimistic = post => ({
   type: DELETE_POST_OPTIMISTIC,
   request: {
-    url: `/posts/${post.ids}`,
+    url: `/posts/${post.id}`,
     method: 'delete',
   },
   meta: {

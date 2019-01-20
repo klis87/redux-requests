@@ -1,0 +1,25 @@
+{
+  "presets": [
+    ["@babel/preset-env", { "loose": true, "modules": false }],
+    "@babel/preset-react"
+  ],
+  "env": {
+    "test": {
+      "presets": [
+        ["@babel/preset-env", { "loose": true }],
+        "@babel/preset-react"
+      ]
+    }
+  },
+  "plugins": [
+    ["@babel/plugin-proposal-object-rest-spread", { "loose": true }],
+    [
+      "@babel/plugin-transform-runtime",
+      {
+        "corejs": false,
+        "helpers": true,
+        "regenerator": true
+      }
+    ],
+    ["transform-react-remove-prop-types", { "mode": "wrap"} ]]
+}

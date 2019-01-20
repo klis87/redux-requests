@@ -29,6 +29,7 @@ integrations could be added, as they are implemented in a plugin fashion.
 - [Usage with GraphQL](#usage-with-graphql-arrow_up)
 - [Mocking](#mocking-arrow_up)
 - [Multiple drivers](#multiple-drivers-arrow_up)
+- [React bindings](#react-bindings-arrow_up)
 - [Examples](#examples-arrow_up)
 
 ## Motivation [:arrow_up:](#table-of-content)
@@ -124,6 +125,7 @@ you don't need to worry that Axios interceptors would be shared across multiple 
 - `onRequest`, `onSuccess`, `onError` and `onAbort` interceptors, you can attach your sagas (or simple functions)
 to them to define a global behaviour for a given event type
 - optional `requestsPromiseMiddleware`, which promisifies requests actions dispatch, so you can wait in your react components to get request response, the same way like you can do this with `redux-thunk`
+- React bindings in `redux-saga-requests-react` package
 
 ## Installation [:arrow_up:](#table-of-content)
 
@@ -1118,6 +1120,12 @@ function* fetchBookSaga() {
   const requestInstance = yield getRequestInstance('fetch');
 }
 ```
+
+## React bindings [:arrow_up:](#table-of-content)
+
+Just install `redux-saga-requests-react`. See
+[docs](https://github.com/klis87/redux-saga-requests/tree/master/packages/redux-saga-requests-react)
+for more info.
 
 ## Examples [:arrow_up:](#table-of-content)
 

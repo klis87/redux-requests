@@ -1,5 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import {
+  ConnectedRequestContainer,
+  ConnectedOperationContainer,
+} from 'redux-saga-requests-react';
 
 import {
   fetchPhoto,
@@ -10,35 +14,25 @@ import {
   deletePostOptimistic,
 } from '../store/actions';
 import { DELETE_PHOTO, DELETE_POST } from '../store/constants';
-import EntityContainer from './entity-container';
-import Photo from './photo';
-import Post from './post';
-
-// You should use selectors here in your real projects, here we don't for simplicity
-const mapStateToProps = state => ({
-  photo: state.photo,
-  posts: state.posts,
-});
+import Spinner from './spinner';
 
 const mapDispatchToProps = {
   fetchPhoto,
-  deletePhoto,
   deletePhotoOptimistic,
   fetchPosts,
-  deletePost,
   deletePostOptimistic,
 };
 
 const buttonStyle = { marginRight: 10 };
 
+const RequestError = () => (
+  <p>There was some error during fetching. Please try again.</p>
+);
+
 const App = ({
-  photo,
   fetchPhoto,
-  deletePhoto,
   deletePhotoOptimistic,
-  posts,
   fetchPosts,
-  deletePost,
   deletePostOptimistic,
 }) => (
   <div>
@@ -50,53 +44,87 @@ const App = ({
     <hr />
     <div>
       <h2>Photo</h2>
-      <button style={buttonStyle} onClick={() => fetchPhoto(1)}>
+      <button type="button" style={buttonStyle} onClick={() => fetchPhoto(1)}>
         Fetch photo with id 1
       </button>
-      <EntityContainer
-        error={photo.error}
-        isFetching={photo.pending > 0}
-        isFetched={!!photo.data}
+      <ConnectedRequestContainer
+        requestSelector={state => state.photo}
+        errorComponent={RequestError}
+        loadingComponent={Spinner}
+        noDataMessage={<p>There is no entity currently.</p>}
       >
-        <Photo
-          data={photo.data}
-          deletePhoto={deletePhoto}
-          deletePhotoOptimistic={deletePhotoOptimistic}
-          deleting={photo.operations[DELETE_PHOTO].pending > 0}
-        />
-      </EntityContainer>
+        {({ data, operations }) => (
+          <div>
+            <h3>{data.title}</h3>
+            <img src={data.thumbnailUrl} alt={data.title} />
+            <hr />
+            <ConnectedOperationContainer
+              operation={operations[DELETE_PHOTO]}
+              operationCreator={deletePhoto}
+            >
+              {({ loading, sendOperation }) => (
+                <button
+                  type="button"
+                  onClick={() => sendOperation(data.id)}
+                  disabled={loading}
+                >
+                  {loading ? 'Deleting...' : 'Delete'}
+                </button>
+              )}
+            </ConnectedOperationContainer>
+            <button type="button" onClick={() => deletePhotoOptimistic(data)}>
+              Delete optimistic
+            </button>
+          </div>
+        )}
+      </ConnectedRequestContainer>
     </div>
     <hr />
     <div>
       <h2>Posts</h2>
-      <button style={buttonStyle} onClick={fetchPosts}>
+      <button type="button" style={buttonStyle} onClick={fetchPosts}>
         Fetch posts
       </button>
-      <EntityContainer
-        error={posts.error}
-        isFetching={posts.pending > 0}
-        isFetched={posts.data.length > 0}
+      <ConnectedRequestContainer
+        requestSelector={state => state.posts}
+        errorComponent={RequestError}
+        loadingComponent={Spinner}
+        noDataMessage={<p>There is no entity currently.</p>}
       >
-        {posts.data.map(post => {
-          const operation = posts.operations[DELETE_POST][post.id];
-
-          return (
-            <Post
-              key={post.id}
-              data={post}
-              deletePost={() => deletePost(post.id)}
-              deletePostOptimistic={() => deletePostOptimistic(post)}
-              deleting={operation && operation.pending > 0}
-            />
-          );
-        })}
-      </EntityContainer>
+        {({ data, operations }) =>
+          data.map(post => (
+            <div key={post.id}>
+              <h3>{post.title}</h3>
+              <p>{post.body}</p>
+              <ConnectedOperationContainer
+                operation={operations[DELETE_POST]}
+                operationCreator={deletePost}
+                requestKey={String(post.id)}
+              >
+                {({ loading, sendOperation }) => (
+                  <button
+                    type="button"
+                    onClick={() => sendOperation(post.id)}
+                    disabled={loading}
+                  >
+                    {loading ? 'Deleting...' : 'Delete'}
+                  </button>
+                )}
+              </ConnectedOperationContainer>
+              <button type="button" onClick={() => deletePostOptimistic(post)}>
+                Delete optimistic
+              </button>
+              <hr />
+            </div>
+          ))
+        }
+      </ConnectedRequestContainer>
     </div>
     <hr />
   </div>
 );
 
 export default connect(
-  mapStateToProps,
+  null,
   mapDispatchToProps,
 )(App);

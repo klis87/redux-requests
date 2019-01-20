@@ -12,12 +12,27 @@ module.exports = {
   },
   resolve: {
     alias: {
+      'react-redux': path.join(
+        __dirname,
+        '..',
+        'node_modules',
+        'react-redux',
+        'es',
+      ),
       'redux-saga-requests': path.join(
         __dirname,
         '..',
         '..',
         'packages',
         'redux-saga-requests',
+        'es',
+      ),
+      'redux-saga-requests-react': path.join(
+        __dirname,
+        '..',
+        '..',
+        'packages',
+        'redux-saga-requests-react',
         'es',
       ),
       'redux-saga-requests-axios': path.join(
