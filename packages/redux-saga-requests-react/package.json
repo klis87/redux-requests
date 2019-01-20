@@ -1,6 +1,6 @@
 {
   "name": "redux-saga-requests-react",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "React bindings for Redux-Saga-Requests, Redux-Saga addon to simplify AJAX requests",
   "main": "lib/index.js",
   "module": "es/index.js",
