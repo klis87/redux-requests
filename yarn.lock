@@ -1387,17 +1387,17 @@
   resolved "https://registry.yarnpkg.com/@nodelib/fs.stat/-/fs.stat-1.1.0.tgz#50c1e2260ac0ed9439a181de3725a0168d59c48a"
   integrity sha512-LAQ1d4OPfSJ/BMbI2DuizmYrrkD9JMaTdi2hQTlI53lQ4kRQPyZQRS4CYQ7O66bnBBnP/oYdRxbk++X0xuFU6A==
 
-"@redux-saga/delay-p@1.0.0-rc.0":
-  version "1.0.0-rc.0"
-  resolved "https://registry.yarnpkg.com/@redux-saga/delay-p/-/delay-p-1.0.0-rc.0.tgz#ce44f7426e8ad9497c8e87a5877ee4f8a62252a6"
-  integrity sha512-bKFhVKiBC2BgnEpRMNO63D6iKydtQli0m/85CV/3kKeiCchJuBaQfVuGHJO/KsXjvMKDgLeYRvWBhLZdRXmyfw==
+"@redux-saga/delay-p@1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@redux-saga/delay-p/-/delay-p-1.0.1.tgz#d69fc6103c7509ae80faa144ea17bbc69e51e029"
+  integrity sha512-0SnNDyDLUyB4NThtptAwiprNOnbCNhoed/Rp5JwS7SB+a/AdWynVgg/E6BmjsggLFNr07KW0bzn05tsPRBuU7Q==
   dependencies:
-    "@redux-saga/symbols" "^1.0.0-rc.0"
+    "@redux-saga/symbols" "^1.0.1"
 
-"@redux-saga/symbols@^1.0.0-rc.0":
-  version "1.0.0-rc.0"
-  resolved "https://registry.yarnpkg.com/@redux-saga/symbols/-/symbols-1.0.0-rc.0.tgz#f3aa0dc66fac77920087c919da59e70cc4b4f92d"
-  integrity sha512-A5ZCEDw06LE3AbVgIX7twz3BZHkMojI0W6pNDTpsFULnqeotpwOPLbueuHow6le5yleCUn8fRF1DE++ySHnnYA==
+"@redux-saga/symbols@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@redux-saga/symbols/-/symbols-1.0.1.tgz#46512ae1275f88df061c42168d0f600ddb170c1e"
+  integrity sha512-akKkzcVnb1RzJaZV2LQFbi51abvdICMuAKwwLoCjjxLbLAGIw9EJxk5ucNnWSSCEsoEQMeol5tkAcK+Xzuv1Bg==
 
 "@types/prop-types@*":
   version "15.5.8"
