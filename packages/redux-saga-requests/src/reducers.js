@@ -12,13 +12,11 @@ import {
 const normalizeActionType = actionType =>
   typeof actionType === 'function' ? actionType.toString() : actionType;
 
-const getEmptyData = multiple => (multiple ? [] : null);
-
 const operationConfigHasRequestKey = config =>
   typeof config !== 'boolean' && !!config.getRequestKey;
 
-const getInitialRequestState = ({ multiple, operations }) => ({
-  data: getEmptyData(multiple),
+const getInitialRequestState = ({ getDefault, multiple, operations }) => ({
+  data: getDefault(multiple),
   pending: 0,
   error: null,
   operations:
@@ -61,6 +59,7 @@ const getDataUpdaterForSuccess = (reducerConfig, operationConfig) => {
 
 const defaultConfig = {
   multiple: false,
+  getDefault: (multiple) => multiple ? [] : null,
   getData: (state, action) =>
     action.payload ? action.payload.data : action.data,
   updateData: null,
@@ -78,7 +77,7 @@ const defaultConfig = {
   }),
   onError: (state, action, config) => ({
     ...state,
-    data: getEmptyData(config.multiple),
+    data: config.getDefault(config.multiple),
     pending: state.pending - 1,
     error: config.getError(state, action, config),
   }),

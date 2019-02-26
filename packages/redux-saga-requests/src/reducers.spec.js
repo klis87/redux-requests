@@ -83,6 +83,43 @@ describe('reducers', () => {
       });
     });
 
+    describe('providing the default value of the reducer', () => {
+      const emptyFeatureCollection = { type: 'FeatureCollection', features: [] };
+      const defaultProvider = jest.fn(() => (emptyFeatureCollection));
+      const reducer = requestsReducer({ actionType, getDefault: defaultProvider });
+
+      afterEach(() => {
+        defaultProvider.mockClear();
+      });
+
+      it('sets initial state via getDefault', () => {
+        expect(reducer(undefined, {})).toEqual({
+          data: emptyFeatureCollection,
+          error: null,
+          pending: 0,
+          operations: null,
+        });
+        expect(defaultProvider.mock.calls.length).toBe(1);
+      });
+
+      it('resets data via getDefault on errors', () => {
+        const someError = 'asdasda';
+        const action = { type: error(actionType), error: someError };
+        expect(reducer({
+          data: {},
+          error: someError,
+          pending: 1,
+          operations: null,
+        }, action)).toEqual({
+          data: emptyFeatureCollection,
+          error: someError,
+          pending: 0,
+          operations: null,
+        });
+        expect(defaultProvider.mock.calls.length).toBe(1);
+      });
+    });
+
     describe('without passed reducer with local config override', () => {
       const RESET = 'RESET';
       const reducer = requestsReducer({
