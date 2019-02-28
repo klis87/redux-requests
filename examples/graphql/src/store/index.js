@@ -1,9 +1,7 @@
 import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
 import createSagaMiddleware from 'redux-saga';
-import axios from 'axios';
 import { createRequestInstance, watchRequests } from 'redux-saga-requests';
 import { createDriver } from 'redux-saga-requests-graphql';
-import { extractFiles } from 'extract-files';
 
 import {
   booksReducer,

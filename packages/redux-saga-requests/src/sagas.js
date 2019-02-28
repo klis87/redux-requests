@@ -11,6 +11,7 @@ import {
   getContext,
   setContext,
 } from 'redux-saga/effects';
+import { END } from 'redux-saga';
 
 import {
   createSuccessAction,
@@ -18,6 +19,8 @@ import {
   createAbortAction,
   getActionPayload,
   isRequestAction,
+  isResponseAction,
+  isSuccessAction,
 } from './actions';
 import {
   REQUESTS_CONFIG,
@@ -83,7 +86,12 @@ export function* sendRequest(
 
   if (dispatchRequestAction && !silent) {
     action = { ...action, meta: { ...action.meta, runByWatcher: false } };
-    action = yield put(action); // to be affected by requestsCacheMiddleware
+    action = yield put(action); // to be affected by requestsCacheMiddleware and serverRequestsFilterMiddleware
+
+    // only possible when using  serverRequestsFilterMiddleware
+    if (action === null) {
+      return { cacheHit: true };
+    }
   }
 
   const driver = yield call(getDriver, requestsConfig, action);
@@ -272,6 +280,49 @@ export function* watchRequests(commonConfig = {}) {
 
     if (abortOn) {
       yield fork(cancelSendRequestOnAction, abortOn, newTask);
+    }
+  }
+}
+
+export function* countServerRequests({
+  serverRequestResponseActions,
+  finishOnFirstError = true,
+}) {
+  let index = 0;
+  serverRequestResponseActions.successActions = [];
+  serverRequestResponseActions.dependentActions = [];
+  serverRequestResponseActions.errorActions = [];
+
+  while (true) {
+    const action = yield take(a => isRequestAction(a) || isResponseAction(a));
+
+    if (isRequestAction(action)) {
+      index +=
+        action.meta && action.meta.requestWeight !== undefined
+          ? action.meta.requestWeight
+          : 1;
+      continue;
+    }
+
+    if (!isSuccessAction(action)) {
+      serverRequestResponseActions.errorActions.push(action);
+
+      if (finishOnFirstError) {
+        yield put(END);
+        return;
+      }
+    } else if (action.meta.dependentRequest) {
+      serverRequestResponseActions.dependentActions.push(action);
+    } else {
+      serverRequestResponseActions.successActions.push(action);
+    }
+
+    index -=
+      action.meta.responseWeight !== undefined ? action.meta.responseWeight : 1;
+
+    if (index === 0) {
+      yield put(END);
+      return;
     }
   }
 }
