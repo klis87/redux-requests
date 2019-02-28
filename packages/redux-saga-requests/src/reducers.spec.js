@@ -84,9 +84,15 @@ describe('reducers', () => {
     });
 
     describe('providing the default value of the reducer', () => {
-      const emptyFeatureCollection = { type: 'FeatureCollection', features: [] };
-      const defaultProvider = jest.fn(() => (emptyFeatureCollection));
-      const reducer = requestsReducer({ actionType, getDefault: defaultProvider });
+      const emptyFeatureCollection = {
+        type: 'FeatureCollection',
+        features: [],
+      };
+      const defaultProvider = jest.fn(() => emptyFeatureCollection);
+      const reducer = requestsReducer({
+        actionType,
+        getDefaultData: defaultProvider,
+      });
 
       afterEach(() => {
         defaultProvider.mockClear();
@@ -105,12 +111,17 @@ describe('reducers', () => {
       it('resets data via getDefault on errors', () => {
         const someError = 'asdasda';
         const action = { type: error(actionType), error: someError };
-        expect(reducer({
-          data: {},
-          error: someError,
-          pending: 1,
-          operations: null,
-        }, action)).toEqual({
+        expect(
+          reducer(
+            {
+              data: {},
+              error: someError,
+              pending: 1,
+              operations: null,
+            },
+            action,
+          ),
+        ).toEqual({
           data: emptyFeatureCollection,
           error: someError,
           pending: 0,

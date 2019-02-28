@@ -84,6 +84,7 @@ watchRequests({ abortOn: ['TYPE'] });
 
 const globalConfig = {
   multiple: false,
+  getDefaultData: multiple => (multiple ? [] : null),
   getData: (state, action) => action.payload.data,
   getError: (state, action) => action.payload,
   onRequest: (state, action, { multiple }) => ({

@@ -451,6 +451,9 @@ In order to be flexible, apart from `actionType` passed in `requestsReducer` con
 following attributes:
 - `multiple: boolean`: default to `false`, change it to `true` if you want your not loaded data to be stored as `[]`
 instead of `null`
+- `getDefaultData: (multiple: boolean) => any`: use instead of `multiple`, if you want your initial data to be
+something else than `null` or `[]`, for instance `() => ({ value: null })`, `multiple => (multiple ? [] : null)`
+by default
 - `getData: (state, action, config) => data`: describes how to get data from `action` object, by default returns `action.data` or `action.payload.data` when action is FSA compliant
 - `updateData: (state, action, config) => data`: optional, useful together with operations to overwrite `getData` default, see more
 information in `operations`

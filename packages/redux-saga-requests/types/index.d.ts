@@ -104,6 +104,7 @@ type Operations = {
 
 type GlobalReducerConfig = {
   multiple?: boolean;
+  getDefaultData?: (multiple: boolean) => any;
   getData?: OnActionCallback;
   updateData?: OnActionCallback;
   getError?: OnActionCallback;
@@ -124,6 +125,7 @@ type LocalReducerConfig = GlobalReducerConfig & ActionTypeReducerConfig;
 type MergedReducerConfig = {
   actionType: string;
   multiple: boolean;
+  getDefaultData: (multiple: boolean) => any;
   getData: OnActionCallback;
   updateData?: OnActionCallback;
   getError: OnActionCallback;
