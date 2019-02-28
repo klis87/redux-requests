@@ -1,3 +1,4 @@
+import { END } from 'redux-saga';
 import { getContext, setContext, cancelled } from 'redux-saga/effects';
 import { expectSaga } from 'redux-saga-test-plan';
 import * as matchers from 'redux-saga-test-plan/matchers';
@@ -21,6 +22,7 @@ import {
   sendRequest,
   cancelSendRequestOnAction,
   watchRequests,
+  countServerRequests,
   voidCallback,
 } from './sagas';
 
@@ -764,6 +766,122 @@ describe('sagas', () => {
           meta: { as: 'version2' },
         })
         .silentRun(100);
+    });
+  });
+
+  describe('countServerRequests', () => {
+    it('dispatches END after successful response', () => {
+      const request = {
+        type: 'FETCH',
+        request: { url: '/url' },
+      };
+      const response = createSuccessAction(request);
+
+      return expectSaga(countServerRequests, {
+        serverRequestResponseActions: {},
+      })
+        .put(END)
+        .dispatch(request)
+        .dispatch(response)
+        .run();
+    });
+
+    it('doesnt dispatch END after request without response', () => {
+      const request = {
+        type: 'FETCH',
+        request: { url: '/url' },
+      };
+
+      return expectSaga(countServerRequests, {
+        serverRequestResponseActions: {},
+      })
+        .not.put(END)
+        .dispatch(request)
+        .silentRun(100);
+    });
+
+    it('doesnt dispatch END after successful response of request with higher requestWeight', () => {
+      const request = {
+        type: 'FETCH',
+        request: { url: '/url' },
+        meta: {
+          requestWeight: 2,
+        },
+      };
+      const response = createSuccessAction(request);
+
+      return expectSaga(countServerRequests, {
+        serverRequestResponseActions: {},
+      })
+        .not.put(END)
+        .dispatch(request)
+        .dispatch(response)
+        .silentRun(100);
+    });
+
+    it('dispatches END after error response', () => {
+      const request = {
+        type: 'FETCH',
+        request: { url: '/url' },
+      };
+      const response = createErrorAction(request);
+
+      return expectSaga(countServerRequests, {
+        serverRequestResponseActions: {},
+      })
+        .put(END)
+        .dispatch(request)
+        .dispatch(request)
+        .dispatch(response)
+        .run();
+    });
+
+    it('doesnt dispatch END after error response when finishOnFirstError is false', () => {
+      const request = {
+        type: 'FETCH',
+        request: { url: '/url' },
+      };
+      const response = createErrorAction(request);
+
+      return expectSaga(countServerRequests, {
+        serverRequestResponseActions: {},
+        finishOnFirstError: false,
+      })
+        .not.put(END)
+        .dispatch(request)
+        .dispatch(request)
+        .dispatch(response)
+        .silentRun(100);
+    });
+
+    it('supports dependent actions', () => {
+      const request = {
+        type: 'FETCH',
+        request: { url: '/url' },
+        meta: {
+          requestWeight: 2,
+        },
+      };
+      const response = createSuccessAction(request);
+      const dependentRequest = {
+        type: 'FETCH_DEPENDENT',
+        request: { url: '/url' },
+        meta: {
+          responseWeight: 2,
+          dependentRequest: true,
+        },
+      };
+      const dependentResponse = createSuccessAction(dependentRequest);
+
+      return expectSaga(countServerRequests, {
+        serverRequestResponseActions: {},
+      })
+        .put(END)
+        .dispatch(request)
+        .dispatch(response)
+        .dispatch(dependentRequest)
+        .dispatch(dependentResponse)
+        .run();
     });
   });
 });

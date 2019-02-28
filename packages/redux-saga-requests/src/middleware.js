@@ -111,3 +111,29 @@ export const requestsCacheMiddleware = () => {
     return next(action);
   };
 };
+
+export const serverRequestsFilterMiddleware = ({
+  serverRequestResponseActions,
+  areActionsEqual = (serverResponseAction, clientRequestAction) =>
+    getRequestActionFromResponse(serverResponseAction).type ===
+    clientRequestAction.type,
+}) => {
+  const actionsToBeIgnored = serverRequestResponseActions.slice();
+
+  return () => next => action => {
+    if (!isRequestAction(action)) {
+      return next(action);
+    }
+
+    const actionToBeIgnoredIndex = actionsToBeIgnored.findIndex(a =>
+      areActionsEqual(a, action),
+    );
+
+    if (actionToBeIgnoredIndex === -1) {
+      return next(action);
+    }
+
+    actionsToBeIgnored.splice(actionToBeIgnoredIndex, 1);
+    return null;
+  };
+};
