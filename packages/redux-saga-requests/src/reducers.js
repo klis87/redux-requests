@@ -94,7 +94,7 @@ export const createRequestsReducer = (globalConfig = {}) => (
   reducer = null,
 ) => (state, action) => {
   const config = { ...defaultConfig, ...globalConfig, ...localConfig };
-  const nextState =
+  let nextState =
     state === undefined ? getInitialState(state, reducer, config) : state;
   const {
     onRequest,
@@ -113,9 +113,9 @@ export const createRequestsReducer = (globalConfig = {}) => (
     (typeof resetOn !== 'function' &&
       resetOn.map(normalizeActionType).includes(action.type))
   ) {
-    return {
-      ...getInitialState(state, reducer, config),
-      pending: state.pending,
+    nextState = {
+      ...getInitialState(nextState, reducer, config),
+      pending: nextState.pending,
     };
   }
 
@@ -123,21 +123,21 @@ export const createRequestsReducer = (globalConfig = {}) => (
     const operationConfig = operations[action.type];
 
     return {
-      ...state,
+      ...nextState,
       data: operationConfig.updateDataOptimistic
-        ? operationConfig.updateDataOptimistic(state, action, config)
-        : state.data,
+        ? operationConfig.updateDataOptimistic(nextState, action, config)
+        : nextState.data,
       operations: {
-        ...state.operations,
+        ...nextState.operations,
         [action.type]: operationConfigHasRequestKey(operationConfig)
           ? {
-              ...state.operations[action.type],
+              ...nextState.operations[action.type],
               [operationConfig.getRequestKey(action)]: {
                 error: null,
-                pending: state.operations[action.type][
+                pending: nextState.operations[action.type][
                   operationConfig.getRequestKey(action)
                 ]
-                  ? state.operations[action.type][
+                  ? nextState.operations[action.type][
                       operationConfig.getRequestKey(action)
                     ].pending + 1
                   : 1,
@@ -145,7 +145,7 @@ export const createRequestsReducer = (globalConfig = {}) => (
             }
           : {
               error: null,
-              pending: state.operations[action.type].pending + 1,
+              pending: nextState.operations[action.type].pending + 1,
             },
       },
     };
@@ -161,7 +161,7 @@ export const createRequestsReducer = (globalConfig = {}) => (
     const {
       [requestAction.type]: currentOperation,
       ...otherOperations
-    } = state.operations;
+    } = nextState.operations;
 
     if (isSuccessAction(action)) {
       const dataUpdater = getDataUpdaterForSuccess(config, operationConfig);
@@ -193,8 +193,8 @@ export const createRequestsReducer = (globalConfig = {}) => (
       };
 
       return {
-        ...state,
-        data: dataUpdater ? dataUpdater(state, action, config) : state.data,
+        ...nextState,
+        data: dataUpdater ? dataUpdater(nextState, action, config) : nextState.data,
         operations: {
           ...otherOperations,
           [requestAction.type]: getUpdatedCurrentOperation(),
@@ -204,17 +204,17 @@ export const createRequestsReducer = (globalConfig = {}) => (
 
     if (isErrorAction(action)) {
       return {
-        ...state,
+        ...nextState,
         data: operationConfig.revertData
-          ? operationConfig.revertData(state, action, config)
-          : state.data,
+          ? operationConfig.revertData(nextState, action, config)
+          : nextState.data,
         operations: {
           ...otherOperations,
           [requestAction.type]: operationConfigHasRequestKey(operationConfig)
             ? {
                 ...currentOperation,
                 [operationConfig.getRequestKey(requestAction)]: {
-                  error: getError(state, action, config),
+                  error: getError(nextState, action, config),
                   pending:
                     currentOperation[
                       operationConfig.getRequestKey(requestAction)
@@ -222,7 +222,7 @@ export const createRequestsReducer = (globalConfig = {}) => (
                 },
               }
             : {
-                error: getError(state, action, config),
+                error: getError(nextState, action, config),
                 pending: currentOperation.pending - 1,
               },
         },
@@ -258,10 +258,10 @@ export const createRequestsReducer = (globalConfig = {}) => (
     };
 
     return {
-      ...state,
+      ...nextState,
       data: operationConfig.revertData
-        ? operationConfig.revertData(state, action, config)
-        : state.data,
+        ? operationConfig.revertData(nextState, action, config)
+        : nextState.data,
       operations: {
         ...otherOperations,
         [requestAction.type]: getUpdatedCurrentOperation(),
@@ -271,13 +271,13 @@ export const createRequestsReducer = (globalConfig = {}) => (
 
   switch (action.type) {
     case normalizedActionType:
-      return onRequest(state, action, config);
+      return onRequest(nextState, action, config);
     case success(normalizedActionType):
-      return onSuccess(state, action, config);
+      return onSuccess(nextState, action, config);
     case error(normalizedActionType):
-      return onError(state, action, config);
+      return onError(nextState, action, config);
     case abort(normalizedActionType):
-      return onAbort(state, action, config);
+      return onAbort(nextState, action, config);
     default:
       return reducer ? reducer(nextState, action) : nextState;
   }
