@@ -194,7 +194,9 @@ export const createRequestsReducer = (globalConfig = {}) => (
 
       return {
         ...nextState,
-        data: dataUpdater ? dataUpdater(nextState, action, config) : nextState.data,
+        data: dataUpdater
+          ? dataUpdater(nextState, action, config)
+          : nextState.data,
         operations: {
           ...otherOperations,
           [requestAction.type]: getUpdatedCurrentOperation(),

@@ -238,11 +238,19 @@ describe('reducers', () => {
         });
       });
 
-
       it('handles reset action when resetOn is the same as the reducer actionType', () => {
-        const resetRequestReducer = requestsReducer({ actionType, resetOn: [actionType], multiple: true });
+        const resetRequestReducer = requestsReducer({
+          actionType,
+          resetOn: [actionType],
+          multiple: true,
+        });
 
-        const state = { data: [1, 2, 3], operations: null, error: null, pending: 0 };
+        const state = {
+          data: [1, 2, 3],
+          operations: null,
+          error: null,
+          pending: 0,
+        };
         expect(resetRequestReducer(state, { type: actionType })).toEqual({
           data: [],
           error: null,
