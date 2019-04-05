@@ -2,6 +2,7 @@ import {
   SUCCESS_SUFFIX,
   ERROR_SUFFIX,
   ABORT_SUFFIX,
+  GET_REQUEST_CACHE,
   CLEAR_REQUESTS_CACHE,
 } from './constants';
 
@@ -15,16 +16,18 @@ export const abort = getActionWithSuffix(ABORT_SUFFIX);
 
 const isFSA = action => !!action.payload;
 
-export const createSuccessAction = (action, data) => ({
+export const createSuccessAction = (action, data, response) => ({
   type: success(action.type),
   ...(isFSA(action)
     ? {
         payload: {
           data,
+          response,
         },
       }
     : {
         data,
+        response,
       }),
   meta: {
     ...action.meta,
@@ -88,6 +91,8 @@ export const isErrorAction = action =>
 
 export const isAbortAction = action =>
   isResponseAction(action) && action.type.endsWith(ABORT_SUFFIX);
+
+export const getRequestCache = () => ({ type: GET_REQUEST_CACHE });
 
 export const clearRequestsCache = (...actionTypes) => ({
   type: CLEAR_REQUESTS_CACHE,

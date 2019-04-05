@@ -83,12 +83,7 @@ export function* sendRequest(
 
   if (dispatchRequestAction && !silent) {
     action = { ...action, meta: { ...action.meta, runByWatcher: false } };
-    const requestResponse = yield put(action);
-
-    // only possible when using requestsCacheMiddleware
-    if (requestResponse === null) {
-      return { cacheHit: true };
-    }
+    action = yield put(action); // to be affected by requestsCacheMiddleware
   }
 
   const driver = yield call(getDriver, requestsConfig, action);
@@ -116,7 +111,9 @@ export function* sendRequest(
     let responseError;
 
     try {
-      if (!Array.isArray(actionPayload.request)) {
+      if (action.meta && action.meta.cacheResponse) {
+        response = action.meta.cacheResponse;
+      } else if (!Array.isArray(actionPayload.request)) {
         response = yield call(
           [driver, 'sendRequest'],
           actionPayload.request,
@@ -185,7 +182,7 @@ export function* sendRequest(
     );
 
     if (!silent) {
-      yield put(createSuccessAction(action, successPayload));
+      yield put(createSuccessAction(action, successPayload, response));
     }
 
     return { response };

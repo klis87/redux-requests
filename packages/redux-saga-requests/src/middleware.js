@@ -1,10 +1,11 @@
-import { CLEAR_REQUESTS_CACHE } from './constants';
+import { GET_REQUEST_CACHE, CLEAR_REQUESTS_CACHE } from './constants';
 import {
   success,
   isRequestAction,
   isSuccessAction,
   isResponseAction,
   getRequestActionFromResponse,
+  getActionPayload,
 } from './actions';
 
 const shouldActionBePromisified = (action, auto) =>
@@ -42,15 +43,20 @@ export const requestsPromiseMiddleware = ({ auto = false } = {}) => {
   };
 };
 
-const isCacheValid = cache => cache === true || Date.now() <= cache;
+const isCacheValid = cache =>
+  cache.expiring === null || Date.now() <= cache.expiring;
 
-const getNewCacheValue = cache =>
-  cache === true ? cache : cache * 1000 + Date.now();
+const getNewCacheTimeout = cache =>
+  cache === true ? null : cache * 1000 + Date.now();
 
 export const requestsCacheMiddleware = () => {
   const cacheMap = new Map();
 
   return () => next => action => {
+    if (action.type === GET_REQUEST_CACHE) {
+      return cacheMap;
+    }
+
     if (action.type === CLEAR_REQUESTS_CACHE) {
       if (action.actionTypes.length === 0) {
         cacheMap.clear();
@@ -66,14 +72,25 @@ export const requestsCacheMiddleware = () => {
       cacheMap.get(action.type) &&
       isCacheValid(cacheMap.get(action.type))
     ) {
-      return null;
+      return next({
+        ...action,
+        meta: {
+          ...action.meta,
+          cacheResponse: cacheMap.get(action.type).response,
+        },
+      });
     }
 
-    if (isSuccessAction(action) && action.meta && action.meta.cache) {
-      cacheMap.set(
-        getRequestActionFromResponse(action).type,
-        getNewCacheValue(action.meta.cache),
-      );
+    if (
+      isSuccessAction(action) &&
+      action.meta &&
+      action.meta.cache &&
+      !action.meta.cacheResponse
+    ) {
+      cacheMap.set(getRequestActionFromResponse(action).type, {
+        response: getActionPayload(action).response,
+        expiring: getNewCacheTimeout(action.meta.cache),
+      });
     }
 
     return next(action);

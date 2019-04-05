@@ -6,6 +6,7 @@ import {
   error,
   abort,
   createSuccessAction,
+  getRequestCache,
   clearRequestsCache,
 } from './actions';
 import {
@@ -240,6 +241,20 @@ describe('requestsPromiseMiddleware', () => {
 });
 
 describe('requestsCacheMiddleware', () => {
+  it('doesnt dispatch anything on getRequestCache action', () => {
+    const mockStore = configureStore([requestsCacheMiddleware()]);
+    const store = mockStore({});
+    store.dispatch(getRequestCache());
+    expect(store.getActions()).toEqual([]);
+  });
+
+  it('returns map on getRequestCache action', () => {
+    const mockStore = configureStore([requestsCacheMiddleware()]);
+    const store = mockStore({});
+    const result = store.dispatch(getRequestCache());
+    expect(result).toEqual(new Map());
+  });
+
   it('doesnt affect non request actions', () => {
     const mockStore = configureStore([requestsCacheMiddleware()]);
     const store = mockStore({});
@@ -247,22 +262,21 @@ describe('requestsCacheMiddleware', () => {
     const result = store.dispatch(action);
     expect(result).toEqual(action);
     expect(store.getActions()).toEqual([action]);
+    expect(store.dispatch(getRequestCache())).toEqual(new Map());
   });
 
   it('doesnt affect request actions with no meta cache', () => {
     const mockStore = configureStore([requestsCacheMiddleware()]);
     const store = mockStore({});
     const action = { type: 'REQUEST', request: { url: '/' } };
-    const responseAction = createSuccessAction(action, null);
+    const responseAction = createSuccessAction(action, null, null);
     store.dispatch(action);
     store.dispatch(responseAction);
-    store.clearActions();
-    const result = store.dispatch(action);
-    expect(result).toEqual(action);
-    expect(store.getActions()).toEqual([action]);
+    expect(store.getActions()).toEqual([action, responseAction]);
+    expect(store.dispatch(getRequestCache())).toEqual(new Map());
   });
 
-  it('doesnt affect request actions after clearing the whole cache', () => {
+  it('adds cacheResponse to request action when meta cache is true', () => {
     const mockStore = configureStore([requestsCacheMiddleware()]);
     const store = mockStore({});
     const action = {
@@ -270,17 +284,109 @@ describe('requestsCacheMiddleware', () => {
       request: { url: '/' },
       meta: { cache: true },
     };
-    const responseAction = createSuccessAction(action, null);
+    const responseAction = createSuccessAction(action, null, { data: 'data' });
+    store.dispatch(action);
+    store.dispatch(responseAction);
+    expect(store.getActions()).toEqual([action, responseAction]);
+    expect(store.dispatch(getRequestCache())).toEqual(
+      new Map([
+        [
+          'REQUEST',
+          {
+            expiring: null,
+            response: { data: 'data' },
+          },
+        ],
+      ]),
+    );
+    store.clearActions();
+    store.dispatch(action);
+    expect(store.getActions()).toEqual([
+      {
+        type: 'REQUEST',
+        request: { url: '/' },
+        meta: { cache: true, cacheResponse: { data: 'data' } },
+      },
+    ]);
+  });
+
+  it('adds cacheResponse to request action when meta cache is integer and valid', () => {
+    advanceTo(new Date(2018, 1, 1, 0, 0, 0));
+    const mockStore = configureStore([requestsCacheMiddleware()]);
+    const store = mockStore({});
+    const action = {
+      type: 'REQUEST',
+      request: { url: '/' },
+      meta: { cache: 1 },
+    };
+    const responseAction = createSuccessAction(action, null, { data: 'data' });
+    store.dispatch(action);
+    store.dispatch(responseAction);
+    expect(store.getActions()).toEqual([action, responseAction]);
+    store.clearActions();
+    advanceBy(1000);
+    store.dispatch(action);
+    clear();
+    expect(store.getActions()).toEqual([
+      {
+        type: 'REQUEST',
+        request: { url: '/' },
+        meta: { cache: 1, cacheResponse: { data: 'data' } },
+      },
+    ]);
+  });
+
+  it('doesnt add cacheResponse to request action when meta cache is integer and invalid', () => {
+    advanceTo(new Date(2018, 1, 1, 0, 0, 0));
+    const mockStore = configureStore([requestsCacheMiddleware()]);
+    const store = mockStore({});
+    const action = {
+      type: 'REQUEST',
+      request: { url: '/' },
+      meta: { cache: 1 },
+    };
+    const responseAction = createSuccessAction(action, null, { data: 'data' });
+    store.dispatch(action);
+    store.dispatch(responseAction);
+    advanceBy(1000);
+    store.dispatch(action);
+    store.dispatch(
+      createSuccessAction(
+        {
+          type: 'REQUEST',
+          request: { url: '/' },
+          meta: { cache: 1, cacheResponse: { data: 'data' } },
+        },
+        null,
+        { data: 'data' },
+      ),
+    );
+    advanceBy(1);
+    store.clearActions();
+    store.dispatch(action);
+    clear();
+    expect(store.getActions()).toEqual([action]);
+  });
+
+  it('doesnt add cacheResponse to request action after the whole cache is cleared', () => {
+    const mockStore = configureStore([requestsCacheMiddleware()]);
+    const store = mockStore({});
+    const action = {
+      type: 'REQUEST',
+      request: { url: '/' },
+      meta: { cache: true },
+    };
+    const responseAction = createSuccessAction(action, null, { data: 'data' });
     store.dispatch(action);
     store.dispatch(responseAction);
     store.dispatch(clearRequestsCache());
+    expect(store.dispatch(getRequestCache())).toEqual(new Map());
     store.clearActions();
-    const result = store.dispatch(action);
-    expect(result).toEqual(action);
+    store.dispatch(action);
     expect(store.getActions()).toEqual([action]);
   });
 
-  it('doesnt affect request actions after clearing action cache', () => {
+  it('doesnt add cacheResponse to request action after specific action cache is cleared', () => {
     const mockStore = configureStore([requestsCacheMiddleware()]);
     const store = mockStore({});
     const action = {
@@ -288,88 +394,13 @@ describe('requestsCacheMiddleware', () => {
       request: { url: '/' },
       meta: { cache: true },
     };
-    const responseAction = createSuccessAction(action, null);
+    const responseAction = createSuccessAction(action, null, { data: 'data' });
     store.dispatch(action);
     store.dispatch(responseAction);
-    store.dispatch(clearRequestsCache('REQUEST', 'ANOTHER'));
+    store.dispatch(clearRequestsCache('REQUEST'));
+    expect(store.dispatch(getRequestCache())).toEqual(new Map());
     store.clearActions();
-    const result = store.dispatch(action);
-    expect(result).toEqual(action);
-    expect(store.getActions()).toEqual([action]);
-  });
-
-  it('doesnt dispatch request with meta cache true', () => {
-    const mockStore = configureStore([requestsCacheMiddleware()]);
-    const store = mockStore({});
-    const action = {
-      type: 'REQUEST',
-      request: { url: '/' },
-      meta: { cache: true },
-    };
-    const responseAction = createSuccessAction(action, null);
     store.dispatch(action);
-    store.dispatch(responseAction);
-    store.clearActions();
-    const result = store.dispatch(action);
-    expect(result).toEqual(null);
-    expect(store.getActions()).toEqual([]);
-  });
-
-  it('clearing unrelated cache doesnt affect valid cache', () => {
-    const mockStore = configureStore([requestsCacheMiddleware()]);
-    const store = mockStore({});
-    const action = {
-      type: 'REQUEST',
-      request: { url: '/' },
-      meta: { cache: true },
-    };
-    const responseAction = createSuccessAction(action, null);
-    store.dispatch(action);
-    store.dispatch(responseAction);
-    store.dispatch(clearRequestsCache('NOT_RELATED'));
-    store.clearActions();
-    const result = store.dispatch(action);
-    expect(result).toEqual(null);
-    expect(store.getActions()).toEqual([]);
-  });
-
-  it('doesnt dispatch request with meta cache as integer when cache valid', () => {
-    advanceTo(new Date(2018, 1, 1, 0, 0, 0));
-    const mockStore = configureStore([requestsCacheMiddleware()]);
-    const store = mockStore({});
-    const action = {
-      type: 'REQUEST',
-      request: { url: '/' },
-      meta: { cache: 1 },
-    };
-    const responseAction = createSuccessAction(action, null);
-    store.dispatch(action);
-    store.dispatch(responseAction);
-    store.clearActions();
-    advanceBy(1000);
-    const result = store.dispatch(action);
-    clear();
-    expect(result).toEqual(null);
-    expect(store.getActions()).toEqual([]);
-  });
-
-  it('dispatches request with meta cache as integer when cache expired', () => {
-    advanceTo(new Date(2018, 1, 1, 0, 0, 0));
-    const mockStore = configureStore([requestsCacheMiddleware()]);
-    const store = mockStore({});
-    const action = {
-      type: 'REQUEST',
-      request: { url: '/' },
-      meta: { cache: 1 },
-    };
-    const responseAction = createSuccessAction(action, null);
-    store.dispatch(action);
-    store.dispatch(responseAction);
-    store.clearActions();
-    advanceBy(1001);
-    const result = store.dispatch(action);
-    clear();
-    expect(result).toEqual(action);
     expect(store.getActions()).toEqual([action]);
   });
 });

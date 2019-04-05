@@ -189,15 +189,28 @@ describe('sagas', () => {
       expect(sagaError).toEqual(INCORRECT_PAYLOAD_ERROR);
     });
 
-    it('returns cache hit when request action dispatch returns null', () => {
-      const action = { type: 'FETCH', request: { url: '/url' } };
+    it('gets response from cache when available in meta cacheResponse', () => {
+      const action = {
+        type: 'FETCH',
+        request: { url: '/url' },
+        meta: { cache: 1 },
+      };
+
+      const actionWithCacheResponse = {
+        ...action,
+        meta: { ...action.meta, cacheResponse: { data: 'data' } },
+      };
 
       return expectSaga(sendRequest, action, { dispatchRequestAction: true })
         .provide([
           [getContext(REQUESTS_CONFIG), config],
-          [matchers.put.actionType(action.type), null],
+          [matchers.put.actionType(action.type), actionWithCacheResponse],
         ])
-        .returns({ cacheHit: true })
+        .put(
+          createSuccessAction(actionWithCacheResponse, 'data', {
+            data: 'data',
+          }),
+        )
         .run();
     });
 
@@ -205,7 +218,10 @@ describe('sagas', () => {
       const action = { type: 'FETCH', request: { url: '/url' } };
 
       return expectSaga(sendRequest, action, { dispatchRequestAction: true })
-        .provide([[getContext(REQUESTS_CONFIG), config]])
+        .provide([
+          [getContext(REQUESTS_CONFIG), config],
+          [matchers.put.actionType(action.type), action],
+        ])
         .put({
           type: 'FETCH',
           request: { url: '/url' },
@@ -240,7 +256,7 @@ describe('sagas', () => {
 
       return expectSaga(sendRequest, action)
         .provide([[getContext(REQUESTS_CONFIG), config]])
-        .put(createSuccessAction(action, 'response'))
+        .put(createSuccessAction(action, 'response', { data: 'response' }))
         .returns({ response: { data: 'response' } })
         .run();
     });
@@ -255,7 +271,7 @@ describe('sagas', () => {
             { ...config, driver: { default: dummyDriver() } },
           ],
         ])
-        .put(createSuccessAction(action, 'response'))
+        .put(createSuccessAction(action, 'response', { data: 'response' }))
         .returns({ response: { data: 'response' } })
         .run();
     });
@@ -277,7 +293,7 @@ describe('sagas', () => {
             },
           ],
         ])
-        .put(createSuccessAction(action, 'response'))
+        .put(createSuccessAction(action, 'response', { data: 'response' }))
         .returns({ response: { data: 'response' } })
         .run();
     });
@@ -289,8 +305,17 @@ describe('sagas', () => {
       };
 
       return expectSaga(sendRequest, action)
-        .provide([[getContext(REQUESTS_CONFIG), config]])
-        .put(createSuccessAction(action, ['response', 'response']))
+        .provide([
+          [getContext(REQUESTS_CONFIG), config],
+          [matchers.put.actionType(action.type), action],
+        ])
+        .put(
+          createSuccessAction(
+            action,
+            ['response', 'response'],
+            [{ data: 'response' }, { data: 'response' }],
+          ),
+        )
         .returns({ response: [{ data: 'response' }, { data: 'response' }] })
         .run();
     });
