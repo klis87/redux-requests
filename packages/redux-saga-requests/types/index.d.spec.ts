@@ -29,6 +29,8 @@ const requestAction: RequestAction = {
     abortOn: ['ABORT'],
     takeLatest: false,
     cache: 1,
+    cacheKey: 'key',
+    cacheSize: 2,
     customKey: 'customValue',
   },
 };

@@ -1,4 +1,10 @@
-export { success, error, abort, clearRequestsCache } from './actions';
+export {
+  success,
+  error,
+  abort,
+  getRequestCache,
+  clearRequestsCache,
+} from './actions';
 export { createRequestsReducer, requestsReducer } from './reducers';
 export {
   requestsPromiseMiddleware,

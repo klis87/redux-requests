@@ -49,6 +49,8 @@ const isCacheValid = cache =>
 const getNewCacheTimeout = cache =>
   cache === true ? null : cache * 1000 + Date.now();
 
+const getCacheKey = action => action.type + (action.meta.cacheKey || '');
+
 export const requestsCacheMiddleware = () => {
   const cacheMap = new Map();
 
@@ -67,27 +69,40 @@ export const requestsCacheMiddleware = () => {
       return null;
     }
 
-    if (
-      isRequestAction(action) &&
-      cacheMap.get(action.type) &&
-      isCacheValid(cacheMap.get(action.type))
-    ) {
-      return next({
-        ...action,
-        meta: {
-          ...action.meta,
-          cacheResponse: cacheMap.get(action.type).response,
-        },
-      });
-    }
+    if (isRequestAction(action) && action.meta && action.meta.cache) {
+      const cacheKey = getCacheKey(action);
+      const cacheValue = cacheMap.get(cacheKey);
 
-    if (
+      if (cacheValue && isCacheValid(cacheValue)) {
+        return next({
+          ...action,
+          meta: {
+            ...action.meta,
+            cacheResponse: cacheValue.response,
+          },
+        });
+      } else if (cacheValue && !isCacheValid(cacheValue)) {
+        cacheMap.delete(cacheKey);
+      }
+    } else if (
       isSuccessAction(action) &&
       action.meta &&
       action.meta.cache &&
       !action.meta.cacheResponse
     ) {
-      cacheMap.set(getRequestActionFromResponse(action).type, {
+      const requestAction = getRequestActionFromResponse(action);
+
+      if (action.meta.cacheKey && action.meta.cacheSize) {
+        const currentCacheKeys = Array.from(cacheMap.keys()).filter(k =>
+          k.startsWith(requestAction.type),
+        );
+
+        if (action.meta.cacheSize === currentCacheKeys.length) {
+          cacheMap.delete(currentCacheKeys[0]);
+        }
+      }
+
+      cacheMap.set(getCacheKey(requestAction), {
         response: getActionPayload(action).response,
         expiring: getNewCacheTimeout(action.meta.cache),
       });

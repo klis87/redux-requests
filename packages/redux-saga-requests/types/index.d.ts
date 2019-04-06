@@ -11,6 +11,8 @@ type RequestActionMeta = {
   takeLatest?: boolean;
   abortOn?: FilterOnActionCallback | string | string[];
   cache?: boolean | number;
+  cacheKey?: string;
+  cacheSize?: number;
 };
 
 export type RequestAction =

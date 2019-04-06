@@ -403,4 +403,77 @@ describe('requestsCacheMiddleware', () => {
     store.dispatch(action);
     expect(store.getActions()).toEqual([action]);
   });
+
+  const wrapWithCacheResponse = action => ({
+    ...action,
+    meta: { ...action.meta, cacheResponse: { data: action.meta.cacheKey } },
+  });
+
+  it('supports meta cacheKey', () => {
+    const mockStore = configureStore([requestsCacheMiddleware()]);
+    const store = mockStore({});
+    const createRequestAction = id => ({
+      type: 'REQUEST',
+      request: { url: `/${id}` },
+      meta: { cache: true, cacheKey: id },
+    });
+    const createResponseAction = id =>
+      createSuccessAction(createRequestAction(id), id, {
+        data: id,
+      });
+
+    store.dispatch(createRequestAction('1'));
+    store.dispatch(createResponseAction('1'));
+    store.dispatch(createRequestAction('1'));
+    store.dispatch(createResponseAction('1'));
+    store.dispatch(createRequestAction('2'));
+    store.dispatch(createResponseAction('2'));
+    store.dispatch(createRequestAction('1'));
+    store.dispatch(createResponseAction('1'));
+
+    expect(store.getActions()).toEqual([
+      createRequestAction('1'),
+      createResponseAction('1'),
+      wrapWithCacheResponse(createRequestAction('1')),
+      createResponseAction('1'),
+      createRequestAction('2'),
+      createResponseAction('2'),
+      wrapWithCacheResponse(createRequestAction('1')),
+      createResponseAction('1'),
+    ]);
+  });
+
+  it('supports meta cacheSize', () => {
+    const mockStore = configureStore([requestsCacheMiddleware()]);
+    const store = mockStore({});
+    const createRequestAction = id => ({
+      type: 'REQUEST',
+      request: { url: `/${id}` },
+      meta: { cache: true, cacheKey: id, cacheSize: 1 },
+    });
+    const createResponseAction = id =>
+      createSuccessAction(createRequestAction(id), id, {
+        data: id,
+      });
+
+    store.dispatch(createRequestAction('1'));
+    store.dispatch(createResponseAction('1'));
+    store.dispatch(createRequestAction('1'));
+    store.dispatch(createResponseAction('1'));
+    store.dispatch(createRequestAction('2'));
+    store.dispatch(createResponseAction('2'));
+    store.dispatch(createRequestAction('1'));
+    store.dispatch(createResponseAction('1'));
+
+    expect(store.getActions()).toEqual([
+      createRequestAction('1'),
+      createResponseAction('1'),
+      wrapWithCacheResponse(createRequestAction('1')),
+      createResponseAction('1'),
+      createRequestAction('2'),
+      createResponseAction('2'),
+      createRequestAction('1'),
+      createResponseAction('1'),
+    ]);
+  });
 });

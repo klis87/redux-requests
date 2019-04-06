@@ -367,7 +367,8 @@ With this request action, assuming `id = 1`, following actions will be dispatche
 ```js
 {
   type: 'DELETE_BOOK_SUCCESS',
-  data: 'a server response',
+  response: { data: 'some data' },
+  data: 'some data',
   meta: {
     id: 1, // got from request action meta
     requestAction: {
@@ -940,8 +941,57 @@ const fetchBooks = () => ({
 ```
 
 What will happen now, is that after a succesfull book fetch (to be specific after `FETCH_BOOKS_SUCCESS` is dispatched),
-any `FETCH_BOOKS` actions for `10` seconds will be totally ignored, they won't touch your reducers and no request will be sent.
-You could also use `cache: true` to cache forever.
+any `FETCH_BOOKS` actions for `10` seconds won't trigger any AJAX calls and the following `FETCH_BOOKS_SUCCESS` will contain
+cached previous server response. You could also use `cache: true` to cache forever.
+
+Another use case is that you might want to keep a separate cache for the same request action based on a cache key. For example:
+```js
+const fetchBook = id => ({
+  type: FETCH_BOOK,
+  request: { url: `/books/${id}`},
+  meta: {
+    cache: true,
+    cacheKey: id // must be string
+  },
+});
+
+/* then, you will achieve the following behaviour:
+- GET /books/1 - make request
+- GET /books/1 - cache hit
+- GET /books/1 - cache hit
+- GET /books/2 - make request
+- GET /books/2 - cache hit
+- GET /books/1 - cache hit
+*/
+```
+
+The only problem with above is that if you happen to request with too many different cache keys,
+then cache would take too much memory. The remedy to this problem is `cacheSize`:
+```js
+const fetchBook = id => ({
+  type: FETCH_BOOK,
+  request: { url: `/books/${id}`},
+  meta: {
+    cache: true,
+    cacheKey: id // must be string
+    cacheSize: 2 // any integer bigger or equal 1
+  },
+});
+
+/* then, you will achieve the following behaviour:
+- GET /books/1 - make request
+- GET /books/1 - cache hit
+- GET /books/1 - cache hit
+- GET /books/2 - make request
+- GET /books/2 - cache hit
+- GET /books/1 - cache hit
+- GET /books/3 - make request
+- GET /books/3 - cache hit
+- GET /books/2 - cache hit
+- GET /books/1 - make request! because /books/3 invalidated /books/1 as
+it was the oldest cache and our cache size was set to 2
+*/
+```
 
 If you need to clear the cache for some reason, you can use `clearRequestsCache` action:
 ```js
@@ -955,8 +1005,16 @@ function* cacheSaga() {
 }
 ```
 
-Also, if you happen to use `sendRequest` with cacheable action with `dispatchRequestAction: true`,
-be aware that it could return `{ cacheHit: true }` instead of object with `error` or `response` key.
+Additionally, you can use `getRequestCache` action for debugging purposes:
+```js
+import { put } from 'redux-saga/effects';
+import { getRequestCache } from 'redux-saga-requests';
+
+function* cacheSaga() {
+  const currentCache = yield put(getRequestCache());
+}
+```
+
 
 ## Usage with Fetch API [:arrow_up:](#table-of-content)
 
