@@ -13,6 +13,10 @@ type RequestActionMeta = {
   cache?: boolean | number;
   cacheKey?: string;
   cacheSize?: number;
+  requestWeight?: number;
+  responseWeight?: number;
+  dependentRequest?: boolean;
+  [extraProperty: string]: any;
 };
 
 export type RequestAction =
@@ -162,3 +166,25 @@ export const requestsCacheMiddleware: () => Middleware;
 export const clearRequestsCache: (
   ...actionTypes: string[]
 ) => { type: string; actionTypes: string[] };
+
+type ServerRequestsFilterMiddlewareConfig = {
+  serverRequestActions: { type: string }[];
+};
+
+export const serverRequestsFilterMiddleware: (
+  config: ServerRequestsFilterMiddlewareConfig,
+) => Middleware;
+
+type ServerRequestActions = {
+  requestActionsToIgnore?: { type: string }[];
+  successActions?: { type: string; [extraProperty: string]: any }[];
+  dependentSuccessActions?: { type: string; [extraProperty: string]: any }[];
+  errorActions?: { type: string; [extraProperty: string]: any }[];
+};
+
+type CountServerRequestsConfig = {
+  serverRequestActions: ServerRequestActions;
+  finishOnFirstError?: boolean;
+};
+
+export const countServerRequests: (config: CountServerRequestsConfig) => void;

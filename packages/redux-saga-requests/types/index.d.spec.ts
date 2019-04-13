@@ -12,6 +12,8 @@ import {
   requestsPromiseMiddleware,
   requestsCacheMiddleware,
   clearRequestsCache,
+  serverRequestsFilterMiddleware,
+  countServerRequests,
   RequestAction,
 } from './index';
 
@@ -31,6 +33,9 @@ const requestAction: RequestAction = {
     cache: 1,
     cacheKey: 'key',
     cacheSize: 2,
+    requestWeight: 1,
+    responseWeight: 1,
+    dependentRequest: false,
     customKey: 'customValue',
   },
 };
@@ -184,3 +189,8 @@ requestsCacheMiddleware();
 clearRequestsCache();
 clearRequestsCache('TYPE');
 clearRequestsCache('TYPE', 'ANOTHER_TYPE');
+
+serverRequestsFilterMiddleware({ serverRequestActions: [{ type: 'REQUEST' }] });
+
+countServerRequests({ serverRequestActions: {} });
+countServerRequests({ serverRequestActions: {}, finishOnFirstError: false });
