@@ -263,7 +263,7 @@ describe('sagas', () => {
         .run();
     });
 
-    it('returns servedSide true when request action dispatch returns null', () => {
+    it('returns serverSide true when request action dispatch returns null', () => {
       const action = { type: 'FETCH', request: { url: '/url' } };
 
       return expectSaga(sendRequest, action, { dispatchRequestAction: true })
