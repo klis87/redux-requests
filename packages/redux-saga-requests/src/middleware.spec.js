@@ -496,7 +496,6 @@ describe('middleware', () => {
         type: 'SERVER_REQUEST',
         request: { url: '/' },
       };
-      const responseServerRequest = createSuccessAction(serverRequest, null);
       const clientRequest = {
         type: 'CLIENT_REQUEST',
         request: { url: '/' },
@@ -504,7 +503,7 @@ describe('middleware', () => {
       const nonRequestAction = { type: 'NOT_REQUEST' };
       const mockStore = configureStore([
         serverRequestsFilterMiddleware({
-          serverRequestResponseActions: [responseServerRequest],
+          serverRequestActions: [serverRequest],
         }),
       ]);
       const store = mockStore({});
@@ -517,35 +516,6 @@ describe('middleware', () => {
         clientRequest,
         nonRequestAction,
       ]);
-    });
-
-    it('allows passing custom areActionsEqual callback', () => {
-      const serverRequest = {
-        type: 'REQUEST',
-        request: { url: '/', data: { param: 1 } },
-      };
-      const responseServerRequest = createSuccessAction(serverRequest, null);
-      const clientRequest = {
-        type: 'REQUEST',
-        request: { url: '/', data: { param: 2 } },
-      };
-      const mockStore = configureStore([
-        serverRequestsFilterMiddleware({
-          serverRequestResponseActions: [responseServerRequest],
-          areActionsEqual: (serverResponseAction, clientRequestAction) => {
-            const serverRequestAction = serverResponseAction.meta.requestAction;
-            return (
-              serverRequestAction.type === clientRequestAction.type &&
-              serverRequestAction.request.data.param ===
-                clientRequestAction.request.data.param
-            );
-          },
-        }),
-      ]);
-      const store = mockStore({});
-      expect(store.dispatch(clientRequest)).toEqual(clientRequest);
-      expect(store.dispatch(serverRequest)).toEqual(null);
-      expect(store.getActions()).toEqual([clientRequest]);
     });
   });
 });
