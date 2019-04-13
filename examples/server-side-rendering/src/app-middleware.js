@@ -65,11 +65,11 @@ router.get('/favicon.ico', (req, res) => {
 
 router.use((req, res) => {
   const store = configureStore(undefined, true);
-  const serverRequestResponseActions = {};
+  const serverRequestActions = {};
   store
-    .runSaga(serverRequestResponseActions)
+    .runSaga(serverRequestActions)
     .done.then(() => {
-      if (serverRequestResponseActions.errorActions.length > 0) {
+      if (serverRequestActions.errorActions.length > 0) {
         res.status(400).send('something went wrong');
       } else {
         const html = renderToString(
@@ -81,8 +81,8 @@ router.use((req, res) => {
         res.render('index', {
           html,
           initialState: JSON.stringify(store.getState()),
-          serverRequestResponseActions: JSON.stringify(
-            serverRequestResponseActions.successActions,
+          serverRequestActions: JSON.stringify(
+            serverRequestActions.requestActionsToIgnore,
           ),
         });
       }

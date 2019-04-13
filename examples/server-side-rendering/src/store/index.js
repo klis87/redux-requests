@@ -24,7 +24,7 @@ function* bookSaga() {
   }
 }
 
-function* rootSaga(ssr = false, serverRequestResponseActions) {
+function* rootSaga(ssr = false, serverRequestActions) {
   yield createRequestInstance({
     driver: createDriver(
       axios.create({
@@ -35,7 +35,7 @@ function* rootSaga(ssr = false, serverRequestResponseActions) {
 
   yield all(
     [
-      ssr && call(countServerRequests, { serverRequestResponseActions }),
+      ssr && call(countServerRequests, { serverRequestActions }),
       call(watchRequests),
       call(bookSaga),
     ].filter(Boolean),
@@ -57,8 +57,7 @@ export const configureStore = (initialState = undefined, ssr = false) => {
   const middlewares = [
     !ssr &&
       serverRequestsFilterMiddleware({
-        serverRequestResponseActions:
-          window.__SERVER_REQUEST_RESPONSE_ACTIONS__,
+        serverRequestActions: window.__SERVER_REQUEST_ACTIONS__,
       }),
     sagaMiddleware,
   ].filter(Boolean);
@@ -69,8 +68,8 @@ export const configureStore = (initialState = undefined, ssr = false) => {
     composeEnhancers(applyMiddleware(...middlewares)),
   );
 
-  store.runSaga = serverRequestResponseActions =>
-    sagaMiddleware.run(rootSaga, ssr, serverRequestResponseActions);
+  store.runSaga = serverRequestActions =>
+    sagaMiddleware.run(rootSaga, ssr, serverRequestActions);
   store.close = () => store.dispatch(END);
   return store;
 };

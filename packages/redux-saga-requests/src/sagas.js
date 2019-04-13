@@ -18,6 +18,7 @@ import {
   createErrorAction,
   createAbortAction,
   getActionPayload,
+  getRequestActionFromResponse,
   isRequestAction,
   isResponseAction,
   isSuccessAction,
@@ -285,13 +286,14 @@ export function* watchRequests(commonConfig = {}) {
 }
 
 export function* countServerRequests({
-  serverRequestResponseActions,
+  serverRequestActions,
   finishOnFirstError = true,
 }) {
   let index = 0;
-  serverRequestResponseActions.successActions = [];
-  serverRequestResponseActions.dependentActions = [];
-  serverRequestResponseActions.errorActions = [];
+  serverRequestActions.requestActionsToIgnore = [];
+  serverRequestActions.successActions = [];
+  serverRequestActions.dependentSuccessActions = [];
+  serverRequestActions.errorActions = [];
 
   while (true) {
     const action = yield take(a => isRequestAction(a) || isResponseAction(a));
@@ -305,22 +307,25 @@ export function* countServerRequests({
     }
 
     if (!isSuccessAction(action)) {
-      serverRequestResponseActions.errorActions.push(action);
+      serverRequestActions.errorActions.push(action);
 
       if (finishOnFirstError) {
         yield put(END);
         return;
       }
     } else if (action.meta.dependentRequest) {
-      serverRequestResponseActions.dependentActions.push(action);
+      serverRequestActions.dependentSuccessActions.push(action);
     } else {
-      serverRequestResponseActions.successActions.push(action);
+      serverRequestActions.successActions.push(action);
     }
 
     index -=
       action.meta.responseWeight !== undefined ? action.meta.responseWeight : 1;
 
     if (index === 0) {
+      serverRequestActions.requestActionsToIgnore = serverRequestActions.successActions
+        .map(getRequestActionFromResponse)
+        .map(a => ({ type: a.type }));
       yield put(END);
       return;
     }

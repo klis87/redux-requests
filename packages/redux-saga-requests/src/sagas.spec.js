@@ -791,7 +791,7 @@ describe('sagas', () => {
       const response = createSuccessAction(request);
 
       return expectSaga(countServerRequests, {
-        serverRequestResponseActions: {},
+        serverRequestActions: {},
       })
         .put(END)
         .dispatch(request)
@@ -806,7 +806,7 @@ describe('sagas', () => {
       };
 
       return expectSaga(countServerRequests, {
-        serverRequestResponseActions: {},
+        serverRequestActions: {},
       })
         .not.put(END)
         .dispatch(request)
@@ -824,7 +824,7 @@ describe('sagas', () => {
       const response = createSuccessAction(request);
 
       return expectSaga(countServerRequests, {
-        serverRequestResponseActions: {},
+        serverRequestActions: {},
       })
         .not.put(END)
         .dispatch(request)
@@ -840,7 +840,7 @@ describe('sagas', () => {
       const response = createErrorAction(request);
 
       return expectSaga(countServerRequests, {
-        serverRequestResponseActions: {},
+        serverRequestActions: {},
       })
         .put(END)
         .dispatch(request)
@@ -857,7 +857,7 @@ describe('sagas', () => {
       const response = createErrorAction(request);
 
       return expectSaga(countServerRequests, {
-        serverRequestResponseActions: {},
+        serverRequestActions: {},
         finishOnFirstError: false,
       })
         .not.put(END)
@@ -887,7 +887,7 @@ describe('sagas', () => {
       const dependentResponse = createSuccessAction(dependentRequest);
 
       return expectSaga(countServerRequests, {
-        serverRequestResponseActions: {},
+        serverRequestActions: {},
       })
         .put(END)
         .dispatch(request)

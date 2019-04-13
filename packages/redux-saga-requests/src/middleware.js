@@ -112,21 +112,16 @@ export const requestsCacheMiddleware = () => {
   };
 };
 
-export const serverRequestsFilterMiddleware = ({
-  serverRequestResponseActions,
-  areActionsEqual = (serverResponseAction, clientRequestAction) =>
-    getRequestActionFromResponse(serverResponseAction).type ===
-    clientRequestAction.type,
-}) => {
-  const actionsToBeIgnored = serverRequestResponseActions.slice();
+export const serverRequestsFilterMiddleware = ({ serverRequestActions }) => {
+  const actionsToBeIgnored = serverRequestActions.slice();
 
   return () => next => action => {
     if (!isRequestAction(action)) {
       return next(action);
     }
 
-    const actionToBeIgnoredIndex = actionsToBeIgnored.findIndex(a =>
-      areActionsEqual(a, action),
+    const actionToBeIgnoredIndex = actionsToBeIgnored.findIndex(
+      a => a.type === action.type,
     );
 
     if (actionToBeIgnoredIndex === -1) {
