@@ -90,7 +90,7 @@ export function* sendRequest(
 
     // only possible when using  serverRequestsFilterMiddleware
     if (action === null) {
-      return { cacheHit: true };
+      return { serverSide: true };
     }
   }
 
