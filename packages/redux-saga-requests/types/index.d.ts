@@ -13,9 +13,8 @@ type RequestActionMeta = {
   cache?: boolean | number;
   cacheKey?: string;
   cacheSize?: number;
-  requestWeight?: number;
-  responseWeight?: number;
-  dependentRequest?: boolean;
+  dependentRequestsNumber: number;
+  isDependentRequest?: boolean;
   [extraProperty: string]: any;
 };
 

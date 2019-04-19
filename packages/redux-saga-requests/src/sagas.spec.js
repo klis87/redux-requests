@@ -813,12 +813,12 @@ describe('sagas', () => {
         .silentRun(100);
     });
 
-    it('doesnt dispatch END after successful response of request with higher requestWeight', () => {
+    it('doesnt dispatch END after successful response of request with dependentRequestsNumber', () => {
       const request = {
         type: 'FETCH',
         request: { url: '/url' },
         meta: {
-          requestWeight: 2,
+          dependentRequestsNumber: 1,
         },
       };
       const response = createSuccessAction(request);
@@ -867,12 +867,12 @@ describe('sagas', () => {
         .silentRun(100);
     });
 
-    it('supports dependent actions', () => {
+    it('dispatches END after dependent actions are finished', () => {
       const request = {
         type: 'FETCH',
         request: { url: '/url' },
         meta: {
-          requestWeight: 2,
+          dependentRequestsNumber: 1,
         },
       };
       const response = createSuccessAction(request);
@@ -880,8 +880,7 @@ describe('sagas', () => {
         type: 'FETCH_DEPENDENT',
         request: { url: '/url' },
         meta: {
-          responseWeight: 2,
-          dependentRequest: true,
+          isDependentRequest: true,
         },
       };
       const dependentResponse = createSuccessAction(dependentRequest);
@@ -896,5 +895,35 @@ describe('sagas', () => {
         .dispatch(dependentResponse)
         .run();
     });
+  });
+
+  it('doesnt dispatch END if not all dependent actions are finished', () => {
+    const request = {
+      type: 'FETCH',
+      request: { url: '/url' },
+      meta: {
+        dependentRequestsNumber: 2,
+      },
+    };
+    const response = createSuccessAction(request);
+    const dependentRequest = {
+      type: 'FETCH_DEPENDENT',
+      request: { url: '/url' },
+      meta: {
+        isDependentRequest: true,
+      },
+    };
+    const dependentResponse = createSuccessAction(dependentRequest);
+
+    return expectSaga(countServerRequests, {
+      serverRequestActions: {},
+    })
+      .not.put(END)
+      .dispatch(request)
+      .dispatch(response)
+      .dispatch(dependentRequest)
+      .dispatch(dependentRequest)
+      .dispatch(dependentResponse)
+      .run();
   });
 });

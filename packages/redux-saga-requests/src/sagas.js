@@ -300,8 +300,8 @@ export function* countServerRequests({
 
     if (isRequestAction(action)) {
       index +=
-        action.meta && action.meta.requestWeight !== undefined
-          ? action.meta.requestWeight
+        action.meta && action.meta.dependentRequestsNumber !== undefined
+          ? action.meta.dependentRequestsNumber + 1
           : 1;
       continue;
     }
@@ -313,14 +313,13 @@ export function* countServerRequests({
         yield put(END);
         return;
       }
-    } else if (action.meta.dependentRequest) {
+    } else if (action.meta.isDependentRequest) {
       serverRequestActions.dependentSuccessActions.push(action);
     } else {
       serverRequestActions.successActions.push(action);
     }
 
-    index -=
-      action.meta.responseWeight !== undefined ? action.meta.responseWeight : 1;
+    index -= action.meta.isDependentRequest ? 2 : 1;
 
     if (index === 0) {
       serverRequestActions.requestActionsToIgnore = serverRequestActions.successActions

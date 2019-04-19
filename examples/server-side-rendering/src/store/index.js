@@ -1,6 +1,6 @@
 import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
-import createSagaMiddleware, { END } from 'redux-saga';
-import { all, put, call, fork } from 'redux-saga/effects';
+import createSagaMiddleware from 'redux-saga';
+import { all, put, call } from 'redux-saga/effects';
 import axios from 'axios';
 import {
   createRequestInstance,
@@ -42,7 +42,8 @@ function* rootSaga(ssr = false, serverRequestActions) {
   );
 }
 
-export const configureStore = (initialState = undefined, ssr = false) => {
+export const configureStore = (initialState = undefined) => {
+  const ssr = !initialState; // if initiaState is not passed, it means we run it on server
   const reducers = combineReducers({
     books: booksReducer,
     booksScreeningActors: booksScreeningActorsReducer,
@@ -70,6 +71,5 @@ export const configureStore = (initialState = undefined, ssr = false) => {
 
   store.runSaga = serverRequestActions =>
     sagaMiddleware.run(rootSaga, ssr, serverRequestActions);
-  store.close = () => store.dispatch(END);
   return store;
 };

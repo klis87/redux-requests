@@ -33,9 +33,8 @@ const requestAction: RequestAction = {
     cache: 1,
     cacheKey: 'key',
     cacheSize: 2,
-    requestWeight: 1,
-    responseWeight: 1,
-    dependentRequest: false,
+    dependentRequestsNumber: 1,
+    isDependentRequest: true,
     customKey: 'customValue',
   },
 };
