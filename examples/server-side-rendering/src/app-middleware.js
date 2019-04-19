@@ -64,7 +64,7 @@ router.get('/favicon.ico', (req, res) => {
 });
 
 router.use((req, res) => {
-  const store = configureStore(undefined, true);
+  const store = configureStore();
   const serverRequestActions = {};
   store
     .runSaga(serverRequestActions)

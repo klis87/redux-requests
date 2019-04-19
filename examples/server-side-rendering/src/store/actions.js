@@ -6,7 +6,7 @@ export const fetchBooks = () => ({
     url: '/api/books',
   },
   meta: {
-    requestWeight: 2,
+    dependentRequestsNumber: 1,
   },
 });
 
@@ -19,7 +19,6 @@ export const fetchBooksScreeningActors = bookIds => ({
     },
   },
   meta: {
-    responseWeight: 2,
-    dependentRequest: true,
+    isDependentRequest: true,
   },
 });
