@@ -92,10 +92,8 @@ const defaultConfig = {
 export const createRequestsReducer = (globalConfig = {}) => (
   localConfig,
   reducer = null,
-) => (state, action) => {
+) => {
   const config = { ...defaultConfig, ...globalConfig, ...localConfig };
-  let nextState =
-    state === undefined ? getInitialState(state, reducer, config) : state;
   const {
     onRequest,
     onSuccess,
@@ -108,67 +106,140 @@ export const createRequestsReducer = (globalConfig = {}) => (
   } = config;
   const normalizedActionType = normalizeActionType(actionType);
 
-  if (
-    (typeof resetOn === 'function' && resetOn(action)) ||
-    (typeof resetOn !== 'function' &&
-      resetOn.map(normalizeActionType).includes(action.type))
-  ) {
-    nextState = {
-      ...getInitialState(nextState, reducer, config),
-      pending: nextState.pending,
-    };
+  let shouldResetForAction = resetOn;
+  if (typeof resetOn !== 'function') {
+    const normalizedResetActions = resetOn.map(normalizeActionType);
+    shouldResetForAction = (action) => normalizedResetActions.includes(action.type);
   }
 
-  if (operations && action.type in operations) {
-    const operationConfig = operations[action.type];
+  return (state, action) => {
+    let nextState =
+      state === undefined ? getInitialState(state, reducer, config) : state;
 
-    return {
-      ...nextState,
-      data: operationConfig.updateDataOptimistic
-        ? operationConfig.updateDataOptimistic(nextState, action, config)
-        : nextState.data,
-      operations: {
-        ...nextState.operations,
-        [action.type]: operationConfigHasRequestKey(operationConfig)
-          ? {
-              ...nextState.operations[action.type],
-              [operationConfig.getRequestKey(action)]: {
+    if (shouldResetForAction(action)) {
+      nextState = {
+        ...getInitialState(nextState, reducer, config),
+        pending: nextState.pending,
+      };
+    }
+
+    if (operations && action.type in operations) {
+      const operationConfig = operations[action.type];
+
+      return {
+        ...nextState,
+        data: operationConfig.updateDataOptimistic
+          ? operationConfig.updateDataOptimistic(nextState, action, config)
+          : nextState.data,
+        operations: {
+          ...nextState.operations,
+          [action.type]: operationConfigHasRequestKey(operationConfig)
+            ? {
+                ...nextState.operations[action.type],
+                [operationConfig.getRequestKey(action)]: {
+                  error: null,
+                  pending: nextState.operations[action.type][
+                    operationConfig.getRequestKey(action)
+                  ]
+                    ? nextState.operations[action.type][
+                        operationConfig.getRequestKey(action)
+                      ].pending + 1
+                    : 1,
+                },
+              }
+            : {
                 error: null,
-                pending: nextState.operations[action.type][
-                  operationConfig.getRequestKey(action)
-                ]
-                  ? nextState.operations[action.type][
-                      operationConfig.getRequestKey(action)
-                    ].pending + 1
-                  : 1,
+                pending: nextState.operations[action.type].pending + 1,
               },
-            }
-          : {
+        },
+      };
+    }
+
+    if (
+      operations &&
+      isResponseAction(action) &&
+      getRequestActionFromResponse(action).type in operations
+    ) {
+      const requestAction = getRequestActionFromResponse(action);
+      const operationConfig = operations[requestAction.type];
+      const {
+        [requestAction.type]: currentOperation,
+        ...otherOperations
+      } = nextState.operations;
+
+      if (isSuccessAction(action)) {
+        const dataUpdater = getDataUpdaterForSuccess(config, operationConfig);
+        const getUpdatedCurrentOperation = () => {
+          if (!operationConfigHasRequestKey(operationConfig)) {
+            return {
               error: null,
-              pending: nextState.operations[action.type].pending + 1,
-            },
-      },
-    };
-  }
+              pending: currentOperation.pending - 1,
+            };
+          }
 
-  if (
-    operations &&
-    isResponseAction(action) &&
-    getRequestActionFromResponse(action).type in operations
-  ) {
-    const requestAction = getRequestActionFromResponse(action);
-    const operationConfig = operations[requestAction.type];
-    const {
-      [requestAction.type]: currentOperation,
-      ...otherOperations
-    } = nextState.operations;
+          const currentRequestKey = operationConfig.getRequestKey(requestAction);
+          const {
+            [currentRequestKey]: operationForRequestKey,
+            ...remainingOperations
+          } = currentOperation;
 
-    if (isSuccessAction(action)) {
-      const dataUpdater = getDataUpdaterForSuccess(config, operationConfig);
+          if (operationForRequestKey.pending !== 1) {
+            return {
+              ...remainingOperations,
+              [currentRequestKey]: {
+                error: null,
+                pending: operationForRequestKey.pending - 1,
+              },
+            };
+          }
+
+          return remainingOperations;
+        };
+
+        return {
+          ...nextState,
+          data: dataUpdater
+            ? dataUpdater(nextState, action, config)
+            : nextState.data,
+          operations: {
+            ...otherOperations,
+            [requestAction.type]: getUpdatedCurrentOperation(),
+          },
+        };
+      }
+
+      if (isErrorAction(action)) {
+        return {
+          ...nextState,
+          data: operationConfig.revertData
+            ? operationConfig.revertData(nextState, action, config)
+            : nextState.data,
+          operations: {
+            ...otherOperations,
+            [requestAction.type]: operationConfigHasRequestKey(operationConfig)
+              ? {
+                  ...currentOperation,
+                  [operationConfig.getRequestKey(requestAction)]: {
+                    error: getError(nextState, action, config),
+                    pending:
+                      currentOperation[
+                        operationConfig.getRequestKey(requestAction)
+                      ].pending - 1,
+                  },
+                }
+              : {
+                  error: getError(nextState, action, config),
+                  pending: currentOperation.pending - 1,
+                },
+          },
+        };
+      }
+
+      // abort case
       const getUpdatedCurrentOperation = () => {
         if (!operationConfigHasRequestKey(operationConfig)) {
           return {
-            error: null,
+            ...currentOperation,
             pending: currentOperation.pending - 1,
           };
         }
@@ -183,7 +254,7 @@ export const createRequestsReducer = (globalConfig = {}) => (
           return {
             ...remainingOperations,
             [currentRequestKey]: {
-              error: null,
+              ...operationForRequestKey,
               pending: operationForRequestKey.pending - 1,
             },
           };
@@ -194,8 +265,8 @@ export const createRequestsReducer = (globalConfig = {}) => (
 
       return {
         ...nextState,
-        data: dataUpdater
-          ? dataUpdater(nextState, action, config)
+        data: operationConfig.revertData
+          ? operationConfig.revertData(nextState, action, config)
           : nextState.data,
         operations: {
           ...otherOperations,
@@ -204,85 +275,19 @@ export const createRequestsReducer = (globalConfig = {}) => (
       };
     }
 
-    if (isErrorAction(action)) {
-      return {
-        ...nextState,
-        data: operationConfig.revertData
-          ? operationConfig.revertData(nextState, action, config)
-          : nextState.data,
-        operations: {
-          ...otherOperations,
-          [requestAction.type]: operationConfigHasRequestKey(operationConfig)
-            ? {
-                ...currentOperation,
-                [operationConfig.getRequestKey(requestAction)]: {
-                  error: getError(nextState, action, config),
-                  pending:
-                    currentOperation[
-                      operationConfig.getRequestKey(requestAction)
-                    ].pending - 1,
-                },
-              }
-            : {
-                error: getError(nextState, action, config),
-                pending: currentOperation.pending - 1,
-              },
-        },
-      };
+    switch (action.type) {
+      case normalizedActionType:
+        return onRequest(nextState, action, config);
+      case success(normalizedActionType):
+        return onSuccess(nextState, action, config);
+      case error(normalizedActionType):
+        return onError(nextState, action, config);
+      case abort(normalizedActionType):
+        return onAbort(nextState, action, config);
+      default:
+        return reducer ? reducer(nextState, action) : nextState;
     }
-
-    // abort case
-    const getUpdatedCurrentOperation = () => {
-      if (!operationConfigHasRequestKey(operationConfig)) {
-        return {
-          ...currentOperation,
-          pending: currentOperation.pending - 1,
-        };
-      }
-
-      const currentRequestKey = operationConfig.getRequestKey(requestAction);
-      const {
-        [currentRequestKey]: operationForRequestKey,
-        ...remainingOperations
-      } = currentOperation;
-
-      if (operationForRequestKey.pending !== 1) {
-        return {
-          ...remainingOperations,
-          [currentRequestKey]: {
-            ...operationForRequestKey,
-            pending: operationForRequestKey.pending - 1,
-          },
-        };
-      }
-
-      return remainingOperations;
-    };
-
-    return {
-      ...nextState,
-      data: operationConfig.revertData
-        ? operationConfig.revertData(nextState, action, config)
-        : nextState.data,
-      operations: {
-        ...otherOperations,
-        [requestAction.type]: getUpdatedCurrentOperation(),
-      },
-    };
-  }
-
-  switch (action.type) {
-    case normalizedActionType:
-      return onRequest(nextState, action, config);
-    case success(normalizedActionType):
-      return onSuccess(nextState, action, config);
-    case error(normalizedActionType):
-      return onError(nextState, action, config);
-    case abort(normalizedActionType):
-      return onAbort(nextState, action, config);
-    default:
-      return reducer ? reducer(nextState, action) : nextState;
-  }
+  };
 };
 
 export const requestsReducer = createRequestsReducer();
