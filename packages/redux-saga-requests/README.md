@@ -30,6 +30,7 @@ integrations could be added, as they are implemented in a plugin fashion.
 - [Mocking](#mocking-arrow_up)
 - [Multiple drivers](#multiple-drivers-arrow_up)
 - [React bindings](#react-bindings-arrow_up)
+- [Server side rendering](#react-bindings-arrow_up)
 - [Examples](#examples-arrow_up)
 
 ## Motivation [:arrow_up:](#table-of-content)
@@ -120,8 +121,8 @@ for the example)
 - mocking - mock driver, which use can use for test purposes or when you would like to integrate with API not yet implemented (and once API is finished, you could just change driver to Axios or Fetch and magicaly everything will work!)
 - multiple driver support - for example you can use Axios for one part of your requests and Fetch Api for another part
 - compatible with FSA, `redux-act` and `redux-actions` libraries (see [redux-act example](https://github.com/klis87/redux-saga-requests/tree/master/examples/redux-act-integration))
-- simple to use with server side rendering - for example you could pass Axios instance to `createRequestInstance` and
-you don't need to worry that Axios interceptors would be shared across multiple requests
+- simple to use with server side rendering - you can structure your code however you want and `countServerRequests` will let you
+know when all requests are done on the server side and when you can render your app
 - `onRequest`, `onSuccess`, `onError` and `onAbort` interceptors, you can attach your sagas (or simple functions)
 to them to define a global behaviour for a given event type
 - optional `requestsPromiseMiddleware`, which promisifies requests actions dispatch, so you can wait in your react components to get request response, the same way like you can do this with `redux-thunk`
@@ -1188,6 +1189,181 @@ Just install `redux-saga-requests-react`. See
 [docs](https://github.com/klis87/redux-saga-requests/tree/master/packages/redux-saga-requests-react)
 for more info.
 
+## Server side rendering [:arrow_up:](#table-of-content)
+
+Server side rendering is a very complex topic and there are many ways how to go about it.
+Many people use the strategy around React components, for instance they attach static methods to components which
+make requests and return promises with responses, then they wrap them in `Promise.all`. I don't recommend this strategy
+when using Redux, because this requires additional code and potentially double rendering on server, but if you really want
+to do it, it is possible. Normally it wouldn't be possible with Redux-Saga, but thanks to `requestsPromiseMiddleware`, dispatched
+request actions return promises, just like with `redux-thunk`.
+
+However, I recommend using another approach. See [server-side-rendering-example](https://github.com/klis87/redux-saga-requests/tree/master/examples/server-side-rendering) with the complete setup, but in a nutshell you can write universal code like you would
+normally write it without SSR, with just only minor additions. Here is how:
+
+1. Before we begin, be advised that this strategy requires to dispatch requests on Redux level, at least those which have to be
+fired on application load. So for instance you cannot dispatch them inside `componentDidMount`. The obvious place to dispatch them
+is in your sagas, like `yield put(fetchBooks())`. However, what if your app has multiple routes, and each route has to send
+different requests? Well, you need to make Redux aware of current route. I recommend to use a router with first class support for
+Redux, namely [redux-first-router](https://github.com/faceyspacey/redux-first-router). If you use `react-router` though, it is
+fine too, you just need to integrate it with Redux with
+[connected-react-router](https://github.com/supasate/connected-react-router). Then, you can use `take` effect to listen to
+routes changes and/or get current location with `select` effect. This would give you information which route is active to know
+which requests to dispatch.
+2. On the server use `countServerRequests`, which keeps track of all your requests and will let you know when all requests
+are finished. Here you can see a possible implementation:
+    ```js
+    import { createStore, applyMiddleware, combineReducers } from 'redux';
+    import createSagaMiddleware from 'redux-saga';
+    import { all, put, call } from 'redux-saga/effects';
+    import axios from 'axios';
+    import {
+      createRequestInstance,
+      watchRequests,
+      countServerRequests,
+      serverRequestsFilterMiddleware,
+    } from 'redux-saga-requests';
+    import { createDriver } from 'redux-saga-requests-axios';
+
+    import { booksReducer } from './reducers';
+    import { fetchBooks } from './actions';
+
+    function* bookSaga() {
+      yield put(fetchBooks());
+    }
+
+    function* rootSaga(ssr = false, serverRequestActions) {
+      yield createRequestInstance({
+        driver: createDriver(
+          axios.create({
+            baseURL: 'http://localhost:3000',
+          }),
+        ),
+      });
+
+      yield all(
+        [
+          ssr && call(countServerRequests, {
+            serverRequestActions
+            finishOnFirstError: true // default, you can change it to false
+          }),
+          call(watchRequests),
+          call(bookSaga),
+        ].filter(Boolean),
+      );
+    }
+
+    export const configureStore = (initialState = undefined) => {
+      const ssr = !initialState; // if initiaState is not passed, it means we run it on server
+      const reducers = combineReducers({
+        books: booksReducer,
+      });
+
+      const sagaMiddleware = createSagaMiddleware();
+
+      const middlewares = [
+        !ssr &&
+          serverRequestsFilterMiddleware({
+            serverRequestActions: window.__SERVER_REQUEST_ACTIONS__,
+          }),
+        sagaMiddleware,
+      ].filter(Boolean);
+
+      const store = createStore(
+        reducers,
+        initialState,
+        applyMiddleware(...middlewares),
+      );
+
+      store.runSaga = serverRequestActions =>
+        sagaMiddleware.run(rootSaga, ssr, serverRequestActions);
+      return store;
+    };
+
+    // on the server
+    import React from 'react';
+    import { renderToString } from 'react-dom/server';
+    import { Provider } from 'react-redux';
+
+    // in an express/other server handler
+    const store = configureStore();
+    const serverRequestActions = {};
+    store
+      .runSaga(serverRequestActions)
+      .done.then(() => {
+        if (serverRequestActions.errorActions.length > 0) {
+          res.status(400).send('something went wrong');
+        } else {
+          const html = renderToString(
+            <Provider store={store}>
+              <App />
+            </Provider>,
+          );
+
+          res.render('index', {
+            html,
+            initialState: JSON.stringify(store.getState()),
+            serverRequestActions: JSON.stringify(
+              serverRequestActions.requestActionsToIgnore,
+            ),
+          });
+        }
+      })
+    ```
+    As you can see, you only need to use `countServerRequests`, which will let you know
+    when you are ready to render plus it will give you information about any errors which could happen
+    during requests by mutating `serverRequestActions` you pass to it.
+
+    How does it work? `countServerRequests` logic is based on an internal counter. Initially it is set to `0` and is
+    increased by `1` after each request is initialized. Then, after each response it is decreased by `1`. So, initially after a first
+    request it gets positive and after all requests are finished, its value is again set back to `0`. And this is the moment
+    which means that all requests are finished. To make this notification, `countServerRequests` dispatches a special
+    action from `redux-saga`, namely `END`, which stops all your sagas. After your sagas are stopped,
+    `store.runSaga(serverRequestActions).done` promise is resolved. Then, it is time to inspect `serverRequestActions`, but before
+    we go into that, lets cover three edge cases.
+
+    One scenario you could be worried with above algorythm is what to do in case of an error. Obviously errors can
+    always happen for network call and actually by default `contServerRequest` dispatches `END` no matter what counter is
+    on any first encountered error response. You can change this behaviour by option `finishOnFirstError: false` to it.
+
+    Another problem you might think of is what to do if you don't want to dispatch any request for a given route?
+    Then counter would never be increased, so it would also never be decreased, so `countServerRequests` would never
+    dispatch `END`. How to fix this? Simple, if you know there is no request, just dispatch `END` yourself!
+    Just `import { END } from 'redux-saga'` and `yield put(END)`
+
+    There is also more complex case. Imagine you have a request `x`, after which you would like to dispatch
+    another `y`. You cannot do it immediately because `y` requires some information from `x` response.
+    Above algorythm would not wait for `y` to be finished, because on `x` response counter would be
+    already reset to `0`. There are two `action.meta` attributes to help here:
+    - `dependentRequestsNumber` - a positive integer, a number of requests which will be fired after this one,
+    in above example we would put `dependentRequestsNumber: 1` to `x` action, because only `y` depends on `x`
+    - `isDependentRequest` - mark a request as `isDependentRequest: true` when it depends on another request,
+    in our example we would put `isDependentRequest: true` to `y`, because it depends on `x`
+
+    You could even have a more complicated situation, in which you would need to dispatch `z` after `y`. Then
+    you would also add `dependentRequestsNumber: 1` to `y` and `isDependentRequest: true` to `z`. Yes, a request
+    can have both of those attibutes at the same time! Anyway, how does it work? Easy, just a request with
+    `dependentRequestsNumber: 2` would increase counter by `3` on request and decrease by `1` on response,
+    while an action with `isDependentRequest: true` would increase counter on request by `1` as usual but decrease
+    it on response by `2`. So, the counter will be reset to `0` after all requests are finished, also dependent ones.
+
+    Going back to `serverRequestActions` object, it has the following properties:
+    - `successActions` - array of `success` actions that were dispatched, exluding dependent actions
+    - `dependentSuccessActions` - array `success` actions that were dispatched with `meta.isDependentRequest: true`
+    - `errorActions` - array of `error` actions if there was an error request
+    - `requestActionsToIgnore` - actions you should pass to client during SSR, actually this is
+    just array of requests actions with just `type` got from `successActions` (to decrease payload size
+    sent to the client side)
+
+3. The last thing you need to do is to use `serverRequestsFilterMiddleware` on the client side,
+like in the snippet from step `2`. What does it do? Well, it will ignore request actions which match
+those already dispatched during SSR. Why? Because otherwise with universal code the same job done on the server
+would be repeated on the client. If you think about it, that is also the reason why `requestActionsToIgnore`
+don't include `dependentSuccessActions`. Dependent request actions won't be dispatched on the client side,
+because request they depend on also won't be dispatched. One thing worth mentioning here is that
+`sendRequest` for ignored request won't return object with `response` or `error` key, but `{ serverSide: true }`.
+One last thing, put `serverRequestsFilterMiddleware` before promise and cache middlewares if you happen to use those.
+
 ## Examples [:arrow_up:](#table-of-content)
 
 I highly recommend to try examples how this package could be used in real applications. You could play with those demos
@@ -1202,6 +1378,7 @@ There are following examples currently:
 - [redux-act integration](https://github.com/klis87/redux-saga-requests/tree/master/examples/redux-act-integration)
 - [low-level-reducers](https://github.com/klis87/redux-saga-requests/tree/master/examples/low-level-reducers)
 - [mock-and-multiple-drivers](https://github.com/klis87/redux-saga-requests/tree/master/examples/mock-and-multiple-drivers)
+- [server-side-rendering](https://github.com/klis87/redux-saga-requests/tree/master/examples/server-side-rendering)
 
 ## Credits [:arrow_up:](#table-of-content)
 
