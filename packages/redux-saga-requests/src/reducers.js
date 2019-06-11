@@ -112,6 +112,12 @@ export const createRequestsReducer = (globalConfig = {}) => (
     shouldResetForAction = (action) => normalizedResetActions.includes(action.type);
   }
 
+  const operationActionTypeMap = operations && Object.entries(operations).reduce((memo, [k, v]) => {
+    const actionType = v.hasOwnProperty('actionType') ? v.actionType : k;
+    memo[actionType] = v;
+    return memo;
+  }, {});
+
   return (state, action) => {
     let nextState =
       state === undefined ? getInitialState(state, reducer, config) : state;
@@ -123,8 +129,8 @@ export const createRequestsReducer = (globalConfig = {}) => (
       };
     }
 
-    if (operations && action.type in operations) {
-      const operationConfig = operations[action.type];
+    if (operations && action.type in operationActionTypeMap) {
+      const operationConfig = operationActionTypeMap[action.type];
 
       return {
         ...nextState,
@@ -158,10 +164,10 @@ export const createRequestsReducer = (globalConfig = {}) => (
     if (
       operations &&
       isResponseAction(action) &&
-      getRequestActionFromResponse(action).type in operations
+      getRequestActionFromResponse(action).type in operationActionTypeMap
     ) {
       const requestAction = getRequestActionFromResponse(action);
-      const operationConfig = operations[requestAction.type];
+      const operationConfig = operationActionTypeMap[requestAction.type];
       const {
         [requestAction.type]: currentOperation,
         ...otherOperations
