@@ -63,7 +63,7 @@
     "redux-saga": "0.16.2",
     "redux-saga-test-plan": "3.7.0",
     "rimraf": "2.6.3",
-    "typescript": "3.2.2",
+    "typescript": "3.5.2",
     "webpack": "4.28.3",
     "webpack-cli": "3.2.0"
   },
