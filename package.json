@@ -23,7 +23,7 @@
   "bundlesize": [
     {
       "path": "./packages/redux-saga-requests/dist/redux-saga-requests.min.js",
-      "maxSize": "7 kB"
+      "maxSize": "8 kB"
     },
     {
       "path": "./packages/redux-saga-requests-axios/dist/redux-saga-requests-axios.min.js",
