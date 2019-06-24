@@ -13,7 +13,7 @@ type RequestActionMeta = {
   cache?: boolean | number;
   cacheKey?: string;
   cacheSize?: number;
-  dependentRequestsNumber: number;
+  dependentRequestsNumber?: number;
   isDependentRequest?: boolean;
   [extraProperty: string]: any;
 };
