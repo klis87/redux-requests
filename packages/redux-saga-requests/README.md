@@ -1290,7 +1290,7 @@ are finished. Here you can see a possible implementation:
     const serverRequestActions = {};
     store
       .runSaga(serverRequestActions)
-      .done.then(() => {
+      .toPromise().then(() => { // done instead of toPromise() if you use redux-saga older than 1.0.0
         if (serverRequestActions.errorActions.length > 0) {
           res.status(400).send('something went wrong');
         } else {

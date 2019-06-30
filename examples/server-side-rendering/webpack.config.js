@@ -12,6 +12,7 @@ const resolve = {
       'react-redux',
       'es',
     ),
+    'redux-saga': path.join(__dirname, '..', 'node_modules', 'redux-saga'),
     'redux-saga-requests': path.join(
       __dirname,
       '..',

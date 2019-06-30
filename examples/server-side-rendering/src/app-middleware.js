@@ -68,7 +68,8 @@ router.use((req, res) => {
   const serverRequestActions = {};
   store
     .runSaga(serverRequestActions)
-    .done.then(() => {
+    .toPromise()
+    .then(() => {
       if (serverRequestActions.errorActions.length > 0) {
         res.status(400).send('something went wrong');
       } else {
@@ -84,6 +85,7 @@ router.use((req, res) => {
           serverRequestActions: JSON.stringify(
             serverRequestActions.requestActionsToIgnore,
           ),
+          layout: false,
         });
       }
     })
