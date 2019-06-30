@@ -479,9 +479,9 @@ For inspiration how you could override any of those attributes, see default conf
 
 You might also want to adjust any configuration for all your requests reducers globally. Here is how you can do this:
 ```js
-import { createRequestsReducer } from 'redux-saga-requests';
+import { requestsReducer } from 'redux-saga-requests';
 
-const requestsReducer = createRequestsReducer({ multiple: true });
+const myRequestsReducer = config => requestsReducer({ multiple: true ...config });
 ```
 Now, instead of built-in `requestsReducer`, you can use your own one, and from now on all reducers will have `multiple` set as `true` by default.
 

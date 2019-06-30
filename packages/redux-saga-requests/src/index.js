@@ -5,7 +5,7 @@ export {
   getRequestCache,
   clearRequestsCache,
 } from './actions';
-export { createRequestsReducer, requestsReducer } from './reducers';
+export { requestsReducer } from './reducers';
 export {
   requestsPromiseMiddleware,
   requestsCacheMiddleware,

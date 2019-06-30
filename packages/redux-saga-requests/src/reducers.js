@@ -89,11 +89,8 @@ const defaultConfig = {
   operations: null,
 };
 
-export const createRequestsReducer = (globalConfig = {}) => (
-  localConfig,
-  reducer = null,
-) => {
-  const config = { ...defaultConfig, ...globalConfig, ...localConfig };
+export const requestsReducer = (localConfig, reducer = null) => {
+  const config = { ...defaultConfig, ...localConfig };
   const {
     onRequest,
     onSuccess,
@@ -292,5 +289,3 @@ export const createRequestsReducer = (globalConfig = {}) => (
     }
   };
 };
-
-export const requestsReducer = createRequestsReducer();

@@ -148,10 +148,6 @@ type RequestsReducer = {
 
 export const requestsReducer: RequestsReducer;
 
-export const createRequestsReducer: (
-  globalConfig?: GlobalReducerConfig,
-) => RequestsReducer;
-
 type RequestsPromiseMiddlewareConfig = {
   auto?: Boolean;
 };

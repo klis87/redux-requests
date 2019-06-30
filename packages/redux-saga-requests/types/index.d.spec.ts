@@ -8,7 +8,6 @@ import {
   sendRequest,
   watchRequests,
   requestsReducer,
-  createRequestsReducer,
   requestsPromiseMiddleware,
   requestsCacheMiddleware,
   clearRequestsCache,
@@ -173,12 +172,6 @@ requestsReducer({
   },
 });
 requestsReducer({ actionType: 'actionType' }, (state, action) => state);
-
-createRequestsReducer()({ actionType: 'actionType' });
-createRequestsReducer(globalConfig)({
-  actionType: 'actionType',
-  ...globalConfig,
-});
 
 requestsPromiseMiddleware();
 requestsPromiseMiddleware({ auto: true });
