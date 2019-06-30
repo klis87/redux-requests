@@ -31,5 +31,5 @@ module.exports = {
       root: 'ReduxSaga',
     },
   },
-  devtool: 'source-map',
+  // devtool: 'source-map',
 };

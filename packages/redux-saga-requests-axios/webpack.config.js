@@ -20,5 +20,5 @@ module.exports = {
       root: 'axios',
     },
   },
-  devtool: 'source-map',
+  // devtool: 'source-map',
 };
