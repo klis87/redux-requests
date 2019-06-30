@@ -109,7 +109,8 @@ export const createRequestsReducer = (globalConfig = {}) => (
   let shouldResetForAction = resetOn;
   if (typeof resetOn !== 'function') {
     const normalizedResetActions = resetOn.map(normalizeActionType);
-    shouldResetForAction = (action) => normalizedResetActions.includes(action.type);
+    shouldResetForAction = action =>
+      normalizedResetActions.includes(action.type);
   }
 
   return (state, action) => {
@@ -177,7 +178,9 @@ export const createRequestsReducer = (globalConfig = {}) => (
             };
           }
 
-          const currentRequestKey = operationConfig.getRequestKey(requestAction);
+          const currentRequestKey = operationConfig.getRequestKey(
+            requestAction,
+          );
           const {
             [currentRequestKey]: operationForRequestKey,
             ...remainingOperations

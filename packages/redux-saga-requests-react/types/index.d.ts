@@ -61,12 +61,7 @@ interface Operation {
 }
 
 interface OperationContainerProps {
-  children?: (
-    props: {
-      loading: boolean;
-      error: any;
-    },
-  ) => React.ReactNode;
+  children?: (props: { loading: boolean; error: any }) => React.ReactNode;
   component?: React.ComponentType<{
     loading: boolean;
     error: any;
@@ -82,13 +77,11 @@ export class OperationContainer extends React.Component<
 > {}
 
 interface ConnectedOperationContainerProps {
-  children?: (
-    props: {
-      loading: boolean;
-      error: any;
-      sendOperation: any;
-    },
-  ) => React.ReactNode;
+  children?: (props: {
+    loading: boolean;
+    error: any;
+    sendOperation: any;
+  }) => React.ReactNode;
   component?: React.ComponentType<{
     loading: boolean;
     error: any;

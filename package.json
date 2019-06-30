@@ -7,18 +7,18 @@
     "build": "lerna run build",
     "clean": "lerna run clean",
     "lint": "lerna run lint",
-    "test": "jest",
-    "test:cover": "jest --coverage",
+    "test": "jest packages/*/src",
+    "test:cover": "jest --coverage packages/*/src",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "test-types": "lerna run test-types",
     "prettify": "prettier --write '{packages,examples}/**/*.{js,jsx,ts}'",
     "bundlesize": "bundlesize"
   },
   "devDependencies": {
-    "bundlesize": "0.17.2",
-    "coveralls": "3.0.2",
+    "bundlesize": "0.18.0",
+    "coveralls": "3.0.4",
     "lerna": "3.10.6",
-    "prettier": "1.15.3"
+    "prettier": "1.18.2"
   },
   "bundlesize": [
     {
