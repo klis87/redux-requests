@@ -5,7 +5,7 @@ const actionType = 'ACTION';
 
 describe('reducers', () => {
   describe('requestsReducer', () => {
-    describe('without passed reducer', () => {
+    describe('simple', () => {
       const defaultState = {
         data: null,
         error: null,
@@ -256,113 +256,6 @@ describe('reducers', () => {
           error: null,
           pending: 1,
           operations: null,
-        });
-      });
-    });
-
-    describe('with passed reducer', () => {
-      const notRequestState = { counter: 0 };
-      const INCREMENT = 'INCREMENT';
-      const RESET = 'RESET';
-      const reducer = requestsReducer(
-        { actionType, resetOn: [RESET] },
-        (state = notRequestState, action) => {
-          switch (action.type) {
-            case INCREMENT:
-              return { ...state, counter: state.counter + 1 };
-            default:
-              return state;
-          }
-        },
-      );
-      const initialState = reducer(undefined, {});
-
-      it('returns correct default state', () => {
-        expect(reducer(undefined, {})).toEqual({
-          data: null,
-          error: null,
-          pending: 0,
-          operations: null,
-          counter: 0,
-        });
-      });
-
-      it('returns correct state for not handled action', () => {
-        const state = 'some_state';
-        expect(reducer(state, {})).toBe(state);
-      });
-
-      it('returns correct state for request action', () => {
-        expect(reducer(initialState, { type: actionType })).toEqual({
-          data: null,
-          error: null,
-          pending: 1,
-          operations: null,
-          counter: 0,
-        });
-      });
-
-      it('returns correct state for success action', () => {
-        const data = 'data';
-        const action = {
-          type: success(actionType),
-          payload: { data },
-        };
-        expect(reducer(initialState, action)).toEqual({
-          data,
-          error: null,
-          pending: -1,
-          operations: null,
-          counter: 0,
-        });
-      });
-
-      it('returns correct state for error action', () => {
-        const someError = 'error';
-        const action = {
-          type: error(actionType),
-          payload: someError,
-        };
-        expect(reducer(initialState, action)).toEqual({
-          data: null,
-          error: someError,
-          pending: -1,
-          operations: null,
-          counter: 0,
-        });
-      });
-
-      it('returns correct state for abort action', () => {
-        const action = { type: abort(actionType) };
-        expect(reducer(initialState, action)).toEqual({
-          data: null,
-          error: null,
-          pending: -1,
-          operations: null,
-          counter: 0,
-        });
-      });
-
-      it('handles action type from passed reducer', () => {
-        const action = { type: INCREMENT };
-        expect(reducer(initialState, action)).toEqual({
-          data: null,
-          error: null,
-          pending: 0,
-          operations: null,
-          counter: 1,
-        });
-      });
-
-      it('handles reset action when resetOn is string array', () => {
-        let nextState = reducer(initialState, { type: INCREMENT });
-        nextState = reducer(nextState, { type: actionType });
-        expect(reducer(nextState, { type: RESET })).toEqual({
-          data: null,
-          error: null,
-          pending: 1,
-          operations: null,
-          counter: 0,
         });
       });
     });

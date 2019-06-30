@@ -171,7 +171,6 @@ requestsReducer({
     },
   },
 });
-requestsReducer({ actionType: 'actionType' }, (state, action) => state);
 
 requestsPromiseMiddleware();
 requestsPromiseMiddleware({ auto: true });

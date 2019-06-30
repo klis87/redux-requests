@@ -15,7 +15,7 @@ const normalizeActionType = actionType =>
 const operationConfigHasRequestKey = config =>
   typeof config !== 'boolean' && !!config.getRequestKey;
 
-const getInitialRequestState = ({ getDefaultData, multiple, operations }) => ({
+const getInitialState = ({ getDefaultData, multiple, operations }) => ({
   data: getDefaultData(multiple),
   pending: 0,
   error: null,
@@ -29,14 +29,6 @@ const getInitialRequestState = ({ getDefaultData, multiple, operations }) => ({
       {},
     ),
 });
-
-const getInitialState = (state, reducer, config) => {
-  if (!reducer) {
-    return getInitialRequestState(config);
-  }
-
-  return { ...getInitialRequestState(config), ...reducer(undefined, {}) };
-};
 
 const getDataUpdaterForSuccess = (reducerConfig, operationConfig) => {
   if (
@@ -89,7 +81,7 @@ const defaultConfig = {
   operations: null,
 };
 
-export const requestsReducer = (localConfig, reducer = null) => {
+export const requestsReducer = localConfig => {
   const config = { ...defaultConfig, ...localConfig };
   const {
     onRequest,
@@ -111,12 +103,11 @@ export const requestsReducer = (localConfig, reducer = null) => {
   }
 
   return (state, action) => {
-    let nextState =
-      state === undefined ? getInitialState(state, reducer, config) : state;
+    let nextState = state === undefined ? getInitialState(config) : state;
 
     if (shouldResetForAction(action)) {
       nextState = {
-        ...getInitialState(nextState, reducer, config),
+        ...getInitialState(config),
         pending: nextState.pending,
       };
     }
@@ -285,7 +276,7 @@ export const requestsReducer = (localConfig, reducer = null) => {
       case abort(normalizedActionType):
         return onAbort(nextState, action, config);
       default:
-        return reducer ? reducer(nextState, action) : nextState;
+        return nextState;
     }
   };
 };

@@ -107,7 +107,8 @@ type Operations = {
       };
 };
 
-type GlobalReducerConfig = {
+type LocalReducerConfig = {
+  actionType: string;
   multiple?: boolean;
   getDefaultData?: (multiple: boolean) => any;
   getData?: OnActionCallback;
@@ -120,12 +121,6 @@ type GlobalReducerConfig = {
   resetOn?: FilterOnActionCallback | string[];
   operations?: Operations;
 };
-
-type ActionTypeReducerConfig = {
-  actionType: string;
-};
-
-type LocalReducerConfig = GlobalReducerConfig & ActionTypeReducerConfig;
 
 type MergedReducerConfig = {
   actionType: string;
@@ -143,7 +138,7 @@ type MergedReducerConfig = {
 };
 
 type RequestsReducer = {
-  (localConfig: LocalReducerConfig, reducer?: Reducer<any>): Reducer<any>;
+  (localConfig: LocalReducerConfig): Reducer<any>;
 };
 
 export const requestsReducer: RequestsReducer;
