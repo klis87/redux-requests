@@ -32,5 +32,5 @@ module.exports = {
       root: 'ReactRedux',
     },
   },
-  // devtool: 'source-map',
+  devtool: 'source-map',
 };
