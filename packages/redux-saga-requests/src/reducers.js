@@ -21,13 +21,17 @@ const getInitialState = ({ getDefaultData, multiple, operations }) => ({
   error: null,
   operations:
     operations &&
-    Object.entries(operations).reduce(
-      (prev, [k, v]) => ({
-        ...prev,
-        [k]: operationConfigHasRequestKey(v) ? {} : { error: null, pending: 0 },
-      }),
-      {},
-    ),
+    Object.entries(operations)
+      .filter(o => !o.local)
+      .reduce(
+        (prev, [k, v]) => ({
+          ...prev,
+          [k]: operationConfigHasRequestKey(v)
+            ? {}
+            : { error: null, pending: 0 },
+        }),
+        {},
+      ),
 });
 
 const getDataUpdaterForSuccess = (reducerConfig, operationConfig) => {
@@ -77,7 +81,42 @@ const defaultConfig = {
   operations: null,
 };
 
-export const requestOperationReducer = (state, action, config) => {
+const updateOperationsForRequest = (
+  operationsState,
+  action,
+  operationConfig,
+) => {
+  if (operationConfig.local) {
+    return operationsState;
+  }
+
+  if (operationConfigHasRequestKey(operationConfig)) {
+    const requestKey = operationConfig.getRequestKey(action);
+
+    return {
+      ...operationsState,
+      [action.type]: {
+        ...operationsState[action.type],
+        [requestKey]: {
+          error: null,
+          pending: operationsState[action.type][requestKey]
+            ? operationsState[action.type][requestKey].pending + 1
+            : 1,
+        },
+      },
+    };
+  }
+
+  return {
+    ...operationsState,
+    [action.type]: {
+      error: null,
+      pending: operationsState[action.type].pending + 1,
+    },
+  };
+};
+
+const requestOperationReducer = (state, action, config) => {
   const operationConfig = config.operations[action.type];
 
   return {
@@ -85,31 +124,15 @@ export const requestOperationReducer = (state, action, config) => {
     data: operationConfig.updateDataOptimistic
       ? operationConfig.updateDataOptimistic(state, action, config)
       : state.data,
-    operations: {
-      ...state.operations,
-      [action.type]: operationConfigHasRequestKey(operationConfig)
-        ? {
-            ...state.operations[action.type],
-            [operationConfig.getRequestKey(action)]: {
-              error: null,
-              pending: state.operations[action.type][
-                operationConfig.getRequestKey(action)
-              ]
-                ? state.operations[action.type][
-                    operationConfig.getRequestKey(action)
-                  ].pending + 1
-                : 1,
-            },
-          }
-        : {
-            error: null,
-            pending: state.operations[action.type].pending + 1,
-          },
-    },
+    operations: updateOperationsForRequest(
+      state.operations,
+      action,
+      operationConfig,
+    ),
   };
 };
 
-export const responseOperationReducer = (state, action, config) => {
+const responseOperationReducer = (state, action, config) => {
   const requestAction = getRequestActionFromResponse(action);
   const operationConfig = config.operations[requestAction.type];
   const {

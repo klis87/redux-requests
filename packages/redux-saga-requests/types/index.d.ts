@@ -104,6 +104,10 @@ type Operations = {
         updateDataOptimistic: OnActionCallback;
         revertData: OnActionCallback;
         getRequestKey?: (action: RequestAction) => string;
+      }
+    | {
+        updateData: OnActionCallback;
+        local: true;
       };
 };
 
