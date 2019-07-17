@@ -59,12 +59,14 @@ const getDataUpdaterForSuccess = (reducerConfig, operationConfig) => {
 const requestOperationReducer = (state, action, config) => {
   const operationConfig = config.operations[action.type];
 
-  return {
-    ...state,
-    data: operationConfig.updateDataOptimistic
-      ? operationConfig.updateDataOptimistic(state, action, config)
-      : state.data,
-  };
+  if (operationConfig.updateDataOptimistic) {
+    return {
+      ...state,
+      data: operationConfig.updateDataOptimistic(state, action, config),
+    };
+  }
+
+  return state;
 };
 
 const responseOperationReducer = (state, action, config) => {
@@ -74,19 +76,21 @@ const responseOperationReducer = (state, action, config) => {
   if (isSuccessAction(action)) {
     const dataUpdater = getDataUpdaterForSuccess(config, operationConfig);
 
-    return {
-      ...state,
-      data: dataUpdater ? dataUpdater(state, action, config) : state.data,
-    };
+    return dataUpdater
+      ? {
+          ...state,
+          data: dataUpdater ? dataUpdater(state, action, config) : state.data,
+        }
+      : state;
   }
 
   // error or abort case
-  return {
-    ...state,
-    data: operationConfig.revertData
-      ? operationConfig.revertData(state, action, config)
-      : state.data,
-  };
+  return operationConfig.revertData
+    ? {
+        ...state,
+        data: operationConfig.revertData(state, action, config),
+      }
+    : state;
 };
 
 export default localConfig => {
