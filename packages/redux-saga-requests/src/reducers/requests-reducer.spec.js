@@ -1,5 +1,5 @@
-import { success, error, abort } from './actions';
-import { requestsReducer } from './reducers';
+import { success, error, abort, createErrorAction } from '../actions';
+import { requestsReducer } from '.';
 
 const actionType = 'ACTION';
 
@@ -83,55 +83,61 @@ describe('reducers', () => {
       });
     });
 
-    describe('providing the default value of the reducer', () => {
-      const emptyFeatureCollection = {
-        type: 'FeatureCollection',
-        features: [],
-      };
-      const defaultProvider = jest.fn(() => emptyFeatureCollection);
-      const reducer = requestsReducer({
-        actionType,
-        getDefaultData: defaultProvider,
-      });
-
-      afterEach(() => {
-        defaultProvider.mockClear();
-      });
-
-      it('sets initial state via getDefault', () => {
-        expect(reducer(undefined, {})).toEqual({
-          data: emptyFeatureCollection,
+    describe('with adjusted getDefaultData', () => {
+      it('sets corrent initial state when multiple true', () => {
+        const reducer = requestsReducer({
+          actionType,
+          getDefaultData: multiple => (multiple ? ['default'] : 'default'),
+          multiple: true,
+        });
+        expect(reducer(undefined, { type: actionType })).toEqual({
+          data: ['default'],
           error: null,
-          pending: 0,
+          pending: 1,
           operations: null,
         });
-        expect(defaultProvider.mock.calls.length).toBe(1);
       });
 
-      it('resets data via getDefault on errors', () => {
-        const someError = 'asdasda';
-        const action = { type: error(actionType), error: someError };
+      it('sets corrent initial state when multiple false', () => {
+        const reducer = requestsReducer({
+          actionType,
+          getDefaultData: multiple => (multiple ? ['default'] : 'default'),
+          multiple: false,
+        });
+        expect(reducer(undefined, { type: actionType })).toEqual({
+          data: 'default',
+          error: null,
+          pending: 1,
+          operations: null,
+        });
+      });
+
+      it('resets state to proper default on error', () => {
+        const reducer = requestsReducer({
+          actionType,
+          getDefaultData: multiple => (multiple ? ['default'] : 'default'),
+          multiple: true,
+        });
         expect(
           reducer(
             {
               data: {},
-              error: someError,
+              error: null,
               pending: 1,
               operations: null,
             },
-            action,
+            createErrorAction({ type: actionType }, 'error'),
           ),
         ).toEqual({
-          data: emptyFeatureCollection,
-          error: someError,
+          data: ['default'],
+          error: 'error',
           pending: 0,
           operations: null,
         });
-        expect(defaultProvider.mock.calls.length).toBe(1);
       });
     });
 
-    describe('without passed reducer with local config override', () => {
+    describe('with config override', () => {
       const RESET = 'RESET';
       const reducer = requestsReducer({
         actionType,
@@ -140,27 +146,27 @@ describe('reducers', () => {
         onRequest: (state, action, { multiple }) => ({
           ...state,
           data: multiple ? [] : null,
-          pending: state.pending + 1,
+          pending: state.pending + 2,
           error: null,
           multiple,
         }),
         onSuccess: (state, action, { multiple, getData }) => ({
           ...state,
           data: getData(state, action),
-          pending: state.pending - 1,
+          pending: state.pending - 2,
           error: null,
           multiple,
         }),
         onError: (state, action, { multiple }) => ({
           ...state,
           data: multiple ? [] : null,
-          pending: state.pending - 1,
+          pending: state.pending - 2,
           error: action.payload,
           multiple,
         }),
         onAbort: (state, action, { multiple }) => ({
           ...state,
-          pending: state.pending - 1,
+          pending: state.pending - 2,
           multiple,
         }),
         resetOn: action => action.type === RESET,
@@ -180,7 +186,7 @@ describe('reducers', () => {
         expect(reducer(initialState, { type: actionType })).toEqual({
           data: [],
           error: null,
-          pending: 1,
+          pending: 2,
           operations: null,
           multiple: true,
         });
@@ -195,7 +201,7 @@ describe('reducers', () => {
         expect(reducer(initialState, action)).toEqual({
           data: { nested: data },
           error: null,
-          pending: -1,
+          pending: -2,
           operations: null,
           multiple: true,
         });
@@ -210,7 +216,7 @@ describe('reducers', () => {
         expect(reducer(initialState, action)).toEqual({
           data: [],
           error: someError,
-          pending: -1,
+          pending: -2,
           operations: null,
           multiple: true,
         });
@@ -221,7 +227,7 @@ describe('reducers', () => {
         expect(reducer(initialState, action)).toEqual({
           data: [],
           error: null,
-          pending: -1,
+          pending: -2,
           operations: null,
           multiple: true,
         });
@@ -233,7 +239,7 @@ describe('reducers', () => {
         expect(reducer(nextState, { type: 'RESET' })).toEqual({
           data: [],
           error: null,
-          pending: 2,
+          pending: 4,
           operations: null,
         });
       });
@@ -357,6 +363,7 @@ describe('reducers', () => {
 
         let nextState = reducer(initialState, {
           type: OPERATION_ACTION,
+          request: { url: '/' },
           meta: { id: 'a' },
         });
         expect(nextState).toEqual({
@@ -375,6 +382,7 @@ describe('reducers', () => {
 
         nextState = reducer(nextState, {
           type: OPERATION_ACTION,
+          request: { url: '/' },
           meta: { id: 'b' },
         });
         expect(nextState).toEqual({
@@ -397,6 +405,7 @@ describe('reducers', () => {
 
         nextState = reducer(nextState, {
           type: OPERATION_ACTION,
+          request: { url: '/' },
           meta: { id: 'a' },
         });
         expect(nextState).toEqual({
