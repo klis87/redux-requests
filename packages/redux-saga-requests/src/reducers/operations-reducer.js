@@ -1,5 +1,4 @@
 import {
-  isSuccessAction,
   isErrorAction,
   isResponseAction,
   getRequestActionFromResponse,
@@ -51,40 +50,6 @@ export default (state, action, config, operationConfig) => {
   const requestAction = getRequestActionFromResponse(action);
   const { [requestAction.type]: currentOperation, ...otherOperations } = state;
 
-  if (isSuccessAction(action)) {
-    const getUpdatedCurrentOperation = () => {
-      if (!operationConfigHasRequestKey(operationConfig)) {
-        return {
-          error: null,
-          pending: currentOperation.pending - 1,
-        };
-      }
-
-      const currentRequestKey = operationConfig.getRequestKey(requestAction);
-      const {
-        [currentRequestKey]: operationForRequestKey,
-        ...remainingOperations
-      } = currentOperation;
-
-      if (operationForRequestKey.pending !== 1) {
-        return {
-          ...remainingOperations,
-          [currentRequestKey]: {
-            error: null,
-            pending: operationForRequestKey.pending - 1,
-          },
-        };
-      }
-
-      return remainingOperations;
-    };
-
-    return {
-      ...otherOperations,
-      [requestAction.type]: getUpdatedCurrentOperation(),
-    };
-  }
-
   if (isErrorAction(action)) {
     return {
       ...otherOperations,
@@ -105,11 +70,11 @@ export default (state, action, config, operationConfig) => {
     };
   }
 
-  // abort case
+  // success or abort case
   const getUpdatedCurrentOperation = () => {
     if (!operationConfigHasRequestKey(operationConfig)) {
       return {
-        ...currentOperation,
+        error: null,
         pending: currentOperation.pending - 1,
       };
     }
@@ -124,7 +89,7 @@ export default (state, action, config, operationConfig) => {
       return {
         ...remainingOperations,
         [currentRequestKey]: {
-          ...operationForRequestKey,
+          error: null,
           pending: operationForRequestKey.pending - 1,
         },
       };
