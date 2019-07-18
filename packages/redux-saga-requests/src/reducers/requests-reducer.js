@@ -28,7 +28,7 @@ const getInitialState = ({
   operations:
     handleOperationsState && operations
       ? Object.entries(operations)
-          .filter(o => !o.local)
+          .filter(([, v]) => !v.local)
           .reduce(
             (prev, [k, v]) => ({
               ...prev,
@@ -41,7 +41,7 @@ const getInitialState = ({
       : null,
 });
 
-const getDataUpdaterForSuccess = (reducerConfig, operationConfig) => {
+const getDataUpdater = (reducerConfig, operationConfig) => {
   if (operationConfig === true || operationConfig.updateData === true) {
     return reducerConfig.updateData || reducerConfig.getData;
   } else if (typeof operationConfig === 'function') {
@@ -66,6 +66,15 @@ const requestOperationReducer = (state, action, config) => {
     };
   }
 
+  if (operationConfig.local) {
+    const dataUpdater = getDataUpdater(config, operationConfig);
+
+    return {
+      ...state,
+      data: dataUpdater(state, action, config),
+    };
+  }
+
   return state;
 };
 
@@ -74,7 +83,7 @@ const responseOperationReducer = (state, action, config) => {
   const operationConfig = config.operations[requestAction.type];
 
   if (isSuccessAction(action)) {
-    const dataUpdater = getDataUpdaterForSuccess(config, operationConfig);
+    const dataUpdater = getDataUpdater(config, operationConfig);
 
     return dataUpdater
       ? {
@@ -115,31 +124,23 @@ export default localConfig => {
       };
     }
 
-    if (config.operations && action.type in config.operations) {
-      return {
-        ...requestOperationReducer(nextState, action, config),
-        operations: operationsReducer(
-          nextState.operations,
-          action,
-          config,
-          config.operations[action.type],
-        ),
-      };
-    }
+    const requestAction = isResponseAction(action)
+      ? getRequestActionFromResponse(action)
+      : action;
 
-    if (
-      config.operations &&
-      isResponseAction(action) &&
-      getRequestActionFromResponse(action).type in config.operations
-    ) {
+    if (config.operations && requestAction.type in config.operations) {
       return {
-        ...responseOperationReducer(nextState, action, config),
-        operations: operationsReducer(
-          nextState.operations,
-          action,
-          config,
-          config.operations[getRequestActionFromResponse(action).type],
-        ),
+        ...(isResponseAction(action)
+          ? responseOperationReducer(nextState, action, config)
+          : requestOperationReducer(nextState, action, config)),
+        operations: config.handleOperationsState
+          ? operationsReducer(
+              nextState.operations,
+              action,
+              config,
+              config.operations[requestAction.type],
+            )
+          : null,
       };
     }
 

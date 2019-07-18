@@ -39,10 +39,6 @@ const updateOperationsForRequest = (state, action, operationConfig) => {
 };
 
 export default (state, action, config, operationConfig) => {
-  if (!config.handleOperationsState) {
-    return null;
-  }
-
   if (!isResponseAction(action)) {
     return updateOperationsForRequest(state, action, operationConfig);
   }

@@ -951,5 +951,43 @@ describe('reducers', () => {
         });
       });
     });
+
+    describe('with local operations', () => {
+      const LOCAL_OPERATION_ACTION = 'LOCAL_OPERATION_ACTION';
+      const commonReducer = requestsReducer({
+        actionType,
+        operations: {
+          operation: true,
+          [LOCAL_OPERATION_ACTION]: {
+            local: true,
+            updateData: (state, action) => action.data,
+          },
+        },
+      });
+      const defaultState = {
+        data: null,
+        error: null,
+        pending: 0,
+        operations: {
+          operation: {
+            error: null,
+            pending: 0,
+          },
+        },
+      };
+
+      it('does not contain local operation in initial state ', () => {
+        expect(commonReducer(undefined, {})).toEqual(defaultState);
+      });
+
+      it('updates data for local operation and doesnt keep local operation state', () => {
+        expect(
+          commonReducer(defaultState, {
+            type: LOCAL_OPERATION_ACTION,
+            data: 'data',
+          }),
+        ).toEqual({ ...defaultState, data: 'data' });
+      });
+    });
   });
 });
