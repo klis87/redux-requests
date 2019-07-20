@@ -1,10 +1,10 @@
 import { success, error, abort, createErrorAction } from '../actions';
 import { requestsReducer } from '.';
 
-const actionType = 'ACTION';
-
 describe('reducers', () => {
   describe('requestsReducer', () => {
+    const actionType = 'ACTION';
+
     describe('simple', () => {
       const defaultState = {
         data: null,

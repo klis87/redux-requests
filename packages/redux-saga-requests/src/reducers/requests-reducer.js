@@ -110,9 +110,17 @@ export default localConfig => {
       ? config.resetOn
       : action => config.resetOn.map(normalizeActionType).includes(action.type);
 
-  return (state, action, extraOperationsConfig) => {
-    if (extraOperationsConfig) {
-      config.operations = { ...config.operations, ...extraOperationsConfig };
+  return (state, action) => {
+    if (
+      action.meta &&
+      action.meta.operations &&
+      normalizedActionType in action.meta.operations &&
+      (!config.operations || !(normalizedActionType in config.operations))
+    ) {
+      config.operations = {
+        ...config.operations,
+        [action.type]: action.meta.operations[normalizedActionType],
+      };
     }
 
     let nextState = state || getInitialState(config);

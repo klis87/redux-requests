@@ -21,9 +21,10 @@ const updateOperationsForRequest = (state, action, operationConfig) => {
         ...state[action.type],
         [requestKey]: {
           error: null,
-          pending: state[action.type][requestKey]
-            ? state[action.type][requestKey].pending + 1
-            : 1,
+          pending:
+            state[action.type] && state[action.type][requestKey]
+              ? state[action.type][requestKey].pending + 1
+              : 1,
         },
       },
     };
@@ -33,7 +34,7 @@ const updateOperationsForRequest = (state, action, operationConfig) => {
     ...state,
     [action.type]: {
       error: null,
-      pending: state[action.type].pending + 1,
+      pending: (state[action.type] ? state[action.type].pending : 0) + 1,
     },
   };
 };
