@@ -18,6 +18,11 @@ export const deletePhoto = id => ({
     url: `/photos/${id}`,
     method: 'delete',
   },
+  meta: {
+    operations: {
+      [FETCH_PHOTO]: () => null,
+    },
+  },
 });
 
 export const deletePhotoOptimistic = photo => ({
@@ -28,6 +33,12 @@ export const deletePhotoOptimistic = photo => ({
   },
   meta: {
     deletedPhoto: photo,
+    operations: {
+      [FETCH_PHOTO]: {
+        updateDataOptimistic: () => null,
+        revertData: (state, action) => action.meta.deletedPhoto,
+      },
+    },
   },
 });
 
@@ -44,6 +55,13 @@ export const deletePost = id => ({
   },
   meta: {
     id,
+    operations: {
+      getRequestKey: action => String(action.meta.id),
+      [FETCH_POSTS]: {
+        updateData: (state, action) =>
+          state.data.filter(v => v.id !== action.meta.id),
+      },
+    },
   },
 });
 
@@ -55,5 +73,13 @@ export const deletePostOptimistic = post => ({
   },
   meta: {
     deletedPost: post,
+    operations: {
+      getRequestKey: action => String(action.meta.deletedPost.id),
+      [FETCH_POSTS]: {
+        updateDataOptimistic: (state, action) =>
+          state.data.filter(v => v.id !== action.meta.deletedPost.id),
+        revertData: (state, action) => [action.meta.deletedPost, ...state.data],
+      },
+    },
   },
 });

@@ -7,6 +7,7 @@ export const fetchPhoto = id => ({
   request: { url: `/photos/${id}` },
   meta: {
     abortOn: CLEAR_PHOTO,
+    resetOn: [CLEAR_PHOTO],
   },
 });
 
@@ -17,5 +18,10 @@ export const fetchPost = id => ({
   request: [{ url: `/posts/${id}` }, { url: `/posts/${id}/comments` }],
   meta: {
     abortOn: CLEAR_POST,
+    getData: (state, action) => ({
+      ...action.data[0],
+      comments: action.data[1],
+    }),
+    resetOn: [CLEAR_POST],
   },
 });

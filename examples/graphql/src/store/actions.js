@@ -62,6 +62,19 @@ export const deleteBook = book => ({
   },
   meta: {
     deletedBook: book,
+    operations: {
+      getRequestKey: action => action.meta.deletedBook.id,
+      [FETCH_BOOKS]: {
+        updateDataOptimistic: (state, action) => ({
+          books: state.data.books.filter(
+            v => v.id !== action.meta.deletedBook.id,
+          ),
+        }),
+        revertData: (state, action) => ({
+          books: [action.meta.deletedBook, ...state.data.books],
+        }),
+      },
+    },
   },
 });
 
@@ -79,6 +92,16 @@ export const likeBook = id => ({
   },
   meta: {
     id,
+    operations: {
+      getRequestKey: action => action.meta.id,
+      [FETCH_BOOKS]: {
+        updateData: (state, action) => ({
+          books: state.data.books.map(v =>
+            v.id === action.meta.id ? { ...v, liked: true } : v,
+          ),
+        }),
+      },
+    },
   },
 });
 
@@ -96,6 +119,16 @@ export const unlikeBook = id => ({
   },
   meta: {
     id,
+    operations: {
+      getRequestKey: action => action.meta.id,
+      [FETCH_BOOKS]: {
+        updateData: (state, action) => ({
+          books: state.data.books.map(v =>
+            v.id === action.meta.id ? { ...v, liked: false } : v,
+          ),
+        }),
+      },
+    },
   },
 });
 
@@ -119,6 +152,9 @@ export const uploadFile = file => ({
     `,
     variables: { file },
   },
+  meta: {
+    asQuery: true,
+  },
 });
 
 export const uploadFiles = files => ({
@@ -133,5 +169,8 @@ export const uploadFiles = files => ({
       ${fileFragment}
     `,
     variables: { files },
+  },
+  meta: {
+    asQuery: true,
   },
 });

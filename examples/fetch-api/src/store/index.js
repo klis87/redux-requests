@@ -1,9 +1,13 @@
 import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
 import createSagaMiddleware from 'redux-saga';
-import { createRequestInstance, watchRequests } from 'redux-saga-requests';
+import {
+  createRequestInstance,
+  watchRequests,
+  networkReducer,
+} from 'redux-saga-requests';
 import { createDriver } from 'redux-saga-requests-fetch';
 
-import { photoReducer, postReducer, abortCounterReducer } from './reducers';
+import { abortCounterReducer } from './reducers';
 
 function* rootSaga() {
   yield createRequestInstance({
@@ -17,8 +21,7 @@ function* rootSaga() {
 
 export const configureStore = () => {
   const reducers = combineReducers({
-    photo: photoReducer,
-    post: postReducer,
+    network: networkReducer(),
     abortCounter: abortCounterReducer,
   });
 

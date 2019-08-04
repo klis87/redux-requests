@@ -14,7 +14,14 @@ import {
   uploadFile,
   uploadFiles,
 } from '../store/actions';
-import { LIKE_BOOK, UNLIKE_BOOK } from '../store/constants';
+import {
+  LIKE_BOOK,
+  UNLIKE_BOOK,
+  FETCH_BOOK,
+  FETCH_BOOKS,
+  UPLOAD_FILE,
+  UPLOAD_FILES,
+} from '../store/constants';
 import Spinner from './spinner';
 
 const mapDispatchToProps = {
@@ -51,12 +58,12 @@ const App = ({
         Fetch books
       </button>
       <ConnectedRequestContainer
-        requestSelector={state => state.books}
+        queryType={FETCH_BOOKS}
         errorComponent={RequestError}
         loadingComponent={Spinner}
         noDataMessage={<p>There is no entity currently.</p>}
       >
-        {({ data, operations }) =>
+        {({ data }) =>
           data.books.map(book => {
             return (
               <div key={book.id}>
@@ -66,7 +73,7 @@ const App = ({
                   Delete optimistic
                 </button>
                 <ConnectedOperationContainer
-                  operation={operations[book.liked ? UNLIKE_BOOK : LIKE_BOOK]}
+                  operationType={book.liked ? UNLIKE_BOOK : LIKE_BOOK}
                   requestKey={book.id}
                   operationCreator={book.liked ? unlikeBook : likeBook}
                 >
@@ -94,7 +101,7 @@ const App = ({
         Fetch book with id 1
       </button>
       <ConnectedRequestContainer
-        requestSelector={state => state.book}
+        queryType={FETCH_BOOK}
         errorComponent={RequestError}
         loadingComponent={Spinner}
         noDataMessage={<p>There is no entity currently.</p>}
@@ -121,7 +128,7 @@ const App = ({
         }) => validity.valid && uploadFile(file)}
       />
       <ConnectedRequestContainer
-        requestSelector={state => state.file}
+        queryType={UPLOAD_FILE}
         errorComponent={RequestError}
         loadingComponent={Spinner}
         noDataMessage={<p>There is no entity currently.</p>}
@@ -146,7 +153,7 @@ const App = ({
         }
       />
       <ConnectedRequestContainer
-        requestSelector={state => state.files}
+        queryType={UPLOAD_FILES}
         errorComponent={RequestError}
         loadingComponent={Spinner}
         noDataMessage={<p>There is no entity currently.</p>}

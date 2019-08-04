@@ -13,7 +13,12 @@ import {
   deletePost,
   deletePostOptimistic,
 } from '../store/actions';
-import { DELETE_PHOTO, DELETE_POST } from '../store/constants';
+import {
+  DELETE_PHOTO,
+  DELETE_POST,
+  FETCH_PHOTO,
+  FETCH_POSTS,
+} from '../store/constants';
 import Spinner from './spinner';
 
 const mapDispatchToProps = {
@@ -48,18 +53,18 @@ const App = ({
         Fetch photo with id 1
       </button>
       <ConnectedRequestContainer
-        requestSelector={state => state.photo}
+        queryType={FETCH_PHOTO}
         errorComponent={RequestError}
         loadingComponent={Spinner}
         noDataMessage={<p>There is no entity currently.</p>}
       >
-        {({ data, operations }) => (
+        {({ data }) => (
           <div>
             <h3>{data.title}</h3>
             <img src={data.thumbnailUrl} alt={data.title} />
             <hr />
             <ConnectedOperationContainer
-              operation={operations[DELETE_PHOTO]}
+              operationType={DELETE_PHOTO}
               operationCreator={deletePhoto}
             >
               {({ loading, sendOperation }) => (
@@ -86,18 +91,18 @@ const App = ({
         Fetch posts
       </button>
       <ConnectedRequestContainer
-        requestSelector={state => state.posts}
+        queryType={FETCH_POSTS}
         errorComponent={RequestError}
         loadingComponent={Spinner}
         noDataMessage={<p>There is no entity currently.</p>}
       >
-        {({ data, operations }) =>
+        {({ data }) =>
           data.map(post => (
             <div key={post.id}>
               <h3>{post.title}</h3>
               <p>{post.body}</p>
               <ConnectedOperationContainer
-                operation={operations[DELETE_POST]}
+                operationType={DELETE_POST}
                 operationCreator={deletePost}
                 requestKey={String(post.id)}
               >

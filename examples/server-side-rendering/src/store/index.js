@@ -8,10 +8,10 @@ import {
   serverRequestsFilterMiddleware,
   countServerRequests,
   sendRequest,
+  networkReducer,
 } from 'redux-saga-requests';
 import { createDriver } from 'redux-saga-requests-axios';
 
-import { booksReducer, booksScreeningActorsReducer } from './reducers';
 import { fetchBooks, fetchBooksScreeningActors } from './actions';
 
 function* bookSaga() {
@@ -45,8 +45,7 @@ function* rootSaga(ssr = false, serverRequestActions) {
 export const configureStore = (initialState = undefined) => {
   const ssr = !initialState; // if initiaState is not passed, it means we run it on server
   const reducers = combineReducers({
-    books: booksReducer,
-    booksScreeningActors: booksScreeningActorsReducer,
+    network: networkReducer(),
   });
 
   const sagaMiddleware = createSagaMiddleware();

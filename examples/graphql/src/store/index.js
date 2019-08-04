@@ -1,14 +1,11 @@
 import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
 import createSagaMiddleware from 'redux-saga';
-import { createRequestInstance, watchRequests } from 'redux-saga-requests';
-import { createDriver } from 'redux-saga-requests-graphql';
-
 import {
-  booksReducer,
-  bookReducer,
-  fileReducer,
-  filesReducer,
-} from './reducers';
+  createRequestInstance,
+  watchRequests,
+  networkReducer,
+} from 'redux-saga-requests';
+import { createDriver } from 'redux-saga-requests-graphql';
 
 function* rootSaga() {
   yield createRequestInstance({
@@ -19,10 +16,7 @@ function* rootSaga() {
 
 export const configureStore = () => {
   const reducers = combineReducers({
-    books: booksReducer,
-    book: bookReducer,
-    file: fileReducer,
-    files: filesReducer,
+    network: networkReducer(),
   });
 
   const sagaMiddleware = createSagaMiddleware();
