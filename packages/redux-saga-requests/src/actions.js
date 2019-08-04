@@ -92,6 +92,22 @@ export const isErrorAction = action =>
 export const isAbortAction = action =>
   isResponseAction(action) && action.type.endsWith(ABORT_SUFFIX);
 
+const isRequestQuery = request =>
+  (!request.query &&
+    (!request.method || request.method.toLowerCase() === 'get')) ||
+  (request.query && !request.query.trim().startsWith('mutation'));
+
+export const isRequestActionQuery = action => {
+  const { request } = getActionPayload(action);
+
+  return (
+    !!(action.meta && action.meta.asQuery) ||
+    (Array.isArray(request)
+      ? request.every(isRequestQuery)
+      : isRequestQuery(request))
+  );
+};
+
 export const getRequestCache = () => ({ type: GET_REQUEST_CACHE });
 
 export const clearRequestsCache = (...actionTypes) => ({

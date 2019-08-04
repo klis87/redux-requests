@@ -22,6 +22,7 @@ import {
   isRequestAction,
   isResponseAction,
   isSuccessAction,
+  isRequestActionQuery,
 } from './actions';
 import {
   REQUESTS_CONFIG,
@@ -216,19 +217,8 @@ export function* sendRequest(
   }
 }
 
-const isRequestReadOnly = request =>
-  (!request.query &&
-    (!request.method || request.method.toLowerCase() === 'get')) ||
-  (request.query && !request.query.trim().startsWith('mutation'));
-
 const watchRequestsDefaultConfig = {
-  takeLatest: action => {
-    const { request } = getActionPayload(action);
-
-    return Array.isArray(request)
-      ? request.every(isRequestReadOnly)
-      : isRequestReadOnly(request);
-  },
+  takeLatest: isRequestActionQuery,
   abortOn: null,
   getLastActionKey: action => action.type,
 };

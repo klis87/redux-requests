@@ -2,25 +2,15 @@ import {
   isRequestAction,
   isResponseAction,
   getRequestActionFromResponse,
+  isRequestActionQuery,
 } from '../actions';
 import defaultConfig from './default-config';
 import requestsReducer from './requests-reducer';
 import operationsReducer from './operations-reducer';
 
-const isRequestReadOnlyDefault = action => {
-  const request = action.payload ? action.payload.request : action.request;
-
-  return (
-    !!(action.meta && action.meta.asQuery) ||
-    (!request.query &&
-      (!request.method || request.method.toLowerCase() === 'get')) ||
-    (request.query && !request.query.trim().startsWith('mutation'))
-  );
-};
-
 export default localConfig => {
   const config = {
-    isRequestReadOnly: isRequestReadOnlyDefault,
+    isRequestReadOnly: isRequestActionQuery,
     ...defaultConfig,
     ...localConfig,
     handleOperationsState: false,
