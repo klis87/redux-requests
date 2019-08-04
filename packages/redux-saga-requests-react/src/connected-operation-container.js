@@ -8,9 +8,11 @@ const ConnectedOperationContainer = connect(
   (state, { operation, requestSelector, operationType, operationCreator }) => ({
     operation:
       operation ||
-      requestSelector(state).operations[
-        operationType || operationCreator.toString()
-      ],
+      (requestSelector
+        ? requestSelector(state).operations[
+            operationType || operationCreator.toString()
+          ]
+        : state.network.mutations[operationType] || {}),
   }),
   (dispatch, ownProps) => ({
     sendOperation: ownProps.operationCreator
