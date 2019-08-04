@@ -20,18 +20,43 @@ export default localConfig => {
     ...localConfig,
     handleOperationsState: false,
   };
+  let initialized = false; // for SSR hydration
+  let initReducers = null;
   const requestsReducers = {};
 
   return (state = { queries: {}, mutations: {} }, action) => {
     if (
+      !initialized &&
+      Object.keys(state.queries).length > 0 &&
+      Object.keys(requestsReducers).length === 0
+    ) {
+      initialized = true;
+      const queryKeys = Object.keys(state.queries);
+      initReducers = new Set(queryKeys);
+
+      queryKeys.forEach(k => {
+        requestsReducers[k] = requestsReducer({
+          ...config,
+          actionType: k,
+        });
+      });
+    }
+
+    if (
       isRequestAction(action) &&
       config.isRequestReadOnly(action) &&
+      (!(action.type in requestsReducers) ||
+        (initReducers && initReducers.has(action.type)))
     ) {
       requestsReducers[action.type] = requestsReducer({
         ...config,
         actionType: action.type,
         ...action.meta,
       });
+
+      if (initReducers) {
+        initReducers.delete(action.type);
+      }
     }
 
     const queries = Object.entries(requestsReducers).reduce(
@@ -45,15 +70,15 @@ export default localConfig => {
     let { mutations } = state;
 
     if (
-      (isRequestAction(action) && !isRequestReadOnly(action.request)) ||
+      (isRequestAction(action) && !config.isRequestReadOnly(action)) ||
       (isResponseAction(action) &&
-        !isRequestReadOnly(getRequestActionFromResponse(action).request))
+        !config.isRequestReadOnly(getRequestActionFromResponse(action)))
     ) {
       mutations = operationsReducer(mutations, action, config, {
         getRequestKey:
-          action.meta &&
-          action.meta.operations &&
-          action.meta.operations.getRequestKey,
+          action.meta && action.meta.operations
+            ? action.meta.operations.getRequestKey
+            : null,
       });
     }
 
