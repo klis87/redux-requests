@@ -7,13 +7,15 @@ import defaultConfig from './default-config';
 import requestsReducer from './requests-reducer';
 import operationsReducer from './operations-reducer';
 
-const isRequestReadOnly = request =>
+const isRequestReadOnlyDefault = ({ request, meta }) =>
+  !!(meta && meta.asQuery) ||
   (!request.query &&
     (!request.method || request.method.toLowerCase() === 'get')) ||
   (request.query && !request.query.trim().startsWith('mutation'));
 
 export default localConfig => {
   const config = {
+    isRequestReadOnly: isRequestReadOnlyDefault,
     ...defaultConfig,
     ...localConfig,
     handleOperationsState: false,
@@ -23,8 +25,7 @@ export default localConfig => {
   return (state = { queries: {}, mutations: {} }, action) => {
     if (
       isRequestAction(action) &&
-      isRequestReadOnly(action.request) &&
-      !(action.type in requestsReducers)
+      config.isRequestReadOnly(action) &&
     ) {
       requestsReducers[action.type] = requestsReducer({
         ...config,
