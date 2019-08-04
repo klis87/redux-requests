@@ -7,11 +7,16 @@ import defaultConfig from './default-config';
 import requestsReducer from './requests-reducer';
 import operationsReducer from './operations-reducer';
 
-const isRequestReadOnlyDefault = ({ request, meta }) =>
-  !!(meta && meta.asQuery) ||
-  (!request.query &&
-    (!request.method || request.method.toLowerCase() === 'get')) ||
-  (request.query && !request.query.trim().startsWith('mutation'));
+const isRequestReadOnlyDefault = action => {
+  const request = action.payload ? action.payload.request : action.request;
+
+  return (
+    !!(action.meta && action.meta.asQuery) ||
+    (!request.query &&
+      (!request.method || request.method.toLowerCase() === 'get')) ||
+    (request.query && !request.query.trim().startsWith('mutation'))
+  );
+};
 
 export default localConfig => {
   const config = {
