@@ -67,20 +67,17 @@ const App = ({
         Fetch non-existent photo
       </button>
       <ConnectedRequestContainer
-        requestSelector={state => state.photo}
+        queryType={fetchPhotoAction}
         errorComponent={RequestError}
         loadingComponent={Spinner}
         noDataMessage={<p>There is no entity currently.</p>}
       >
-        {({ data, operations }) => (
+        {({ data }) => (
           <div>
             <h3>{data.title}</h3>
             <img src={data.thumbnailUrl} alt={data.title} />
             <hr />
-            <ConnectedOperationContainer
-              operation={operations[deletePhotoAction]}
-              operationCreator={deletePhotoAction}
-            >
+            <ConnectedOperationContainer operationCreator={deletePhotoAction}>
               {({ loading, sendOperation }) => (
                 <button
                   type="button"
@@ -105,18 +102,17 @@ const App = ({
         Fetch posts
       </button>
       <ConnectedRequestContainer
-        requestSelector={state => state.posts}
+        queryType={fetchPostsAction}
         errorComponent={RequestError}
         loadingComponent={Spinner}
         noDataMessage={<p>There is no entity currently.</p>}
       >
-        {({ data, operations }) =>
+        {({ data }) =>
           data.map(post => (
             <div key={post.id}>
               <h3>{post.title}</h3>
               <p>{post.body}</p>
               <ConnectedOperationContainer
-                operation={operations[deletePostAction]}
                 operationCreator={deletePostAction}
                 requestKey={String(post.id)}
               >

@@ -7,12 +7,23 @@ export const fetchPhotoAction = createAction(
   id => ({
     request: { url: `/photos/${id}` },
   }),
-  () => ({ abortOn: clearPhotoAction }),
+  () => ({
+    abortOn: clearPhotoAction,
+    resetOn: [clearPhotoAction],
+  }),
 );
 
-export const deletePhotoAction = createAction('delete photo', id => ({
-  request: { url: `/photos/${id}`, method: 'delete' },
-}));
+export const deletePhotoAction = createAction(
+  'delete photo',
+  id => ({
+    request: { url: `/photos/${id}`, method: 'delete' },
+  }),
+  () => ({
+    operations: {
+      [fetchPhotoAction]: () => null,
+    },
+  }),
+);
 
 export const clearPostsAction = createAction('clear posts');
 
@@ -21,7 +32,10 @@ export const fetchPostsAction = createAction(
   () => ({
     request: { url: '/posts/' },
   }),
-  () => ({ abortOn: clearPostsAction }),
+  () => ({
+    abortOn: clearPostsAction,
+    resetOn: [clearPostsAction],
+  }),
 );
 
 export const deletePostAction = createAction(
@@ -29,5 +43,14 @@ export const deletePostAction = createAction(
   id => ({
     request: { url: `/posts/${id}`, method: 'delete' },
   }),
-  id => ({ id }),
+  id => ({
+    id,
+    operations: {
+      getRequestKey: action => String(action.meta.id),
+      [fetchPostsAction]: {
+        updateData: (state, action) =>
+          state.data.filter(v => v.id !== action.meta.id),
+      },
+    },
+  }),
 );
