@@ -10,7 +10,7 @@ import operationsReducer from './operations-reducer';
 
 export default localConfig => {
   const config = {
-    isRequestReadOnly: isRequestActionQuery,
+    isRequestActionQuery,
     ...defaultConfig,
     ...localConfig,
     handleOperationsState: false,
@@ -39,7 +39,7 @@ export default localConfig => {
 
     if (
       isRequestAction(action) &&
-      config.isRequestReadOnly(action) &&
+      config.isRequestActionQuery(action) &&
       (!(action.type in requestsReducers) ||
         (initReducers && initReducers.has(action.type)))
     ) {
@@ -65,9 +65,9 @@ export default localConfig => {
     let { mutations } = state;
 
     if (
-      (isRequestAction(action) && !config.isRequestReadOnly(action)) ||
+      (isRequestAction(action) && !config.isRequestActionQuery(action)) ||
       (isResponseAction(action) &&
-        !config.isRequestReadOnly(getRequestActionFromResponse(action)))
+        !config.isRequestActionQuery(getRequestActionFromResponse(action)))
     ) {
       mutations = operationsReducer(mutations, action, config, {
         getRequestKey:
