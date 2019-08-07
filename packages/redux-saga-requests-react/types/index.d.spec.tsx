@@ -1,18 +1,11 @@
 import * as React from 'react';
-import {
-  RequestContainer,
-  ConnectedRequestContainer,
-  OperationContainer,
-  ConnectedOperationContainer,
-} from './index';
+import { Query, ConnectedQuery, Mutation, ConnectedMutation } from './index';
 
-function BasicRequestContainer() {
+function BasicQuery() {
   return (
-    <RequestContainer
-      request={{ data: null, error: null, pending: 1, operations: [] }}
-    >
+    <Query query={{ data: null, error: null, pending: 1, mutations: [] }}>
       {null}
-    </RequestContainer>
+    </Query>
   );
 }
 
@@ -28,70 +21,71 @@ function Error({ error, extra }) {
   );
 }
 
-function AdvancedRequestContainer() {
+function AdvancedQuery() {
   return (
-    <RequestContainer
-      request={{ data: 'data', error: null, pending: 1, operations: [] }}
+    <Query
+      query={{ data: 'data', error: null, pending: 1, mutations: [] }}
       loadingComponent={Spinner}
       loadingComponentProps={{ extra: 'extra' }}
       errorComponent={Error}
       errorComponentProps={{ extra: 'extra' }}
       noDataMessage={<span>No data</span>}
       showLoaderDuringRefetch={false}
-      isDataEmpty={request => true}
+      isDataEmpty={query => true}
     >
       {({ data }) => <div>{data}</div>}
-    </RequestContainer>
+    </Query>
   );
 }
 
-function Component({ request, x }) {
+function Component({ query, x }) {
   return (
     <div>
-      {request} {x}
+      {query} {x}
     </div>
   );
 }
 
-function RequestContainerwithComponentProp() {
+function QuerywithComponentProp() {
   return (
-    <RequestContainer
-      request={{ data: 'data', error: null, pending: 1, operations: [] }}
+    <Query
+      query={{ data: 'data', error: null, pending: 1, mutations: [] }}
       component={Component}
       x={1}
     />
   );
 }
 
-function BasicConnectedRequestContainer() {
+function BasicConnectedQuery() {
   return (
-    <ConnectedRequestContainer
+    <ConnectedQuery
       requestSelector={state => ({
         data: 'x',
         error: null,
         pending: 1,
-        operations: [],
+        mutations: [],
       })}
+      type="TYPE"
     >
-      {request => request.data}
-    </ConnectedRequestContainer>
+      {query => query.data}
+    </ConnectedQuery>
   );
 }
 
-function RenderPropOperationContainer() {
+function RenderPropMutation() {
   return (
-    <OperationContainer operation={{ pending: 1, error: 1 }}>
+    <Mutation mutation={{ pending: 1, error: 1 }}>
       {({ loading, error }) => (
         <div>
           {loading && 'loading'}
           {error}
         </div>
       )}
-    </OperationContainer>
+    </Mutation>
   );
 }
 
-function OperationComponent({ loading, error, extra }) {
+function MutationComponent({ loading, error, extra }) {
   return (
     <div>
       {loading && 'loading'}
@@ -101,45 +95,40 @@ function OperationComponent({ loading, error, extra }) {
   );
 }
 
-function OperationContainerWithCustomComponent() {
+function MutationWithCustomComponent() {
   return (
-    <OperationContainer
-      operation={{ pending: 1, error: 'error' }}
+    <Mutation
+      mutation={{ pending: 1, error: 'error' }}
       requestKey="key"
-      component={OperationComponent}
+      component={MutationComponent}
       extra="extra"
     />
   );
 }
 
-function BasicConnectedOperationContainer() {
+function BasicConnectedMutation() {
   return (
-    <ConnectedOperationContainer operation={{ pending: 1, error: 'error' }}>
-      {({ loading, error, sendOperation }) => (
+    <ConnectedMutation type="TYPE">
+      {({ loading, error }) => (
         <div>
           {loading && 'loading'}
           {error}
-          <button onClick={sendOperation}>Send</button>
         </div>
       )}
-    </ConnectedOperationContainer>
+    </ConnectedMutation>
   );
 }
 
-function ConnectedOperationContainerWithSelector() {
+function ConnectedMutationWithSelector() {
   return (
-    <ConnectedOperationContainer
-      operationType="operationType"
-      operationCreator={x => ({
-        type: 'operationType',
-        request: { x },
-      })}
+    <ConnectedMutation
+      type="TYPE"
       requestKey="key"
       requestSelector={state => ({
         data: 'x',
         error: null,
         pending: 1,
-        operations: [],
+        mutations: [],
       })}
     >
       {({ loading, error }) => (
@@ -148,6 +137,6 @@ function ConnectedOperationContainerWithSelector() {
           {error}
         </div>
       )}
-    </ConnectedOperationContainer>
+    </ConnectedMutation>
   );
 }

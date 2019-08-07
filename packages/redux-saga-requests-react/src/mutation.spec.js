@@ -1,69 +1,63 @@
 import renderer from 'react-test-renderer';
 import React from 'react';
 
-import OperationContainer from './operation-container';
+import Mutation from './mutation';
 
-describe('OperationContainer', () => {
+describe('Mutation', () => {
   it('renders loading and error', () => {
     const component = renderer.create(
-      <OperationContainer operation={{ pending: 1, error: 'error' }}>
+      <Mutation mutation={{ pending: 1, error: 'error' }}>
         {({ loading, error }) => (
           <div>
             {loading && 'loading'}
             {error}
           </div>
         )}
-      </OperationContainer>,
+      </Mutation>,
     );
     expect(component.toJSON()).toMatchSnapshot();
   });
 
-  it('renders loading and error of operation with requestKey', () => {
+  it('renders loading and error of mutation with requestKey', () => {
     const component = renderer.create(
-      <OperationContainer
-        requestKey="x"
-        operation={{ x: { pending: 1, error: 'error' } }}
-      >
+      <Mutation requestKey="x" mutation={{ x: { pending: 1, error: 'error' } }}>
         {({ loading, error }) => (
           <div>
             {loading && 'loading'}
             {error}
           </div>
         )}
-      </OperationContainer>,
+      </Mutation>,
     );
     expect(component.toJSON()).toMatchSnapshot();
   });
 
-  it('doesnt crush if an operation with a requestKey doesnt exist', () => {
+  it('doesnt crush if an mutation with a requestKey doesnt exist', () => {
     const component = renderer.create(
-      <OperationContainer
-        requestKey="y"
-        operation={{ x: { pending: 1, error: 'error' } }}
-      >
+      <Mutation requestKey="y" mutation={{ x: { pending: 1, error: 'error' } }}>
         {({ loading, error }) => (
           <div>
             {loading && 'loading'}
             {error}
           </div>
         )}
-      </OperationContainer>,
+      </Mutation>,
     );
     expect(component.toJSON()).toMatchSnapshot();
   });
 
   it('renders custom component as prop with extra prop', () => {
-    const OperationComponent = ({ loading, error, extra }) => (
+    const MutationComponent = ({ loading, error, extra }) => (
       <div>
         {loading && 'loading'} {error} {extra}
       </div>
     );
 
     const component = renderer.create(
-      <OperationContainer
-        operation={{ pending: 1, error: 'error' }}
+      <Mutation
+        mutation={{ pending: 1, error: 'error' }}
         extra="extra"
-        component={OperationComponent}
+        component={MutationComponent}
       />,
     );
     expect(component.toJSON()).toMatchSnapshot();

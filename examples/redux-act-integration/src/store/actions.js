@@ -19,7 +19,7 @@ export const deletePhotoAction = createAction(
     request: { url: `/photos/${id}`, method: 'delete' },
   }),
   () => ({
-    operations: {
+    mutations: {
       [fetchPhotoAction]: () => null,
     },
   }),
@@ -45,7 +45,7 @@ export const deletePostAction = createAction(
   }),
   id => ({
     id,
-    operations: {
+    mutations: {
       getRequestKey: action => String(action.meta.id),
       [fetchPostsAction]: {
         updateData: (state, action) =>

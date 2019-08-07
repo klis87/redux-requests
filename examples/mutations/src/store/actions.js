@@ -19,7 +19,7 @@ export const deletePhoto = id => ({
     method: 'delete',
   },
   meta: {
-    operations: {
+    mutations: {
       [FETCH_PHOTO]: () => null,
     },
   },
@@ -33,7 +33,7 @@ export const deletePhotoOptimistic = photo => ({
   },
   meta: {
     deletedPhoto: photo,
-    operations: {
+    mutations: {
       [FETCH_PHOTO]: {
         updateDataOptimistic: () => null,
         revertData: (state, action) => action.meta.deletedPhoto,
@@ -55,7 +55,7 @@ export const deletePost = id => ({
   },
   meta: {
     id,
-    operations: {
+    mutations: {
       getRequestKey: action => String(action.meta.id),
       [FETCH_POSTS]: {
         updateData: (state, action) =>
@@ -73,7 +73,7 @@ export const deletePostOptimistic = post => ({
   },
   meta: {
     deletedPost: post,
-    operations: {
+    mutations: {
       getRequestKey: action => String(action.meta.deletedPost.id),
       [FETCH_POSTS]: {
         updateDataOptimistic: (state, action) =>

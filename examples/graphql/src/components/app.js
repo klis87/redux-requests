@@ -1,9 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import {
-  ConnectedRequestContainer,
-  ConnectedOperationContainer,
-} from 'redux-saga-requests-react';
+import { ConnectedQuery, ConnectedMutation } from 'redux-saga-requests-react';
 
 import {
   fetchBooks,
@@ -30,6 +27,8 @@ const mapDispatchToProps = {
   deleteBook,
   uploadFile,
   uploadFiles,
+  likeBook,
+  unlikeBook,
 };
 
 const buttonStyle = { marginRight: 10 };
@@ -44,6 +43,8 @@ const App = ({
   fetchBook,
   uploadFile,
   uploadFiles,
+  likeBook,
+  unlikeBook,
 }) => (
   <div>
     <h1>Redux Saga Requests GraphQL example</h1>
@@ -57,8 +58,8 @@ const App = ({
       <button type="button" style={buttonStyle} onClick={() => fetchBooks()}>
         Fetch books
       </button>
-      <ConnectedRequestContainer
-        queryType={FETCH_BOOKS}
+      <ConnectedQuery
+        type={FETCH_BOOKS}
         errorComponent={RequestError}
         loadingComponent={Spinner}
         noDataMessage={<p>There is no entity currently.</p>}
@@ -72,27 +73,28 @@ const App = ({
                 <button type="button" onClick={() => deleteBook(book)}>
                   Delete optimistic
                 </button>
-                <ConnectedOperationContainer
-                  operationType={book.liked ? UNLIKE_BOOK : LIKE_BOOK}
+                <ConnectedMutation
+                  type={book.liked ? UNLIKE_BOOK : LIKE_BOOK}
                   requestKey={book.id}
-                  operationCreator={book.liked ? unlikeBook : likeBook}
                 >
-                  {({ loading, sendOperation }) => (
+                  {({ loading }) => (
                     <button
                       type="button"
-                      onClick={() => sendOperation(book.id)}
+                      onClick={() =>
+                        book.liked ? unlikeBook(book.id) : likeBook(book.id)
+                      }
                       disabled={loading}
                     >
                       {book.liked ? 'Unlike' : 'Like'}
                       {loading && '...'}
                     </button>
                   )}
-                </ConnectedOperationContainer>
+                </ConnectedMutation>
               </div>
             );
           })
         }
-      </ConnectedRequestContainer>
+      </ConnectedQuery>
     </div>
     <hr />
     <div>
@@ -100,8 +102,8 @@ const App = ({
       <button type="button" style={buttonStyle} onClick={() => fetchBook('1')}>
         Fetch book with id 1
       </button>
-      <ConnectedRequestContainer
-        queryType={FETCH_BOOK}
+      <ConnectedQuery
+        type={FETCH_BOOK}
         errorComponent={RequestError}
         loadingComponent={Spinner}
         noDataMessage={<p>There is no entity currently.</p>}
@@ -112,7 +114,7 @@ const App = ({
             <div>{data.book.author}</div>
           </div>
         )}
-      </ConnectedRequestContainer>
+      </ConnectedQuery>
     </div>
     <hr />
     <div>
@@ -127,8 +129,8 @@ const App = ({
           },
         }) => validity.valid && uploadFile(file)}
       />
-      <ConnectedRequestContainer
-        queryType={UPLOAD_FILE}
+      <ConnectedQuery
+        type={UPLOAD_FILE}
         errorComponent={RequestError}
         loadingComponent={Spinner}
         noDataMessage={<p>There is no entity currently.</p>}
@@ -139,7 +141,7 @@ const App = ({
             <div>Mimetype: {data.singleUpload.mimetype}</div>
           </div>
         )}
-      </ConnectedRequestContainer>
+      </ConnectedQuery>
     </div>
     <hr />
     <div>
@@ -152,8 +154,8 @@ const App = ({
           validity.valid && uploadFiles(files)
         }
       />
-      <ConnectedRequestContainer
-        queryType={UPLOAD_FILES}
+      <ConnectedQuery
+        type={UPLOAD_FILES}
         errorComponent={RequestError}
         loadingComponent={Spinner}
         noDataMessage={<p>There is no entity currently.</p>}
@@ -166,7 +168,7 @@ const App = ({
             </div>
           ))
         }
-      </ConnectedRequestContainer>
+      </ConnectedQuery>
     </div>
   </div>
 );

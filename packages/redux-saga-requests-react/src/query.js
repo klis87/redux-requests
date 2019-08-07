@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 
 import { reactComponentPropType } from './propTypesValidators';
 
-const RequestContainer = ({
-  request,
+const Query = ({
+  query,
   children,
   component: Component,
   isDataEmpty,
@@ -16,17 +16,17 @@ const RequestContainer = ({
   loadingComponentProps,
   ...extraProps
 }) => {
-  const dataEmpty = isDataEmpty(request);
+  const dataEmpty = isDataEmpty(query);
 
-  if (request.pending > 0 && (showLoaderDuringRefetch || dataEmpty)) {
+  if (query.pending > 0 && (showLoaderDuringRefetch || dataEmpty)) {
     return LoadingComponent ? (
       <LoadingComponent {...loadingComponentProps} />
     ) : null;
   }
 
-  if (request.error) {
+  if (query.error) {
     return ErrorComponent ? (
-      <ErrorComponent error={request.error} {...errorComponentProps} />
+      <ErrorComponent error={query.error} {...errorComponentProps} />
     ) : null;
   }
 
@@ -35,23 +35,23 @@ const RequestContainer = ({
   }
 
   if (children) {
-    return typeof children === 'function' ? children(request) : children;
+    return typeof children === 'function' ? children(query) : children;
   }
 
-  return <Component request={request} {...extraProps} />;
+  return <Component query={query} {...extraProps} />;
 };
 
-RequestContainer.defaultProps = {
-  isDataEmpty: request =>
-    Array.isArray(request.data) ? request.data.length === 0 : !request.data,
+Query.defaultProps = {
+  isDataEmpty: query =>
+    Array.isArray(query.data) ? query.data.length === 0 : !query.data,
   showLoaderDuringRefetch: true,
   noDataMessage: null,
 };
 
-RequestContainer.propTypes = {
+Query.propTypes = {
   children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
-  component: reactComponentPropType('RequestContainer'),
-  request: PropTypes.shape({
+  component: reactComponentPropType('Query'),
+  query: PropTypes.shape({
     data: PropTypes.any,
     error: PropTypes.any,
     pending: PropTypes.number.isRequired,
@@ -59,10 +59,10 @@ RequestContainer.propTypes = {
   isDataEmpty: PropTypes.func,
   showLoaderDuringRefetch: PropTypes.bool,
   noDataMessage: PropTypes.node,
-  errorComponent: reactComponentPropType('RequestContainer'),
+  errorComponent: reactComponentPropType('Query'),
   errorComponentProps: PropTypes.objectOf(PropTypes.any),
-  loadingComponent: reactComponentPropType('RequestContainer'),
+  loadingComponent: reactComponentPropType('Query'),
   loadingComponentProps: PropTypes.objectOf(PropTypes.any),
 };
 
-export default RequestContainer;
+export default Query;

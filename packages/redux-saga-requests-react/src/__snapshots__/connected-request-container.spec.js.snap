@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`ConnectedRequestContainer maps requestSelector to request 1`] = `
-<div>
-  data
-</div>
-`;

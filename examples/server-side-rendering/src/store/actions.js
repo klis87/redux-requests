@@ -13,7 +13,7 @@ export const fetchBooks = () => ({
 export const resetBooks = () => ({
   type: 'RESET_BOOKS',
   meta: {
-    operations: {
+    mutations: {
       [FETCH_BOOKS]: {
         local: true,
         updateData: () => null,

@@ -1,56 +1,50 @@
 import renderer from 'react-test-renderer';
 import React from 'react';
 
-import RequestContainer from './request-container';
+import Query from './query';
 
-describe('RequestContainer', () => {
+describe('Query', () => {
   it('renders null when data is falsy by default', () => {
     const component = renderer.create(
-      <RequestContainer request={{ data: null, error: null, pending: 0 }}>
-        {null}
-      </RequestContainer>,
+      <Query query={{ data: null, error: null, pending: 0 }}>{null}</Query>,
     );
     expect(component.toJSON()).toMatchSnapshot();
   });
 
   it('renders null when data is empty array by default', () => {
     const component = renderer.create(
-      <RequestContainer request={{ data: [], error: null, pending: 0 }}>
-        {[]}
-      </RequestContainer>,
+      <Query query={{ data: [], error: null, pending: 0 }}>{[]}</Query>,
     );
     expect(component.toJSON()).toMatchSnapshot();
   });
 
   it('renders null when custom isDataEmpty returns true', () => {
     const component = renderer.create(
-      <RequestContainer
-        request={{ data: 'empty', error: null, pending: 0 }}
-        isDataEmpty={request => !request.data || request.data === 'empty'}
+      <Query
+        query={{ data: 'empty', error: null, pending: 0 }}
+        isDataEmpty={query => !query.data || query.data === 'empty'}
       >
         empty
-      </RequestContainer>,
+      </Query>,
     );
     expect(component.toJSON()).toMatchSnapshot();
   });
 
   it('allows passing no data message', () => {
     const component = renderer.create(
-      <RequestContainer
-        request={{ data: null, error: null, pending: 0 }}
+      <Query
+        query={{ data: null, error: null, pending: 0 }}
         noDataMessage="no data"
       >
         {null}
-      </RequestContainer>,
+      </Query>,
     );
     expect(component.toJSON()).toMatchSnapshot();
   });
 
   it('renders null when pending is positive by default', () => {
     const component = renderer.create(
-      <RequestContainer request={{ data: 'data', error: null, pending: 1 }}>
-        data
-      </RequestContainer>,
+      <Query query={{ data: 'data', error: null, pending: 1 }}>data</Query>,
     );
     expect(component.toJSON()).toMatchSnapshot();
   });
@@ -59,13 +53,13 @@ describe('RequestContainer', () => {
     const Spinner = ({ extra }) => <span>loading... {extra}</span>;
 
     const component = renderer.create(
-      <RequestContainer
-        request={{ data: 'data', error: null, pending: 1 }}
+      <Query
+        query={{ data: 'data', error: null, pending: 1 }}
         loadingComponent={Spinner}
         loadingComponentProps={{ extra: 'extra' }}
       >
         data
-      </RequestContainer>,
+      </Query>,
     );
     expect(component.toJSON()).toMatchSnapshot();
   });
@@ -78,12 +72,12 @@ describe('RequestContainer', () => {
     try {
       expect(() =>
         renderer.create(
-          <RequestContainer
-            request={{ data: null, error: null, pending: 1 }}
+          <Query
+            query={{ data: null, error: null, pending: 1 }}
             loadingComponent={<div>loading</div>}
           >
             {null}
-          </RequestContainer>,
+          </Query>,
         ),
       ).toThrow();
       expect(loggerSpy).toBeCalled();
@@ -94,21 +88,19 @@ describe('RequestContainer', () => {
 
   it('renders data even when pending is positive if showLoaderDuringRefetch is false', () => {
     const component = renderer.create(
-      <RequestContainer
-        request={{ data: 'data', error: null, pending: 1 }}
+      <Query
+        query={{ data: 'data', error: null, pending: 1 }}
         showLoaderDuringRefetch={false}
       >
         data
-      </RequestContainer>,
+      </Query>,
     );
     expect(component.toJSON()).toMatchSnapshot();
   });
 
   it('renders null when error is truthy by default', () => {
     const component = renderer.create(
-      <RequestContainer request={{ data: null, error: 'error', pending: 0 }}>
-        {null}
-      </RequestContainer>,
+      <Query query={{ data: null, error: 'error', pending: 0 }}>{null}</Query>,
     );
     expect(component.toJSON()).toMatchSnapshot();
   });
@@ -121,13 +113,13 @@ describe('RequestContainer', () => {
     );
 
     const component = renderer.create(
-      <RequestContainer
-        request={{ data: null, error: 'error', pending: 0 }}
+      <Query
+        query={{ data: null, error: 'error', pending: 0 }}
         errorComponent={Error}
         errorComponentProps={{ extra: 'extra' }}
       >
         {null}
-      </RequestContainer>,
+      </Query>,
     );
     expect(component.toJSON()).toMatchSnapshot();
   });
@@ -140,12 +132,12 @@ describe('RequestContainer', () => {
     try {
       expect(() =>
         renderer.create(
-          <RequestContainer
-            request={{ data: null, error: 'error', pending: 0 }}
+          <Query
+            query={{ data: null, error: 'error', pending: 0 }}
             errorComponent={<div>error</div>}
           >
             {null}
-          </RequestContainer>,
+          </Query>,
         ),
       ).toThrow();
       expect(loggerSpy).toBeCalled();
@@ -156,9 +148,9 @@ describe('RequestContainer', () => {
 
   it('renders children callback when data in not empty', () => {
     const component = renderer.create(
-      <RequestContainer request={{ data: 'data', error: null, pending: 0 }}>
+      <Query query={{ data: 'data', error: null, pending: 0 }}>
         {({ data }) => <span>{data}</span>}
-      </RequestContainer>,
+      </Query>,
     );
     expect(component.toJSON()).toMatchSnapshot();
   });
@@ -167,23 +159,23 @@ describe('RequestContainer', () => {
     const Component = ({ children }) => <span>{children}</span>;
 
     const component = renderer.create(
-      <RequestContainer request={{ data: 'data', error: null, pending: 0 }}>
+      <Query query={{ data: 'data', error: null, pending: 0 }}>
         <Component>data</Component>
-      </RequestContainer>,
+      </Query>,
     );
     expect(component.toJSON()).toMatchSnapshot();
   });
 
   it('renders custom prop component with extra props', () => {
-    const CustomComponent = ({ request, extra }) => (
+    const CustomComponent = ({ query, extra }) => (
       <span>
-        {request.data} {extra}
+        {query.data} {extra}
       </span>
     );
 
     const component = renderer.create(
-      <RequestContainer
-        request={{ data: 'data', error: null, pending: 0 }}
+      <Query
+        query={{ data: 'data', error: null, pending: 0 }}
         component={CustomComponent}
         extra="extra"
       />,

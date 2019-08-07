@@ -11,7 +11,7 @@ import {
 
 export const photoReducer = requestsReducer({
   actionType: FETCH_PHOTO,
-  operations: {
+  mutations: {
     [DELETE_PHOTO]: () => null,
     [DELETE_PHOTO_OPTIMISTIC]: {
       updateDataOptimistic: () => null,
@@ -23,7 +23,7 @@ export const photoReducer = requestsReducer({
 export const postsReducer = requestsReducer({
   actionType: FETCH_POSTS,
   multiple: true,
-  operations: {
+  mutations: {
     [DELETE_POST]: {
       updateData: (state, action) =>
         state.data.filter(v => v.id !== action.meta.id),

@@ -10,7 +10,7 @@ describe('reducers', () => {
         data: null,
         error: null,
         pending: 0,
-        operations: null,
+        mutations: null,
       };
       const reducer = requestsReducer({ actionType });
 
@@ -28,7 +28,7 @@ describe('reducers', () => {
           data: null,
           error: null,
           pending: 1,
-          operations: null,
+          mutations: null,
         });
       });
 
@@ -42,7 +42,7 @@ describe('reducers', () => {
           data,
           error: null,
           pending: -1,
-          operations: null,
+          mutations: null,
         });
       });
 
@@ -56,7 +56,7 @@ describe('reducers', () => {
           data: null,
           error: someError,
           pending: -1,
-          operations: null,
+          mutations: null,
         });
       });
 
@@ -66,7 +66,7 @@ describe('reducers', () => {
           data: null,
           error: null,
           pending: -1,
-          operations: null,
+          mutations: null,
         });
       });
 
@@ -78,7 +78,7 @@ describe('reducers', () => {
           data: null,
           error: null,
           pending: 1,
-          operations: null,
+          mutations: null,
         });
       });
     });
@@ -94,11 +94,11 @@ describe('reducers', () => {
           data: ['default'],
           error: null,
           pending: 1,
-          operations: null,
+          mutations: null,
         });
       });
 
-      it('sets corrent initial state when multiple false', () => {
+      it('sets correct initial state when multiple false', () => {
         const reducer = requestsReducer({
           actionType,
           getDefaultData: multiple => (multiple ? ['default'] : 'default'),
@@ -108,7 +108,7 @@ describe('reducers', () => {
           data: 'default',
           error: null,
           pending: 1,
-          operations: null,
+          mutations: null,
         });
       });
 
@@ -124,7 +124,7 @@ describe('reducers', () => {
               data: {},
               error: null,
               pending: 1,
-              operations: null,
+              mutations: null,
             },
             createErrorAction({ type: actionType }, 'error'),
           ),
@@ -132,7 +132,7 @@ describe('reducers', () => {
           data: ['default'],
           error: 'error',
           pending: 0,
-          operations: null,
+          mutations: null,
         });
       });
     });
@@ -178,7 +178,7 @@ describe('reducers', () => {
           data: [],
           error: null,
           pending: 0,
-          operations: null,
+          mutations: null,
         });
       });
 
@@ -187,7 +187,7 @@ describe('reducers', () => {
           data: [],
           error: null,
           pending: 2,
-          operations: null,
+          mutations: null,
           multiple: true,
         });
       });
@@ -202,7 +202,7 @@ describe('reducers', () => {
           data: { nested: data },
           error: null,
           pending: -2,
-          operations: null,
+          mutations: null,
           multiple: true,
         });
       });
@@ -217,7 +217,7 @@ describe('reducers', () => {
           data: [],
           error: someError,
           pending: -2,
-          operations: null,
+          mutations: null,
           multiple: true,
         });
       });
@@ -228,7 +228,7 @@ describe('reducers', () => {
           data: [],
           error: null,
           pending: -2,
-          operations: null,
+          mutations: null,
           multiple: true,
         });
       });
@@ -240,7 +240,7 @@ describe('reducers', () => {
           data: [],
           error: null,
           pending: 4,
-          operations: null,
+          mutations: null,
         });
       });
 
@@ -253,7 +253,7 @@ describe('reducers', () => {
 
         const state = {
           data: [1, 2, 3],
-          operations: null,
+          mutations: null,
           error: null,
           pending: 0,
         };
@@ -261,40 +261,40 @@ describe('reducers', () => {
           data: [],
           error: null,
           pending: 1,
-          operations: null,
+          mutations: null,
         });
       });
     });
 
-    describe('with operations', () => {
-      const OPERATION_ACTION = 'OPERATION_ACTION';
+    describe('with mutations', () => {
+      const MUTATION_ACTION = 'MUTATION_ACTION';
       const commonReducer = requestsReducer({
         actionType,
-        operations: {
-          [OPERATION_ACTION]: true,
+        mutations: {
+          [MUTATION_ACTION]: true,
         },
       });
       const defaultState = {
         data: null,
         error: null,
         pending: 0,
-        operations: {
-          [OPERATION_ACTION]: {
+        mutations: {
+          [MUTATION_ACTION]: {
             error: null,
             pending: 0,
           },
         },
       };
 
-      it('returns default state containing operation default data', () => {
+      it('returns default state containing mutation default data', () => {
         expect(commonReducer(undefined, {})).toEqual(defaultState);
       });
 
-      it('returns default state containing operation default data with defined requestKey', () => {
+      it('returns default state containing mutation default data with defined requestKey', () => {
         const reducer = requestsReducer({
           actionType,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               updateData: (state, action) => action.data,
               getRequestKey: action => action.meta.id,
             },
@@ -302,46 +302,19 @@ describe('reducers', () => {
         });
         expect(reducer(undefined, {})).toEqual({
           ...defaultState,
-          operations: {
-            [OPERATION_ACTION]: {},
+          mutations: {
+            [MUTATION_ACTION]: {},
           },
         });
       });
 
-      it('increases pending counter on operation request', () => {
-        expect(commonReducer(defaultState, { type: OPERATION_ACTION })).toEqual(
-          {
-            data: null,
-            error: null,
-            pending: 0,
-            operations: {
-              [OPERATION_ACTION]: {
-                error: null,
-                pending: 1,
-              },
-            },
-          },
-        );
-      });
-
-      it('can update data optimistic', () => {
-        const reducer = requestsReducer({
-          actionType,
-          operations: {
-            [OPERATION_ACTION]: {
-              updateDataOptimistic: (state, action) => action.data,
-            },
-          },
-        });
-
-        expect(
-          reducer(defaultState, { type: OPERATION_ACTION, data: 'data' }),
-        ).toEqual({
-          data: 'data',
+      it('increases pending counter on mutation request', () => {
+        expect(commonReducer(defaultState, { type: MUTATION_ACTION })).toEqual({
+          data: null,
           error: null,
           pending: 0,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               error: null,
               pending: 1,
             },
@@ -349,11 +322,36 @@ describe('reducers', () => {
         });
       });
 
-      it('increases pending counter on operation request with defined requestKey', () => {
+      it('can update data optimistic', () => {
         const reducer = requestsReducer({
           actionType,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
+              updateDataOptimistic: (state, action) => action.data,
+            },
+          },
+        });
+
+        expect(
+          reducer(defaultState, { type: MUTATION_ACTION, data: 'data' }),
+        ).toEqual({
+          data: 'data',
+          error: null,
+          pending: 0,
+          mutations: {
+            [MUTATION_ACTION]: {
+              error: null,
+              pending: 1,
+            },
+          },
+        });
+      });
+
+      it('increases pending counter on mutation request with defined requestKey', () => {
+        const reducer = requestsReducer({
+          actionType,
+          mutations: {
+            [MUTATION_ACTION]: {
               updateData: true,
               getRequestKey: action => action.meta.id,
             },
@@ -362,7 +360,7 @@ describe('reducers', () => {
         const initialState = reducer(undefined, {});
 
         let nextState = reducer(initialState, {
-          type: OPERATION_ACTION,
+          type: MUTATION_ACTION,
           request: { url: '/' },
           meta: { id: 'a' },
         });
@@ -370,8 +368,8 @@ describe('reducers', () => {
           data: null,
           error: null,
           pending: 0,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               a: {
                 error: null,
                 pending: 1,
@@ -381,7 +379,7 @@ describe('reducers', () => {
         });
 
         nextState = reducer(nextState, {
-          type: OPERATION_ACTION,
+          type: MUTATION_ACTION,
           request: { url: '/' },
           meta: { id: 'b' },
         });
@@ -389,8 +387,8 @@ describe('reducers', () => {
           data: null,
           error: null,
           pending: 0,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               a: {
                 error: null,
                 pending: 1,
@@ -404,7 +402,7 @@ describe('reducers', () => {
         });
 
         nextState = reducer(nextState, {
-          type: OPERATION_ACTION,
+          type: MUTATION_ACTION,
           request: { url: '/' },
           meta: { id: 'a' },
         });
@@ -412,8 +410,8 @@ describe('reducers', () => {
           data: null,
           error: null,
           pending: 0,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               a: {
                 error: null,
                 pending: 2,
@@ -427,19 +425,19 @@ describe('reducers', () => {
         });
       });
 
-      it('handles operation success response', () => {
+      it('handles mutation success response', () => {
         expect(
           commonReducer(defaultState, {
-            type: success(OPERATION_ACTION),
+            type: success(MUTATION_ACTION),
             data: 'response',
-            meta: { requestAction: { type: OPERATION_ACTION } },
+            meta: { requestAction: { type: MUTATION_ACTION } },
           }),
         ).toEqual({
           data: 'response',
           error: null,
           pending: 0,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               error: null,
               pending: -1,
             },
@@ -447,25 +445,25 @@ describe('reducers', () => {
         });
       });
 
-      it('handles operation success response defined as updateData true', () => {
+      it('handles mutation success response defined as updateData true', () => {
         const reducer = requestsReducer({
           actionType,
-          operations: {
-            [OPERATION_ACTION]: { updateData: true },
+          mutations: {
+            [MUTATION_ACTION]: { updateData: true },
           },
         });
         expect(
           reducer(defaultState, {
-            type: success(OPERATION_ACTION),
+            type: success(MUTATION_ACTION),
             data: 'response',
-            meta: { requestAction: { type: OPERATION_ACTION } },
+            meta: { requestAction: { type: MUTATION_ACTION } },
           }),
         ).toEqual({
           data: 'response',
           error: null,
           pending: 0,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               error: null,
               pending: -1,
             },
@@ -473,26 +471,26 @@ describe('reducers', () => {
         });
       });
 
-      it('doesnt override data when a defined operation is false', () => {
+      it('doesnt override data when a defined mutation is false', () => {
         const reducer = requestsReducer({
           actionType,
-          operations: {
-            [OPERATION_ACTION]: false,
+          mutations: {
+            [MUTATION_ACTION]: false,
           },
         });
 
         expect(
           reducer(defaultState, {
-            type: success(OPERATION_ACTION),
+            type: success(MUTATION_ACTION),
             data: 'response',
-            meta: { requestAction: { type: OPERATION_ACTION } },
+            meta: { requestAction: { type: MUTATION_ACTION } },
           }),
         ).toEqual({
           data: null,
           error: null,
           pending: 0,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               error: null,
               pending: -1,
             },
@@ -500,26 +498,26 @@ describe('reducers', () => {
         });
       });
 
-      it('doesnt override data when a defined operation is object with key updateData as false', () => {
+      it('doesnt override data when a defined mutation is object with key updateData as false', () => {
         const reducer = requestsReducer({
           actionType,
-          operations: {
-            [OPERATION_ACTION]: { updateData: false },
+          mutations: {
+            [MUTATION_ACTION]: { updateData: false },
           },
         });
 
         expect(
           reducer(defaultState, {
-            type: success(OPERATION_ACTION),
+            type: success(MUTATION_ACTION),
             data: 'response',
-            meta: { requestAction: { type: OPERATION_ACTION } },
+            meta: { requestAction: { type: MUTATION_ACTION } },
           }),
         ).toEqual({
           data: null,
           error: null,
           pending: 0,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               error: null,
               pending: -1,
             },
@@ -532,23 +530,23 @@ describe('reducers', () => {
           actionType,
           getData: () => null,
           updateData: (state, action) => action.data,
-          operations: {
-            [OPERATION_ACTION]: true,
+          mutations: {
+            [MUTATION_ACTION]: true,
           },
         });
 
         expect(
           reducer(defaultState, {
-            type: success(OPERATION_ACTION),
+            type: success(MUTATION_ACTION),
             data: 'response',
-            meta: { requestAction: { type: OPERATION_ACTION } },
+            meta: { requestAction: { type: MUTATION_ACTION } },
           }),
         ).toEqual({
           data: 'response',
           error: null,
           pending: 0,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               error: null,
               pending: -1,
             },
@@ -556,28 +554,28 @@ describe('reducers', () => {
         });
       });
 
-      it('handles updateData customized per operation', () => {
+      it('handles updateData customized per mutation', () => {
         const reducer = requestsReducer({
           actionType,
           getData: () => null,
           updateData: (state, action) => action.data,
-          operations: {
-            [OPERATION_ACTION]: (state, action) => action.data.nested,
+          mutations: {
+            [MUTATION_ACTION]: (state, action) => action.data.nested,
           },
         });
 
         expect(
           reducer(defaultState, {
-            type: success(OPERATION_ACTION),
+            type: success(MUTATION_ACTION),
             data: { nested: 'response' },
-            meta: { requestAction: { type: OPERATION_ACTION } },
+            meta: { requestAction: { type: MUTATION_ACTION } },
           }),
         ).toEqual({
           data: 'response',
           error: null,
           pending: 0,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               error: null,
               pending: -1,
             },
@@ -585,13 +583,13 @@ describe('reducers', () => {
         });
       });
 
-      it('handles updateData customized per operation defined in updateData object key', () => {
+      it('handles updateData customized per mutation defined in updateData object key', () => {
         const reducer = requestsReducer({
           actionType,
           getData: () => null,
           updateData: (state, action) => action.data,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               updateData: (state, action) => action.data.nested,
             },
           },
@@ -599,16 +597,16 @@ describe('reducers', () => {
 
         expect(
           reducer(defaultState, {
-            type: success(OPERATION_ACTION),
+            type: success(MUTATION_ACTION),
             data: { nested: 'response' },
-            meta: { requestAction: { type: OPERATION_ACTION } },
+            meta: { requestAction: { type: MUTATION_ACTION } },
           }),
         ).toEqual({
           data: 'response',
           error: null,
           pending: 0,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               error: null,
               pending: -1,
             },
@@ -616,13 +614,13 @@ describe('reducers', () => {
         });
       });
 
-      it('handles updateData customized per operation with defined requestKey', () => {
+      it('handles updateData customized per mutation with defined requestKey', () => {
         const reducer = requestsReducer({
           actionType,
           getData: () => null,
           updateData: (state, action) => action.data,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               updateData: (state, action) => action.data.nested,
               getRequestKey: action => action.meta.id,
             },
@@ -633,8 +631,8 @@ describe('reducers', () => {
           data: null,
           error: null,
           pending: 0,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               1: {
                 error: null,
                 pending: 2,
@@ -648,10 +646,10 @@ describe('reducers', () => {
         };
 
         state = reducer(state, {
-          type: success(OPERATION_ACTION),
+          type: success(MUTATION_ACTION),
           data: { nested: 'response' },
           meta: {
-            requestAction: { type: OPERATION_ACTION, meta: { id: '1' } },
+            requestAction: { type: MUTATION_ACTION, meta: { id: '1' } },
             id: '1',
           },
         });
@@ -660,8 +658,8 @@ describe('reducers', () => {
           data: 'response',
           error: null,
           pending: 0,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               1: {
                 error: null,
                 pending: 1,
@@ -675,10 +673,10 @@ describe('reducers', () => {
         });
 
         state = reducer(state, {
-          type: success(OPERATION_ACTION),
+          type: success(MUTATION_ACTION),
           data: { nested: 'response2' },
           meta: {
-            requestAction: { type: OPERATION_ACTION, meta: { id: '1' } },
+            requestAction: { type: MUTATION_ACTION, meta: { id: '1' } },
             id: '1',
           },
         });
@@ -687,8 +685,8 @@ describe('reducers', () => {
           data: 'response2',
           error: null,
           pending: 0,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               2: {
                 error: null,
                 pending: 1,
@@ -698,10 +696,10 @@ describe('reducers', () => {
         });
 
         state = reducer(state, {
-          type: success(OPERATION_ACTION),
+          type: success(MUTATION_ACTION),
           data: { nested: 'response2' },
           meta: {
-            requestAction: { type: OPERATION_ACTION, meta: { id: '2' } },
+            requestAction: { type: MUTATION_ACTION, meta: { id: '2' } },
             id: '2',
           },
         });
@@ -710,25 +708,25 @@ describe('reducers', () => {
           data: 'response2',
           error: null,
           pending: 0,
-          operations: {
-            [OPERATION_ACTION]: {},
+          mutations: {
+            [MUTATION_ACTION]: {},
           },
         });
       });
 
-      it('handles operation error response', () => {
+      it('handles mutation error response', () => {
         expect(
           commonReducer(defaultState, {
-            type: error(OPERATION_ACTION),
+            type: error(MUTATION_ACTION),
             error: 'error',
-            meta: { requestAction: { type: OPERATION_ACTION } },
+            meta: { requestAction: { type: MUTATION_ACTION } },
           }),
         ).toEqual({
           data: null,
           error: null,
           pending: 0,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               error: 'error',
               pending: -1,
             },
@@ -736,11 +734,11 @@ describe('reducers', () => {
         });
       });
 
-      it('reverts optimistic update on operation error', () => {
+      it('reverts optimistic update on mutation error', () => {
         const reducer = requestsReducer({
           actionType,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               updateDataOptimistic: (state, action) => action.data,
               revertData: (state, action) => action.meta.requestAction.oldData,
             },
@@ -749,18 +747,18 @@ describe('reducers', () => {
 
         expect(
           reducer(defaultState, {
-            type: error(OPERATION_ACTION),
+            type: error(MUTATION_ACTION),
             error: 'error',
             meta: {
-              requestAction: { type: OPERATION_ACTION, oldData: 'oldData' },
+              requestAction: { type: MUTATION_ACTION, oldData: 'oldData' },
             },
           }),
         ).toEqual({
           data: 'oldData',
           error: null,
           pending: 0,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               error: 'error',
               pending: -1,
             },
@@ -768,11 +766,11 @@ describe('reducers', () => {
         });
       });
 
-      it('handles operation error response with defined requestKey', () => {
+      it('handles mutation error response with defined requestKey', () => {
         const reducer = requestsReducer({
           actionType,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               updateData: true,
               getRequestKey: action => action.meta.id,
             },
@@ -783,8 +781,8 @@ describe('reducers', () => {
           data: null,
           error: null,
           pending: 0,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               1: {
                 error: null,
                 pending: 2,
@@ -794,10 +792,10 @@ describe('reducers', () => {
         };
 
         state = reducer(state, {
-          type: error(OPERATION_ACTION),
+          type: error(MUTATION_ACTION),
           error: 'error',
           meta: {
-            requestAction: { type: OPERATION_ACTION, meta: { id: '1' } },
+            requestAction: { type: MUTATION_ACTION, meta: { id: '1' } },
           },
         });
 
@@ -805,8 +803,8 @@ describe('reducers', () => {
           data: null,
           error: null,
           pending: 0,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               1: {
                 error: 'error',
                 pending: 1,
@@ -816,10 +814,10 @@ describe('reducers', () => {
         });
 
         state = reducer(state, {
-          type: error(OPERATION_ACTION),
+          type: error(MUTATION_ACTION),
           error: 'error2',
           meta: {
-            requestAction: { type: OPERATION_ACTION, meta: { id: '1' } },
+            requestAction: { type: MUTATION_ACTION, meta: { id: '1' } },
           },
         });
 
@@ -827,8 +825,8 @@ describe('reducers', () => {
           data: null,
           error: null,
           pending: 0,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               1: {
                 error: 'error2',
                 pending: 0,
@@ -838,18 +836,18 @@ describe('reducers', () => {
         });
       });
 
-      it('handles operation abort response', () => {
+      it('handles mutation abort response', () => {
         expect(
           commonReducer(defaultState, {
-            type: abort(OPERATION_ACTION),
-            meta: { requestAction: { type: OPERATION_ACTION } },
+            type: abort(MUTATION_ACTION),
+            meta: { requestAction: { type: MUTATION_ACTION } },
           }),
         ).toEqual({
           data: null,
           error: null,
           pending: 0,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               error: null,
               pending: -1,
             },
@@ -857,11 +855,11 @@ describe('reducers', () => {
         });
       });
 
-      it('reverts optimistic update on operation abort', () => {
+      it('reverts optimistic update on mutation abort', () => {
         const reducer = requestsReducer({
           actionType,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               updateDataOptimistic: (state, action) => action.data,
               revertData: (state, action) => action.meta.requestAction.oldData,
             },
@@ -870,17 +868,17 @@ describe('reducers', () => {
 
         expect(
           reducer(defaultState, {
-            type: abort(OPERATION_ACTION),
+            type: abort(MUTATION_ACTION),
             meta: {
-              requestAction: { type: OPERATION_ACTION, oldData: 'oldData' },
+              requestAction: { type: MUTATION_ACTION, oldData: 'oldData' },
             },
           }),
         ).toEqual({
           data: 'oldData',
           error: null,
           pending: 0,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               error: null,
               pending: -1,
             },
@@ -888,11 +886,11 @@ describe('reducers', () => {
         });
       });
 
-      it('handles operation abort response with defined requestKey', () => {
+      it('handles mutation abort response with defined requestKey', () => {
         const reducer = requestsReducer({
           actionType,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               updateData: true,
               getRequestKey: action => action.meta.id,
             },
@@ -903,8 +901,8 @@ describe('reducers', () => {
           data: null,
           error: null,
           pending: 0,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               1: {
                 error: null,
                 pending: 2,
@@ -914,9 +912,9 @@ describe('reducers', () => {
         };
 
         state = reducer(state, {
-          type: abort(OPERATION_ACTION),
+          type: abort(MUTATION_ACTION),
           meta: {
-            requestAction: { type: OPERATION_ACTION, meta: { id: '1' } },
+            requestAction: { type: MUTATION_ACTION, meta: { id: '1' } },
           },
         });
 
@@ -924,8 +922,8 @@ describe('reducers', () => {
           data: null,
           error: null,
           pending: 0,
-          operations: {
-            [OPERATION_ACTION]: {
+          mutations: {
+            [MUTATION_ACTION]: {
               1: {
                 error: null,
                 pending: 1,
@@ -935,9 +933,9 @@ describe('reducers', () => {
         });
 
         state = reducer(state, {
-          type: abort(OPERATION_ACTION),
+          type: abort(MUTATION_ACTION),
           meta: {
-            requestAction: { type: OPERATION_ACTION, meta: { id: '1' } },
+            requestAction: { type: MUTATION_ACTION, meta: { id: '1' } },
           },
         });
 
@@ -945,20 +943,20 @@ describe('reducers', () => {
           data: null,
           error: null,
           pending: 0,
-          operations: {
-            [OPERATION_ACTION]: {},
+          mutations: {
+            [MUTATION_ACTION]: {},
           },
         });
       });
     });
 
-    describe('with local operations', () => {
-      const LOCAL_OPERATION_ACTION = 'LOCAL_OPERATION_ACTION';
+    describe('with local mutations', () => {
+      const LOCAL_MUTATION_ACTION = 'LOCAL_MUTATION_ACTION';
       const commonReducer = requestsReducer({
         actionType,
-        operations: {
-          operation: true,
-          [LOCAL_OPERATION_ACTION]: {
+        mutations: {
+          mutation: true,
+          [LOCAL_MUTATION_ACTION]: {
             local: true,
             updateData: (state, action) => action.data,
           },
@@ -968,22 +966,22 @@ describe('reducers', () => {
         data: null,
         error: null,
         pending: 0,
-        operations: {
-          operation: {
+        mutations: {
+          mutation: {
             error: null,
             pending: 0,
           },
         },
       };
 
-      it('does not contain local operation in initial state ', () => {
+      it('does not contain local mutation in initial state ', () => {
         expect(commonReducer(undefined, {})).toEqual(defaultState);
       });
 
-      it('updates data for local operation and doesnt keep local operation state', () => {
+      it('updates data for local mutation and doesnt keep local mutation state', () => {
         expect(
           commonReducer(defaultState, {
-            type: LOCAL_OPERATION_ACTION,
+            type: LOCAL_MUTATION_ACTION,
             data: 'data',
           }),
         ).toEqual({ ...defaultState, data: 'data' });

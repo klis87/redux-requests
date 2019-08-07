@@ -3,16 +3,16 @@ import PropTypes from 'prop-types';
 
 import { reactComponentPropType } from './propTypesValidators';
 
-const OperationContainer = ({
-  operation,
+const Mutation = ({
+  mutation,
   requestKey,
   children,
   component: Component,
   ...extraProps
 }) => {
-  const operationObject = requestKey ? operation[requestKey] : operation;
-  const loading = operationObject ? operationObject.pending > 0 : false;
-  const error = operationObject ? operationObject.error : null;
+  const mutationObject = requestKey ? mutation[requestKey] : mutation;
+  const loading = mutationObject ? mutationObject.pending > 0 : false;
+  const error = mutationObject ? mutationObject.error : null;
 
   if (children) {
     return children({ loading, error, ...extraProps });
@@ -21,10 +21,10 @@ const OperationContainer = ({
   return <Component loading={loading} error={error} {...extraProps} />;
 };
 
-OperationContainer.propTypes = {
+Mutation.propTypes = {
   children: PropTypes.func,
-  component: reactComponentPropType('OperationContainer'),
-  operation: PropTypes.oneOfType([
+  component: reactComponentPropType('Mutation'),
+  mutation: PropTypes.oneOfType([
     PropTypes.shape({
       error: PropTypes.any,
       pending: PropTypes.number.isRequired,
@@ -39,4 +39,4 @@ OperationContainer.propTypes = {
   requestKey: PropTypes.string,
 };
 
-export default OperationContainer;
+export default Mutation;

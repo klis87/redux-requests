@@ -458,15 +458,15 @@ something else than `null` or `[]`, for instance `() => ({ value: null })`, `mul
 by default
 - `getData: (state, action, config) => data`: describes how to get data from `action` object, by default returns `action.data` or `action.payload.data` when action is FSA compliant
 - `updateData: (state, action, config) => data`: optional, useful together with operations to overwrite `getData` default, see more
-information in `operations`
+information in `mutations`
 - `getError: (state, action, config) => data`: describes how to get error from `action` object, by default returns `action.error` or `action.payload` when action is FSA compliant
 - `onRequest: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles request actions
 - `onSuccess: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles success actions
 - `onError: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles error actions
 - `onAbort: (state, action, config) => nextState`: here you can adjust how `requestReducers` handles abort actions
 - `resetOn: action => boolean or string[]`: callback or array of action types on which reducer will reset its state to initial one, for instance `['LOGOUT']` or `action => action.type === 'LOGOUT'`, `[]` by default
-- `operations`: optional object which you can use to map write actions like update/delete to `data` update, which also adds pending
-state and errors for each defined operation and allows optimistic updates, see more details below
+- `mutations`: optional object which you can use to map write actions like update/delete to `data` update, which also adds pending
+state and errors for each defined mutation and allows optimistic updates, see more details below
 
 For example:
 ```js
@@ -510,7 +510,7 @@ const state = {
 };
 ```
 
-Another big feature of reducers are operations. They allow you to add additional actions to update `data`, with extra
+Another big feature of reducers are mutations. They allow you to add additional actions to update `data`, with extra
 information kept in state useful to render button spinners or error messages. For example, lets say you have following request
 actions:
 ```js
@@ -530,7 +530,7 @@ You can create a following reducer:
 const booksReducer = requestsReducer({
   actionType: 'FETCH_BOOKS',
   multiple: true,
-  operations: {
+  mutations: {
     DELETE_ALL_BOOKS: { updateData: (state, action) => [] } // or just (state, action) => []
   },
 });
@@ -541,7 +541,7 @@ which will give you the following initial state:
   data: [],
   error: null,
   pending: 0,
-  operations: {
+  mutations: {
     DELETE_ALL_BOOKS: {
       error: null,
       pending: 0,
@@ -550,16 +550,16 @@ which will give you the following initial state:
 };
 ```
 
-Notice that `operations` structure resembles the one from config we just passed, giving you
-useful `error` and `pending` state per operation. You can use them for example to show spinner or to disable `DELETE` button
-or to show a request error. Also, after a successful delete operation, `data` will be set to `[]` as defined in `updateData`.
+Notice that `mutations` structure resembles the one from config we just passed, giving you
+useful `error` and `pending` state per mutation. You can use them for example to show spinner or to disable `DELETE` button
+or to show a request error. Also, after a successful delete mutation, `data` will be set to `[]` as defined in `updateData`.
 
-It is also good to know, that you can set `updateData` to `false`, which would disable `data` manipulation and such an operation
+It is also good to know, that you can set `updateData` to `false`, which would disable `data` manipulation and such a mutation
 would be responsible only for `pending` and `error` state. Moreover, you can set `updateData` as `true`, which is useful to avoid
-duplication, as often your server responses are the same for multiple operations. Setting to `true` will fallback to top level
+duplication, as often your server responses are the same for multiple mutations. Setting to `true` will fallback to top level
 `updateData` defined in `requestsReducer` config, and if `updateData` is not defined, global `getData` will be used.
 
-There is one more case to cover in operations. Imagine we need another action:
+There is one more case to cover in mutations. Imagine we need another action:
 ```js
 const deleteBook = id => ({
   type: 'DELETE_BOOK',
@@ -583,7 +583,7 @@ const deleteBook = id => ({
 const booksReducer = requestsReducer({
   actionType: 'FETCH_BOOKS',
   multiple: true,
-  operations: {
+  mutations: {
     DELETE_ALL_BOOKS: (state, action) => [],
     DELETE_BOOK: {
       updateData: (state, action) => state.data.filter(book => book.id !== action.meta.id),
@@ -598,7 +598,7 @@ which will give you the following initial state:
   data: [],
   error: null,
   pending: 0,
-  operations: {
+  mutations: {
     DELETE_ALL_BOOKS: {
       error: null,
       pending: 0,
@@ -613,7 +613,7 @@ which will give you the following initial state:
   data: [],
   error: null,
   pending: 0,
-  operations: {
+  mutations: {
     DELETE_ALL_BOOKS: {
       error: null,
       pending: 0,
@@ -649,8 +649,8 @@ DELETE_BOOK: {
 ```
 as instead of resetting `pending` to `0`, a given object is just removed to release memory.
 
-As a bonus, operations come with optimistic updates support, so `data` can be updated even before requests are finished! Of course only if you can predict
-server response. Let's update `DELETE_BOOK` operation to support optimistic updates:
+As a bonus, mutations come with optimistic updates support, so `data` can be updated even before requests are finished! Of course only if you can predict
+server response. Let's update `DELETE_BOOK` mutation to support optimistic updates:
 ```js
 const deleteBook = book => ({
   type: 'DELETE_BOOK',
@@ -663,7 +663,7 @@ const deleteBook = book => ({
 const booksReducer = requestsReducer({
   actionType: 'FETCH_BOOKS',
   multiple: true,
-  operations: {
+  mutations: {
     DELETE_ALL_BOOKS: (state, action) => [],
     DELETE_BOOK: {
       updateDataOptimistic: (state, action) => state.data.filter(book => book.id !== action.meta.book.id),
@@ -1372,7 +1372,8 @@ and see what actions are being sent with [redux-devtools](https://github.com/zal
 There are following examples currently:
 - [basic](https://github.com/klis87/redux-saga-requests/tree/master/examples/basic)
 - [advanced](https://github.com/klis87/redux-saga-requests/tree/master/examples/advanced)
-- [operations](https://github.com/klis87/redux-saga-requests/tree/master/examples/operations)
+- [mutations](https://github.com/klis87/redux-saga-requests/tree/master/examples/mutations)
+- [mutations with requests reducers](https://github.com/klis87/redux-saga-requests/tree/master/examples/mutations-with-requests-reducers)
 - [Fetch API](https://github.com/klis87/redux-saga-requests/tree/master/examples/fetch-api)
 - [GraphQL](https://github.com/klis87/redux-saga-requests/tree/master/examples/graphql)
 - [redux-act integration](https://github.com/klis87/redux-saga-requests/tree/master/examples/redux-act-integration)

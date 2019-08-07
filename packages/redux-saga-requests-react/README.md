@@ -25,17 +25,17 @@ For general usage, see [redux-saga-requests docs](https://github.com/klis87/redu
 ## Purpose
 
 This library is totally optional, but it reduces boilerplate of using `react-saga-requests`
-state from `requestsReducer` instances inside React component. It provides the following components:
+state from `networkReducer` or `requestsReducer` instances inside React components. It provides the following components:
 
-### `RequestContainer`
+### `Query`
 
-`RequestContainer` simplifies rendering server responses, spinners and server errors.
+`Query` simplifies rendering server responses, spinners and server errors.
 It has the following props:
-- `request` - a state from a `requestsReducer`
-- `children` - a React node or render function receiving `request` object, render function has the advantage
-that it gets called only when `request.data` is present, so you don't need to do checks like `data && data.length > 0`
-- `component` - alternative prop to `children`, you can pass your custom component here, which will receive `request` prop, plus any external props passed to `RequestContainer`
-- `isDataEmpty: request => boolean`: function which defines when `data` is empty, by default data as empty array and falsy value like `null`, `undefined` is considered as empty
+- `query` - a state from a `requestsReducer`
+- `children` - a React node or render function receiving `query` object, render function has the advantage
+that it gets called only when `query.data` is present, so you don't need to do checks like `data && data.length > 0`
+- `component` - alternative prop to `children`, you can pass your custom component here, which will receive `query` prop, plus any external props passed to `Query`
+- `isDataEmpty: query => boolean`: function which defines when `data` is empty, by default data as empty array and falsy value like `null`, `undefined` is considered as empty
 - `showLoaderDuringRefetch: boolean`: `true` by default, change it to `false` if you don't want to show spinner
 when data is updated - it will still show during initial fetch, but will not for subsequent requests
 - `noDataMessage`: `string` or any React node, like `<div>message</div>`, which will be rendered when `data` is empty
@@ -48,36 +48,36 @@ spinners, `null` by default
 
 Minimalistic example:
 ```js
-import { RequestContainer } from 'redux-saga-requests-react';
+import { Query } from 'redux-saga-requests-react';
 
-<RequestContainer request={request}>
+<Query query={query}>
   {({ data }) => (
     <div>
       {data}
     </div>
   )}
-</RequestContainer>
+</Query>
 ```
 or with `component` prop:
 ```js
-import { RequestContainer } from 'redux-saga-requests-react';
+import { Query } from 'redux-saga-requests-react';
 
-const DataComponent = ({ request, extraLabelProp }) => (
+const DataComponent = ({ query, extraLabelProp }) => (
   <div>
     <h1>{extraLabelProp}</h1>
-    {request.data}
+    {query.data}
   </div>
 );
 
-<RequestContainer
-  request={request}
+<Query
+  query={query}
   component={DataComponent}
   extraLabelProp="label"
 />
 ```
 or with all props:
 ```js
-import { RequestContainer } from 'redux-saga-requests-react';
+import { Query } from 'redux-saga-requests-react';
 
 const LoadingComponent = ({ label }) => (
   <div>
@@ -93,10 +93,10 @@ const ErrorComponent = ({ error, label }) => (
   </div>
 );
 
-<RequestContainer
-  request={request}
-  isDataEmpty={request =>
-    Array.isArray(request.data) ? request.data.length === 0 : !request.data}
+<Query
+  query={query}
+  isDataEmpty={query =>
+    Array.isArray(query.data) ? query.data.length === 0 : !query.data}
   showLoaderDuringRefetch={false}
   noDataMessage="There is no data"
   errorComponent={ErrorComponent}
@@ -109,102 +109,88 @@ const ErrorComponent = ({ error, label }) => (
       {data}
     </div>
   )}
-</RequestContainer>
+</Query>
 ```
 
-### `ConnectedRequestContainer`
+### `ConnectedQuery`
 
-Wrapper around `RequestContainer`, it has the same purpose, but instead of passing
-`request` prop, you pass `requestSelector`. Then, you don't need to worry about
-using `connect` from `react-redux`, `ConnectedRequestContainer` will do it automatically
-for you:
+Wrapper around `Query`, it has the same purpose, but instead of passing
+`query` prop, you pass `requestSelector` or `type` when using `networkReducer`. Then, you don't need to worry about
+using `connect` from `react-redux`, `ConnectedQuery` will do it automatically
+for you. Of course you can pass other `Query` props like `isDataEmpty`.
 ```js
-import { ConnectedRequestContainer } from 'redux-saga-requests-react';
+import { ConnectedQuery } from 'redux-saga-requests-react';
 
-<ConnectedRequestContainer requestSelector={state => state.request}>
+<ConnectedQuery
+  requestSelector={state => state.request}
+  // or type={REQUEST_TYPE}
+>
   {({ data }) => (
     <div>
       {data}
     </div>
   )}
-</ConnectedRequestContainer>
+</ConnectedQuery>
 ```
 
-### `OperationContainer`
+### `Mutation`
 
-`OperationContainer` is a small syntactic sugar component and can be used when you use
-operations in `requestsReducer` and for example you want to show loading state
-for a button or an operation error message. It has the following props:
-- `operation` - an operation substate from a `requestsReducer`
+`Mutation` is a small syntactic sugar component and can be used when you use
+mutations in `requestsReducer` or in actions with `networkReducer` and for example you want to show loading state
+for a button or an mutation error message. It has the following props:
+- `mutation` - a mutation substate from a `requestsReducer` or `networkReducer`
 - `children` - render function receiving object with `loading` flag and `error` property
-- `component` - alternative prop to `children`, you can pass your custom component here, which will receive `loading` and `error` props, plus any external props passed to `OperationContainer`
-- `requestKey: string`: only necessary if you defined `getRequestKey` in `requestsReducer` operation,
+- `component` - alternative prop to `children`, you can pass your custom component here, which will receive `loading` and `error` props, plus any external props passed to `Mutation`
+- `requestKey: string`: only necessary if you defined `getRequestKey` in a mutation,
 usually it will be some kind of id
 
 You use it like this:
 ```js
-import { OperationContainer } from 'redux-saga-requests-react';
+import { Mutation } from 'redux-saga-requests-react';
 
-<OperationContainer operation={request.operations[OPERATION_TYPE]}>
+<Mutation mutation={request.mutations[MUTATION_TYPE]}>
   {({ loading, error }) => {
     if (error) {
       return <div>Something went wrong</div>;
     }
 
     return (
-      <button onClick={dispatchSomeOperation} disabled={loading}>
-        Send operation {loading && '...' }
+      <button onClick={dispatchSomeMutation} disabled={loading}>
+        Send mutation {loading && '...' }
       </button>
     );
   }}
-</OperationContainer>
+</Mutation>
 ```
 
-### `ConnectedOperationContainer`
+### `ConnectedMutation`
 
-`ConnectedOperationContainer` is a wrapper around `OperationContainer`. It has automatic
+`ConnectedMutation` is a wrapper around `Mutation`. It has automatic
 state Redux connection capabilities, thanks to below additional props:
-- `requestSelector`: selector to get state of `requestsReducer`, the same you would use
-in `ConnectedRequestContainer`, pass it instead of `operation` to avoid connecting to Redux manually
-- `operationType: string`: Redux action type of corresponding operation action,
-used together with `requestSelector`
-- `operationCreator`: optional, Redux action creator object describing a given operation,
-`ConnectedOperationContainer` will put it to `mapDispatchToProps` for you and pass ready to dispatch operation as
-additional prop `sendOperation` to `children` callback. As a bonus, if you use
-libraries like `redux-act` or `redux-actions`, `operationCreator.toString()` actually returns
-action type, so you don't need to pass `operationType` together with `operationCreator` then!
+- `type: string`: Redux action type of corresponding mutation action
+- `requestSelector`: (only if you use `requestsReducer`, for `networkReducer` `type` is all you need) selector to get state of `requestsReducer`, the same you would use
+in `ConnectedQuery`, pass it instead of `mutation` to avoid connecting to Redux manually
 
 Here is how you use it:
 ```js
-import { ConnectedOperationContainer } from 'redux-saga-requests-react';
+import { ConnectedMutation } from 'redux-saga-requests-react';
 
-const OPERATION_TYPE = 'OPERATION_TYPE';
-
-const Operation = () => ({
-  type: OPERATION_TYPE,
-  request: {
-    url: '/url',
-    method: 'post',
-  },
-})
-
-<ConnectedOperationContainer
+<ConnectedMutation
   requestSelector={state => state.request}
-  operationType={OPERATION_TYPE}
-  operationCreator={Operation}
+  type={MUTATION_TYPE}
 >
-  {({ loading, error, sendOperation }) => {
+  {({ loading, error }) => {
     if (error) {
       return <div>Something went wrong</div>;
     }
 
     return (
-      <button onClick={sendOperation} disabled={loading}>
-        Send operation {loading && '...' }
+      <button onClick={dispatchSomeMutation} disabled={loading}>
+        Send mutation {loading && '...' }
       </button>
     );
   }}
-</ConnectedOperationContainer>
+</ConnectedMutation>
 ```
 
 ## Licence

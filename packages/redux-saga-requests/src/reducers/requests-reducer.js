@@ -6,33 +6,33 @@ import {
   isResponseAction,
   getRequestActionFromResponse,
 } from '../actions';
-import operationsReducer from './operations-reducer';
+import mutationsReducer from './mutations-reducer';
 import defaultConfig from './default-config';
 
 // to support libraries like redux-act and redux-actions
 const normalizeActionType = actionType =>
   typeof actionType === 'function' ? actionType.toString() : actionType;
 
-const operationConfigHasRequestKey = config =>
+const mutationConfigHasRequestKey = config =>
   typeof config !== 'boolean' && !!config.getRequestKey;
 
 const getInitialState = ({
   getDefaultData,
   multiple,
-  operations,
-  handleOperationsState,
+  mutations,
+  handleMutationsState,
 }) => ({
   data: getDefaultData(multiple),
   pending: 0,
   error: null,
-  operations:
-    handleOperationsState && operations
-      ? Object.entries(operations)
+  mutations:
+    handleMutationsState && mutations
+      ? Object.entries(mutations)
           .filter(([, v]) => !v.local)
           .reduce(
             (prev, [k, v]) => ({
               ...prev,
-              [k]: operationConfigHasRequestKey(v)
+              [k]: mutationConfigHasRequestKey(v)
                 ? {}
                 : { error: null, pending: 0 },
             }),
@@ -41,33 +41,33 @@ const getInitialState = ({
       : null,
 });
 
-const getDataUpdater = (reducerConfig, operationConfig) => {
-  if (operationConfig === true || operationConfig.updateData === true) {
+const getDataUpdater = (reducerConfig, mutationConfig) => {
+  if (mutationConfig === true || mutationConfig.updateData === true) {
     return reducerConfig.updateData || reducerConfig.getData;
-  } else if (typeof operationConfig === 'function') {
-    return operationConfig;
+  } else if (typeof mutationConfig === 'function') {
+    return mutationConfig;
   } else if (
-    typeof operationConfig !== 'boolean' &&
-    typeof operationConfig.updateData === 'function'
+    typeof mutationConfig !== 'boolean' &&
+    typeof mutationConfig.updateData === 'function'
   ) {
-    return operationConfig.updateData;
+    return mutationConfig.updateData;
   }
 
   return null;
 };
 
-const requestOperationReducer = (state, action, config) => {
-  const operationConfig = config.operations[action.type];
+const requestMutationReducer = (state, action, config) => {
+  const mutationConfig = config.mutations[action.type];
 
-  if (operationConfig.updateDataOptimistic) {
+  if (mutationConfig.updateDataOptimistic) {
     return {
       ...state,
-      data: operationConfig.updateDataOptimistic(state, action, config),
+      data: mutationConfig.updateDataOptimistic(state, action, config),
     };
   }
 
-  if (operationConfig.local) {
-    const dataUpdater = getDataUpdater(config, operationConfig);
+  if (mutationConfig.local) {
+    const dataUpdater = getDataUpdater(config, mutationConfig);
 
     return {
       ...state,
@@ -78,26 +78,26 @@ const requestOperationReducer = (state, action, config) => {
   return state;
 };
 
-const responseOperationReducer = (state, action, config) => {
+const responseMutationReducer = (state, action, config) => {
   const requestAction = getRequestActionFromResponse(action);
-  const operationConfig = config.operations[requestAction.type];
+  const mutationConfig = config.mutations[requestAction.type];
 
   if (isSuccessAction(action)) {
-    const dataUpdater = getDataUpdater(config, operationConfig);
+    const dataUpdater = getDataUpdater(config, mutationConfig);
 
     return dataUpdater
       ? {
           ...state,
-          data: dataUpdater ? dataUpdater(state, action, config) : state.data,
+          data: dataUpdater(state, action, config),
         }
       : state;
   }
 
   // error or abort case
-  return operationConfig.revertData
+  return mutationConfig.revertData
     ? {
         ...state,
-        data: operationConfig.revertData(state, action, config),
+        data: mutationConfig.revertData(state, action, config),
       }
     : state;
 };
@@ -113,13 +113,13 @@ export default localConfig => {
   return (state, action) => {
     if (
       action.meta &&
-      action.meta.operations &&
-      normalizedActionType in action.meta.operations &&
-      (!config.operations || !(normalizedActionType in config.operations))
+      action.meta.mutations &&
+      normalizedActionType in action.meta.mutations &&
+      (!config.mutations || !(normalizedActionType in config.mutations))
     ) {
-      config.operations = {
-        ...config.operations,
-        [action.type]: action.meta.operations[normalizedActionType],
+      config.mutations = {
+        ...config.mutations,
+        [action.type]: action.meta.mutations[normalizedActionType],
       };
     }
 
@@ -136,17 +136,17 @@ export default localConfig => {
       ? getRequestActionFromResponse(action)
       : action;
 
-    if (config.operations && requestAction.type in config.operations) {
+    if (config.mutations && requestAction.type in config.mutations) {
       return {
         ...(isResponseAction(action)
-          ? responseOperationReducer(nextState, action, config)
-          : requestOperationReducer(nextState, action, config)),
-        operations: config.handleOperationsState
-          ? operationsReducer(
-              nextState.operations,
+          ? responseMutationReducer(nextState, action, config)
+          : requestMutationReducer(nextState, action, config)),
+        mutations: config.handleMutationsState
+          ? mutationsReducer(
+              nextState.mutations,
               action,
               config,
-              config.operations[requestAction.type],
+              config.mutations[requestAction.type],
             )
           : null,
       };

@@ -30,7 +30,7 @@ describe('reducers', () => {
           data: null,
           pending: 1,
           error: null,
-          operations: null,
+          mutations: null,
         },
       });
 
@@ -40,13 +40,13 @@ describe('reducers', () => {
           data: null,
           pending: 1,
           error: null,
-          operations: null,
+          mutations: null,
         },
         REQUEST_2: {
           data: null,
           pending: 1,
           error: null,
-          operations: null,
+          mutations: null,
         },
       });
 
@@ -59,13 +59,13 @@ describe('reducers', () => {
           data: 'data',
           pending: 0,
           error: null,
-          operations: null,
+          mutations: null,
         },
         REQUEST_2: {
           data: null,
           pending: 1,
           error: null,
-          operations: null,
+          mutations: null,
         },
       });
 
@@ -75,13 +75,13 @@ describe('reducers', () => {
           data: 'data',
           pending: 0,
           error: null,
-          operations: null,
+          mutations: null,
         },
         REQUEST_2: {
           data: null,
           pending: 0,
           error: 'error',
-          operations: null,
+          mutations: null,
         },
       });
     });
@@ -100,7 +100,7 @@ describe('reducers', () => {
             data: [],
             pending: 1,
             error: null,
-            operations: null,
+            mutations: null,
           },
         },
         mutations: {},
@@ -121,17 +121,17 @@ describe('reducers', () => {
             data: [],
             pending: 1,
             error: null,
-            operations: null,
+            mutations: null,
           },
         },
         mutations: {},
       });
     });
 
-    it('supports operations', () => {
+    it('supports mutations', () => {
       const reducer = networkReducer();
       reducer(
-        { queries: {}, operations: {} },
+        { queries: {}, mutations: {} },
         { type: 'REQUEST', request: { url: '/' } },
       );
 
@@ -141,17 +141,17 @@ describe('reducers', () => {
             data: null,
             pending: 0,
             error: null,
-            operations: null,
+            mutations: null,
           },
         },
         mutations: {},
       };
 
       state = reducer(state, {
-        type: 'LOCAL_OPERATION',
+        type: 'LOCAL_MUTATION',
         data: 'data',
         meta: {
-          operations: {
+          mutations: {
             REQUEST: {
               local: true,
               updateData: (_, action) => action.data,
@@ -166,18 +166,18 @@ describe('reducers', () => {
             data: 'data',
             pending: 0,
             error: null,
-            operations: null,
+            mutations: null,
           },
         },
         mutations: {},
       });
 
-      const operationWithoutConfig = {
-        type: 'OPERATION_WITHOUT_CONFIG',
+      const mutationWithoutConfig = {
+        type: 'MUTATION_WITHOUT_CONFIG',
         request: { url: '/', method: 'post' },
       };
 
-      state = reducer(state, operationWithoutConfig);
+      state = reducer(state, mutationWithoutConfig);
 
       expect(state).toEqual({
         queries: {
@@ -185,21 +185,18 @@ describe('reducers', () => {
             data: 'data',
             pending: 0,
             error: null,
-            operations: null,
+            mutations: null,
           },
         },
         mutations: {
-          OPERATION_WITHOUT_CONFIG: {
+          MUTATION_WITHOUT_CONFIG: {
             error: null,
             pending: 1,
           },
         },
       });
 
-      state = reducer(
-        state,
-        createErrorAction(operationWithoutConfig, 'error'),
-      );
+      state = reducer(state, createErrorAction(mutationWithoutConfig, 'error'));
 
       expect(state).toEqual({
         queries: {
@@ -207,18 +204,18 @@ describe('reducers', () => {
             data: 'data',
             pending: 0,
             error: null,
-            operations: null,
+            mutations: null,
           },
         },
         mutations: {
-          OPERATION_WITHOUT_CONFIG: {
+          MUTATION_WITHOUT_CONFIG: {
             error: 'error',
             pending: 0,
           },
         },
       });
 
-      state = reducer(state, operationWithoutConfig);
+      state = reducer(state, mutationWithoutConfig);
 
       expect(state).toEqual({
         queries: {
@@ -226,11 +223,11 @@ describe('reducers', () => {
             data: 'data',
             pending: 0,
             error: null,
-            operations: null,
+            mutations: null,
           },
         },
         mutations: {
-          OPERATION_WITHOUT_CONFIG: {
+          MUTATION_WITHOUT_CONFIG: {
             error: null,
             pending: 1,
           },
@@ -239,7 +236,7 @@ describe('reducers', () => {
 
       state = reducer(
         state,
-        createSuccessAction(operationWithoutConfig, 'data'),
+        createSuccessAction(mutationWithoutConfig, 'data'),
       );
 
       expect(state).toEqual({
@@ -248,28 +245,28 @@ describe('reducers', () => {
             data: 'data',
             pending: 0,
             error: null,
-            operations: null,
+            mutations: null,
           },
         },
         mutations: {
-          OPERATION_WITHOUT_CONFIG: {
+          MUTATION_WITHOUT_CONFIG: {
             error: null,
             pending: 0,
           },
         },
       });
 
-      const operationWithConfig = {
-        type: 'OPERATION_WITH_CONFIG',
+      const mutationWithConfig = {
+        type: 'MUTATION_WITH_CONFIG',
         request: { url: '/', method: 'post' },
         meta: {
-          operations: {
+          mutations: {
             REQUEST: (_, action) => action.data,
           },
         },
       };
 
-      state = reducer(state, operationWithConfig);
+      state = reducer(state, mutationWithConfig);
 
       expect(state).toEqual({
         queries: {
@@ -277,22 +274,22 @@ describe('reducers', () => {
             data: 'data',
             pending: 0,
             error: null,
-            operations: null,
+            mutations: null,
           },
         },
         mutations: {
-          OPERATION_WITHOUT_CONFIG: {
+          MUTATION_WITHOUT_CONFIG: {
             error: null,
             pending: 0,
           },
-          OPERATION_WITH_CONFIG: {
+          MUTATION_WITH_CONFIG: {
             error: null,
             pending: 1,
           },
         },
       });
 
-      state = reducer(state, createSuccessAction(operationWithConfig, 'data2'));
+      state = reducer(state, createSuccessAction(mutationWithConfig, 'data2'));
 
       expect(state).toEqual({
         queries: {
@@ -300,34 +297,34 @@ describe('reducers', () => {
             data: 'data2',
             pending: 0,
             error: null,
-            operations: null,
+            mutations: null,
           },
         },
         mutations: {
-          OPERATION_WITHOUT_CONFIG: {
+          MUTATION_WITHOUT_CONFIG: {
             error: null,
             pending: 0,
           },
-          OPERATION_WITH_CONFIG: {
+          MUTATION_WITH_CONFIG: {
             error: null,
             pending: 0,
           },
         },
       });
 
-      const operationWithConfigWithRequestKey = {
-        type: 'OPERATION_WITH_CONFIG_WITH_REQUEST_KEY',
+      const mutationWithConfigWithRequestKey = {
+        type: 'MUTATION_WITH_CONFIG_WITH_REQUEST_KEY',
         request: { url: '/', method: 'post' },
         meta: {
           id: '1',
-          operations: {
+          mutations: {
             getRequestKey: action => action.meta.id,
             REQUEST: (_, action) => action.data,
           },
         },
       };
 
-      state = reducer(state, operationWithConfigWithRequestKey);
+      state = reducer(state, mutationWithConfigWithRequestKey);
 
       expect(state).toEqual({
         queries: {
@@ -335,19 +332,19 @@ describe('reducers', () => {
             data: 'data2',
             pending: 0,
             error: null,
-            operations: null,
+            mutations: null,
           },
         },
         mutations: {
-          OPERATION_WITHOUT_CONFIG: {
+          MUTATION_WITHOUT_CONFIG: {
             error: null,
             pending: 0,
           },
-          OPERATION_WITH_CONFIG: {
+          MUTATION_WITH_CONFIG: {
             error: null,
             pending: 0,
           },
-          OPERATION_WITH_CONFIG_WITH_REQUEST_KEY: {
+          MUTATION_WITH_CONFIG_WITH_REQUEST_KEY: {
             1: {
               error: null,
               pending: 1,
@@ -358,7 +355,7 @@ describe('reducers', () => {
 
       state = reducer(
         state,
-        createSuccessAction(operationWithConfigWithRequestKey, 'data3'),
+        createSuccessAction(mutationWithConfigWithRequestKey, 'data3'),
       );
 
       expect(state).toEqual({
@@ -367,28 +364,28 @@ describe('reducers', () => {
             data: 'data3',
             pending: 0,
             error: null,
-            operations: null,
+            mutations: null,
           },
         },
         mutations: {
-          OPERATION_WITHOUT_CONFIG: {
+          MUTATION_WITHOUT_CONFIG: {
             error: null,
             pending: 0,
           },
-          OPERATION_WITH_CONFIG: {
+          MUTATION_WITH_CONFIG: {
             error: null,
             pending: 0,
           },
-          OPERATION_WITH_CONFIG_WITH_REQUEST_KEY: {},
+          MUTATION_WITH_CONFIG_WITH_REQUEST_KEY: {},
         },
       });
 
-      const operationWithOptimisticUpdate = {
-        type: 'OPERATION_WITH_OPTIMISTIC_UPDATE',
+      const mutationWithOptimisticUpdate = {
+        type: 'MUTATION_WITH_OPTIMISTIC_UPDATE',
         request: { url: '/', method: 'post' },
         data: 'optimistic data',
         meta: {
-          operations: {
+          mutations: {
             REQUEST: {
               updateData: (_, action) => action.data,
               updateDataOptimistic: (_, action) => action.data,
@@ -398,7 +395,7 @@ describe('reducers', () => {
         },
       };
 
-      state = reducer(state, operationWithOptimisticUpdate);
+      state = reducer(state, mutationWithOptimisticUpdate);
 
       expect(state).toEqual({
         queries: {
@@ -406,20 +403,20 @@ describe('reducers', () => {
             data: 'optimistic data',
             pending: 0,
             error: null,
-            operations: null,
+            mutations: null,
           },
         },
         mutations: {
-          OPERATION_WITHOUT_CONFIG: {
+          MUTATION_WITHOUT_CONFIG: {
             error: null,
             pending: 0,
           },
-          OPERATION_WITH_CONFIG: {
+          MUTATION_WITH_CONFIG: {
             error: null,
             pending: 0,
           },
-          OPERATION_WITH_CONFIG_WITH_REQUEST_KEY: {},
-          OPERATION_WITH_OPTIMISTIC_UPDATE: {
+          MUTATION_WITH_CONFIG_WITH_REQUEST_KEY: {},
+          MUTATION_WITH_OPTIMISTIC_UPDATE: {
             error: null,
             pending: 1,
           },
@@ -428,7 +425,7 @@ describe('reducers', () => {
 
       state = reducer(
         state,
-        createSuccessAction(operationWithOptimisticUpdate, 'data4'),
+        createSuccessAction(mutationWithOptimisticUpdate, 'data4'),
       );
 
       expect(state).toEqual({
@@ -437,31 +434,31 @@ describe('reducers', () => {
             data: 'data4',
             pending: 0,
             error: null,
-            operations: null,
+            mutations: null,
           },
         },
         mutations: {
-          OPERATION_WITHOUT_CONFIG: {
+          MUTATION_WITHOUT_CONFIG: {
             error: null,
             pending: 0,
           },
-          OPERATION_WITH_CONFIG: {
+          MUTATION_WITH_CONFIG: {
             error: null,
             pending: 0,
           },
-          OPERATION_WITH_CONFIG_WITH_REQUEST_KEY: {},
-          OPERATION_WITH_OPTIMISTIC_UPDATE: {
+          MUTATION_WITH_CONFIG_WITH_REQUEST_KEY: {},
+          MUTATION_WITH_OPTIMISTIC_UPDATE: {
             error: null,
             pending: 0,
           },
         },
       });
 
-      state = reducer(state, operationWithOptimisticUpdate);
+      state = reducer(state, mutationWithOptimisticUpdate);
 
       state = reducer(
         state,
-        createErrorAction(operationWithOptimisticUpdate, 'error'),
+        createErrorAction(mutationWithOptimisticUpdate, 'error'),
       );
 
       expect(state).toEqual({
@@ -470,20 +467,20 @@ describe('reducers', () => {
             data: 'reverted data',
             pending: 0,
             error: null,
-            operations: null,
+            mutations: null,
           },
         },
         mutations: {
-          OPERATION_WITHOUT_CONFIG: {
+          MUTATION_WITHOUT_CONFIG: {
             error: null,
             pending: 0,
           },
-          OPERATION_WITH_CONFIG: {
+          MUTATION_WITH_CONFIG: {
             error: null,
             pending: 0,
           },
-          OPERATION_WITH_CONFIG_WITH_REQUEST_KEY: {},
-          OPERATION_WITH_OPTIMISTIC_UPDATE: {
+          MUTATION_WITH_CONFIG_WITH_REQUEST_KEY: {},
+          MUTATION_WITH_OPTIMISTIC_UPDATE: {
             error: 'error',
             pending: 0,
           },

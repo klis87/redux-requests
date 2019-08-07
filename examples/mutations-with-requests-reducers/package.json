@@ -1,7 +1,7 @@
 {
-  "name": "redux-saga-requests-operations-with-requests-reducers-example",
+  "name": "redux-saga-requests-mutations-with-requests-reducers-example",
   "version": "1.0.0",
-  "description": "redux-saga-requests operations with requests reducers example",
+  "description": "redux-saga-requests mutations with requests reducers example",
   "main": "src/index.js",
   "repository": "git@github.com:klis87/redux-saga-requests.git",
   "author": "Konrad Lisiczynski <klisiczynski@gmail.com>",

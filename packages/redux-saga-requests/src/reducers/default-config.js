@@ -27,6 +27,6 @@ export default {
     pending: state.pending - 1,
   }),
   resetOn: [],
-  operations: null,
-  handleOperationsState: true,
+  mutations: null,
+  handleMutationsState: true,
 };

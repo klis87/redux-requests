@@ -1,12 +1,10 @@
 import * as React from 'react';
 
-import { RequestAction } from 'redux-saga-requests';
-
-interface Request<RequestData> {
-  data: RequestData;
+interface QueryState<QueryStateData> {
+  data: QueryStateData;
   error: any;
   pending: number;
-  operations: any;
+  mutations: any;
   [extraProperty: string]: any;
 }
 
@@ -19,15 +17,15 @@ interface ErrorProps {
   [errorProp: string]: any;
 }
 
-interface CommonRequestContainerProps<RequestData> {
+interface CommonQueryProps<QueryStateData> {
   children?:
     | React.ReactNode
-    | ((request: Request<RequestData>) => React.ReactNode);
+    | ((query: QueryState<QueryStateData>) => React.ReactNode);
   component?: React.ComponentType<{
-    request: Request<RequestData>;
+    query: QueryState<QueryStateData>;
     [extraProperty: string]: any;
   }>;
-  isDataEmpty?: (request: Request<RequestData>) => boolean;
+  isDataEmpty?: (query: QueryState<QueryStateData>) => boolean;
   showLoaderDuringRefetch?: boolean;
   noDataMessage?: React.ReactNode;
   errorComponent?: React.ComponentType<ErrorProps>;
@@ -37,65 +35,56 @@ interface CommonRequestContainerProps<RequestData> {
   [extraProperty: string]: any;
 }
 
-interface RequestContainerProps<RequestData>
-  extends CommonRequestContainerProps<RequestData> {
-  request: Request<RequestData>;
+interface QueryProps<QueryStateData> extends CommonQueryProps<QueryStateData> {
+  query: QueryState<QueryStateData>;
 }
 
-export class RequestContainer<RequestData = any> extends React.Component<
-  RequestContainerProps<RequestData>
+export class Query<QueryStateData = any> extends React.Component<
+  QueryProps<QueryStateData>
 > {}
 
-interface ConnectedRequestContainerProps<RequestData>
-  extends CommonRequestContainerProps<RequestData> {
-  requestSelector: (state: any) => Request<RequestData>;
+interface ConnectedQueryProps<QueryStateData>
+  extends CommonQueryProps<QueryStateData> {
+  requestSelector?: (state: any) => QueryState<QueryStateData>;
+  type?: string;
 }
 
-export class ConnectedRequestContainer<
-  RequestData = any
-> extends React.Component<ConnectedRequestContainerProps<RequestData>> {}
+export class ConnectedQuery<QueryStateData = any> extends React.Component<
+  ConnectedQueryProps<QueryStateData>
+> {}
 
-interface Operation {
-  error: any;
+interface MutationState {
   pending: number;
+  error: any;
 }
 
-interface OperationContainerProps {
+interface MutationProps {
   children?: (props: { loading: boolean; error: any }) => React.ReactNode;
   component?: React.ComponentType<{
     loading: boolean;
     error: any;
     [extraProperty: string]: any;
   }>;
-  operation: Operation;
+  mutation: MutationState;
   requestKey?: string;
   [extraProperty: string]: any;
 }
 
-export class OperationContainer extends React.Component<
-  OperationContainerProps
-> {}
+export class Mutation extends React.Component<MutationProps> {}
 
-interface ConnectedOperationContainerProps {
-  children?: (props: {
-    loading: boolean;
-    error: any;
-    sendOperation: any;
-  }) => React.ReactNode;
+interface ConnectedMutationProps {
+  children?: (props: { loading: boolean; error: any }) => React.ReactNode;
   component?: React.ComponentType<{
     loading: boolean;
     error: any;
-    sendOperation: any;
     [extraProperty: string]: any;
   }>;
   requestKey?: string;
-  operation?: Operation;
-  requestSelector?: (state: any) => Request<any>;
-  operationType?: string;
-  operationCreator?: (...args: any[]) => RequestAction;
+  requestSelector?: (state: any) => QueryState<any>;
+  type: string;
   [extraProperty: string]: any;
 }
 
-export class ConnectedOperationContainer extends React.Component<
-  ConnectedOperationContainerProps
+export class ConnectedMutation extends React.Component<
+  ConnectedMutationProps
 > {}

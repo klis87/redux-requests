@@ -1,9 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import {
-  ConnectedRequestContainer,
-  ConnectedOperationContainer,
-} from 'redux-saga-requests-react';
+import { ConnectedQuery, ConnectedMutation } from 'redux-saga-requests-react';
 
 import {
   fetchPhotoAction,
@@ -25,6 +22,8 @@ const mapDispatchToProps = {
   clearPhoto: clearPhotoAction,
   fetchPosts: fetchPostsAction,
   clearPosts: clearPostsAction,
+  deletePhoto: deletePhotoAction,
+  deletePost: deletePostAction,
 };
 
 const buttonStyle = { marginRight: 10 };
@@ -38,6 +37,8 @@ const App = ({
   clearPhoto,
   fetchPosts,
   clearPosts,
+  deletePhoto,
+  deletePost,
   abortCounter,
 }) => (
   <div>
@@ -66,8 +67,8 @@ const App = ({
       >
         Fetch non-existent photo
       </button>
-      <ConnectedRequestContainer
-        queryType={fetchPhotoAction}
+      <ConnectedQuery
+        type={fetchPhotoAction}
         errorComponent={RequestError}
         loadingComponent={Spinner}
         noDataMessage={<p>There is no entity currently.</p>}
@@ -77,20 +78,20 @@ const App = ({
             <h3>{data.title}</h3>
             <img src={data.thumbnailUrl} alt={data.title} />
             <hr />
-            <ConnectedOperationContainer operationCreator={deletePhotoAction}>
-              {({ loading, sendOperation }) => (
+            <ConnectedMutation type={deletePhotoAction}>
+              {({ loading }) => (
                 <button
                   type="button"
-                  onClick={() => sendOperation(data.id)}
+                  onClick={() => deletePhoto(data.id)}
                   disabled={loading}
                 >
                   {loading ? 'Deleting...' : 'Delete'}
                 </button>
               )}
-            </ConnectedOperationContainer>
+            </ConnectedMutation>
           </div>
         )}
-      </ConnectedRequestContainer>
+      </ConnectedQuery>
     </div>
     <hr />
     <div>
@@ -101,8 +102,8 @@ const App = ({
       <button type="button" style={buttonStyle} onClick={() => fetchPosts()}>
         Fetch posts
       </button>
-      <ConnectedRequestContainer
-        queryType={fetchPostsAction}
+      <ConnectedQuery
+        type={fetchPostsAction}
         errorComponent={RequestError}
         loadingComponent={Spinner}
         noDataMessage={<p>There is no entity currently.</p>}
@@ -112,25 +113,25 @@ const App = ({
             <div key={post.id}>
               <h3>{post.title}</h3>
               <p>{post.body}</p>
-              <ConnectedOperationContainer
-                operationCreator={deletePostAction}
+              <ConnectedMutation
+                type={deletePostAction}
                 requestKey={String(post.id)}
               >
-                {({ loading, sendOperation }) => (
+                {({ loading }) => (
                   <button
                     type="button"
-                    onClick={() => sendOperation(post.id)}
+                    onClick={() => deletePost(post.id)}
                     disabled={loading}
                   >
                     {loading ? 'Deleting...' : 'Delete'}
                   </button>
                 )}
-              </ConnectedOperationContainer>
+              </ConnectedMutation>
               <hr />
             </div>
           ))
         }
-      </ConnectedRequestContainer>
+      </ConnectedQuery>
     </div>
     <hr />
   </div>

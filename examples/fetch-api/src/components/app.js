@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { ConnectedRequestContainer } from 'redux-saga-requests-react';
+import { ConnectedQuery } from 'redux-saga-requests-react';
 
 import { fetchPhoto, clearPhoto, fetchPost, clearPost } from '../store/actions';
 import { FETCH_PHOTO, FETCH_POST } from '../store/constants';
@@ -55,14 +55,14 @@ const App = ({
       <button style={buttonStyle} onClick={() => fetchPhoto(10001)}>
         Fetch non-existent photo
       </button>
-      <ConnectedRequestContainer
-        queryType={FETCH_PHOTO}
+      <ConnectedQuery
+        type={FETCH_PHOTO}
         errorComponent={RequestError}
         loadingComponent={Spinner}
         noDataMessage={<p>There is no entity currently.</p>}
       >
         {({ data }) => <Photo data={data} />}
-      </ConnectedRequestContainer>
+      </ConnectedQuery>
     </div>
     <hr />
     <div>
@@ -76,14 +76,14 @@ const App = ({
       <button style={buttonStyle} onClick={() => fetchPost(1001)}>
         Fetch non-existent post
       </button>
-      <ConnectedRequestContainer
-        queryType={FETCH_POST}
+      <ConnectedQuery
+        type={FETCH_POST}
         errorComponent={RequestError}
         loadingComponent={Spinner}
         noDataMessage={<p>There is no entity currently.</p>}
       >
         {({ data }) => <Post data={data} />}
-      </ConnectedRequestContainer>
+      </ConnectedQuery>
     </div>
     <hr />
   </div>

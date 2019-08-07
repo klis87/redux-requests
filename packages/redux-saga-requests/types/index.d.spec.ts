@@ -126,26 +126,26 @@ requestsReducer({
 });
 requestsReducer({
   actionType: 'actionType',
-  operations: {
-    OPERATION: true,
+  mutations: {
+    MUTATION: true,
   },
 });
 requestsReducer({
   actionType: 'actionType',
-  operations: {
-    OPERATION: { updateData: true },
+  mutations: {
+    MUTATION: { updateData: true },
   },
 });
 requestsReducer({
   actionType: 'actionType',
-  operations: {
-    OPERATION: { updateData: (state, action) => state },
+  mutations: {
+    MUTATION: { updateData: (state, action) => state },
   },
 });
 requestsReducer({
   actionType: 'actionType',
-  operations: {
-    OPERATION: {
+  mutations: {
+    MUTATION: {
       getRequestKey: action => 'id',
       updateData: (state, action) => state,
     },
@@ -153,8 +153,8 @@ requestsReducer({
 });
 requestsReducer({
   actionType: 'actionType',
-  operations: {
-    OPERATION: {
+  mutations: {
+    MUTATION: {
       updateDataOptimistic: (state, action) => state,
       revertData: (state, action) => state,
     },
@@ -162,8 +162,8 @@ requestsReducer({
 });
 requestsReducer({
   actionType: 'actionType',
-  operations: {
-    OPERATION: {
+  mutations: {
+    MUTATION: {
       updateData: (state, action) => state,
       updateDataOptimistic: (state, action) => state,
       revertData: (state, action) => state,

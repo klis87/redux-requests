@@ -91,7 +91,7 @@ type OnActionCallback = {
   (state: any, action: AnyAction, config: MergedReducerConfig): any;
 };
 
-type Operations = {
+type Mutations = {
   [actionType: string]:
     | boolean
     | OnActionCallback
@@ -123,7 +123,7 @@ type LocalReducerConfig = {
   onError?: OnActionCallback;
   onAbort?: OnActionCallback;
   resetOn?: FilterOnActionCallback | string[];
-  operations?: Operations;
+  mutations?: Mutations;
 };
 
 type MergedReducerConfig = {
@@ -138,7 +138,7 @@ type MergedReducerConfig = {
   onError: OnActionCallback;
   onAbort: OnActionCallback;
   resetOn: FilterOnActionCallback | string[];
-  operations: Operations;
+  mutations: Mutations;
 };
 
 type RequestsReducer = {

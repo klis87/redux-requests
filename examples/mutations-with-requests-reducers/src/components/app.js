@@ -1,9 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import {
-  ConnectedRequestContainer,
-  ConnectedOperationContainer,
-} from 'redux-saga-requests-react';
+import { ConnectedQuery, ConnectedMutation } from 'redux-saga-requests-react';
 
 import {
   fetchPhoto,
@@ -13,18 +10,15 @@ import {
   deletePost,
   deletePostOptimistic,
 } from '../store/actions';
-import {
-  DELETE_PHOTO,
-  DELETE_POST,
-  FETCH_PHOTO,
-  FETCH_POSTS,
-} from '../store/constants';
+import { DELETE_PHOTO, DELETE_POST } from '../store/constants';
 import Spinner from './spinner';
 
 const mapDispatchToProps = {
   fetchPhoto,
+  deletePhoto,
   deletePhotoOptimistic,
   fetchPosts,
+  deletePost,
   deletePostOptimistic,
 };
 
@@ -36,12 +30,14 @@ const RequestError = () => (
 
 const App = ({
   fetchPhoto,
+  deletePhoto,
   deletePhotoOptimistic,
   fetchPosts,
+  deletePost,
   deletePostOptimistic,
 }) => (
   <div>
-    <h1>Redux Saga Requests operations example</h1>
+    <h1>Redux Saga Requests mutations with requests reducers example</h1>
     <p>
       In order to see aborts in action, you should set network throttling in
       your browser
@@ -52,8 +48,8 @@ const App = ({
       <button type="button" style={buttonStyle} onClick={() => fetchPhoto(1)}>
         Fetch photo with id 1
       </button>
-      <ConnectedRequestContainer
-        queryType={FETCH_PHOTO}
+      <ConnectedQuery
+        requestSelector={state => state.photo}
         errorComponent={RequestError}
         loadingComponent={Spinner}
         noDataMessage={<p>There is no entity currently.</p>}
@@ -63,26 +59,26 @@ const App = ({
             <h3>{data.title}</h3>
             <img src={data.thumbnailUrl} alt={data.title} />
             <hr />
-            <ConnectedOperationContainer
-              operationType={DELETE_PHOTO}
-              operationCreator={deletePhoto}
+            <ConnectedMutation
+              requestSelector={state => state.photo}
+              type={DELETE_PHOTO}
             >
-              {({ loading, sendOperation }) => (
+              {({ loading }) => (
                 <button
                   type="button"
-                  onClick={() => sendOperation(data.id)}
+                  onClick={() => deletePhoto(data.id)}
                   disabled={loading}
                 >
                   {loading ? 'Deleting...' : 'Delete'}
                 </button>
               )}
-            </ConnectedOperationContainer>
+            </ConnectedMutation>
             <button type="button" onClick={() => deletePhotoOptimistic(data)}>
               Delete optimistic
             </button>
           </div>
         )}
-      </ConnectedRequestContainer>
+      </ConnectedQuery>
     </div>
     <hr />
     <div>
@@ -90,8 +86,8 @@ const App = ({
       <button type="button" style={buttonStyle} onClick={fetchPosts}>
         Fetch posts
       </button>
-      <ConnectedRequestContainer
-        queryType={FETCH_POSTS}
+      <ConnectedQuery
+        requestSelector={state => state.posts}
         errorComponent={RequestError}
         loadingComponent={Spinner}
         noDataMessage={<p>There is no entity currently.</p>}
@@ -101,21 +97,21 @@ const App = ({
             <div key={post.id}>
               <h3>{post.title}</h3>
               <p>{post.body}</p>
-              <ConnectedOperationContainer
-                operationType={DELETE_POST}
-                operationCreator={deletePost}
+              <ConnectedMutation
+                type={DELETE_POST}
+                requestSelector={state => state.posts}
                 requestKey={String(post.id)}
               >
-                {({ loading, sendOperation }) => (
+                {({ loading }) => (
                   <button
                     type="button"
-                    onClick={() => sendOperation(post.id)}
+                    onClick={() => deletePost(post.id)}
                     disabled={loading}
                   >
                     {loading ? 'Deleting...' : 'Delete'}
                   </button>
                 )}
-              </ConnectedOperationContainer>
+              </ConnectedMutation>
               <button type="button" onClick={() => deletePostOptimistic(post)}>
                 Delete optimistic
               </button>
@@ -123,7 +119,7 @@ const App = ({
             </div>
           ))
         }
-      </ConnectedRequestContainer>
+      </ConnectedQuery>
     </div>
     <hr />
   </div>

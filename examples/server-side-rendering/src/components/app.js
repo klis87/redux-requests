@@ -1,5 +1,5 @@
 import React from 'react';
-import { ConnectedRequestContainer } from 'redux-saga-requests-react';
+import { ConnectedQuery } from 'redux-saga-requests-react';
 import { connect } from 'react-redux';
 
 import { FETCH_BOOKS, FETCH_BOOKS_SCREENING_ACTORS } from '../store/constants';
@@ -18,8 +18,8 @@ const App = ({ resetBooks, fetchBooks }) => (
       <h2>Books</h2>
       <button onClick={resetBooks}>reset books</button>
       <button onClick={fetchBooks}>fetch books</button>
-      <ConnectedRequestContainer
-        queryType={FETCH_BOOKS}
+      <ConnectedQuery
+        type={FETCH_BOOKS}
         errorComponent={RequestError}
         loadingComponent={Spinner}
         noDataMessage={<p>There is no entity currently.</p>}
@@ -34,11 +34,11 @@ const App = ({ resetBooks, fetchBooks }) => (
             );
           })
         }
-      </ConnectedRequestContainer>
+      </ConnectedQuery>
       <hr />
       <h2>Books screening actors</h2>
-      <ConnectedRequestContainer
-        queryType={FETCH_BOOKS_SCREENING_ACTORS}
+      <ConnectedQuery
+        type={FETCH_BOOKS_SCREENING_ACTORS}
         errorComponent={RequestError}
         loadingComponent={Spinner}
         noDataMessage={<p>There is no entity currently.</p>}
@@ -53,7 +53,7 @@ const App = ({ resetBooks, fetchBooks }) => (
             );
           })
         }
-      </ConnectedRequestContainer>
+      </ConnectedQuery>
     </div>
   </div>
 );

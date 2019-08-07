@@ -3,21 +3,21 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 
-import ConnectedRequestContainer from './connected-request-container';
+import ConnectedQuery from './connected-query';
 
 const mockStore = configureStore();
 
-describe('ConnectedRequestContainer', () => {
-  it('maps requestSelector to request', () => {
+describe('ConnectedQuery', () => {
+  it('maps requestSelector to query', () => {
     const component = renderer.create(
       <Provider
         store={mockStore({
           request: { data: 'data', error: null, pending: 0 },
         })}
       >
-        <ConnectedRequestContainer requestSelector={state => state.request}>
+        <ConnectedQuery requestSelector={state => state.request}>
           {({ data }) => <div>{data}</div>}
-        </ConnectedRequestContainer>
+        </ConnectedQuery>
       </Provider>,
     );
     expect(component.toJSON()).toMatchSnapshot();

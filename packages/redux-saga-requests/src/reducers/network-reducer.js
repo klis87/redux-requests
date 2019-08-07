@@ -6,14 +6,14 @@ import {
 } from '../actions';
 import defaultConfig from './default-config';
 import requestsReducer from './requests-reducer';
-import operationsReducer from './operations-reducer';
+import mutationsReducer from './mutations-reducer';
 
 export default localConfig => {
   const config = {
     isRequestActionQuery,
     ...defaultConfig,
     ...localConfig,
-    handleOperationsState: false,
+    handleMutationsState: false,
   };
   let initialized = false; // for SSR hydration
   let initReducers = null;
@@ -69,10 +69,10 @@ export default localConfig => {
       (isResponseAction(action) &&
         !config.isRequestActionQuery(getRequestActionFromResponse(action)))
     ) {
-      mutations = operationsReducer(mutations, action, config, {
+      mutations = mutationsReducer(mutations, action, config, {
         getRequestKey:
-          action.meta && action.meta.operations
-            ? action.meta.operations.getRequestKey
+          action.meta && action.meta.mutations
+            ? action.meta.mutations.getRequestKey
             : null,
       });
     }

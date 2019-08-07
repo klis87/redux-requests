@@ -62,7 +62,7 @@ export const deleteBook = book => ({
   },
   meta: {
     deletedBook: book,
-    operations: {
+    mutations: {
       getRequestKey: action => action.meta.deletedBook.id,
       [FETCH_BOOKS]: {
         updateDataOptimistic: (state, action) => ({
@@ -92,7 +92,7 @@ export const likeBook = id => ({
   },
   meta: {
     id,
-    operations: {
+    mutations: {
       getRequestKey: action => action.meta.id,
       [FETCH_BOOKS]: {
         updateData: (state, action) => ({
@@ -119,7 +119,7 @@ export const unlikeBook = id => ({
   },
   meta: {
     id,
-    operations: {
+    mutations: {
       getRequestKey: action => action.meta.id,
       [FETCH_BOOKS]: {
         updateData: (state, action) => ({
