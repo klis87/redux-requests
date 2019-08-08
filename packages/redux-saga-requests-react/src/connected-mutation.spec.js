@@ -61,4 +61,52 @@ describe('ConnectedMutation', () => {
     );
     expect(component.toJSON()).toMatchSnapshot();
   });
+
+  it('maps type to mutation when using networkReducer', () => {
+    const mutationType = 'MUTATION';
+    const component = renderer.create(
+      <Provider
+        store={mockStore({
+          network: {
+            mutations: {
+              [mutationType]: { pending: 1, error: 'error' },
+            },
+          },
+        })}
+      >
+        <ConnectedMutation type={mutationType}>
+          {({ loading, error }) => (
+            <div>
+              {loading && 'loading'}
+              {error}
+            </div>
+          )}
+        </ConnectedMutation>
+      </Provider>,
+    );
+    expect(component.toJSON()).toMatchSnapshot();
+  });
+
+  it('maps type to default mutation when no type in networkReducer', () => {
+    const mutationType = 'MUTATION';
+    const component = renderer.create(
+      <Provider
+        store={mockStore({
+          network: {
+            mutations: {},
+          },
+        })}
+      >
+        <ConnectedMutation type={mutationType}>
+          {({ loading, error }) => (
+            <div>
+              {loading && 'loading'}
+              {error}
+            </div>
+          )}
+        </ConnectedMutation>
+      </Provider>,
+    );
+    expect(component.toJSON()).toMatchSnapshot();
+  });
 });
