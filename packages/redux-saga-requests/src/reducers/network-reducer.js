@@ -15,9 +15,11 @@ export default localConfig => {
     ...localConfig,
     handleMutationsState: false,
   };
-  let initialized = false; // for SSR hydration
-  let initReducers = null;
   const requestsReducers = {};
+
+  // for SSR hydration
+  let initialized = false;
+  let hydratedReducers = null;
 
   return (state = { queries: {}, mutations: {} }, action) => {
     if (
@@ -27,7 +29,7 @@ export default localConfig => {
     ) {
       initialized = true;
       const queryKeys = Object.keys(state.queries);
-      initReducers = new Set(queryKeys);
+      hydratedReducers = new Set(queryKeys);
 
       queryKeys.forEach(k => {
         requestsReducers[k] = requestsReducer({
@@ -41,7 +43,7 @@ export default localConfig => {
       isRequestAction(action) &&
       config.isRequestActionQuery(action) &&
       (!(action.type in requestsReducers) ||
-        (initReducers && initReducers.has(action.type)))
+        (hydratedReducers && hydratedReducers.has(action.type)))
     ) {
       requestsReducers[action.type] = requestsReducer({
         ...config,
@@ -49,8 +51,8 @@ export default localConfig => {
         ...action.meta,
       });
 
-      if (initReducers) {
-        initReducers.delete(action.type);
+      if (hydratedReducers) {
+        hydratedReducers.delete(action.type);
       }
     }
 

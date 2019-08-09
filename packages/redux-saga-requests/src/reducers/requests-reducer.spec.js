@@ -1,4 +1,10 @@
-import { success, error, abort, createErrorAction } from '../actions';
+import {
+  success,
+  error,
+  abort,
+  createSuccessAction,
+  createErrorAction,
+} from '../actions';
 import { requestsReducer } from '.';
 
 describe('reducers', () => {
@@ -78,6 +84,35 @@ describe('reducers', () => {
           data: null,
           error: null,
           pending: 1,
+          mutations: null,
+        });
+      });
+
+      it('supports FSA actions for getting data and error by default', () => {
+        const action = {
+          type: actionType,
+          payload: {
+            request: {
+              url: '/',
+            },
+          },
+        };
+
+        expect(
+          reducer(defaultState, createSuccessAction(action, 'data')),
+        ).toEqual({
+          data: 'data',
+          error: null,
+          pending: -1,
+          mutations: null,
+        });
+
+        expect(
+          reducer(defaultState, createErrorAction(action, 'error')),
+        ).toEqual({
+          data: null,
+          error: 'error',
+          pending: -1,
           mutations: null,
         });
       });

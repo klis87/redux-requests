@@ -487,5 +487,73 @@ describe('reducers', () => {
         },
       });
     });
+
+    it('supports SSR', () => {
+      const reducer = networkReducer();
+      const initialState = {
+        queries: {
+          QUERY: {
+            data: ['data'],
+            pending: 0,
+            error: null,
+            mutations: null,
+          },
+        },
+        mutations: {},
+      };
+
+      let state = reducer(initialState, {});
+      expect(state).toEqual(initialState);
+
+      state = reducer(state, {
+        type: 'LOCAL_MUTATION',
+        data: 'data2',
+        meta: {
+          mutations: {
+            QUERY: {
+              updateData: (queryState, action) => [
+                ...queryState.data,
+                action.data,
+              ],
+              local: true,
+            },
+          },
+        },
+      });
+      expect(state).toEqual({
+        queries: {
+          QUERY: {
+            data: ['data', 'data2'],
+            pending: 0,
+            error: null,
+            mutations: null,
+          },
+        },
+        mutations: {},
+      });
+
+      const query = {
+        type: 'QUERY',
+        request: {
+          url: '/',
+        },
+        meta: {
+          getData: (queryState, action) => [...queryState.data, action.data],
+        },
+      };
+      state = reducer(state, query);
+      state = reducer(state, createSuccessAction(query, 'data3'));
+      expect(state).toEqual({
+        queries: {
+          QUERY: {
+            data: ['data', 'data2', 'data3'],
+            pending: 0,
+            error: null,
+            mutations: null,
+          },
+        },
+        mutations: {},
+      });
+    });
   });
 });
