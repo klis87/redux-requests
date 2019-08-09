@@ -8,6 +8,7 @@ import {
   sendRequest,
   watchRequests,
   requestsReducer,
+  networkReducer,
   requestsPromiseMiddleware,
   requestsCacheMiddleware,
   clearRequestsCache,
@@ -171,6 +172,8 @@ requestsReducer({
     },
   },
 });
+
+networkReducer({ isRequestActionQuery: () => true });
 
 requestsPromiseMiddleware();
 requestsPromiseMiddleware({ auto: true });

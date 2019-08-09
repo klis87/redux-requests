@@ -4,12 +4,38 @@ interface FilterOnActionCallback {
   (action: AnyAction): boolean;
 }
 
+interface OnActionCallback {
+  (state: any, action: AnyAction, config: MergedReducerConfig): any;
+}
+
 interface RequestActionMeta {
   asPromise?: boolean;
   driver?: string;
   runByWatcher?: boolean;
   takeLatest?: boolean;
   abortOn?: FilterOnActionCallback | string | string[];
+  resetOn?: FilterOnActionCallback | string[];
+  getData?: OnActionCallback;
+  updateData?: OnActionCallback;
+  getError?: OnActionCallback;
+  operations?: {
+    getRequestKey?: (action: RequestAction) => string;
+    [actionType: string]:
+      | boolean
+      | OnActionCallback
+      | {
+          updateData: boolean | OnActionCallback;
+        }
+      | {
+          updateData?: OnActionCallback;
+          updateDataOptimistic: OnActionCallback;
+          revertData: OnActionCallback;
+        }
+      | {
+          updateData: OnActionCallback;
+          local: true;
+        };
+  };
   cache?: boolean | number;
   cacheKey?: string;
   cacheSize?: number;
@@ -87,10 +113,6 @@ interface WatchRequestsConfig {
 
 export const watchRequests: (config?: WatchRequestsConfig) => void;
 
-interface OnActionCallback {
-  (state: any, action: AnyAction, config: MergedReducerConfig): any;
-}
-
 interface Mutations {
   [actionType: string]:
     | boolean
@@ -111,10 +133,7 @@ interface Mutations {
       };
 }
 
-interface LocalReducerConfig {
-  actionType: string;
-  multiple?: boolean;
-  getDefaultData?: (multiple: boolean) => any;
+interface CommonReducerConfig {
   getData?: OnActionCallback;
   updateData?: OnActionCallback;
   getError?: OnActionCallback;
@@ -123,7 +142,14 @@ interface LocalReducerConfig {
   onError?: OnActionCallback;
   onAbort?: OnActionCallback;
   resetOn?: FilterOnActionCallback | string[];
+}
+
+interface RequestsReducerConfig extends CommonReducerConfig {
+  actionType: string;
+  multiple?: boolean;
+  getDefaultData?: (multiple: boolean) => any;
   mutations?: Mutations;
+  handleMutationsState?: boolean;
 }
 
 interface MergedReducerConfig {
@@ -139,13 +165,20 @@ interface MergedReducerConfig {
   onAbort: OnActionCallback;
   resetOn: FilterOnActionCallback | string[];
   mutations: Mutations;
+  handleMutationsState: boolean;
 }
 
 interface RequestsReducer {
-  (localConfig: LocalReducerConfig): Reducer<any>;
+  (config: RequestsReducerConfig): Reducer<any>;
 }
 
 export const requestsReducer: RequestsReducer;
+
+interface NetworkReducerConfig extends CommonReducerConfig {
+  isRequestActionQuery?: (requestAction: RequestAction) => boolean;
+}
+
+export const networkReducer: (config: NetworkReducerConfig) => Reducer<any>;
 
 interface RequestsPromiseMiddlewareConfig {
   auto?: Boolean;
