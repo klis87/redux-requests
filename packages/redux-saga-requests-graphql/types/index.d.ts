@@ -1,8 +1,8 @@
 import { Driver } from 'redux-saga-requests';
 
-type GraphqlDriverConfig = {
+interface GraphqlDriverConfig {
   url: string;
-};
+}
 
 export const createDriver: (config: GraphqlDriverConfig) => Driver;
 

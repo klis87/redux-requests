@@ -1,9 +1,9 @@
 import { Driver } from 'redux-saga-requests';
 
-type FetchDriverConfig = {
+interface FetchDriverConfig {
   baseURL?: string;
   AbortController?: any;
-};
+}
 
 export const createDriver: (
   fetchInstance: any,

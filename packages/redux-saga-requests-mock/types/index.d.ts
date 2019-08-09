@@ -1,9 +1,9 @@
 import { Driver } from 'redux-saga-requests';
 
-type MockDriverConfig = {
+interface MockDriverConfig {
   timeout?: number;
   getDataFromResponse?: (response: any) => any;
-};
+}
 
 export const createDriver: (
   mockInstance: any,
