@@ -1,93 +1,94 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { fetchPhoto, clearPhoto, fetchPost, clearPost } from '../store/actions';
 import EntityContainer from './entity-container';
 import Photo from './photo';
 import Post from './post';
 
-// You should use selectors here in your real projects, here we don't for simplicity
-const mapStateToProps = state => ({
-  photo: state.photo.data,
-  photoIsFetched: state.photo.data !== null,
-  photoIsFetching: state.photo.fetching,
-  photoFetchError: state.photo.error,
-  post: state.post.data,
-  postIsFetched: state.post.data !== null,
-  postIsFetching: state.post.fetching,
-  postFetchError: state.post.error,
-});
-
-const mapDispatchToProps = {
-  fetchPhoto,
-  clearPhoto,
-  fetchPost,
-  clearPost,
-};
-
 const buttonStyle = { marginRight: 10 };
 
-const App = ({
-  photo,
-  photoIsFetched,
-  photoIsFetching,
-  photoFetchError,
-  post,
-  postIsFetched,
-  postIsFetching,
-  postFetchError,
-  fetchPhoto,
-  clearPhoto,
-  fetchPost,
-  clearPost,
-}) => (
-  <div>
-    <h1>Redux Saga Requests low level reducers example</h1>
-    <hr />
-    <div>
-      <h2>Photo</h2>
-      <button style={buttonStyle} onClick={clearPhoto}>
-        Clear
-      </button>
-      <button style={buttonStyle} onClick={() => fetchPhoto(1)}>
-        Fetch photo with id 1
-      </button>
-      <button style={buttonStyle} onClick={() => fetchPhoto(10001)}>
-        Fetch non-existent photo
-      </button>
-      <EntityContainer
-        error={photoFetchError}
-        isFetching={photoIsFetching}
-        isFetched={photoIsFetched}
-      >
-        <Photo data={photo} />
-      </EntityContainer>
-    </div>
-    <hr />
-    <div>
-      <h2>Post</h2>
-      <button style={buttonStyle} onClick={clearPost}>
-        Clear
-      </button>
-      <button style={buttonStyle} onClick={() => fetchPost(1)}>
-        Fetch post with id 1
-      </button>
-      <button style={buttonStyle} onClick={() => fetchPost(1001)}>
-        Fetch non-existent post
-      </button>
-      <EntityContainer
-        error={postFetchError}
-        isFetching={postIsFetching}
-        isFetched={postIsFetched}
-      >
-        <Post data={post} />
-      </EntityContainer>
-    </div>
-    <hr />
-  </div>
-);
+const App = () => {
+  const photo = useSelector(state => state.photo.data);
+  const photoIsFetched = useSelector(state => state.photo.data !== null);
+  const photoIsFetching = useSelector(state => state.photo.fetching);
+  const photoFetchError = useSelector(state => state.photo.error);
+  const post = useSelector(state => state.post.data);
+  const postIsFetched = useSelector(state => state.post.data !== null);
+  const postIsFetching = useSelector(state => state.post.fetching);
+  const postFetchError = useSelector(state => state.post.error);
+  const dispatch = useDispatch();
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(App);
+  return (
+    <div>
+      <h1>Redux Saga Requests low level reducers example</h1>
+      <hr />
+      <div>
+        <h2>Photo</h2>
+        <button
+          type="button"
+          style={buttonStyle}
+          onClick={() => dispatch(clearPhoto())}
+        >
+          Clear
+        </button>
+        <button
+          type="button"
+          style={buttonStyle}
+          onClick={() => dispatch(fetchPhoto(1))}
+        >
+          Fetch photo with id 1
+        </button>
+        <button
+          type="button"
+          style={buttonStyle}
+          onClick={() => dispatch(fetchPhoto(10001))}
+        >
+          Fetch non-existent photo
+        </button>
+        <EntityContainer
+          error={photoFetchError}
+          isFetching={photoIsFetching}
+          isFetched={photoIsFetched}
+        >
+          <Photo data={photo} />
+        </EntityContainer>
+      </div>
+      <hr />
+      <div>
+        <h2>Post</h2>
+        <button
+          type="button"
+          style={buttonStyle}
+          onClick={() => dispatch(clearPost())}
+        >
+          Clear
+        </button>
+        <button
+          type="button"
+          style={buttonStyle}
+          onClick={() => dispatch(fetchPost(1))}
+        >
+          Fetch post with id 1
+        </button>
+        <button
+          type="button"
+          style={buttonStyle}
+          onClick={() => dispatch(fetchPost(1001))}
+        >
+          Fetch non-existent post
+        </button>
+        <EntityContainer
+          error={postFetchError}
+          isFetching={postIsFetching}
+          isFetched={postIsFetched}
+        >
+          <Post data={post} />
+        </EntityContainer>
+      </div>
+      <hr />
+    </div>
+  );
+};
+
+export default App;

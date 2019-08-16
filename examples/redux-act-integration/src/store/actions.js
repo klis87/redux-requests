@@ -1,44 +1,44 @@
 import { createAction } from 'redux-act';
 
-export const clearPhotoAction = createAction('clear photo');
+export const clearPhoto = createAction('clear photo');
 
-export const fetchPhotoAction = createAction(
+export const fetchPhoto = createAction(
   'fetch photo',
   id => ({
     request: { url: `/photos/${id}` },
   }),
   () => ({
-    abortOn: clearPhotoAction,
-    resetOn: [clearPhotoAction],
+    abortOn: clearPhoto,
+    resetOn: [clearPhoto],
   }),
 );
 
-export const deletePhotoAction = createAction(
+export const deletePhoto = createAction(
   'delete photo',
   id => ({
     request: { url: `/photos/${id}`, method: 'delete' },
   }),
   () => ({
     mutations: {
-      [fetchPhotoAction]: () => null,
+      [fetchPhoto]: () => null,
     },
   }),
 );
 
-export const clearPostsAction = createAction('clear posts');
+export const clearPosts = createAction('clear posts');
 
-export const fetchPostsAction = createAction(
+export const fetchPosts = createAction(
   'fetch posts',
   () => ({
     request: { url: '/posts/' },
   }),
   () => ({
-    abortOn: clearPostsAction,
-    resetOn: [clearPostsAction],
+    abortOn: clearPosts,
+    resetOn: [clearPosts],
   }),
 );
 
-export const deletePostAction = createAction(
+export const deletePost = createAction(
   'delete post',
   id => ({
     request: { url: `/posts/${id}`, method: 'delete' },
@@ -47,7 +47,7 @@ export const deletePostAction = createAction(
     id,
     mutations: {
       getRequestKey: action => String(action.meta.id),
-      [fetchPostsAction]: {
+      [fetchPosts]: {
         updateData: (state, action) =>
           state.data.filter(v => v.id !== action.meta.id),
       },

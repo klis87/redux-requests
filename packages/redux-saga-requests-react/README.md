@@ -25,16 +25,35 @@ For general usage, see [redux-saga-requests docs](https://github.com/klis87/redu
 ## Purpose
 
 This library is totally optional, but it reduces boilerplate of using `react-saga-requests`
-state from `networkReducer` or `requestsReducer` instances inside React components. It provides the following components:
+state from `networkReducer` or `requestsReducer` inside React components. It provides the following hooks and components:
+
+### `useQuery`
+
+`useQuery` easily gets query state from Redux store and converts `pending` key into `boolean` `loading` as `loading: pending > 0`
+for convenience. It also returns fallback query when it does not exist yet in your reducer as `{ data: null, error: null, loading: false }` so you always have the same object structure in your components. It uses `useMemo` internally so it
+is friendly with `memo`/`PureComponent` optimisations. To use it, pass object as argument with one of the following keys:
+- `requestSelector`: required when using `requestsReducer`, for instance `state => state.request`
+- `type: string`: required when using `networkReducer`, just pass action type or action itself when using action creator library
+
+For example:
+```js
+import { useQuery } from 'redux-saga-requests-react';
+
+// when using requestsReducer
+const query = useQuery({ requestSelector: state => state.request });
+
+// when using networkReducer
+const query = useQuery({ type: REQUEST_TYPE });
+```
 
 ### `Query`
 
-`Query` simplifies rendering server responses, spinners and server errors.
-It has the following props:
-- `query` - a state from a `requestsReducer`
-- `children` - a React node or render function receiving `query` object, render function has the advantage
-that it gets called only when `query.data` is present, so you don't need to do checks like `data && data.length > 0`
-- `component` - alternative prop to `children`, you can pass your custom component here, which will receive `query` prop, plus any external props passed to `Query`
+`Query` simplifies rendering queries data, loading spinners and server errors. It automatically connects to Redux store
+by using `useQuery` under the hood. It has the following props:
+- `requestSelector`: refer to `useQuery`
+- `type: string`: refer to `useQuery`
+- `children` - render function receiving `query` object, called when data is not empty according to `isDataEmpty` prop
+- `component` - alternative prop to `children`, you can pass your custom component here, which will receive `query` prop, plus any additional props passed to `Query`
 - `isDataEmpty: query => boolean`: function which defines when `data` is empty, by default data as empty array and falsy value like `null`, `undefined` is considered as empty
 - `showLoaderDuringRefetch: boolean`: `true` by default, change it to `false` if you don't want to show spinner
 when data is updated - it will still show during initial fetch, but will not for subsequent requests
@@ -50,7 +69,10 @@ Minimalistic example:
 ```js
 import { Query } from 'redux-saga-requests-react';
 
-<Query query={query}>
+<Query
+  requestSelector={state => state.request}
+  // or type={REQUEST_TYPE}
+>
   {({ data }) => (
     <div>
       {data}
@@ -70,7 +92,8 @@ const DataComponent = ({ query, extraLabelProp }) => (
 );
 
 <Query
-  query={query}
+  requestSelector={state => state.request}
+  // or type={REQUEST_TYPE}
   component={DataComponent}
   extraLabelProp="label"
 />
@@ -94,7 +117,8 @@ const ErrorComponent = ({ error, label }) => (
 );
 
 <Query
-  query={query}
+  requestSelector={state => state.request}
+  // or type={REQUEST_TYPE}
   isDataEmpty={query =>
     Array.isArray(query.data) ? query.data.length === 0 : !query.data}
   showLoaderDuringRefetch={false}
@@ -112,43 +136,49 @@ const ErrorComponent = ({ error, label }) => (
 </Query>
 ```
 
-### `ConnectedQuery`
+### `useMutation`
 
-Wrapper around `Query`, it has the same purpose, but instead of passing
-`query` prop, you pass `requestSelector` or `type` when using `networkReducer`. Then, you don't need to worry about
-using `connect` from `react-redux`, `ConnectedQuery` will do it automatically
-for you. Of course you can pass other `Query` props like `isDataEmpty`.
+`useMutation` easily gets query state from Redux store and converts `pending` key into `boolean` `loading` as `loading: pending > 0` for convenience. It also returns fallback query when it does not exist yet in your reducer as
+`{ error: null, loading: false }` so you always have the same object structure in your components.
+It uses `useMemo` internally so it is friendly with `memo`/`PureComponent` optimisations. To use it, pass object as argument
+with one of the following keys:
+- `type: string`: just pass action type or action itself when using action creator library
+- `requestSelector`: only when using `requestsReducer`, for instance `state => state.request`, the same as in `useQuery`
+- `requestKey: string`: only necessary if you defined `getRequestKey` in a mutation,
+usually it will be some kind of id
+
+For example:
 ```js
-import { ConnectedQuery } from 'redux-saga-requests-react';
+import { useMutation } from 'redux-saga-requests-react';
 
-<ConnectedQuery
-  requestSelector={state => state.request}
-  // or type={REQUEST_TYPE}
->
-  {({ data }) => (
-    <div>
-      {data}
-    </div>
-  )}
-</ConnectedQuery>
+// when using requestsReducer
+const query = useQuery({ type: MUTATION_TYPE, requestSelector: state => state.request });
+
+// when using networkReducer
+const query = useQuery({ type: MUTATION_TYPE });
+
+// when using networkReducer and getRequestKey
+const query = useQuery({ type: MUTATION_TYPE, requestKey: '1' });
 ```
+
 
 ### `Mutation`
 
-`Mutation` is a small syntactic sugar component and can be used when you use
-mutations in `requestsReducer` or in actions with `networkReducer` and for example you want to show loading state
-for a button or an mutation error message. It has the following props:
-- `mutation` - a mutation substate from a `requestsReducer` or `networkReducer`
+`Mutation` Converts `useMutation` into component with render prop. It has the following props:
+- `type: string`: refer to `useMutation`
+- `requestSelector`: refer to `useMutation`
+- `requestKey: string`: refer to `useMutation`
 - `children` - render function receiving object with `loading` flag and `error` property
-- `component` - alternative prop to `children`, you can pass your custom component here, which will receive `loading` and `error` props, plus any external props passed to `Mutation`
-- `requestKey: string`: only necessary if you defined `getRequestKey` in a mutation,
-usually it will be some kind of id
+- `component` - alternative prop to `children`, you can pass your custom component here, which will receive `loading` and `error` props, plus any additional props passed to `Mutation`
 
 You use it like this:
 ```js
 import { Mutation } from 'redux-saga-requests-react';
 
-<Mutation mutation={request.mutations[MUTATION_TYPE]}>
+<Mutation
+  type={MUTATION_TYPE}
+  requestSelector={state => state.request} // only when using requestsReducer
+>
   {({ loading, error }) => {
     if (error) {
       return <div>Something went wrong</div>;
@@ -161,36 +191,6 @@ import { Mutation } from 'redux-saga-requests-react';
     );
   }}
 </Mutation>
-```
-
-### `ConnectedMutation`
-
-`ConnectedMutation` is a wrapper around `Mutation`. It has automatic
-state Redux connection capabilities, thanks to below additional props:
-- `type: string`: Redux action type of corresponding mutation action
-- `requestSelector`: (only if you use `requestsReducer`, for `networkReducer` `type` is all you need) selector to get state of `requestsReducer`, the same you would use
-in `ConnectedQuery`, pass it instead of `mutation` to avoid connecting to Redux manually
-
-Here is how you use it:
-```js
-import { ConnectedMutation } from 'redux-saga-requests-react';
-
-<ConnectedMutation
-  requestSelector={state => state.request}
-  type={MUTATION_TYPE}
->
-  {({ loading, error }) => {
-    if (error) {
-      return <div>Something went wrong</div>;
-    }
-
-    return (
-      <button onClick={dispatchSomeMutation} disabled={loading}>
-        Send mutation {loading && '...' }
-      </button>
-    );
-  }}
-</ConnectedMutation>
 ```
 
 ## Licence

@@ -17,16 +17,18 @@ exports[`Query allows rendering custom loading component with extra props 1`] = 
 </span>
 `;
 
-exports[`Query renders children callback when data in not empty 1`] = `
-<span>
+exports[`Query maps requestSelector to query 1`] = `
+<div>
   data
-</span>
+</div>
 `;
 
-exports[`Query renders children component when data in not empty 1`] = `
-<span>
+exports[`Query maps type to default query data when request state is not yet in networkReducer  1`] = `null`;
+
+exports[`Query maps type to query when using networkReducer 1`] = `
+<div>
   data
-</span>
+</div>
 `;
 
 exports[`Query renders custom prop component with extra props 1`] = `
@@ -37,7 +39,11 @@ exports[`Query renders custom prop component with extra props 1`] = `
 </span>
 `;
 
-exports[`Query renders data even when pending is positive if showLoaderDuringRefetch is false 1`] = `"data"`;
+exports[`Query renders data even when pending is positive if showLoaderDuringRefetch is false 1`] = `
+<div>
+  data
+</div>
+`;
 
 exports[`Query renders null when custom isDataEmpty returns true 1`] = `null`;
 

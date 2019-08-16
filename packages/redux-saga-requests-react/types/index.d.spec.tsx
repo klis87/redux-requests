@@ -1,10 +1,28 @@
 import * as React from 'react';
-import { Query, ConnectedQuery, Mutation, ConnectedMutation } from './index';
+import { Query, Mutation, useQuery, useMutation } from './index';
+
+const query = useQuery<string>({ type: 'Query' });
+const query2 = useQuery({
+  type: 'Query',
+  requestSelector: () => ({ data: { nested: 1 }, pending: 1, error: null }),
+});
+const mutation = useMutation({ type: 'Mutation' });
+const mutation2 = useMutation({
+  type: 'Mutation',
+  requestSelector: () => ({ data: 'data', pending: 1, error: null }),
+});
 
 function BasicQuery() {
   return (
-    <Query query={{ data: null, error: null, pending: 1, mutations: [] }}>
-      {null}
+    <Query<string>
+      requestSelector={state => ({
+        data: 'x',
+        error: null,
+        pending: 1,
+      })}
+      type="TYPE"
+    >
+      {({ data }) => data}
     </Query>
   );
 }
@@ -21,10 +39,19 @@ function Error({ error, extra }) {
   );
 }
 
-function AdvancedQuery() {
+function Component({ query, extra }) {
   return (
-    <Query
-      query={{ data: 'data', error: null, pending: 1, mutations: [] }}
+    <div>
+      {query.data as number} {extra}
+    </div>
+  );
+}
+
+function QueryWithComponents() {
+  return (
+    <Query<string>
+      type="QUERY"
+      component={Component}
       loadingComponent={Spinner}
       loadingComponentProps={{ extra: 'extra' }}
       errorComponent={Error}
@@ -32,49 +59,13 @@ function AdvancedQuery() {
       noDataMessage={<span>No data</span>}
       showLoaderDuringRefetch={false}
       isDataEmpty={query => true}
-    >
-      {({ data }) => <div>{data}</div>}
-    </Query>
-  );
-}
-
-function Component({ query, x }) {
-  return (
-    <div>
-      {query} {x}
-    </div>
-  );
-}
-
-function QuerywithComponentProp() {
-  return (
-    <Query
-      query={{ data: 'data', error: null, pending: 1, mutations: [] }}
-      component={Component}
-      x={1}
     />
   );
 }
 
-function BasicConnectedQuery() {
+function BasicMutation() {
   return (
-    <ConnectedQuery
-      requestSelector={state => ({
-        data: 'x',
-        error: null,
-        pending: 1,
-        mutations: [],
-      })}
-      type="TYPE"
-    >
-      {query => query.data}
-    </ConnectedQuery>
-  );
-}
-
-function RenderPropMutation() {
-  return (
-    <Mutation mutation={{ pending: 1, error: 1 }}>
+    <Mutation type="Mutation">
       {({ loading, error }) => (
         <div>
           {loading && 'loading'}
@@ -85,11 +76,11 @@ function RenderPropMutation() {
   );
 }
 
-function MutationComponent({ loading, error, extra }) {
+function MutationComponent({ mutation, extra }) {
   return (
     <div>
-      {loading && 'loading'}
-      {error}
+      {mutation.loading && 'loading'}
+      {mutation.error}
       {extra}
     </div>
   );
@@ -98,7 +89,7 @@ function MutationComponent({ loading, error, extra }) {
 function MutationWithCustomComponent() {
   return (
     <Mutation
-      mutation={{ pending: 1, error: 'error' }}
+      type="MUTATION"
       requestKey="key"
       component={MutationComponent}
       extra="extra"
@@ -106,29 +97,15 @@ function MutationWithCustomComponent() {
   );
 }
 
-function BasicConnectedMutation() {
+function MutationWithSelector() {
   return (
-    <ConnectedMutation type="TYPE">
-      {({ loading, error }) => (
-        <div>
-          {loading && 'loading'}
-          {error}
-        </div>
-      )}
-    </ConnectedMutation>
-  );
-}
-
-function ConnectedMutationWithSelector() {
-  return (
-    <ConnectedMutation
+    <Mutation
       type="TYPE"
       requestKey="key"
       requestSelector={state => ({
         data: 'x',
         error: null,
         pending: 1,
-        mutations: [],
       })}
     >
       {({ loading, error }) => (
@@ -137,6 +114,6 @@ function ConnectedMutationWithSelector() {
           {error}
         </div>
       )}
-    </ConnectedMutation>
+    </Mutation>
   );
 }

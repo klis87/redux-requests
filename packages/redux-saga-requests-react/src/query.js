@@ -2,9 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { reactComponentPropType } from './propTypesValidators';
+import useQuery from './use-query';
 
 const Query = ({
-  query,
+  type,
+  requestSelector,
   children,
   component: Component,
   isDataEmpty,
@@ -16,9 +18,11 @@ const Query = ({
   loadingComponentProps,
   ...extraProps
 }) => {
+  const query = useQuery({ type, requestSelector });
+
   const dataEmpty = isDataEmpty(query);
 
-  if (query.pending > 0 && (showLoaderDuringRefetch || dataEmpty)) {
+  if (query.loading && (showLoaderDuringRefetch || dataEmpty)) {
     return LoadingComponent ? (
       <LoadingComponent {...loadingComponentProps} />
     ) : null;
@@ -35,7 +39,7 @@ const Query = ({
   }
 
   if (children) {
-    return typeof children === 'function' ? children(query) : children;
+    return children(query);
   }
 
   return <Component query={query} {...extraProps} />;
@@ -49,13 +53,10 @@ Query.defaultProps = {
 };
 
 Query.propTypes = {
-  children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
+  requestSelector: PropTypes.func,
+  type: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+  children: PropTypes.func,
   component: reactComponentPropType('Query'),
-  query: PropTypes.shape({
-    data: PropTypes.any,
-    error: PropTypes.any,
-    pending: PropTypes.number.isRequired,
-  }).isRequired,
   isDataEmpty: PropTypes.func,
   showLoaderDuringRefetch: PropTypes.bool,
   noDataMessage: PropTypes.node,

@@ -2,6 +2,29 @@
 
 exports[`Mutation doesnt crush if an mutation with a requestKey doesnt exist 1`] = `<div />`;
 
+exports[`Mutation maps requestSelector to mutation with type prop 1`] = `
+<div>
+  loading
+  error
+</div>
+`;
+
+exports[`Mutation maps requestSelector to mutation with type prop as action creator 1`] = `
+<div>
+  loading
+  error
+</div>
+`;
+
+exports[`Mutation maps type to default mutation when no type in networkReducer 1`] = `<div />`;
+
+exports[`Mutation maps type to mutation when using networkReducer 1`] = `
+<div>
+  loading
+  error
+</div>
+`;
+
 exports[`Mutation renders custom component as prop with extra prop 1`] = `
 <div>
   loading
@@ -9,13 +32,6 @@ exports[`Mutation renders custom component as prop with extra prop 1`] = `
   error
    
   extra
-</div>
-`;
-
-exports[`Mutation renders loading and error 1`] = `
-<div>
-  loading
-  error
 </div>
 `;
 

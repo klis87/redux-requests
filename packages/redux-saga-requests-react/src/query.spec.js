@@ -1,51 +1,163 @@
 import renderer from 'react-test-renderer';
 import React from 'react';
+import { Provider } from 'react-redux';
+import configureStore from 'redux-mock-store';
 
 import Query from './query';
 
+const mockStore = configureStore();
+
 describe('Query', () => {
+  const QUERY_TYPE = 'QUERY_TYPE';
+
+  it('maps requestSelector to query', () => {
+    const component = renderer.create(
+      <Provider
+        store={mockStore({
+          request: { data: 'data', error: null, pending: 0 },
+        })}
+      >
+        <Query requestSelector={state => state.request}>
+          {({ data }) => <div>{data}</div>}
+        </Query>
+      </Provider>,
+    );
+    expect(component.toJSON()).toMatchSnapshot();
+  });
+
+  it('maps type to query when using networkReducer', () => {
+    const component = renderer.create(
+      <Provider
+        store={mockStore({
+          network: {
+            queries: {
+              [QUERY_TYPE]: { data: 'data', error: null, pending: 0 },
+            },
+          },
+        })}
+      >
+        <Query type={QUERY_TYPE}>{({ data }) => <div>{data}</div>}</Query>
+      </Provider>,
+    );
+    expect(component.toJSON()).toMatchSnapshot();
+  });
+
+  it('maps type to default query data when request state is not yet in networkReducer ', () => {
+    const component = renderer.create(
+      <Provider
+        store={mockStore({
+          network: {
+            queries: {},
+          },
+        })}
+      >
+        <Query type={QUERY_TYPE}>{({ data }) => <div>{data}</div>}</Query>
+      </Provider>,
+    );
+    expect(component.toJSON()).toMatchSnapshot();
+  });
+
   it('renders null when data is falsy by default', () => {
     const component = renderer.create(
-      <Query query={{ data: null, error: null, pending: 0 }}>{null}</Query>,
+      <Provider
+        store={mockStore({
+          network: {
+            queries: {
+              [QUERY_TYPE]: { data: null, error: null, pending: 0 },
+            },
+          },
+        })}
+      >
+        <Query type={QUERY_TYPE}>{({ data }) => <div>{data}</div>}</Query>
+      </Provider>,
     );
+
     expect(component.toJSON()).toMatchSnapshot();
   });
 
   it('renders null when data is empty array by default', () => {
     const component = renderer.create(
-      <Query query={{ data: [], error: null, pending: 0 }}>{[]}</Query>,
+      <Provider
+        store={mockStore({
+          network: {
+            queries: {
+              [QUERY_TYPE]: { data: [], error: null, pending: 0 },
+            },
+          },
+        })}
+      >
+        <Query type={QUERY_TYPE}>
+          {({ data }) => (
+            <div>
+              {data.map(v => (
+                <span key={v}>{v}</span>
+              ))}
+            </div>
+          )}
+        </Query>
+      </Provider>,
     );
     expect(component.toJSON()).toMatchSnapshot();
   });
 
   it('renders null when custom isDataEmpty returns true', () => {
     const component = renderer.create(
-      <Query
-        query={{ data: 'empty', error: null, pending: 0 }}
-        isDataEmpty={query => !query.data || query.data === 'empty'}
+      <Provider
+        store={mockStore({
+          network: {
+            queries: {
+              [QUERY_TYPE]: { data: 'empty', error: null, pending: 0 },
+            },
+          },
+        })}
       >
-        empty
-      </Query>,
+        <Query
+          type={QUERY_TYPE}
+          isDataEmpty={query => !query.data || query.data === 'empty'}
+        >
+          {({ data }) => <div>{data}</div>}
+        </Query>
+      </Provider>,
     );
+
     expect(component.toJSON()).toMatchSnapshot();
   });
 
   it('allows passing no data message', () => {
     const component = renderer.create(
-      <Query
-        query={{ data: null, error: null, pending: 0 }}
-        noDataMessage="no data"
+      <Provider
+        store={mockStore({
+          network: {
+            queries: {
+              [QUERY_TYPE]: { data: null, error: null, pending: 0 },
+            },
+          },
+        })}
       >
-        {null}
-      </Query>,
+        <Query noDataMessage="no data" type={QUERY_TYPE}>
+          {({ data }) => <div>{data}</div>}
+        </Query>
+      </Provider>,
     );
+
     expect(component.toJSON()).toMatchSnapshot();
   });
 
   it('renders null when pending is positive by default', () => {
     const component = renderer.create(
-      <Query query={{ data: 'data', error: null, pending: 1 }}>data</Query>,
+      <Provider
+        store={mockStore({
+          network: {
+            queries: {
+              [QUERY_TYPE]: { data: 'data', error: null, pending: 1 },
+            },
+          },
+        })}
+      >
+        <Query type={QUERY_TYPE}>{({ data }) => <div>{data}</div>}</Query>
+      </Provider>,
     );
+
     expect(component.toJSON()).toMatchSnapshot();
   });
 
@@ -53,14 +165,25 @@ describe('Query', () => {
     const Spinner = ({ extra }) => <span>loading... {extra}</span>;
 
     const component = renderer.create(
-      <Query
-        query={{ data: 'data', error: null, pending: 1 }}
-        loadingComponent={Spinner}
-        loadingComponentProps={{ extra: 'extra' }}
+      <Provider
+        store={mockStore({
+          network: {
+            queries: {
+              [QUERY_TYPE]: { data: 'data', error: null, pending: 1 },
+            },
+          },
+        })}
       >
-        data
-      </Query>,
+        <Query
+          type={QUERY_TYPE}
+          loadingComponent={Spinner}
+          loadingComponentProps={{ extra: 'extra' }}
+        >
+          {({ data }) => <div>{data}</div>}
+        </Query>
+      </Provider>,
     );
+
     expect(component.toJSON()).toMatchSnapshot();
   });
 
@@ -72,12 +195,19 @@ describe('Query', () => {
     try {
       expect(() =>
         renderer.create(
-          <Query
-            query={{ data: null, error: null, pending: 1 }}
-            loadingComponent={<div>loading</div>}
+          <Provider
+            store={mockStore({
+              network: {
+                queries: {
+                  [QUERY_TYPE]: { data: 'data', error: null, pending: 1 },
+                },
+              },
+            })}
           >
-            {null}
-          </Query>,
+            <Query type={QUERY_TYPE} loadingComponent={<div>loading</div>}>
+              {({ data }) => <div>{data}</div>}
+            </Query>
+          </Provider>,
         ),
       ).toThrow();
       expect(loggerSpy).toBeCalled();
@@ -88,20 +218,39 @@ describe('Query', () => {
 
   it('renders data even when pending is positive if showLoaderDuringRefetch is false', () => {
     const component = renderer.create(
-      <Query
-        query={{ data: 'data', error: null, pending: 1 }}
-        showLoaderDuringRefetch={false}
+      <Provider
+        store={mockStore({
+          network: {
+            queries: {
+              [QUERY_TYPE]: { data: 'data', error: null, pending: 1 },
+            },
+          },
+        })}
       >
-        data
-      </Query>,
+        <Query type={QUERY_TYPE} showLoaderDuringRefetch={false}>
+          {({ data }) => <div>{data}</div>}
+        </Query>
+      </Provider>,
     );
+
     expect(component.toJSON()).toMatchSnapshot();
   });
 
   it('renders null when error is truthy by default', () => {
     const component = renderer.create(
-      <Query query={{ data: null, error: 'error', pending: 0 }}>{null}</Query>,
+      <Provider
+        store={mockStore({
+          network: {
+            queries: {
+              [QUERY_TYPE]: { data: 'data', error: 'error', pending: 0 },
+            },
+          },
+        })}
+      >
+        <Query type={QUERY_TYPE}>{({ data }) => <div>{data}</div>}</Query>
+      </Provider>,
     );
+
     expect(component.toJSON()).toMatchSnapshot();
   });
 
@@ -113,14 +262,25 @@ describe('Query', () => {
     );
 
     const component = renderer.create(
-      <Query
-        query={{ data: null, error: 'error', pending: 0 }}
-        errorComponent={Error}
-        errorComponentProps={{ extra: 'extra' }}
+      <Provider
+        store={mockStore({
+          network: {
+            queries: {
+              [QUERY_TYPE]: { data: 'data', error: 'error', pending: 0 },
+            },
+          },
+        })}
       >
-        {null}
-      </Query>,
+        <Query
+          type={QUERY_TYPE}
+          errorComponent={Error}
+          errorComponentProps={{ extra: 'extra' }}
+        >
+          {({ data }) => <div>{data}</div>}
+        </Query>
+      </Provider>,
     );
+
     expect(component.toJSON()).toMatchSnapshot();
   });
 
@@ -132,38 +292,25 @@ describe('Query', () => {
     try {
       expect(() =>
         renderer.create(
-          <Query
-            query={{ data: null, error: 'error', pending: 0 }}
-            errorComponent={<div>error</div>}
+          <Provider
+            store={mockStore({
+              network: {
+                queries: {
+                  [QUERY_TYPE]: { data: 'data', error: 'error', pending: 0 },
+                },
+              },
+            })}
           >
-            {null}
-          </Query>,
+            <Query type={QUERY_TYPE} errorComponent={<div>error</div>}>
+              {({ data }) => <div>{data}</div>}
+            </Query>
+          </Provider>,
         ),
       ).toThrow();
       expect(loggerSpy).toBeCalled();
     } finally {
       loggerSpy.mockRestore();
     }
-  });
-
-  it('renders children callback when data in not empty', () => {
-    const component = renderer.create(
-      <Query query={{ data: 'data', error: null, pending: 0 }}>
-        {({ data }) => <span>{data}</span>}
-      </Query>,
-    );
-    expect(component.toJSON()).toMatchSnapshot();
-  });
-
-  it('renders children component when data in not empty', () => {
-    const Component = ({ children }) => <span>{children}</span>;
-
-    const component = renderer.create(
-      <Query query={{ data: 'data', error: null, pending: 0 }}>
-        <Component>data</Component>
-      </Query>,
-    );
-    expect(component.toJSON()).toMatchSnapshot();
   });
 
   it('renders custom prop component with extra props', () => {
@@ -174,12 +321,19 @@ describe('Query', () => {
     );
 
     const component = renderer.create(
-      <Query
-        query={{ data: 'data', error: null, pending: 0 }}
-        component={CustomComponent}
-        extra="extra"
-      />,
+      <Provider
+        store={mockStore({
+          network: {
+            queries: {
+              [QUERY_TYPE]: { data: 'data', error: null, pending: 0 },
+            },
+          },
+        })}
+      >
+        <Query type={QUERY_TYPE} component={CustomComponent} extra="extra" />
+      </Provider>,
     );
+
     expect(component.toJSON()).toMatchSnapshot();
   });
 });

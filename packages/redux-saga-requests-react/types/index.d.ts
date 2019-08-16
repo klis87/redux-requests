@@ -3,9 +3,7 @@ import * as React from 'react';
 interface QueryState<QueryStateData> {
   data: QueryStateData;
   error: any;
-  pending: number;
-  mutations: any;
-  [extraProperty: string]: any;
+  loading: boolean;
 }
 
 interface LoadingProps {
@@ -17,10 +15,14 @@ interface ErrorProps {
   [errorProp: string]: any;
 }
 
-interface CommonQueryProps<QueryStateData> {
-  children?:
-    | React.ReactNode
-    | ((query: QueryState<QueryStateData>) => React.ReactNode);
+type RequestSelector<QueryStateData> = (
+  state: any,
+) => Omit<QueryState<QueryStateData>, 'loading'> & { pending: number };
+
+interface QueryProps<QueryStateData> {
+  requestSelector?: RequestSelector<QueryStateData>;
+  type?: string;
+  children?: (query: QueryState<QueryStateData>) => React.ReactNode;
   component?: React.ComponentType<{
     query: QueryState<QueryStateData>;
     [extraProperty: string]: any;
@@ -35,56 +37,36 @@ interface CommonQueryProps<QueryStateData> {
   [extraProperty: string]: any;
 }
 
-interface QueryProps<QueryStateData> extends CommonQueryProps<QueryStateData> {
-  query: QueryState<QueryStateData>;
-}
-
 export class Query<QueryStateData = any> extends React.Component<
   QueryProps<QueryStateData>
 > {}
 
-interface ConnectedQueryProps<QueryStateData>
-  extends CommonQueryProps<QueryStateData> {
-  requestSelector?: (state: any) => QueryState<QueryStateData>;
-  type?: string;
-}
-
-export class ConnectedQuery<QueryStateData = any> extends React.Component<
-  ConnectedQueryProps<QueryStateData>
-> {}
-
 interface MutationState {
-  pending: number;
+  loading: boolean;
   error: any;
 }
 
 interface MutationProps {
-  children?: (props: { loading: boolean; error: any }) => React.ReactNode;
+  requestKey?: string;
+  requestSelector?: RequestSelector<any>;
+  type: string;
+  children?: (mutation: MutationState) => React.ReactNode;
   component?: React.ComponentType<{
-    loading: boolean;
-    error: any;
+    mutation: MutationState;
     [extraProperty: string]: any;
   }>;
-  mutation: MutationState;
-  requestKey?: string;
   [extraProperty: string]: any;
 }
 
 export class Mutation extends React.Component<MutationProps> {}
 
-interface ConnectedMutationProps {
-  children?: (props: { loading: boolean; error: any }) => React.ReactNode;
-  component?: React.ComponentType<{
-    loading: boolean;
-    error: any;
-    [extraProperty: string]: any;
-  }>;
-  requestKey?: string;
-  requestSelector?: (state: any) => QueryState<any>;
-  type: string;
-  [extraProperty: string]: any;
-}
+export function useQuery<QueryStateData = any>(props: {
+  type?: string;
+  requestSelector?: RequestSelector<QueryStateData>;
+}): QueryState<QueryStateData>;
 
-export class ConnectedMutation extends React.Component<
-  ConnectedMutationProps
-> {}
+export function useMutation(props: {
+  type: string;
+  requestKey?: string;
+  requestSelector?: RequestSelector<any>;
+}): MutationState;

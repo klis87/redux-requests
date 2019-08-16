@@ -1,42 +1,32 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import useMutation from './use-mutation';
 import { reactComponentPropType } from './propTypesValidators';
 
 const Mutation = ({
-  mutation,
+  requestSelector,
+  type,
   requestKey,
   children,
   component: Component,
   ...extraProps
 }) => {
-  const mutationObject = requestKey ? mutation[requestKey] : mutation;
-  const loading = mutationObject ? mutationObject.pending > 0 : false;
-  const error = mutationObject ? mutationObject.error : null;
+  const mutation = useMutation({ requestSelector, type, requestKey });
 
   if (children) {
-    return children({ loading, error, ...extraProps });
+    return children(mutation);
   }
 
-  return <Component loading={loading} error={error} {...extraProps} />;
+  return <Component mutation={mutation} {...extraProps} />;
 };
 
 Mutation.propTypes = {
+  requestSelector: PropTypes.func,
+  type: PropTypes.oneOfType([PropTypes.string, PropTypes.func]).isRequired,
+  requestKey: PropTypes.string,
   children: PropTypes.func,
   component: reactComponentPropType('Mutation'),
-  mutation: PropTypes.oneOfType([
-    PropTypes.shape({
-      error: PropTypes.any,
-      pending: PropTypes.number.isRequired,
-    }),
-    PropTypes.objectOf(
-      PropTypes.shape({
-        error: PropTypes.any,
-        pending: PropTypes.number.isRequired,
-      }),
-    ),
-  ]).isRequired,
-  requestKey: PropTypes.string,
 };
 
 export default Mutation;

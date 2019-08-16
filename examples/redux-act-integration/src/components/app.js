@@ -1,30 +1,16 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import { ConnectedQuery, ConnectedMutation } from 'redux-saga-requests-react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Query, Mutation } from 'redux-saga-requests-react';
 
 import {
-  fetchPhotoAction,
-  clearPhotoAction,
-  deletePhotoAction,
-  fetchPostsAction,
-  clearPostsAction,
-  deletePostAction,
+  fetchPhoto,
+  clearPhoto,
+  deletePhoto,
+  fetchPosts,
+  clearPosts,
+  deletePost,
 } from '../store/actions';
 import Spinner from './spinner';
-
-// You should use selectors here in your real projects, here we don't for simplicity
-const mapStateToProps = state => ({
-  abortCounter: state.abortCounter,
-});
-
-const mapDispatchToProps = {
-  fetchPhoto: fetchPhotoAction,
-  clearPhoto: clearPhotoAction,
-  fetchPosts: fetchPostsAction,
-  clearPosts: clearPostsAction,
-  deletePhoto: deletePhotoAction,
-  deletePost: deletePostAction,
-};
 
 const buttonStyle = { marginRight: 10 };
 
@@ -32,112 +18,119 @@ const RequestError = () => (
   <p>There was some error during fetching. Please try again.</p>
 );
 
-const App = ({
-  fetchPhoto,
-  clearPhoto,
-  fetchPosts,
-  clearPosts,
-  deletePhoto,
-  deletePost,
-  abortCounter,
-}) => (
-  <div>
-    <h1>Redux Saga Requests integration with Redux Act example</h1>
-    <p>
-      In order to see aborts in action, you should set network throttling in
-      your browser
-    </p>
-    <hr />
+const App = () => {
+  const abortCounter = useSelector(state => state.abortCounter);
+  const dispatch = useDispatch();
+
+  return (
     <div>
-      <span>Abort counter: {abortCounter}</span>
-    </div>
-    <hr />
-    <div>
-      <h2>Photo</h2>
-      <button type="button" style={buttonStyle} onClick={() => clearPhoto()}>
-        Clear
-      </button>
-      <button type="button" style={buttonStyle} onClick={() => fetchPhoto(1)}>
-        Fetch photo with id 1
-      </button>
-      <button
-        type="button"
-        style={buttonStyle}
-        onClick={() => fetchPhoto(10001)}
-      >
-        Fetch non-existent photo
-      </button>
-      <ConnectedQuery
-        type={fetchPhotoAction}
-        errorComponent={RequestError}
-        loadingComponent={Spinner}
-        noDataMessage={<p>There is no entity currently.</p>}
-      >
-        {({ data }) => (
-          <div>
-            <h3>{data.title}</h3>
-            <img src={data.thumbnailUrl} alt={data.title} />
-            <hr />
-            <ConnectedMutation type={deletePhotoAction}>
-              {({ loading }) => (
-                <button
-                  type="button"
-                  onClick={() => deletePhoto(data.id)}
-                  disabled={loading}
-                >
-                  {loading ? 'Deleting...' : 'Delete'}
-                </button>
-              )}
-            </ConnectedMutation>
-          </div>
-        )}
-      </ConnectedQuery>
-    </div>
-    <hr />
-    <div>
-      <h2>Post</h2>
-      <button type="button" style={buttonStyle} onClick={() => clearPosts()}>
-        Clear
-      </button>
-      <button type="button" style={buttonStyle} onClick={() => fetchPosts()}>
-        Fetch posts
-      </button>
-      <ConnectedQuery
-        type={fetchPostsAction}
-        errorComponent={RequestError}
-        loadingComponent={Spinner}
-        noDataMessage={<p>There is no entity currently.</p>}
-      >
-        {({ data }) =>
-          data.map(post => (
-            <div key={post.id}>
-              <h3>{post.title}</h3>
-              <p>{post.body}</p>
-              <ConnectedMutation
-                type={deletePostAction}
-                requestKey={String(post.id)}
-              >
+      <h1>Redux Saga Requests integration with Redux Act example</h1>
+      <p>
+        In order to see aborts in action, you should set network throttling in
+        your browser
+      </p>
+      <hr />
+      <div>
+        <span>Abort counter: {abortCounter}</span>
+      </div>
+      <hr />
+      <div>
+        <h2>Photo</h2>
+        <button
+          type="button"
+          style={buttonStyle}
+          onClick={() => dispatch(clearPhoto())}
+        >
+          Clear
+        </button>
+        <button
+          type="button"
+          style={buttonStyle}
+          onClick={() => dispatch(fetchPhoto(1))}
+        >
+          Fetch photo with id 1
+        </button>
+        <button
+          type="button"
+          style={buttonStyle}
+          onClick={() => dispatch(fetchPhoto(10001))}
+        >
+          Fetch non-existent photo
+        </button>
+        <Query
+          type={fetchPhoto}
+          errorComponent={RequestError}
+          loadingComponent={Spinner}
+          noDataMessage={<p>There is no entity currently.</p>}
+        >
+          {({ data }) => (
+            <div>
+              <h3>{data.title}</h3>
+              <img src={data.thumbnailUrl} alt={data.title} />
+              <hr />
+              <Mutation type={deletePhoto}>
                 {({ loading }) => (
                   <button
                     type="button"
-                    onClick={() => deletePost(post.id)}
+                    onClick={() => dispatch(deletePhoto(data.id))}
                     disabled={loading}
                   >
                     {loading ? 'Deleting...' : 'Delete'}
                   </button>
                 )}
-              </ConnectedMutation>
-              <hr />
+              </Mutation>
             </div>
-          ))
-        }
-      </ConnectedQuery>
+          )}
+        </Query>
+      </div>
+      <hr />
+      <div>
+        <h2>Post</h2>
+        <button
+          type="button"
+          style={buttonStyle}
+          onClick={() => dispatch(clearPosts())}
+        >
+          Clear
+        </button>
+        <button
+          type="button"
+          style={buttonStyle}
+          onClick={() => dispatch(fetchPosts())}
+        >
+          Fetch posts
+        </button>
+        <Query
+          type={fetchPosts}
+          errorComponent={RequestError}
+          loadingComponent={Spinner}
+          noDataMessage={<p>There is no entity currently.</p>}
+        >
+          {({ data }) =>
+            data.map(post => (
+              <div key={post.id}>
+                <h3>{post.title}</h3>
+                <p>{post.body}</p>
+                <Mutation type={deletePost} requestKey={String(post.id)}>
+                  {({ loading }) => (
+                    <button
+                      type="button"
+                      onClick={() => dispatch(deletePost(post.id))}
+                      disabled={loading}
+                    >
+                      {loading ? 'Deleting...' : 'Delete'}
+                    </button>
+                  )}
+                </Mutation>
+                <hr />
+              </div>
+            ))
+          }
+        </Query>
+      </div>
+      <hr />
     </div>
-    <hr />
-  </div>
-);
+  );
+};
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(App);
+export default App;
