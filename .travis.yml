@@ -2,10 +2,10 @@ language: node_js
 node_js:
   - node
 script:
+  - yarn run build
   - yarn run lint
   - yarn run test:cover
   - yarn run test-types
-  - yarn run build
   - yarn run bundlesize
 after_success: yarn run coveralls
 cache: yarn
