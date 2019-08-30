@@ -21,7 +21,7 @@ integrations could be added, as they are implemented in a plugin fashion.
 - [Usage](#usage-arrow_up)
 - [Actions](#actions-arrow_up)
 - [Reducers](#reducers-arrow_up)
-- [Selectors](#selectors-arrow-up)
+- [Selectors](#selectors-arrow_up)
 - [Interceptors](#interceptors-arrow_up)
 - [FSA](#fsa-arrow_up)
 - [Promise middleware](#promise-middleware-arrow_up)
