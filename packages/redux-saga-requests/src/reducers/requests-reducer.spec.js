@@ -5,7 +5,7 @@ import {
   createSuccessAction,
   createErrorAction,
 } from '../actions';
-import { requestsReducer } from '.';
+import requestsReducer from './requests-reducer';
 
 describe('reducers', () => {
   describe('requestsReducer', () => {

@@ -54,3 +54,16 @@ exports[`Query renders null when data is falsy by default 1`] = `null`;
 exports[`Query renders null when error is truthy by default 1`] = `null`;
 
 exports[`Query renders null when pending is positive by default 1`] = `null`;
+
+exports[`Query uses array as empty data when multiple is true 1`] = `
+<div>
+  array length: 
+  0
+</div>
+`;
+
+exports[`Query uses defaultData prop when data is null 1`] = `
+<div>
+  1
+</div>
+`;

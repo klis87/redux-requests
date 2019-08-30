@@ -30,6 +30,12 @@ module.exports = {
       amd: 'redux-saga',
       root: 'ReduxSaga',
     },
+    reselect: {
+      commonjs: 'reselect',
+      commonjs2: 'reselect',
+      amd: 'reselect',
+      root: 'Reselect',
+    },
   },
   devtool: 'source-map',
 };

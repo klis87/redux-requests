@@ -18,3 +18,4 @@ export {
   watchRequests,
   countServerRequests,
 } from './sagas';
+export { getQuery, getMutation } from './selectors';

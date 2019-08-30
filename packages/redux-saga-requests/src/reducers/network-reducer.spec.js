@@ -1,5 +1,5 @@
 import { createSuccessAction, createErrorAction } from '../actions';
-import { networkReducer } from '.';
+import networkReducer from './network-reducer';
 
 describe('reducers', () => {
   describe('networkReducer', () => {

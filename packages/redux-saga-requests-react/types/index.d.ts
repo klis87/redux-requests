@@ -22,6 +22,8 @@ type RequestSelector<QueryStateData> = (
 interface QueryProps<QueryStateData> {
   requestSelector?: RequestSelector<QueryStateData>;
   type?: string;
+  multiple?: boolean;
+  defaultData?: any;
   children?: (query: QueryState<QueryStateData>) => React.ReactNode;
   component?: React.ComponentType<{
     query: QueryState<QueryStateData>;
@@ -63,6 +65,8 @@ export class Mutation extends React.Component<MutationProps> {}
 export function useQuery<QueryStateData = any>(props: {
   type?: string;
   requestSelector?: RequestSelector<QueryStateData>;
+  multiple?: boolean;
+  defaultData?: any;
 }): QueryState<QueryStateData>;
 
 export function useMutation(props: {

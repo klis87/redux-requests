@@ -37,7 +37,8 @@
     "prepublish": "yarn run build"
   },
   "peerDependencies": {
-    "redux-saga": ">=0.15.0"
+    "redux-saga": ">=0.15.0",
+    "reselect": ">=4.0.0"
   },
   "devDependencies": {
     "@babel/cli": "7.5.5",
@@ -61,6 +62,7 @@
     "redux-mock-store": "1.5.3",
     "redux-saga": "0.16.2",
     "redux-saga-test-plan": "3.7.0",
+    "reselect": "4.0.0",
     "rimraf": "3.0.0",
     "typescript": "3.5.3",
     "webpack": "4.39.2",

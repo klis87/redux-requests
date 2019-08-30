@@ -21,6 +21,7 @@ integrations could be added, as they are implemented in a plugin fashion.
 - [Usage](#usage-arrow_up)
 - [Actions](#actions-arrow_up)
 - [Reducers](#reducers-arrow_up)
+- [Selectors](#selectors-arrow-up)
 - [Interceptors](#interceptors-arrow_up)
 - [FSA](#fsa-arrow_up)
 - [Promise middleware](#promise-middleware-arrow_up)
@@ -162,7 +163,8 @@ Also, you need to install a driver:
   ```
   or CDN: `https://unpkg.com/redux-saga-requests-fetch`.
 
-Of course, because this is Redux-Saga addon, you also need to install Redux-Saga.
+Of course, because this is Redux-Saga addon, you also need to install `redux-saga`.
+Also, it requires to install `reselect`.
 
 ## Usage [:arrow_up:](#table-of-content)
 
@@ -717,6 +719,64 @@ const booksReducer = (state = initialState, action) => {
       return state;
   }
 };
+```
+
+## Selectors [:arrow_up:](#table-of-content)
+
+### getQuery
+
+`getQuery` returns `reselect` selector, which gets a query state from Redux store with
+converted `pending` key into `boolean` `loading` as `loading: pending > 0` for convenience.
+Returned selector also returns fallback query when it does not exist yet in your reducer as
+`{ data: null, error: null, loading: false }` so you always have the same object
+structure. Because it uses `reselect`, it is friendly
+with `React` `memo`/`PureComponent` optimisations. To use it, pass object as argument
+with the following keys:
+- `type: string`: just pass action type or action itself when using action creator library, possible only when using `networkReducer`,
+- `requestSelector`: for instance `state => state.request`, use only when you use `requestsReducer`
+- `multiple`: set to `true` if you prefer `data` to be `[]` instead of `null`, `false` by default
+- `defaultData`: use it to represent `data` as an orbitrary object instead of `null`
+
+For example:
+```js
+import { getQuery } from 'redux-saga-requests';
+
+// when using networkReducer
+const querySelector = getQuery({ type: QUERY_TYPE });
+
+// when using requestsReducer
+const querySelector = getQuery({ requestSelector: state => state.request });
+
+const queryState = querySelector(state);
+```
+
+### `getMutation`
+
+`getMutation` returns `reselect` selector, which gets a mutation state from Redux store and converts `pending` key into `boolean` `loading` as `loading: pending > 0` for convenience. Returned selector also returns fallback mutation when it does not exist yet in your reducer as
+`{ error: null, loading: false }` so you always have the same object structure.
+To use it, pass object as argument with one of the following keys:
+- `type: string`: just pass action type or action itself when using action creator library
+- `requestSelector`: only when using `requestsReducer`, for instance `state => state.request`, the same as in `getQuery`
+- `requestKey: string`: only necessary if you defined `getRequestKey` in a mutation,
+usually it will be some kind of id
+
+For example:
+```js
+import { getMutation } from 'redux-saga-requests';
+
+// when using networkReducer
+const mutationSelector = getMutation({ type: MUTATION_TYPE });
+
+// when using networkReducer and getRequestKey
+const mutationSelector = getMutation({ type: MUTATION_TYPE, requestKey: '1' });
+
+// when using requestsReducer
+const mutationSelector = getMutation({
+  type: MUTATION_TYPE,
+  requestSelector: state => state.request,
+});
+
+const mutationState = mutationSelector(state);
 ```
 
 ## Interceptors [:arrow_up:](#table-of-content)

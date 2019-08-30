@@ -29,29 +29,47 @@ state from `networkReducer` or `requestsReducer` inside React components. It pro
 
 ### `useQuery`
 
-`useQuery` easily gets query state from Redux store and converts `pending` key into `boolean` `loading` as `loading: pending > 0`
-for convenience. It also returns fallback query when it does not exist yet in your reducer as `{ data: null, error: null, loading: false }` so you always have the same object structure in your components. It uses `useMemo` internally so it
-is friendly with `memo`/`PureComponent` optimisations. To use it, pass object as argument with one of the following keys:
-- `requestSelector`: required when using `requestsReducer`, for instance `state => state.request`
-- `type: string`: required when using `networkReducer`, just pass action type or action itself when using action creator library
-
-For example:
+`useQuery` is a hook which uses `useSelector` from `react-redux` together with `getQuery` selector from
+`redux-saga-requests`. It accepts the same arguments as `getQuery`. You could
+easily use `useSelector` directly, but then you would need to remember not to recreate selector during each
+render. `useQuery` does this for you. So, without `useQuery`:
 ```js
+import React from 'react';
+import { getQuery } from 'redux-saga-requests';
+import { useSelector } from 'react-redux';
+
+// you must use `getQuery` outside of component
+const booksSelector = getQuery({ type: 'FETCH_BOOKS' });
+
+const Books = () => {
+  // You cannot use `getQuery` inside component (unless you would memoize it) because it would be recreated
+  // during each render, so it could not memoize return value
+  // const books = useSelector(getQuery({ type: 'FETCH_BOOKS' }));
+
+  const books = useSelector(booksSelector)
+  // ...
+};
+```
+
+and with `useQuery`:
+```js
+import React from 'react';
 import { useQuery } from 'redux-saga-requests-react';
 
-// when using requestsReducer
-const query = useQuery({ requestSelector: state => state.request });
-
-// when using networkReducer
-const query = useQuery({ type: REQUEST_TYPE });
+const Books = () => {
+  const books = useQuery({ type: 'FETCH_BOOKS' })
+  // ...
+};
 ```
 
 ### `Query`
 
 `Query` simplifies rendering queries data, loading spinners and server errors. It automatically connects to Redux store
 by using `useQuery` under the hood. It has the following props:
-- `requestSelector`: refer to `useQuery`
-- `type: string`: refer to `useQuery`
+- `requestSelector`: refer to `getQuery`
+- `type: string`: refer to `getQuery`
+- `multiple`: refer to `getQuery`
+- `defaultObject`: refer to `getQuery`
 - `children` - render function receiving `query` object, called when data is not empty according to `isDataEmpty` prop
 - `component` - alternative prop to `children`, you can pass your custom component here, which will receive `query` prop, plus any additional props passed to `Query`
 - `isDataEmpty: query => boolean`: function which defines when `data` is empty, by default data as empty array and falsy value like `null`, `undefined` is considered as empty
@@ -138,29 +156,21 @@ const ErrorComponent = ({ error, label }) => (
 
 ### `useMutation`
 
-`useMutation` easily gets query state from Redux store and converts `pending` key into `boolean` `loading` as `loading: pending > 0` for convenience. It also returns fallback query when it does not exist yet in your reducer as
-`{ error: null, loading: false }` so you always have the same object structure in your components.
-It uses `useMemo` internally so it is friendly with `memo`/`PureComponent` optimisations. To use it, pass object as argument
-with one of the following keys:
-- `type: string`: just pass action type or action itself when using action creator library
-- `requestSelector`: only when using `requestsReducer`, for instance `state => state.request`, the same as in `useQuery`
-- `requestKey: string`: only necessary if you defined `getRequestKey` in a mutation,
-usually it will be some kind of id
+`useMutation` is a hook which uses `useSelector` from `react-redux` together with `getMutation` selector from
+`redux-saga-requests`. It accepts the same arguments as `getMutation`. Like in case of `useMutation`, you could
+easily use `useSelector` directly, but then you would need to remember not to recreate selector during each
+render.
 
 For example:
 ```js
+import React from 'react';
 import { useMutation } from 'redux-saga-requests-react';
 
-// when using requestsReducer
-const query = useQuery({ type: MUTATION_TYPE, requestSelector: state => state.request });
-
-// when using networkReducer
-const query = useQuery({ type: MUTATION_TYPE });
-
-// when using networkReducer and getRequestKey
-const query = useQuery({ type: MUTATION_TYPE, requestKey: '1' });
+const Books = () => {
+  const { loading, error } = useMutation({ type: 'DELETE_BOOK' })
+  // ...
+};
 ```
-
 
 ### `Mutation`
 

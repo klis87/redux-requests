@@ -123,6 +123,44 @@ describe('Query', () => {
     expect(component.toJSON()).toMatchSnapshot();
   });
 
+  it('uses defaultData prop when data is null', () => {
+    const component = renderer.create(
+      <Provider
+        store={mockStore({
+          network: {
+            queries: {
+              [QUERY_TYPE]: { data: null, error: null, pending: 0 },
+            },
+          },
+        })}
+      >
+        <Query type={QUERY_TYPE} defaultData={1}>
+          {({ data }) => <div>{data}</div>}
+        </Query>
+      </Provider>,
+    );
+    expect(component.toJSON()).toMatchSnapshot();
+  });
+
+  it('uses array as empty data when multiple is true', () => {
+    const component = renderer.create(
+      <Provider
+        store={mockStore({
+          network: {
+            queries: {
+              [QUERY_TYPE]: { data: null, error: null, pending: 0 },
+            },
+          },
+        })}
+      >
+        <Query type={QUERY_TYPE} multiple isDataEmpty={query => !query.data}>
+          {({ data }) => <div>array length: {data.length}</div>}
+        </Query>
+      </Provider>,
+    );
+    expect(component.toJSON()).toMatchSnapshot();
+  });
+
   it('allows passing no data message', () => {
     const component = renderer.create(
       <Provider

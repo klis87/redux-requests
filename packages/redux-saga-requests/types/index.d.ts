@@ -10,6 +10,7 @@ interface OnActionCallback {
 
 interface RequestActionMeta {
   asPromise?: boolean;
+  asQuery?: boolean;
   driver?: string;
   runByWatcher?: boolean;
   takeLatest?: boolean;
@@ -215,3 +216,31 @@ interface CountServerRequestsConfig {
 }
 
 export const countServerRequests: (config: CountServerRequestsConfig) => void;
+
+interface QueryState<QueryStateData> {
+  data: QueryStateData;
+  error: any;
+  loading: boolean;
+}
+
+type RequestSelector<QueryStateData> = (
+  state: any,
+) => Omit<QueryState<QueryStateData>, 'loading'> & { pending: number };
+
+export function getQuery<QueryStateData = any>(props: {
+  type?: string;
+  requestSelector?: RequestSelector<QueryStateData>;
+  multiple?: boolean;
+  defaultData?: any;
+}): QueryState<QueryStateData>;
+
+interface MutationState {
+  loading: boolean;
+  error: any;
+}
+
+export function getMutation(props: {
+  type: string;
+  requestKey?: string;
+  requestSelector?: RequestSelector<any>;
+}): MutationState;

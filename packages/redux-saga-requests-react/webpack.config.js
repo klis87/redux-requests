@@ -31,6 +31,12 @@ module.exports = {
       amd: 'react-redux',
       root: 'ReactRedux',
     },
+    'redux-saga-requests': {
+      commonjs: 'redux-saga-requests',
+      commonjs2: 'redux-saga-requests',
+      amd: 'redux-saga-requests',
+      root: 'ReduxSagaRequests',
+    },
   },
   devtool: 'source-map',
 };

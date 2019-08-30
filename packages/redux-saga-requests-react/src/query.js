@@ -7,6 +7,8 @@ import useQuery from './use-query';
 const Query = ({
   type,
   requestSelector,
+  defaultData,
+  multiple,
   children,
   component: Component,
   isDataEmpty,
@@ -18,7 +20,7 @@ const Query = ({
   loadingComponentProps,
   ...extraProps
 }) => {
-  const query = useQuery({ type, requestSelector });
+  const query = useQuery({ type, requestSelector, defaultData, multiple });
 
   const dataEmpty = isDataEmpty(query);
 
@@ -50,11 +52,14 @@ Query.defaultProps = {
     Array.isArray(query.data) ? query.data.length === 0 : !query.data,
   showLoaderDuringRefetch: true,
   noDataMessage: null,
+  multiple: false,
 };
 
 Query.propTypes = {
   requestSelector: PropTypes.func,
   type: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+  multiple: PropTypes.bool,
+  defaultData: PropTypes.any,
   children: PropTypes.func,
   component: reactComponentPropType('Query'),
   isDataEmpty: PropTypes.func,

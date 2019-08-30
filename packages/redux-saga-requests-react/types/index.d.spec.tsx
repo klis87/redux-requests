@@ -5,6 +5,8 @@ const query = useQuery<string>({ type: 'Query' });
 const query2 = useQuery({
   type: 'Query',
   requestSelector: () => ({ data: { nested: 1 }, pending: 1, error: null }),
+  multiple: true,
+  defaultData: {},
 });
 const mutation = useMutation({ type: 'Mutation' });
 const mutation2 = useMutation({
