@@ -16,7 +16,7 @@
     "express": "4.17.1",
     "react": "16.9.0",
     "react-dom": "16.9.0",
-    "react-redux": "7.1.0",
+    "react-redux": "7.1.1",
     "redux": "4.0.4",
     "redux-saga": "1.0.5"
   },
@@ -29,7 +29,7 @@
     "express-handlebars": "3.1.0",
     "html-webpack-harddisk-plugin": "1.0.1",
     "html-webpack-plugin": "3.2.0",
-    "webpack": "4.39.2",
+    "webpack": "4.39.3",
     "webpack-dev-middleware": "3.7.0",
     "webpack-hot-middleware": "2.25.0",
     "webpack-hot-server-middleware": "0.6.0",
