@@ -434,7 +434,10 @@ With this request action, assuming `id = 1`, following actions will be dispatche
 ## Reducers [:arrow_up:](#table-of-content)
 
 Except for `watchRequests` and `sendRequest`, which can simplify your actions and sagas a lot, you can also use
-`requestsReducer`, a higher order reducer, which is responsible for a portion of your state related to a given request type.
+`requestsReducer` or `networkReducer`, higher order reducers, which are responsible for a portion of your state related to given requests.
+
+### requestsReducer
+
 For a general idea how it works, see [Motivation](#motivation-arrow_up) paragraph. This is just a minimal example, where with simple:
 ```javascript
 const reducer = requestsReducer({ actionType: `FETCH_SOMETHING` });
@@ -486,31 +489,6 @@ import { requestsReducer } from 'redux-saga-requests';
 const myRequestsReducer = config => requestsReducer({ multiple: true ...config });
 ```
 Now, instead of built-in `requestsReducer`, you can use your own one, and from now on all reducers will have `multiple` set as `true` by default.
-
-If you need to have an additional state next to built-in state in `requestsReducer`, or additional actions you would like
-it to handle, you can pass an optional custom reducer as a 2nd pararameter to `requestsReducer`:
-```js
-const activeReducer = (state = { active: false }, action) => {
-  switch (action.type) {
-    case `SET_ACTIVE`:
-      return { ...state, active: true };
-    case `SET_INACTIVE`:
-      return { ...state, active: false };
-    default:
-      return state;
-  }
-
-const reducer = requestsReducer({ actionType }, activeReducer);
-```
-which effectively will merge `activeReducer` with `requestsReducer`, giving you initial state:
-```js
-const state = {
-  data: null,
-  error: null,
-  pending: 0,
-  active: false,
-};
-```
 
 Another big feature of reducers are mutations. They allow you to add additional actions to update `data`, with extra
 information kept in state useful to render button spinners or error messages. For example, lets say you have following request
@@ -686,11 +664,121 @@ aborted operations though, unless you use `takeLatest: true` for an operation. T
 optimistic update though, because for an aborted request there is no way to tell whether an operation succedded or not, so
 it is impossible to tell whether we should revert or not.
 
-As you can see, you can use `requestsReducer`, which will handle requests related logic in a configurable way with any custom
-logic you need.
+Also, sometimes you might have a situation which requires to update `data` with a local action, not a remote mutation.
+For this, you can use a local mutation, for instance:
+```js
+const deleteAllBooks = () => ({ type: 'DELETE_ALL_BOOKS' });
 
-However, if `requestsReducer` seems too magical for you, this is totally fine, you can write your reducers in a standard
-way too, but you might consider using `success`, `error` and `abort` helpers, which can add proper suffixes for you:
+const booksReducer = requestsReducer({
+  actionType: 'FETCH_BOOKS',
+  multiple: true,
+  mutations: {
+    DELETE_ALL_BOOKS: {
+      updateData: (state, action) => [],
+      local: true,
+    },
+  },
+});
+```
+
+### networkReducer
+
+This is a manager of `requestsReducer` instances, so you don't need to write reducers for your remote state anymore!
+It is recent additional to this library, but it is the recommended way to use it and probably `requestsReducer` will be removed
+from public API. The difference is that you define only one `networkReducer` and config you used in `requestsReducer` now
+you need to move to action.meta. Also, because all remote state is kept in standardized form, not only you don't need to write
+reducers for remote data, but selectors also become redundant! Just use `getQuery`, `getMutation` and React helpers is you use
+React.
+
+So how does it work? Before going into that, lets divide all requests into queries and mutations. Queries have `data`, while mutations
+can change it. By default, for REST drivers queries are requests with `GET` method, the rest are mutations. For graphql... not by coincidence... queries are queries and mutations are mutations. Actually this division is taken from graphql naming convention.
+
+This division is necessary because `networkReducer` needs to know whether request is a query or a mutation, because it handles
+them differently. You can adjust this distinction by providing `isRequestActionQuery` to `networkReducer`. Also, if the default behaviour
+is good for your use case, but sometimes you have an exception, you can use `action.meta.asMutation` `true` or `false`, for instance:
+```js
+const fetchBooks = () => ({
+  type: 'FETCH_BOOKS',
+  request: { url: '/books' },
+  meta: { asMutation: true },
+})
+```
+Above action will be treated as mutation, not query.
+
+So how to use `networkReducer`? Just put it as `network` key in your top reducer:
+```js
+import { combineReducers } from 'redux';
+import { networkReducer } from 'redux-saga-requests';
+
+const reducer = combineReducers({
+  network: networkReducer({
+    // isRequestActionQuery
+    // getData,
+    // updateData,
+    // getError,
+    // onRequest,
+    // onSuccess,
+    // onError,
+    // onAbort,
+    // resetOn,
+  })
+})
+```
+Above you can see additional optional settings which it supports, they work the same
+as in `requestsReducer` and actually here you can just provide defaults for dynamically created
+`requestsReducer` instances. Remember you still could override them in action.meta.
+
+`networkReducer` default state is `{ queries: {}, mutations: {} }` and it reacts on requests actions.
+For example when you dispatch:
+```js
+const fetchBooks = () => ({
+  type: 'FETCH_BOOKS',
+  request: { url: '/books' },
+})
+```
+the state will be updated to:
+```js
+{
+  queries: {
+    FETCH_BOOKS: {
+      data: null,
+      pending: 1,
+      error: null,
+    },
+  },
+  mutations: {},
+}
+```
+As you can see, it groups your remote state by queries and mutations, and those by action types.
+The rest works the same as with `requestsReducer`.
+
+Now, for queries you can use `resetOn`, `getData`, `updateData`, `getError` in the same way you did for `requestsReducer`, just put them in action.meta.
+Notice that `actionType` does not make sense as `action.type` defines it. Also, `multiple` and `getDefaultData` also cannot be supported
+as it could be used only after an initial dispatch of a query. You would get inconsistent results then. That's why it is
+recommented to use `getQuery` and `getMutation` selectors. Regarding mutations, you need to revert the way it worked in `requestsReducer`.
+There you defined all possible mutations inside `requestsReducer` config, so mutations where coupled with queries. With `networkReducer`
+you put mutation config inside action.meta of mutation actions. For example:
+```js
+const deleteBook = id => ({
+  type: 'DELETE_BOOK',
+  meta: {
+    id,
+    mutations: {
+      getRequestKey: requestAction => String(requestAction.meta.book.id),
+      FETCH_BOOKS: {
+        updateDataOptimistic: (state, action) => state.data.filter(book => book.id !== action.meta.book.id),
+        revertData: (state, action) => [action.meta.book, ...state.data],
+      },
+    },
+  },
+});
+```
+So, it is similar, but now keys inside mutations are actually queries types. Also, `getRequestKey`
+goes directly into `mutation`. Additional change compared to `requestsReducer` is that
+all mutations state is handled, so you don't need to do things like `updateData: false`.
+
+### Custom reducers
+Of course can write your reducers in a standard way too, but you might consider using `success`, `error` and `abort` helpers, which can add proper suffixes for you:
 ```js
 import { success, error, abort } from 'redux-saga-requests';
 
