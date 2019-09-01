@@ -1,47 +1,10 @@
-import { GET_REQUEST_CACHE, CLEAR_REQUESTS_CACHE } from './constants';
+import { GET_REQUEST_CACHE, CLEAR_REQUESTS_CACHE } from '../constants';
 import {
-  success,
   isRequestAction,
   isSuccessAction,
-  isResponseAction,
   getRequestActionFromResponse,
   getActionPayload,
-} from './actions';
-
-const shouldActionBePromisified = (action, auto) =>
-  (auto && !(action.meta && action.meta.asPromise === false)) ||
-  (action.meta && action.meta.asPromise);
-
-export const requestsPromiseMiddleware = ({ auto = false } = {}) => {
-  const requestMap = new Map();
-
-  return () => next => action => {
-    if (isRequestAction(action) && shouldActionBePromisified(action, auto)) {
-      return new Promise((resolve, reject) => {
-        requestMap.set(action, (response, error) =>
-          error ? reject(response) : resolve(response),
-        );
-
-        next(action);
-      });
-    }
-
-    if (isResponseAction(action)) {
-      const requestAction = getRequestActionFromResponse(action);
-
-      if (shouldActionBePromisified(requestAction, auto)) {
-        const requestActionPromise = requestMap.get(requestAction);
-        requestActionPromise(
-          action,
-          action.type !== success(requestAction.type),
-        );
-        requestMap.delete(requestAction);
-      }
-    }
-
-    return next(action);
-  };
-};
+} from '../actions';
 
 const isCacheValid = cache =>
   cache.expiring === null || Date.now() <= cache.expiring;
@@ -51,7 +14,7 @@ const getNewCacheTimeout = cache =>
 
 const getCacheKey = action => action.type + (action.meta.cacheKey || '');
 
-export const requestsCacheMiddleware = () => {
+export default () => {
   const cacheMap = new Map();
 
   return () => next => action => {
@@ -109,26 +72,5 @@ export const requestsCacheMiddleware = () => {
     }
 
     return next(action);
-  };
-};
-
-export const serverRequestsFilterMiddleware = ({ serverRequestActions }) => {
-  const actionsToBeIgnored = serverRequestActions.slice();
-
-  return () => next => action => {
-    if (!isRequestAction(action)) {
-      return next(action);
-    }
-
-    const actionToBeIgnoredIndex = actionsToBeIgnored.findIndex(
-      a => a.type === action.type,
-    );
-
-    if (actionToBeIgnoredIndex === -1) {
-      return next(action);
-    }
-
-    actionsToBeIgnored.splice(actionToBeIgnoredIndex, 1);
-    return null;
   };
 };
