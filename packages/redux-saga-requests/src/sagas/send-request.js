@@ -1,75 +1,32 @@
 import {
   call,
-  fork,
-  join,
-  take,
-  race,
-  cancel,
   put,
   all,
   cancelled,
   getContext,
   setContext,
 } from 'redux-saga/effects';
-import { END } from 'redux-saga';
 
 import {
   createSuccessAction,
   createErrorAction,
   createAbortAction,
   getActionPayload,
-  getRequestActionFromResponse,
   isRequestAction,
-  isResponseAction,
-  isSuccessAction,
-  isRequestActionQuery,
-} from './actions';
+} from '../actions';
 import {
-  REQUESTS_CONFIG,
   INCORRECT_PAYLOAD_ERROR,
   RUN_BY_INTERCEPTOR,
   INTERCEPTORS,
-} from './constants';
-
-/* eslint-disable */
-const delay =
-  require('redux-saga').delay || require('@redux-saga/delay-p').default;
-/* eslint-enable */
-
-export const voidCallback = () => {};
-
-export const defaultConfig = {
-  driver: null,
-  onRequest: null,
-  onSuccess: null,
-  onError: null,
-  onAbort: null,
-};
-
-export function createRequestInstance(config) {
-  return setContext({
-    [REQUESTS_CONFIG]: { ...defaultConfig, ...config },
-  });
-}
-
-export function getRequestsConfig() {
-  return getContext(REQUESTS_CONFIG);
-}
-
-export function* getRequestInstance(driverType = null) {
-  const config = yield getRequestsConfig();
-  const driver = driverType
-    ? config.driver[driverType]
-    : config.driver.default || config.driver;
-  return driver.requestInstance;
-}
+} from '../constants';
+import { getRequestsConfig } from './get-request-instance';
 
 const getDriver = (requestsConfig, action) =>
   action.meta && action.meta.driver
     ? requestsConfig.driver[action.meta.driver]
     : requestsConfig.driver.default || requestsConfig.driver;
 
-export function* sendRequest(
+export default function* sendRequest(
   action,
   {
     dispatchRequestAction = false,
@@ -213,110 +170,6 @@ export function* sendRequest(
       if (!silent) {
         yield put(createAbortAction(action));
       }
-    }
-  }
-}
-
-const watchRequestsDefaultConfig = {
-  takeLatest: isRequestActionQuery,
-  abortOn: null,
-  getLastActionKey: action => action.type,
-};
-
-export function* cancelSendRequestOnAction(abortOn, task) {
-  const { abortingAction } = yield race({
-    abortingAction: take(abortOn),
-    taskFinished: join(task),
-    timeout: call(delay, 10000), // taskFinished doesnt work for aborted tasks
-  });
-
-  if (abortingAction) {
-    yield cancel(task);
-  }
-}
-
-const isWatchable = a =>
-  isRequestAction(a) && (!a.meta || a.meta.runByWatcher !== false);
-
-export function* watchRequests(commonConfig = {}) {
-  const lastTasks = {};
-  const config = { ...watchRequestsDefaultConfig, ...commonConfig };
-
-  while (true) {
-    const action = yield take(isWatchable);
-    const lastActionKey = config.getLastActionKey(action);
-    const takeLatest =
-      action.meta && action.meta.takeLatest !== undefined
-        ? action.meta.takeLatest
-        : typeof config.takeLatest === 'function'
-        ? config.takeLatest(action)
-        : config.takeLatest;
-
-    if (takeLatest) {
-      const activeTask = lastTasks[lastActionKey];
-
-      if (activeTask) {
-        yield cancel(activeTask);
-      }
-    }
-
-    const newTask = yield fork(sendRequest, action);
-
-    if (takeLatest) {
-      lastTasks[lastActionKey] = newTask;
-    }
-
-    const abortOn =
-      action.meta && action.meta.abortOn ? action.meta.abortOn : config.abortOn;
-
-    if (abortOn) {
-      yield fork(cancelSendRequestOnAction, abortOn, newTask);
-    }
-  }
-}
-
-export function* countServerRequests({
-  serverRequestActions,
-  finishOnFirstError = true,
-}) {
-  let index = 0;
-  serverRequestActions.requestActionsToIgnore = [];
-  serverRequestActions.successActions = [];
-  serverRequestActions.dependentSuccessActions = [];
-  serverRequestActions.errorActions = [];
-
-  while (true) {
-    const action = yield take(a => isRequestAction(a) || isResponseAction(a));
-
-    if (isRequestAction(action)) {
-      index +=
-        action.meta && action.meta.dependentRequestsNumber !== undefined
-          ? action.meta.dependentRequestsNumber + 1
-          : 1;
-      continue;
-    }
-
-    if (!isSuccessAction(action)) {
-      serverRequestActions.errorActions.push(action);
-
-      if (finishOnFirstError) {
-        yield put(END);
-        return;
-      }
-    } else if (action.meta.isDependentRequest) {
-      serverRequestActions.dependentSuccessActions.push(action);
-    } else {
-      serverRequestActions.successActions.push(action);
-    }
-
-    index -= action.meta.isDependentRequest ? 2 : 1;
-
-    if (index === 0) {
-      serverRequestActions.requestActionsToIgnore = serverRequestActions.successActions
-        .map(getRequestActionFromResponse)
-        .map(a => ({ type: a.type }));
-      yield put(END);
-      return;
     }
   }
 }

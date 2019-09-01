@@ -1,5 +1,4 @@
-import { END } from 'redux-saga';
-import { getContext, setContext, cancelled } from 'redux-saga/effects';
+import { getContext, cancelled } from 'redux-saga/effects';
 import { expectSaga } from 'redux-saga-test-plan';
 import * as matchers from 'redux-saga-test-plan/matchers';
 
@@ -7,24 +6,15 @@ import {
   createSuccessAction,
   createErrorAction,
   createAbortAction,
-} from './actions';
+} from '../actions';
 import {
   REQUESTS_CONFIG,
   INCORRECT_PAYLOAD_ERROR,
   RUN_BY_INTERCEPTOR,
   INTERCEPTORS,
-} from './constants';
-import {
-  defaultConfig,
-  createRequestInstance,
-  getRequestInstance,
-  getRequestsConfig,
-  sendRequest,
-  cancelSendRequestOnAction,
-  watchRequests,
-  countServerRequests,
-  voidCallback,
-} from './sagas';
+} from '../constants';
+import { defaultRequestInstanceConfig } from './create-request-instance';
+import sendRequest from './send-request';
 
 const nullback = () => {};
 
@@ -74,107 +64,8 @@ const dummyErrorDriver = requestInstance => ({
 });
 
 describe('sagas', () => {
-  describe('voidCallback', () => {
-    it('returns undefined', () => {
-      expect(voidCallback()).toBe(undefined);
-    });
-  });
-
-  describe('defaultConfig', () => {
-    it('has correct value', () => {
-      expect(defaultConfig).toEqual({
-        driver: null,
-        onRequest: null,
-        onSuccess: null,
-        onError: null,
-        onAbort: null,
-      });
-    });
-  });
-
-  describe('createRequestInstance', () => {
-    it('returns correct effect with default config', () => {
-      expect(createRequestInstance()).toEqual(
-        setContext({
-          [REQUESTS_CONFIG]: defaultConfig,
-        }),
-      );
-    });
-
-    it('returns correct effect with overwritten config', () => {
-      const config = {
-        driver: 'some driver',
-        onRequest: voidCallback,
-        onSuccess: voidCallback,
-        onError: voidCallback,
-        onAbort: voidCallback,
-      };
-
-      expect(createRequestInstance(config)).toEqual(
-        setContext({
-          [REQUESTS_CONFIG]: config,
-        }),
-      );
-    });
-  });
-
-  describe('getRequestsConfig', () => {
-    it('returns correct effect', () => {
-      expect(getRequestsConfig()).toEqual(getContext(REQUESTS_CONFIG));
-    });
-  });
-
-  describe('getRequestInstance', () => {
-    it('returns correct effect', () => {
-      return expectSaga(getRequestInstance)
-        .provide([
-          [
-            getContext(REQUESTS_CONFIG),
-            { driver: { requestInstance: 'requestInstance' } },
-          ],
-        ])
-        .returns('requestInstance')
-        .run();
-    });
-
-    it('handles driver as object', () => {
-      return expectSaga(getRequestInstance)
-        .provide([
-          [
-            getContext(REQUESTS_CONFIG),
-            {
-              driver: {
-                default: {
-                  requestInstance: 'requestInstance',
-                },
-              },
-            },
-          ],
-        ])
-        .returns('requestInstance')
-        .run();
-    });
-
-    it('handles not default driver as object', () => {
-      return expectSaga(getRequestInstance, 'another')
-        .provide([
-          [
-            getContext(REQUESTS_CONFIG),
-            {
-              driver: {
-                default: { requestInstance: 'requestInstance' },
-                another: { requestInstance: 'anotherRequestInstance' },
-              },
-            },
-          ],
-        ])
-        .returns('anotherRequestInstance')
-        .run();
-    });
-  });
-
   describe('sendRequest', () => {
-    const config = { ...defaultConfig, driver: dummyDriver() };
+    const config = { ...defaultRequestInstanceConfig, driver: dummyDriver() };
 
     it('throws when request action is of incorrect type', async () => {
       const action = { type: 'TYPE' };
@@ -351,7 +242,7 @@ describe('sagas', () => {
         .provide([
           [
             getContext(REQUESTS_CONFIG),
-            { ...defaultConfig, driver: dummyErrorDriver() },
+            { ...defaultRequestInstanceConfig, driver: dummyErrorDriver() },
           ],
         ])
         .put(createErrorAction(action, new Error('responseError')))
@@ -366,7 +257,7 @@ describe('sagas', () => {
         .provide([
           [
             getContext(REQUESTS_CONFIG),
-            { ...defaultConfig, driver: dummyErrorDriver() },
+            { ...defaultRequestInstanceConfig, driver: dummyErrorDriver() },
           ],
         ])
         .not.put(createErrorAction(action, new Error('responseError')))
@@ -380,7 +271,7 @@ describe('sagas', () => {
         .provide([
           [
             getContext(REQUESTS_CONFIG),
-            { ...defaultConfig, driver: dummyDriver() },
+            { ...defaultRequestInstanceConfig, driver: dummyDriver() },
           ],
           [cancelled(), true],
         ])
@@ -395,7 +286,7 @@ describe('sagas', () => {
         .provide([
           [
             getContext(REQUESTS_CONFIG),
-            { ...defaultConfig, driver: dummyDriver() },
+            { ...defaultRequestInstanceConfig, driver: dummyDriver() },
           ],
           [cancelled(), true],
         ])
@@ -596,334 +487,5 @@ describe('sagas', () => {
         .not.call(onAbort, action)
         .run();
     });
-  });
-
-  describe('watchRequests', () => {
-    const config = { ...defaultConfig, driver: dummyDriver() };
-    const action = { type: 'FETCH', request: { url: '/url' } };
-
-    it('forks sendRequests for request action', () => {
-      return expectSaga(watchRequests)
-        .provide([[getContext(REQUESTS_CONFIG), config]])
-        .fork(sendRequest, action)
-        .dispatch(action)
-        .silentRun(100);
-    });
-
-    it('forks sendRequests for batch request action', () => {
-      const batchAction = {
-        type: 'FETCH',
-        request: [{ url: '/' }, { url: '/path' }],
-      };
-
-      return expectSaga(watchRequests)
-        .provide([[getContext(REQUESTS_CONFIG), config]])
-        .fork(sendRequest, batchAction)
-        .dispatch(batchAction)
-        .silentRun(100);
-    });
-
-    it('doesnt fork sendRequests for not request action', () => {
-      return expectSaga(watchRequests)
-        .provide([[getContext(REQUESTS_CONFIG), config]])
-        .not.fork.fn(sendRequest)
-        .dispatch({ type: 'NOT_REQUEST' })
-        .silentRun(100);
-    });
-
-    it('doesnt fork sendRequests for request action with meta runByWatcher as false', () => {
-      return expectSaga(watchRequests)
-        .provide([[getContext(REQUESTS_CONFIG), config]])
-        .not.fork.fn(sendRequest)
-        .dispatch({ ...action, meta: { runByWatcher: false } })
-        .silentRun(100);
-    });
-
-    it('forks cancelSendRequestOnAction on abort action', () => {
-      return expectSaga(watchRequests, { abortOn: 'ABORT' })
-        .provide([[getContext(REQUESTS_CONFIG), config]])
-        .fork.fn(cancelSendRequestOnAction)
-        .dispatch(action)
-        .silentRun(100);
-    });
-
-    it('cancels request on abort action', () => {
-      return expectSaga(watchRequests, { abortOn: 'ABORT' })
-        .provide([[getContext(REQUESTS_CONFIG), config]])
-        .put.actionType('FETCH_ABORT')
-        .dispatch(action)
-        .dispatch({ type: 'ABORT' })
-        .silentRun(100);
-    });
-
-    it('cancels request on abort action defined in action meta', () => {
-      return expectSaga(watchRequests)
-        .provide([[getContext(REQUESTS_CONFIG), config]])
-        .put.actionType('FETCH_ABORT')
-        .dispatch({ ...action, meta: { abortOn: 'ABORT' } })
-        .dispatch({ type: 'ABORT' })
-        .silentRun(100);
-    });
-
-    it('doesnt cancel request without abort action', () => {
-      return expectSaga(watchRequests, { abortOn: 'ABORT' })
-        .provide([[getContext(REQUESTS_CONFIG), config]])
-        .not.put.actionType('FETCH_ABORT')
-        .dispatch(action)
-        .dispatch({ type: 'ACTION' })
-        .silentRun(100);
-    });
-
-    it('uses takeLatest for get requests', () => {
-      return expectSaga(watchRequests)
-        .provide([[getContext(REQUESTS_CONFIG), config]])
-        .put.actionType('FETCH_ABORT')
-        .dispatch(action)
-        .dispatch(action)
-        .silentRun(100);
-    });
-
-    it('uses takeLatest for queries', () => {
-      const postAction = {
-        type: 'FETCH',
-        request: {
-          query: `
-            {
-              x
-            }
-          `,
-        },
-      };
-
-      return expectSaga(watchRequests)
-        .provide([[getContext(REQUESTS_CONFIG), config]])
-        .put.actionType('FETCH_ABORT')
-        .dispatch(postAction)
-        .dispatch(postAction)
-        .silentRun(100);
-    });
-
-    it('uses takeEvery for post requests', () => {
-      const postAction = {
-        type: 'FETCH',
-        request: { url: '/url', method: 'post' },
-      };
-
-      return expectSaga(watchRequests)
-        .provide([[getContext(REQUESTS_CONFIG), config]])
-        .not.put.actionType('FETCH_ABORT')
-        .dispatch(postAction)
-        .dispatch(postAction)
-        .silentRun(100);
-    });
-
-    it('uses takeEvery for mutations', () => {
-      const postAction = {
-        type: 'FETCH',
-        request: {
-          query: `
-            mutation($id: ID!) {
-              x(id: $id) {
-                y
-              }
-            }
-          `,
-        },
-      };
-
-      return expectSaga(watchRequests)
-        .provide([[getContext(REQUESTS_CONFIG), config]])
-        .not.put.actionType('FETCH_ABORT')
-        .dispatch(postAction)
-        .dispatch(postAction)
-        .silentRun(100);
-    });
-
-    it('allows override takeLatest config', () => {
-      return expectSaga(watchRequests, { takeLatest: false })
-        .provide([[getContext(REQUESTS_CONFIG), config]])
-        .not.put.actionType('FETCH_ABORT')
-        .dispatch(action)
-        .dispatch(action)
-        .silentRun(100);
-    });
-
-    it('allows overriding takeLatest per action', () => {
-      const actionWithMeta = {
-        ...action,
-        meta: { takeLatest: false },
-      };
-
-      return expectSaga(watchRequests, { takeLatest: true })
-        .provide([[getContext(REQUESTS_CONFIG), config]])
-        .not.put.actionType('FETCH_ABORT')
-        .dispatch(actionWithMeta)
-        .dispatch(actionWithMeta)
-        .silentRun(100);
-    });
-
-    it('respects getLastActionKey override to distinguish actions of the same type', () => {
-      return expectSaga(watchRequests, {
-        getLastActionKey: a => a.type + a.meta.as,
-      })
-        .provide([[getContext(REQUESTS_CONFIG), config]])
-        .not.put.actionType('FETCH_ABORT')
-        .dispatch({
-          type: 'FETCH',
-          request: { url: '/url' },
-          meta: { as: 'version1' },
-        })
-        .dispatch({
-          type: 'FETCH',
-          request: { url: '/url' },
-          meta: { as: 'version2' },
-        })
-        .silentRun(100);
-    });
-  });
-
-  describe('countServerRequests', () => {
-    it('dispatches END after successful response', () => {
-      const request = {
-        type: 'FETCH',
-        request: { url: '/url' },
-      };
-      const response = createSuccessAction(request);
-
-      return expectSaga(countServerRequests, {
-        serverRequestActions: {},
-      })
-        .put(END)
-        .dispatch(request)
-        .dispatch(response)
-        .run();
-    });
-
-    it('doesnt dispatch END after request without response', () => {
-      const request = {
-        type: 'FETCH',
-        request: { url: '/url' },
-      };
-
-      return expectSaga(countServerRequests, {
-        serverRequestActions: {},
-      })
-        .not.put(END)
-        .dispatch(request)
-        .silentRun(100);
-    });
-
-    it('doesnt dispatch END after successful response of request with dependentRequestsNumber', () => {
-      const request = {
-        type: 'FETCH',
-        request: { url: '/url' },
-        meta: {
-          dependentRequestsNumber: 1,
-        },
-      };
-      const response = createSuccessAction(request);
-
-      return expectSaga(countServerRequests, {
-        serverRequestActions: {},
-      })
-        .not.put(END)
-        .dispatch(request)
-        .dispatch(response)
-        .silentRun(100);
-    });
-
-    it('dispatches END after error response', () => {
-      const request = {
-        type: 'FETCH',
-        request: { url: '/url' },
-      };
-      const response = createErrorAction(request);
-
-      return expectSaga(countServerRequests, {
-        serverRequestActions: {},
-      })
-        .put(END)
-        .dispatch(request)
-        .dispatch(request)
-        .dispatch(response)
-        .run();
-    });
-
-    it('doesnt dispatch END after error response when finishOnFirstError is false', () => {
-      const request = {
-        type: 'FETCH',
-        request: { url: '/url' },
-      };
-      const response = createErrorAction(request);
-
-      return expectSaga(countServerRequests, {
-        serverRequestActions: {},
-        finishOnFirstError: false,
-      })
-        .not.put(END)
-        .dispatch(request)
-        .dispatch(request)
-        .dispatch(response)
-        .silentRun(100);
-    });
-
-    it('dispatches END after dependent actions are finished', () => {
-      const request = {
-        type: 'FETCH',
-        request: { url: '/url' },
-        meta: {
-          dependentRequestsNumber: 1,
-        },
-      };
-      const response = createSuccessAction(request);
-      const dependentRequest = {
-        type: 'FETCH_DEPENDENT',
-        request: { url: '/url' },
-        meta: {
-          isDependentRequest: true,
-        },
-      };
-      const dependentResponse = createSuccessAction(dependentRequest);
-
-      return expectSaga(countServerRequests, {
-        serverRequestActions: {},
-      })
-        .put(END)
-        .dispatch(request)
-        .dispatch(response)
-        .dispatch(dependentRequest)
-        .dispatch(dependentResponse)
-        .run();
-    });
-  });
-
-  it('doesnt dispatch END if not all dependent actions are finished', () => {
-    const request = {
-      type: 'FETCH',
-      request: { url: '/url' },
-      meta: {
-        dependentRequestsNumber: 2,
-      },
-    };
-    const response = createSuccessAction(request);
-    const dependentRequest = {
-      type: 'FETCH_DEPENDENT',
-      request: { url: '/url' },
-      meta: {
-        isDependentRequest: true,
-      },
-    };
-    const dependentResponse = createSuccessAction(dependentRequest);
-
-    return expectSaga(countServerRequests, {
-      serverRequestActions: {},
-    })
-      .not.put(END)
-      .dispatch(request)
-      .dispatch(response)
-      .dispatch(dependentRequest)
-      .dispatch(dependentRequest)
-      .dispatch(dependentResponse)
-      .run();
   });
 });
