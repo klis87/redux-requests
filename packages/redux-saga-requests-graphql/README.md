@@ -82,6 +82,9 @@ const fetchBooks = () => ({
         }
       }
     `,
+    headers: {
+      SOMEHEADER: 'SOMEHEADER',
+    },
   },
 });
 ```

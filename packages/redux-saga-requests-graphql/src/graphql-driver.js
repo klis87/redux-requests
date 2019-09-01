@@ -46,6 +46,7 @@ export const createDriver = ({ url }) => {
         cancelToken: abortSource.token,
         method: 'post',
         data,
+        headers: requestConfig.headers,
       }).then(response => {
         if (response.data.errors) {
           throw response;

@@ -53,13 +53,19 @@ describe('graphqlDriver', () => {
         }
       `;
       await expect(
-        driver.sendRequest({ query }, { token: 'token' }),
+        driver.sendRequest(
+          { query, headers: { header: 'header' } },
+          { token: 'token' },
+        ),
       ).resolves.toEqual({
         data: 'data',
       });
       await expect(axiosInstanceMock).toBeCalledWith({
         cancelToken: 'token',
         method: 'post',
+        headers: {
+          header: 'header',
+        },
         data: {
           query,
         },
