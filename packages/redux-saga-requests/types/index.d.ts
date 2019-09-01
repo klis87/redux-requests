@@ -232,7 +232,7 @@ export function getQuery<QueryStateData = any>(props: {
   requestSelector?: RequestSelector<QueryStateData>;
   multiple?: boolean;
   defaultData?: any;
-}): QueryState<QueryStateData>;
+}): (state: any) => QueryState<QueryStateData>;
 
 interface MutationState {
   loading: boolean;
@@ -243,4 +243,4 @@ export function getMutation(props: {
   type: string;
   requestKey?: string;
   requestSelector?: RequestSelector<any>;
-}): MutationState;
+}): (state: any) => MutationState;
