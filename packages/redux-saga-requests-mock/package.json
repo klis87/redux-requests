@@ -1,6 +1,6 @@
 {
   "name": "redux-saga-requests-mock",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Mocking driver for Redux-Saga-Requests, Redux-Saga addon to simplify AJAX requests",
   "main": "lib/index.js",
   "module": "es/index.js",
