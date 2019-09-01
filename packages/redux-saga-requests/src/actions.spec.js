@@ -11,6 +11,7 @@ import {
   isSuccessAction,
   isErrorAction,
   isAbortAction,
+  isRequestActionQuery,
 } from './actions';
 
 describe('actions', () => {
@@ -344,6 +345,41 @@ describe('actions', () => {
           meta: { requestAction: { type: 'REQUEST' } },
         }),
       ).toBe(false);
+    });
+  });
+
+  describe('isRequestActionQuery', () => {
+    it('treats request with GET method as queries', () => {
+      expect(isRequestActionQuery({ request: { url: '/books' } })).toBe(true);
+      expect(
+        isRequestActionQuery({ request: { url: '/books', method: 'GET' } }),
+      ).toBe(true);
+    });
+
+    it('treats request with POST method as mutations', () => {
+      expect(
+        isRequestActionQuery({ request: { url: '/books', method: 'POST' } }),
+      ).toBe(false);
+    });
+
+    it('treats request with GET method as mutation when asMutation is true', () => {
+      expect(isRequestActionQuery({ request: { url: '/books' } })).toBe(true);
+      expect(
+        isRequestActionQuery({
+          request: { url: '/books', method: 'GET' },
+          meta: { asMutation: true },
+        }),
+      ).toBe(false);
+    });
+
+    it('treats request with POST method as query when asMutation is false', () => {
+      expect(isRequestActionQuery({ request: { url: '/books' } })).toBe(true);
+      expect(
+        isRequestActionQuery({
+          request: { url: '/books', method: 'POST' },
+          meta: { asMutation: false },
+        }),
+      ).toBe(true);
     });
   });
 });

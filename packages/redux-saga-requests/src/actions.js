@@ -100,12 +100,13 @@ const isRequestQuery = request =>
 export const isRequestActionQuery = action => {
   const { request } = getActionPayload(action);
 
-  return (
-    (!action.meta || !action.meta.asMutation) &&
-    (Array.isArray(request)
-      ? request.every(isRequestQuery)
-      : isRequestQuery(request))
-  );
+  if (action.meta && action.meta.asMutation !== undefined) {
+    return !action.meta.asMutation;
+  }
+
+  return !!(Array.isArray(request)
+    ? request.every(isRequestQuery)
+    : isRequestQuery(request));
 };
 
 export const getRequestCache = () => ({ type: GET_REQUEST_CACHE });
