@@ -10,7 +10,7 @@ interface OnActionCallback {
 
 interface RequestActionMeta {
   asPromise?: boolean;
-  asQuery?: boolean;
+  asMutation?: boolean;
   driver?: string;
   runByWatcher?: boolean;
   takeLatest?: boolean;

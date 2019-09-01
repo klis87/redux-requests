@@ -153,7 +153,7 @@ export const uploadFile = file => ({
     variables: { file },
   },
   meta: {
-    asQuery: true,
+    asMutation: false,
   },
 });
 
@@ -171,6 +171,6 @@ export const uploadFiles = files => ({
     variables: { files },
   },
   meta: {
-    asQuery: true,
+    asMutation: false,
   },
 });

@@ -101,7 +101,7 @@ export const isRequestActionQuery = action => {
   const { request } = getActionPayload(action);
 
   return (
-    !!(action.meta && action.meta.asQuery) ||
+    (!action.meta || !action.meta.asMutation) &&
     (Array.isArray(request)
       ? request.every(isRequestQuery)
       : isRequestQuery(request))
