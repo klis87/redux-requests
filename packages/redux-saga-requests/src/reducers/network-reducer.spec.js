@@ -30,7 +30,6 @@ describe('reducers', () => {
           data: null,
           pending: 1,
           error: null,
-          mutations: null,
         },
       });
 
@@ -40,13 +39,11 @@ describe('reducers', () => {
           data: null,
           pending: 1,
           error: null,
-          mutations: null,
         },
         REQUEST_2: {
           data: null,
           pending: 1,
           error: null,
-          mutations: null,
         },
       });
 
@@ -59,13 +56,11 @@ describe('reducers', () => {
           data: 'data',
           pending: 0,
           error: null,
-          mutations: null,
         },
         REQUEST_2: {
           data: null,
           pending: 1,
           error: null,
-          mutations: null,
         },
       });
 
@@ -75,32 +70,38 @@ describe('reducers', () => {
           data: 'data',
           pending: 0,
           error: null,
-          mutations: null,
         },
         REQUEST_2: {
           data: null,
           pending: 0,
           error: 'error',
-          mutations: null,
         },
       });
     });
 
     it('allows to override config as argument', () => {
-      const reducer = networkReducer({ multiple: true });
+      const reducer = networkReducer({
+        getData: (state, action) => ({ nested: action.data }),
+      });
+      const state = reducer(
+        { queries: {}, mutations: {} },
+        { type: 'REQUEST', request: { url: '/' } },
+      );
 
       expect(
         reducer(
-          { queries: {}, mutations: {} },
-          { type: 'REQUEST', request: { url: '/' } },
+          state,
+          createSuccessAction(
+            { type: 'REQUEST', request: { url: '/' } },
+            'data',
+          ),
         ),
       ).toEqual({
         queries: {
           REQUEST: {
-            data: [],
-            pending: 1,
+            data: { nested: 'data' },
+            pending: 0,
             error: null,
-            mutations: null,
           },
         },
         mutations: {},
@@ -109,19 +110,21 @@ describe('reducers', () => {
 
     it('allows to override config with action meta', () => {
       const reducer = networkReducer();
+      const requestAction = {
+        type: 'REQUEST',
+        request: { url: '/' },
+        meta: { getData: (state, action) => ({ nested: action.data }) },
+      };
+      const state = reducer({ queries: {}, mutations: {} }, requestAction);
 
       expect(
-        reducer(
-          { queries: {}, mutations: {} },
-          { type: 'REQUEST', request: { url: '/' }, meta: { multiple: true } },
-        ),
+        reducer(state, createSuccessAction(requestAction, 'data')),
       ).toEqual({
         queries: {
           REQUEST: {
-            data: [],
-            pending: 1,
+            data: { nested: 'data' },
+            pending: 0,
             error: null,
-            mutations: null,
           },
         },
         mutations: {},
@@ -141,7 +144,6 @@ describe('reducers', () => {
             data: null,
             pending: 0,
             error: null,
-            mutations: null,
           },
         },
         mutations: {},
@@ -166,7 +168,6 @@ describe('reducers', () => {
             data: 'data',
             pending: 0,
             error: null,
-            mutations: null,
           },
         },
         mutations: {},
@@ -185,7 +186,6 @@ describe('reducers', () => {
             data: 'data',
             pending: 0,
             error: null,
-            mutations: null,
           },
         },
         mutations: {
@@ -204,7 +204,6 @@ describe('reducers', () => {
             data: 'data',
             pending: 0,
             error: null,
-            mutations: null,
           },
         },
         mutations: {
@@ -223,7 +222,6 @@ describe('reducers', () => {
             data: 'data',
             pending: 0,
             error: null,
-            mutations: null,
           },
         },
         mutations: {
@@ -245,7 +243,6 @@ describe('reducers', () => {
             data: 'data',
             pending: 0,
             error: null,
-            mutations: null,
           },
         },
         mutations: {
@@ -274,7 +271,6 @@ describe('reducers', () => {
             data: 'data',
             pending: 0,
             error: null,
-            mutations: null,
           },
         },
         mutations: {
@@ -297,7 +293,6 @@ describe('reducers', () => {
             data: 'data2',
             pending: 0,
             error: null,
-            mutations: null,
           },
         },
         mutations: {
@@ -325,6 +320,7 @@ describe('reducers', () => {
       };
 
       state = reducer(state, mutationWithConfigWithRequestKey);
+      state = reducer(state, mutationWithConfigWithRequestKey);
 
       expect(state).toEqual({
         queries: {
@@ -332,7 +328,37 @@ describe('reducers', () => {
             data: 'data2',
             pending: 0,
             error: null,
-            mutations: null,
+          },
+        },
+        mutations: {
+          MUTATION_WITHOUT_CONFIG: {
+            error: null,
+            pending: 0,
+          },
+          MUTATION_WITH_CONFIG: {
+            error: null,
+            pending: 0,
+          },
+          MUTATION_WITH_CONFIG_WITH_REQUEST_KEY: {
+            1: {
+              error: null,
+              pending: 2,
+            },
+          },
+        },
+      });
+
+      state = reducer(
+        state,
+        createSuccessAction(mutationWithConfigWithRequestKey, 'data3'),
+      );
+
+      expect(state).toEqual({
+        queries: {
+          REQUEST: {
+            data: 'data3',
+            pending: 0,
+            error: null,
           },
         },
         mutations: {
@@ -364,7 +390,6 @@ describe('reducers', () => {
             data: 'data3',
             pending: 0,
             error: null,
-            mutations: null,
           },
         },
         mutations: {
@@ -403,7 +428,6 @@ describe('reducers', () => {
             data: 'optimistic data',
             pending: 0,
             error: null,
-            mutations: null,
           },
         },
         mutations: {
@@ -434,7 +458,6 @@ describe('reducers', () => {
             data: 'data4',
             pending: 0,
             error: null,
-            mutations: null,
           },
         },
         mutations: {
@@ -467,7 +490,6 @@ describe('reducers', () => {
             data: 'reverted data',
             pending: 0,
             error: null,
-            mutations: null,
           },
         },
         mutations: {
@@ -496,7 +518,6 @@ describe('reducers', () => {
             data: ['data'],
             pending: 0,
             error: null,
-            mutations: null,
           },
         },
         mutations: {},
@@ -526,7 +547,6 @@ describe('reducers', () => {
             data: ['data', 'data2'],
             pending: 0,
             error: null,
-            mutations: null,
           },
         },
         mutations: {},
@@ -549,7 +569,6 @@ describe('reducers', () => {
             data: ['data', 'data2', 'data3'],
             pending: 0,
             error: null,
-            mutations: null,
           },
         },
         mutations: {},

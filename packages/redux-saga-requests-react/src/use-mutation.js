@@ -2,11 +2,11 @@ import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { getMutation } from 'redux-saga-requests';
 
-const useMutation = ({ requestSelector, type, requestKey }) => {
-  const mutationSelector = useMemo(
-    () => getMutation({ requestSelector, type, requestKey }),
-    [requestSelector, type, requestKey],
-  );
+const useMutation = ({ type, requestKey }) => {
+  const mutationSelector = useMemo(() => getMutation({ type, requestKey }), [
+    type,
+    requestKey,
+  ]);
 
   return useSelector(mutationSelector);
 };

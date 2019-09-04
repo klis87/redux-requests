@@ -13,7 +13,6 @@ export default localConfig => {
     isRequestActionQuery,
     ...defaultConfig,
     ...localConfig,
-    handleMutationsState: false,
   };
   const requestsReducers = {};
 

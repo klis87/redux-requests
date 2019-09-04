@@ -7,7 +7,6 @@ import {
   getRequestInstance,
   sendRequest,
   watchRequests,
-  requestsReducer,
   networkReducer,
   requestsPromiseMiddleware,
   requestsCacheMiddleware,
@@ -88,92 +87,12 @@ watchRequests({
 });
 watchRequests({ abortOn: ['TYPE'] });
 
-const globalConfig = {
-  multiple: false,
-  getDefaultData: multiple => (multiple ? [] : null),
+networkReducer({
+  isRequestActionQuery: () => true,
   getData: (state, action) => action.payload.data,
   getError: (state, action) => action.payload,
-  onRequest: (state, action, { multiple }) => ({
-    ...state,
-    data: null,
-    pending: state.pending + 1,
-    error: null,
-  }),
-  onSuccess: (state, action, { getData }) => ({
-    ...state,
-    data: getData(state, action),
-    pending: state.pending - 1,
-    error: null,
-  }),
-  onError: (state, action, { multiple }) => ({
-    ...state,
-    data: null,
-    pending: state.pending - 1,
-    error: action.payload.error,
-  }),
-  onAbort: (state, action) => ({
-    ...state,
-    pending: state.pending - 1,
-  }),
   resetOn: ['RESET'],
-};
-requestsReducer({
-  actionType: 'actionType',
-  resetOn: action => action.type === 'SOME_TYPE',
 });
-requestsReducer({
-  actionType: 'actionType',
-  ...globalConfig,
-});
-requestsReducer({
-  actionType: 'actionType',
-  mutations: {
-    MUTATION: true,
-  },
-});
-requestsReducer({
-  actionType: 'actionType',
-  mutations: {
-    MUTATION: { updateData: true },
-  },
-});
-requestsReducer({
-  actionType: 'actionType',
-  mutations: {
-    MUTATION: { updateData: (state, action) => state },
-  },
-});
-requestsReducer({
-  actionType: 'actionType',
-  mutations: {
-    MUTATION: {
-      getRequestKey: action => 'id',
-      updateData: (state, action) => state,
-    },
-  },
-});
-requestsReducer({
-  actionType: 'actionType',
-  mutations: {
-    MUTATION: {
-      updateDataOptimistic: (state, action) => state,
-      revertData: (state, action) => state,
-    },
-  },
-});
-requestsReducer({
-  actionType: 'actionType',
-  mutations: {
-    MUTATION: {
-      updateData: (state, action) => state,
-      updateDataOptimistic: (state, action) => state,
-      revertData: (state, action) => state,
-      getRequestKey: action => 'id',
-    },
-  },
-});
-
-networkReducer({ isRequestActionQuery: () => true });
 
 requestsPromiseMiddleware();
 requestsPromiseMiddleware({ auto: true });

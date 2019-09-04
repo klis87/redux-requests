@@ -1,18 +1,24 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
+import { getMutation } from 'redux-saga-requests';
 
-import useMutation from './use-mutation';
 import { reactComponentPropType } from './propTypesValidators';
 
 const Mutation = ({
-  requestSelector,
   type,
+  selector,
   requestKey,
   children,
   component: Component,
   ...extraProps
 }) => {
-  const mutation = useMutation({ requestSelector, type, requestKey });
+  const mutationSelector = useMemo(
+    () => selector || getMutation({ type, requestKey }),
+    [selector, type, requestKey],
+  );
+
+  const mutation = useSelector(mutationSelector);
 
   if (children) {
     return children(mutation);
@@ -22,8 +28,8 @@ const Mutation = ({
 };
 
 Mutation.propTypes = {
-  requestSelector: PropTypes.func,
-  type: PropTypes.oneOfType([PropTypes.string, PropTypes.func]).isRequired,
+  selector: PropTypes.func,
+  type: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   requestKey: PropTypes.string,
   children: PropTypes.func,
   component: reactComponentPropType('Mutation'),

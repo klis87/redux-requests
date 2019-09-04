@@ -6,40 +6,17 @@ import {
   isResponseAction,
   getRequestActionFromResponse,
 } from '../actions';
-import mutationsReducer from './mutations-reducer';
 import defaultConfig from './default-config';
 
 // to support libraries like redux-act and redux-actions
 const normalizeActionType = actionType =>
   typeof actionType === 'function' ? actionType.toString() : actionType;
 
-const mutationConfigHasRequestKey = config =>
-  typeof config !== 'boolean' && !!config.getRequestKey;
-
-const getInitialState = ({
-  getDefaultData,
-  multiple,
-  mutations,
-  handleMutationsState,
-}) => ({
-  data: getDefaultData(multiple),
+const initialState = {
+  data: null,
   pending: 0,
   error: null,
-  mutations:
-    handleMutationsState && mutations
-      ? Object.entries(mutations)
-          .filter(([, v]) => !v.local)
-          .reduce(
-            (prev, [k, v]) => ({
-              ...prev,
-              [k]: mutationConfigHasRequestKey(v)
-                ? {}
-                : { error: null, pending: 0 },
-            }),
-            {},
-          )
-      : null,
-});
+};
 
 const getDataUpdater = (reducerConfig, mutationConfig) => {
   if (mutationConfig === true || mutationConfig.updateData === true) {
@@ -102,6 +79,31 @@ const responseMutationReducer = (state, action, config) => {
     : state;
 };
 
+const onRequest = state => ({
+  ...state,
+  pending: state.pending + 1,
+  error: null,
+});
+
+const onSuccess = (state, action, config) => ({
+  ...state,
+  data: config.getData(state, action),
+  pending: state.pending - 1,
+  error: null,
+});
+
+const onError = (state, action, config) => ({
+  ...state,
+  data: null,
+  pending: state.pending - 1,
+  error: config.getError(state, action),
+});
+
+const onAbort = state => ({
+  ...state,
+  pending: state.pending - 1,
+});
+
 export default localConfig => {
   const config = { ...defaultConfig, ...localConfig };
   const normalizedActionType = normalizeActionType(config.actionType);
@@ -123,11 +125,11 @@ export default localConfig => {
       };
     }
 
-    let nextState = state || getInitialState(config);
+    let nextState = state || initialState;
 
     if (shouldActionBeReset(action)) {
       nextState = {
-        ...getInitialState(config),
+        ...initialState,
         pending: nextState.pending,
       };
     }
@@ -137,30 +139,20 @@ export default localConfig => {
       : action;
 
     if (config.mutations && requestAction.type in config.mutations) {
-      return {
-        ...(isResponseAction(action)
-          ? responseMutationReducer(nextState, action, config)
-          : requestMutationReducer(nextState, action, config)),
-        mutations: config.handleMutationsState
-          ? mutationsReducer(
-              nextState.mutations,
-              action,
-              config,
-              config.mutations[requestAction.type],
-            )
-          : null,
-      };
+      return isResponseAction(action)
+        ? responseMutationReducer(nextState, action, config)
+        : requestMutationReducer(nextState, action, config);
     }
 
     switch (action.type) {
       case normalizedActionType:
-        return config.onRequest(nextState, action, config);
+        return onRequest(nextState, action, config);
       case success(normalizedActionType):
-        return config.onSuccess(nextState, action, config);
+        return onSuccess(nextState, action, config);
       case error(normalizedActionType):
-        return config.onError(nextState, action, config);
+        return onError(nextState, action, config);
       case abort(normalizedActionType):
-        return config.onAbort(nextState, action, config);
+        return onAbort(nextState, action, config);
       default:
         return nextState;
     }

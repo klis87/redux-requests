@@ -1,10 +1,5 @@
 import * as React from 'react';
-
-interface QueryState<QueryStateData> {
-  data: QueryStateData;
-  error: any;
-  loading: boolean;
-}
+import { QueryState, MutationState } from 'redux-saga-requests';
 
 interface LoadingProps {
   [loadingProp: string]: any;
@@ -15,15 +10,11 @@ interface ErrorProps {
   [errorProp: string]: any;
 }
 
-type RequestSelector<QueryStateData> = (
-  state: any,
-) => Omit<QueryState<QueryStateData>, 'loading'> & { pending: number };
-
 interface QueryProps<QueryStateData> {
-  requestSelector?: RequestSelector<QueryStateData>;
   type?: string;
   multiple?: boolean;
   defaultData?: any;
+  selector?: (state: any) => QueryState<QueryStateData>;
   children?: (query: QueryState<QueryStateData>) => React.ReactNode;
   component?: React.ComponentType<{
     query: QueryState<QueryStateData>;
@@ -43,15 +34,10 @@ export class Query<QueryStateData = any> extends React.Component<
   QueryProps<QueryStateData>
 > {}
 
-interface MutationState {
-  loading: boolean;
-  error: any;
-}
-
 interface MutationProps {
+  type?: string;
   requestKey?: string;
-  requestSelector?: RequestSelector<any>;
-  type: string;
+  selector?: (state: any) => MutationState;
   children?: (mutation: MutationState) => React.ReactNode;
   component?: React.ComponentType<{
     mutation: MutationState;
@@ -63,8 +49,7 @@ interface MutationProps {
 export class Mutation extends React.Component<MutationProps> {}
 
 export function useQuery<QueryStateData = any>(props: {
-  type?: string;
-  requestSelector?: RequestSelector<QueryStateData>;
+  type: string;
   multiple?: boolean;
   defaultData?: any;
 }): QueryState<QueryStateData>;
@@ -72,5 +57,4 @@ export function useQuery<QueryStateData = any>(props: {
 export function useMutation(props: {
   type: string;
   requestKey?: string;
-  requestSelector?: RequestSelector<any>;
 }): MutationState;

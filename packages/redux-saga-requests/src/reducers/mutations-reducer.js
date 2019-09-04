@@ -8,10 +8,6 @@ const mutationConfigHasRequestKey = config =>
   typeof config !== 'boolean' && !!config.getRequestKey;
 
 const updateMutationsForRequest = (state, action, mutationConfig) => {
-  if (mutationConfig.local) {
-    return state;
-  }
-
   if (mutationConfigHasRequestKey(mutationConfig)) {
     const requestKey = mutationConfig.getRequestKey(action);
 

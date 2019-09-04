@@ -10,7 +10,7 @@ const mockStore = configureStore();
 describe('Mutation', () => {
   const MUTATION_TYPE = 'MUTATION_TYPE';
 
-  it('maps requestSelector to mutation with type prop', () => {
+  it('supports custom selector', () => {
     const component = renderer.create(
       <Provider
         store={mockStore({
@@ -19,35 +19,7 @@ describe('Mutation', () => {
           },
         })}
       >
-        <Mutation requestSelector={state => state.request} type={MUTATION_TYPE}>
-          {({ loading, error }) => (
-            <div>
-              {loading && 'loading'}
-              {error}
-            </div>
-          )}
-        </Mutation>
-      </Provider>,
-    );
-    expect(component.toJSON()).toMatchSnapshot();
-  });
-
-  it('maps requestSelector to mutation with type prop as action creator', () => {
-    const mutationAction = () => {};
-    mutationAction.toString = () => 'MUTATION';
-
-    const component = renderer.create(
-      <Provider
-        store={mockStore({
-          request: {
-            mutations: { MUTATION: { pending: 1, error: 'error' } },
-          },
-        })}
-      >
-        <Mutation
-          requestSelector={state => state.request}
-          type={mutationAction}
-        >
+        <Mutation selector={state => state.request.mutations[MUTATION_TYPE]}>
           {({ loading, error }) => (
             <div>
               {loading && 'loading'}

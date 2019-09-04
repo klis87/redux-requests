@@ -22,23 +22,12 @@ const getData = (data, multiple, defaultData) => {
   return data;
 };
 
-export const getQuery = ({
-  requestSelector,
-  type,
-  defaultData,
-  multiple = false,
-}) =>
+export const getQuery = ({ type, defaultData, multiple = false }) =>
   createSelector(
-    state =>
-      requestSelector
-        ? requestSelector(state)
-        : state.network.queries[type] || defaultQueryState,
+    state => state.network.queries[type] || defaultQueryState,
     queryState => ({
       data: getData(queryState.data, multiple, defaultData),
-      loading:
-        queryState.pending === undefined
-          ? queryState.loading
-          : queryState.pending > 0,
+      loading: queryState.pending > 0,
       error: queryState.error,
     }),
   );
@@ -48,12 +37,9 @@ const defaultMutation = {
   error: null,
 };
 
-export const getMutation = ({ requestSelector, type, requestKey }) =>
+export const getMutation = ({ type, requestKey }) =>
   createSelector(
-    state =>
-      requestSelector
-        ? requestSelector(state).mutations[type]
-        : state.network.mutations[type],
+    state => state.network.mutations[type],
     mutationContainer => {
       if (
         !mutationContainer ||

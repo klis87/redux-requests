@@ -10,14 +10,14 @@ const mockStore = configureStore();
 describe('Query', () => {
   const QUERY_TYPE = 'QUERY_TYPE';
 
-  it('maps requestSelector to query', () => {
+  it('supports custom query selector', () => {
     const component = renderer.create(
       <Provider
         store={mockStore({
-          request: { data: 'data', error: null, pending: 0 },
+          request: { data: 'data', error: null, loading: false },
         })}
       >
-        <Query requestSelector={state => state.request}>
+        <Query selector={state => state.request}>
           {({ data }) => <div>{data}</div>}
         </Query>
       </Provider>,

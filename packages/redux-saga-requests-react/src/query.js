@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
+import { getQuery } from 'redux-saga-requests';
 
 import { reactComponentPropType } from './propTypesValidators';
-import useQuery from './use-query';
 
 const Query = ({
   type,
-  requestSelector,
+  selector,
   defaultData,
   multiple,
   children,
@@ -20,7 +21,12 @@ const Query = ({
   loadingComponentProps,
   ...extraProps
 }) => {
-  const query = useQuery({ type, requestSelector, defaultData, multiple });
+  const querySelector = useMemo(
+    () => selector || getQuery({ type, defaultData, multiple }),
+    [selector, type, defaultData, multiple],
+  );
+
+  const query = useSelector(querySelector);
 
   const dataEmpty = isDataEmpty(query);
 
@@ -56,8 +62,8 @@ Query.defaultProps = {
 };
 
 Query.propTypes = {
-  requestSelector: PropTypes.func,
   type: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+  selector: PropTypes.func,
   multiple: PropTypes.bool,
   defaultData: PropTypes.any,
   children: PropTypes.func,

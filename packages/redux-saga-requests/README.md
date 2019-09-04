@@ -1521,7 +1521,6 @@ There are following examples currently:
 - [basic](https://github.com/klis87/redux-saga-requests/tree/master/examples/basic)
 - [advanced](https://github.com/klis87/redux-saga-requests/tree/master/examples/advanced)
 - [mutations](https://github.com/klis87/redux-saga-requests/tree/master/examples/mutations)
-- [mutations with requests reducers](https://github.com/klis87/redux-saga-requests/tree/master/examples/mutations-with-requests-reducers)
 - [Fetch API](https://github.com/klis87/redux-saga-requests/tree/master/examples/fetch-api)
 - [GraphQL](https://github.com/klis87/redux-saga-requests/tree/master/examples/graphql)
 - [redux-act integration](https://github.com/klis87/redux-saga-requests/tree/master/examples/redux-act-integration)

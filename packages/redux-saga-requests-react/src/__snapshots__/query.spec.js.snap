@@ -17,12 +17,6 @@ exports[`Query allows rendering custom loading component with extra props 1`] = 
 </span>
 `;
 
-exports[`Query maps requestSelector to query 1`] = `
-<div>
-  data
-</div>
-`;
-
 exports[`Query maps type to default query data when request state is not yet in networkReducer  1`] = `null`;
 
 exports[`Query maps type to query when using networkReducer 1`] = `
@@ -54,6 +48,12 @@ exports[`Query renders null when data is falsy by default 1`] = `null`;
 exports[`Query renders null when error is truthy by default 1`] = `null`;
 
 exports[`Query renders null when pending is positive by default 1`] = `null`;
+
+exports[`Query supports custom query selector 1`] = `
+<div>
+  data
+</div>
+`;
 
 exports[`Query uses array as empty data when multiple is true 1`] = `
 <div>

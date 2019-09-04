@@ -5,7 +5,7 @@ interface FilterOnActionCallback {
 }
 
 interface OnActionCallback {
-  (state: any, action: AnyAction, config: MergedReducerConfig): any;
+  (state: any, action: AnyAction): any;
 }
 
 interface RequestActionMeta {
@@ -114,69 +114,12 @@ interface WatchRequestsConfig {
 
 export const watchRequests: (config?: WatchRequestsConfig) => void;
 
-interface Mutations {
-  [actionType: string]:
-    | boolean
-    | OnActionCallback
-    | {
-        updateData: boolean | OnActionCallback;
-        getRequestKey?: (action: RequestAction) => string;
-      }
-    | {
-        updateData?: OnActionCallback;
-        updateDataOptimistic: OnActionCallback;
-        revertData: OnActionCallback;
-        getRequestKey?: (action: RequestAction) => string;
-      }
-    | {
-        updateData: OnActionCallback;
-        local: true;
-      };
-}
-
-interface CommonReducerConfig {
+interface NetworkReducerConfig {
+  isRequestActionQuery?: (requestAction: RequestAction) => boolean;
   getData?: OnActionCallback;
   updateData?: OnActionCallback;
   getError?: OnActionCallback;
-  onRequest?: OnActionCallback;
-  onSuccess?: OnActionCallback;
-  onError?: OnActionCallback;
-  onAbort?: OnActionCallback;
   resetOn?: FilterOnActionCallback | string[];
-}
-
-interface RequestsReducerConfig extends CommonReducerConfig {
-  actionType: string;
-  multiple?: boolean;
-  getDefaultData?: (multiple: boolean) => any;
-  mutations?: Mutations;
-  handleMutationsState?: boolean;
-}
-
-interface MergedReducerConfig {
-  actionType: string;
-  multiple: boolean;
-  getDefaultData: (multiple: boolean) => any;
-  getData: OnActionCallback;
-  updateData: OnActionCallback;
-  getError: OnActionCallback;
-  onRequest: OnActionCallback;
-  onSuccess: OnActionCallback;
-  onError: OnActionCallback;
-  onAbort: OnActionCallback;
-  resetOn: FilterOnActionCallback | string[];
-  mutations: Mutations;
-  handleMutationsState: boolean;
-}
-
-interface RequestsReducer {
-  (config: RequestsReducerConfig): Reducer<any>;
-}
-
-export const requestsReducer: RequestsReducer;
-
-interface NetworkReducerConfig extends CommonReducerConfig {
-  isRequestActionQuery?: (requestAction: RequestAction) => boolean;
 }
 
 export const networkReducer: (config: NetworkReducerConfig) => Reducer<any>;
@@ -217,24 +160,19 @@ interface CountServerRequestsConfig {
 
 export const countServerRequests: (config: CountServerRequestsConfig) => void;
 
-interface QueryState<QueryStateData> {
+export interface QueryState<QueryStateData> {
   data: QueryStateData;
   error: any;
   loading: boolean;
 }
 
-type RequestSelector<QueryStateData> = (
-  state: any,
-) => Omit<QueryState<QueryStateData>, 'loading'> & { pending: number };
-
 export function getQuery<QueryStateData = any>(props: {
   type?: string;
-  requestSelector?: RequestSelector<QueryStateData>;
   multiple?: boolean;
   defaultData?: any;
 }): (state: any) => QueryState<QueryStateData>;
 
-interface MutationState {
+export interface MutationState {
   loading: boolean;
   error: any;
 }
@@ -242,5 +180,4 @@ interface MutationState {
 export function getMutation(props: {
   type: string;
   requestKey?: string;
-  requestSelector?: RequestSelector<any>;
 }): (state: any) => MutationState;

@@ -4,23 +4,22 @@ import { Query, Mutation, useQuery, useMutation } from './index';
 const query = useQuery<string>({ type: 'Query' });
 const query2 = useQuery({
   type: 'Query',
-  requestSelector: () => ({ data: { nested: 1 }, pending: 1, error: null }),
   multiple: true,
   defaultData: {},
 });
 const mutation = useMutation({ type: 'Mutation' });
 const mutation2 = useMutation({
   type: 'Mutation',
-  requestSelector: () => ({ data: 'data', pending: 1, error: null }),
+  requestKey: 'key',
 });
 
 function BasicQuery() {
   return (
     <Query<string>
-      requestSelector={state => ({
+      selector={state => ({
         data: 'x',
         error: null,
-        pending: 1,
+        loading: true,
       })}
       type="TYPE"
     >
@@ -102,12 +101,9 @@ function MutationWithCustomComponent() {
 function MutationWithSelector() {
   return (
     <Mutation
-      type="TYPE"
-      requestKey="key"
-      requestSelector={state => ({
-        data: 'x',
+      selector={state => ({
         error: null,
-        pending: 1,
+        loading: false,
       })}
     >
       {({ loading, error }) => (
