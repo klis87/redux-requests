@@ -17,15 +17,13 @@ interface RequestActionMeta {
   abortOn?: FilterOnActionCallback | string | string[];
   resetOn?: FilterOnActionCallback | string[];
   getData?: OnActionCallback;
-  updateData?: OnActionCallback;
   getError?: OnActionCallback;
   operations?: {
     getRequestKey?: (action: RequestAction) => string;
     [actionType: string]:
-      | boolean
       | OnActionCallback
       | {
-          updateData: boolean | OnActionCallback;
+          updateData: OnActionCallback;
         }
       | {
           updateData?: OnActionCallback;
@@ -117,7 +115,6 @@ export const watchRequests: (config?: WatchRequestsConfig) => void;
 interface NetworkReducerConfig {
   isRequestActionQuery?: (requestAction: RequestAction) => boolean;
   getData?: OnActionCallback;
-  updateData?: OnActionCallback;
   getError?: OnActionCallback;
   resetOn?: FilterOnActionCallback | string[];
 }

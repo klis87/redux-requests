@@ -4,7 +4,6 @@ import {
   abort,
   isSuccessAction,
   isResponseAction,
-  getRequestActionFromResponse,
 } from '../actions';
 import defaultConfig from './default-config';
 
@@ -18,24 +17,17 @@ const initialState = {
   error: null,
 };
 
-const getDataUpdater = (reducerConfig, mutationConfig) => {
-  if (mutationConfig === true || mutationConfig.updateData === true) {
-    return reducerConfig.updateData || reducerConfig.getData;
-  } else if (typeof mutationConfig === 'function') {
+const getDataUpdater = mutationConfig => {
+  if (typeof mutationConfig === 'function') {
     return mutationConfig;
-  } else if (
-    typeof mutationConfig !== 'boolean' &&
-    typeof mutationConfig.updateData === 'function'
-  ) {
+  } else if (mutationConfig.updateData) {
     return mutationConfig.updateData;
   }
 
   return null;
 };
 
-const requestMutationReducer = (state, action, config) => {
-  const mutationConfig = config.mutations[action.type];
-
+const requestMutationReducer = (state, action, config, mutationConfig) => {
   if (mutationConfig.updateDataOptimistic) {
     return {
       ...state,
@@ -44,7 +36,7 @@ const requestMutationReducer = (state, action, config) => {
   }
 
   if (mutationConfig.local) {
-    const dataUpdater = getDataUpdater(config, mutationConfig);
+    const dataUpdater = getDataUpdater(mutationConfig);
 
     return {
       ...state,
@@ -55,12 +47,9 @@ const requestMutationReducer = (state, action, config) => {
   return state;
 };
 
-const responseMutationReducer = (state, action, config) => {
-  const requestAction = getRequestActionFromResponse(action);
-  const mutationConfig = config.mutations[requestAction.type];
-
+const responseMutationReducer = (state, action, config, mutationConfig) => {
   if (isSuccessAction(action)) {
-    const dataUpdater = getDataUpdater(config, mutationConfig);
+    const dataUpdater = getDataUpdater(mutationConfig);
 
     return dataUpdater
       ? {
@@ -113,18 +102,6 @@ export default localConfig => {
       : action => config.resetOn.map(normalizeActionType).includes(action.type);
 
   return (state, action) => {
-    if (
-      action.meta &&
-      action.meta.mutations &&
-      normalizedActionType in action.meta.mutations &&
-      (!config.mutations || !(normalizedActionType in config.mutations))
-    ) {
-      config.mutations = {
-        ...config.mutations,
-        [action.type]: action.meta.mutations[normalizedActionType],
-      };
-    }
-
     let nextState = state || initialState;
 
     if (shouldActionBeReset(action)) {
@@ -134,14 +111,16 @@ export default localConfig => {
       };
     }
 
-    const requestAction = isResponseAction(action)
-      ? getRequestActionFromResponse(action)
-      : action;
+    if (
+      action.meta &&
+      action.meta.mutations &&
+      normalizedActionType in action.meta.mutations
+    ) {
+      const mutationConfig = action.meta.mutations[normalizedActionType];
 
-    if (config.mutations && requestAction.type in config.mutations) {
       return isResponseAction(action)
-        ? responseMutationReducer(nextState, action, config)
-        : requestMutationReducer(nextState, action, config);
+        ? responseMutationReducer(nextState, action, config, mutationConfig)
+        : requestMutationReducer(nextState, action, config, mutationConfig);
     }
 
     switch (action.type) {
