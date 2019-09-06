@@ -41,6 +41,11 @@ export default (state, action, config) => {
   const { [requestAction.type]: currentMutation, ...otherMutations } = state;
 
   if (isErrorAction(action)) {
+    const getError =
+      action.meta && action.meta.getError
+        ? action.meta.getError
+        : config.getError;
+
     return {
       ...otherMutations,
       [requestAction.type]:
@@ -48,12 +53,12 @@ export default (state, action, config) => {
           ? {
               ...currentMutation,
               [action.meta.requestKey]: {
-                error: config.getError(state.error, action),
+                error: getError(state.error, action),
                 pending: currentMutation[action.meta.requestKey].pending - 1,
               },
             }
           : {
-              error: config.getError(state.error, action),
+              error: getError(state.error, action),
               pending: currentMutation.pending - 1,
             },
     };
