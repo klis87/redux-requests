@@ -2,65 +2,32 @@ import {
   isRequestAction,
   isResponseAction,
   getRequestActionFromResponse,
-  isRequestActionQuery,
 } from '../actions';
 import defaultConfig from './default-config';
 import requestsReducer from './requests-reducer';
 import mutationsReducer from './mutations-reducer';
 
 export default localConfig => {
-  const config = {
-    isRequestActionQuery,
-    ...defaultConfig,
-    ...localConfig,
-  };
-  const requestsReducers = {};
-
-  // for SSR hydration
-  let initialized = false;
-  let hydratedReducers = null;
+  const config = { ...defaultConfig, ...localConfig };
 
   return (state = { queries: {}, mutations: {} }, action) => {
-    if (
-      !initialized &&
-      Object.keys(state.queries).length > 0 &&
-      Object.keys(requestsReducers).length === 0
-    ) {
-      initialized = true;
-      const queryKeys = Object.keys(state.queries);
-      hydratedReducers = new Set(queryKeys);
-
-      queryKeys.forEach(k => {
-        requestsReducers[k] = requestsReducer({
-          ...config,
-          actionType: k,
-        });
-      });
-    }
-
-    if (
-      isRequestAction(action) &&
-      config.isRequestActionQuery(action) &&
-      (!(action.type in requestsReducers) ||
-        (hydratedReducers && hydratedReducers.has(action.type)))
-    ) {
-      requestsReducers[action.type] = requestsReducer({
-        ...config,
-        actionType: action.type,
-        ...action.meta,
-      });
-
-      if (hydratedReducers) {
-        hydratedReducers.delete(action.type);
-      }
-    }
-
-    const queries = Object.entries(requestsReducers).reduce(
-      (prev, [actionType, reducer]) => {
-        prev[actionType] = reducer(state.queries[actionType], action);
+    const queries = Object.entries(state.queries).reduce(
+      (prev, [actionType, query]) => {
+        prev[actionType] = requestsReducer(query, action, actionType, config);
         return prev;
       },
-      {},
+      isRequestAction(action) &&
+        config.isRequestActionQuery(action) &&
+        !(action.type in Object.keys(state.queries))
+        ? {
+            [action.type]: requestsReducer(
+              undefined,
+              action,
+              action.type,
+              config,
+            ),
+          }
+        : {},
     );
 
     let { mutations } = state;

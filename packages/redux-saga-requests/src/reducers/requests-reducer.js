@@ -5,11 +5,6 @@ import {
   isSuccessAction,
   isResponseAction,
 } from '../actions';
-import defaultConfig from './default-config';
-
-// to support libraries like redux-act and redux-actions
-const normalizeActionType = actionType =>
-  typeof actionType === 'function' ? actionType.toString() : actionType;
 
 const initialState = {
   data: null,
@@ -76,7 +71,9 @@ const onRequest = state => ({
 
 const onSuccess = (state, action, config) => ({
   ...state,
-  data: config.getData(state.data, action),
+  data: (action.meta && action.meta.getData
+    ? action.meta.getData
+    : config.getData)(state.data, action),
   pending: state.pending - 1,
   error: null,
 });
@@ -85,7 +82,9 @@ const onError = (state, action, config) => ({
   ...state,
   data: null,
   pending: state.pending - 1,
-  error: config.getError(state.error, action),
+  error: (action.meta && action.meta.getError
+    ? action.meta.getError
+    : config.getError)(state.error, action),
 });
 
 const onAbort = state => ({
@@ -93,36 +92,29 @@ const onAbort = state => ({
   pending: state.pending - 1,
 });
 
-export default localConfig => {
-  const config = { ...defaultConfig, ...localConfig };
-  const normalizedActionType = normalizeActionType(config.actionType);
+export default (state = initialState, action, actionType, config) => {
+  if (
+    action.meta &&
+    action.meta.mutations &&
+    action.meta.mutations[actionType]
+  ) {
+    const mutationConfig = action.meta.mutations[actionType];
 
-  return (state, action) => {
-    const nextState = state || initialState;
+    return isResponseAction(action)
+      ? responseMutationReducer(state, action, mutationConfig)
+      : requestMutationReducer(state, action, mutationConfig);
+  }
 
-    if (
-      action.meta &&
-      action.meta.mutations &&
-      action.meta.mutations[normalizedActionType]
-    ) {
-      const mutationConfig = action.meta.mutations[normalizedActionType];
-
-      return isResponseAction(action)
-        ? responseMutationReducer(nextState, action, mutationConfig)
-        : requestMutationReducer(nextState, action, mutationConfig);
-    }
-
-    switch (action.type) {
-      case normalizedActionType:
-        return onRequest(nextState);
-      case success(normalizedActionType):
-        return onSuccess(nextState, action, config);
-      case error(normalizedActionType):
-        return onError(nextState, action, config);
-      case abort(normalizedActionType):
-        return onAbort(nextState, action, config);
-      default:
-        return nextState;
-    }
-  };
+  switch (action.type) {
+    case actionType:
+      return onRequest(state);
+    case success(actionType):
+      return onSuccess(state, action, config);
+    case error(actionType):
+      return onError(state, action, config);
+    case abort(actionType):
+      return onAbort(state, action, config);
+    default:
+      return state;
+  }
 };

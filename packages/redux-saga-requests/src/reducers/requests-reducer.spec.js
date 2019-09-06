@@ -6,6 +6,7 @@ import {
   createErrorAction,
 } from '../actions';
 import requestsReducer from './requests-reducer';
+import defaultConfig from './default-config';
 
 describe('reducers', () => {
   describe('requestsReducer', () => {
@@ -17,19 +18,29 @@ describe('reducers', () => {
         error: null,
         pending: 0,
       };
-      const reducer = requestsReducer({ actionType });
 
       it('returns correct default state', () => {
-        expect(reducer(undefined, {})).toEqual(defaultState);
+        expect(
+          requestsReducer(undefined, {}, actionType, defaultConfig),
+        ).toEqual(defaultState);
       });
 
       it('returns correct state for not handled action', () => {
         const state = 'some_state';
-        expect(reducer(state, {})).toBe(state);
+        expect(requestsReducer(state, {}, actionType, defaultConfig)).toBe(
+          state,
+        );
       });
 
       it('returns correct state for request action', () => {
-        expect(reducer(defaultState, { type: actionType })).toEqual({
+        expect(
+          requestsReducer(
+            defaultState,
+            { type: actionType },
+            actionType,
+            defaultConfig,
+          ),
+        ).toEqual({
           data: null,
           error: null,
           pending: 1,
@@ -42,7 +53,9 @@ describe('reducers', () => {
           type: success(actionType),
           data,
         };
-        expect(reducer(defaultState, action)).toEqual({
+        expect(
+          requestsReducer(defaultState, action, actionType, defaultConfig),
+        ).toEqual({
           data,
           error: null,
           pending: -1,
@@ -55,7 +68,9 @@ describe('reducers', () => {
           type: error(actionType),
           error: someError,
         };
-        expect(reducer(defaultState, action)).toEqual({
+        expect(
+          requestsReducer(defaultState, action, actionType, defaultConfig),
+        ).toEqual({
           data: null,
           error: someError,
           pending: -1,
@@ -64,21 +79,12 @@ describe('reducers', () => {
 
       it('returns correct state for abort action', () => {
         const action = { type: abort(actionType) };
-        expect(reducer(defaultState, action)).toEqual({
+        expect(
+          requestsReducer(defaultState, action, actionType, defaultConfig),
+        ).toEqual({
           data: null,
           error: null,
           pending: -1,
-        });
-      });
-
-      it('supports action creator libraries', () => {
-        const action = () => ({ type: actionType });
-        action.toString = () => actionType;
-        const reduxActReducer = requestsReducer({ actionType: action });
-        expect(reduxActReducer(defaultState, action())).toEqual({
-          data: null,
-          error: null,
-          pending: 1,
         });
       });
 
@@ -93,7 +99,12 @@ describe('reducers', () => {
         };
 
         expect(
-          reducer(defaultState, createSuccessAction(action, 'data')),
+          requestsReducer(
+            defaultState,
+            createSuccessAction(action, 'data'),
+            actionType,
+            defaultConfig,
+          ),
         ).toEqual({
           data: 'data',
           error: null,
@@ -101,69 +112,15 @@ describe('reducers', () => {
         });
 
         expect(
-          reducer(defaultState, createErrorAction(action, 'error')),
+          requestsReducer(
+            defaultState,
+            createErrorAction(action, 'error'),
+            actionType,
+            defaultConfig,
+          ),
         ).toEqual({
           data: null,
           error: 'error',
-          pending: -1,
-        });
-      });
-    });
-
-    describe('with config override', () => {
-      const reducer = requestsReducer({
-        actionType,
-        getData: (data, action) => ({ nested: action.payload.data }),
-      });
-      const initialState = reducer(undefined, {});
-
-      it('returns correct default state', () => {
-        expect(reducer(undefined, {})).toEqual({
-          data: null,
-          error: null,
-          pending: 0,
-        });
-      });
-
-      it('returns correct state for request action', () => {
-        expect(reducer(initialState, { type: actionType })).toEqual({
-          data: null,
-          error: null,
-          pending: 1,
-        });
-      });
-
-      it('returns correct state for success action', () => {
-        const data = ['data'];
-        const action = {
-          type: success(actionType),
-          payload: { data },
-        };
-        expect(reducer(initialState, action)).toEqual({
-          data: { nested: data },
-          error: null,
-          pending: -1,
-        });
-      });
-
-      it('returns correct state for error action', () => {
-        const someError = 'error';
-        const action = {
-          type: error(actionType),
-          payload: someError,
-        };
-        expect(reducer(initialState, action)).toEqual({
-          data: null,
-          error: someError,
-          pending: -1,
-        });
-      });
-
-      it('returns correct state for abort action', () => {
-        const action = { type: abort(actionType) };
-        expect(reducer(initialState, action)).toEqual({
-          data: null,
-          error: null,
           pending: -1,
         });
       });
@@ -178,19 +135,22 @@ describe('reducers', () => {
       };
 
       it('can update data optimistic', () => {
-        const reducer = requestsReducer({ actionType });
-
         expect(
-          reducer(defaultState, {
-            type: MUTATION_ACTION,
-            meta: {
-              mutations: {
-                [actionType]: {
-                  updateDataOptimistic: () => 'data',
+          requestsReducer(
+            defaultState,
+            {
+              type: MUTATION_ACTION,
+              meta: {
+                mutations: {
+                  [actionType]: {
+                    updateDataOptimistic: () => 'data',
+                  },
                 },
               },
             },
-          }),
+            actionType,
+            defaultConfig,
+          ),
         ).toEqual({
           data: 'data',
           error: null,
@@ -199,21 +159,22 @@ describe('reducers', () => {
       });
 
       it('handles updateData customized per mutation', () => {
-        const reducer = requestsReducer({
-          actionType,
-        });
-
         expect(
-          reducer(defaultState, {
-            type: success(MUTATION_ACTION),
-            data: { nested: 'response' },
-            meta: {
-              requestAction: { type: MUTATION_ACTION },
-              mutations: {
-                [actionType]: (data, action) => action.data.nested,
+          requestsReducer(
+            defaultState,
+            {
+              type: success(MUTATION_ACTION),
+              data: { nested: 'response' },
+              meta: {
+                requestAction: { type: MUTATION_ACTION },
+                mutations: {
+                  [actionType]: (data, action) => action.data.nested,
+                },
               },
             },
-          }),
+            actionType,
+            defaultConfig,
+          ),
         ).toEqual({
           data: 'response',
           error: null,
@@ -222,23 +183,24 @@ describe('reducers', () => {
       });
 
       it('handles updateData customized per mutation defined in updateData object key', () => {
-        const reducer = requestsReducer({
-          actionType,
-        });
-
         expect(
-          reducer(defaultState, {
-            type: success(MUTATION_ACTION),
-            data: { nested: 'response' },
-            meta: {
-              requestAction: { type: MUTATION_ACTION },
-              mutations: {
-                [actionType]: {
-                  updateData: (data, action) => action.data.nested,
+          requestsReducer(
+            defaultState,
+            {
+              type: success(MUTATION_ACTION),
+              data: { nested: 'response' },
+              meta: {
+                requestAction: { type: MUTATION_ACTION },
+                mutations: {
+                  [actionType]: {
+                    updateData: (data, action) => action.data.nested,
+                  },
                 },
               },
             },
-          }),
+            actionType,
+            defaultConfig,
+          ),
         ).toEqual({
           data: 'response',
           error: null,
@@ -247,24 +209,25 @@ describe('reducers', () => {
       });
 
       it('reverts optimistic update on mutation error', () => {
-        const reducer = requestsReducer({
-          actionType,
-        });
-
         expect(
-          reducer(defaultState, {
-            type: error(MUTATION_ACTION),
-            error: 'error',
-            meta: {
-              requestAction: { type: MUTATION_ACTION },
-              mutations: {
-                [actionType]: {
-                  updateDataOptimistic: (state, action) => action.data,
-                  revertData: () => 'oldData',
+          requestsReducer(
+            defaultState,
+            {
+              type: error(MUTATION_ACTION),
+              error: 'error',
+              meta: {
+                requestAction: { type: MUTATION_ACTION },
+                mutations: {
+                  [actionType]: {
+                    updateDataOptimistic: (state, action) => action.data,
+                    revertData: () => 'oldData',
+                  },
                 },
               },
             },
-          }),
+            actionType,
+            defaultConfig,
+          ),
         ).toEqual({
           data: 'oldData',
           error: null,
@@ -273,12 +236,8 @@ describe('reducers', () => {
       });
 
       it('doesnt change data on mutation error without optimistic update revertData', () => {
-        const reducer = requestsReducer({
-          actionType,
-        });
-
         expect(
-          reducer(
+          requestsReducer(
             { ...defaultState, data: 'data' },
             {
               type: error(MUTATION_ACTION),
@@ -293,6 +252,8 @@ describe('reducers', () => {
                 },
               },
             },
+            actionType,
+            defaultConfig,
           ),
         ).toEqual({
           data: 'data',
@@ -302,23 +263,24 @@ describe('reducers', () => {
       });
 
       it('reverts optimistic update on mutation abort', () => {
-        const reducer = requestsReducer({
-          actionType,
-        });
-
         expect(
-          reducer(defaultState, {
-            type: abort(MUTATION_ACTION),
-            meta: {
-              requestAction: { type: MUTATION_ACTION },
-              mutations: {
-                [actionType]: {
-                  updateDataOptimistic: () => 'data2',
-                  revertData: () => 'oldData',
+          requestsReducer(
+            defaultState,
+            {
+              type: abort(MUTATION_ACTION),
+              meta: {
+                requestAction: { type: MUTATION_ACTION },
+                mutations: {
+                  [actionType]: {
+                    updateDataOptimistic: () => 'data2',
+                    revertData: () => 'oldData',
+                  },
                 },
               },
             },
-          }),
+            actionType,
+            defaultConfig,
+          ),
         ).toEqual({
           data: 'oldData',
           error: null,
@@ -329,9 +291,6 @@ describe('reducers', () => {
 
     describe('with local mutations', () => {
       const LOCAL_MUTATION_ACTION = 'LOCAL_MUTATION_ACTION';
-      const commonReducer = requestsReducer({
-        actionType,
-      });
       const defaultState = {
         data: null,
         error: null,
@@ -340,17 +299,22 @@ describe('reducers', () => {
 
       it('updates data for local mutation and doesnt keep local mutation state', () => {
         expect(
-          commonReducer(defaultState, {
-            type: LOCAL_MUTATION_ACTION,
-            meta: {
-              mutations: {
-                [actionType]: {
-                  local: true,
-                  updateData: () => 'data local',
+          requestsReducer(
+            defaultState,
+            {
+              type: LOCAL_MUTATION_ACTION,
+              meta: {
+                mutations: {
+                  [actionType]: {
+                    local: true,
+                    updateData: () => 'data local',
+                  },
                 },
               },
             },
-          }),
+            actionType,
+            defaultConfig,
+          ),
         ).toEqual({ ...defaultState, data: 'data local' });
       });
     });
