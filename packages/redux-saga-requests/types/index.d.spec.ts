@@ -99,7 +99,6 @@ networkReducer({
   isRequestActionQuery: () => true,
   getData: (data, action) => action.payload.data,
   getError: (error, action) => action.payload,
-  resetOn: ['RESET'],
 });
 
 requestsPromiseMiddleware();

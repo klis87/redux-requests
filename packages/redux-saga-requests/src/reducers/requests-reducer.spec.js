@@ -111,11 +111,9 @@ describe('reducers', () => {
     });
 
     describe('with config override', () => {
-      const RESET = 'RESET';
       const reducer = requestsReducer({
         actionType,
         getData: (data, action) => ({ nested: action.payload.data }),
-        resetOn: action => action.type === RESET,
       });
       const initialState = reducer(undefined, {});
 
@@ -167,36 +165,6 @@ describe('reducers', () => {
           data: null,
           error: null,
           pending: -1,
-        });
-      });
-
-      it('handles reset action when resetOn is function', () => {
-        const nextState = reducer(
-          { data: 'data', pending: 0, error: null },
-          { type: actionType },
-        );
-        expect(reducer(nextState, { type: 'RESET' })).toEqual({
-          data: null,
-          error: null,
-          pending: 1,
-        });
-      });
-
-      it('handles reset action when resetOn is the same as the reducer actionType', () => {
-        const resetRequestReducer = requestsReducer({
-          actionType,
-          resetOn: [actionType],
-        });
-
-        const state = {
-          data: [1, 2, 3],
-          error: null,
-          pending: 0,
-        };
-        expect(resetRequestReducer(state, { type: actionType })).toEqual({
-          data: null,
-          error: null,
-          pending: 1,
         });
       });
     });

@@ -15,7 +15,6 @@ interface RequestActionMeta {
   runByWatcher?: boolean;
   takeLatest?: boolean;
   abortOn?: FilterActions | string | string[];
-  resetOn?: FilterActions | string[];
   getData?: ModifyData;
   getError?: (error: any, action: AnyAction) => any;
   requestKey?: string;
@@ -116,7 +115,6 @@ interface NetworkReducerConfig {
   isRequestActionQuery?: (requestAction: RequestAction) => boolean;
   getData?: ModifyData;
   getError?: (error: any, action: AnyAction) => any;
-  resetOn?: FilterActions | string[];
 }
 
 export const networkReducer: (config: NetworkReducerConfig) => Reducer<any>;

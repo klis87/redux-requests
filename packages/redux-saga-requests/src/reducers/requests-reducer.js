@@ -96,20 +96,9 @@ const onAbort = state => ({
 export default localConfig => {
   const config = { ...defaultConfig, ...localConfig };
   const normalizedActionType = normalizeActionType(config.actionType);
-  const shouldActionBeReset =
-    typeof config.resetOn === 'function'
-      ? config.resetOn
-      : action => config.resetOn.map(normalizeActionType).includes(action.type);
 
   return (state, action) => {
-    let nextState = state || initialState;
-
-    if (shouldActionBeReset(action)) {
-      nextState = {
-        ...initialState,
-        pending: nextState.pending,
-      };
-    }
+    const nextState = state || initialState;
 
     if (
       action.meta &&
