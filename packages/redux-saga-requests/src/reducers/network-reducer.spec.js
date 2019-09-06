@@ -81,7 +81,7 @@ describe('reducers', () => {
 
     it('allows to override config as argument', () => {
       const reducer = networkReducer({
-        getData: (state, action) => ({ nested: action.data }),
+        getData: (data, action) => ({ nested: action.data }),
       });
       const state = reducer(
         { queries: {}, mutations: {} },
@@ -113,7 +113,7 @@ describe('reducers', () => {
       const requestAction = {
         type: 'REQUEST',
         request: { url: '/' },
-        meta: { getData: (state, action) => ({ nested: action.data }) },
+        meta: { getData: (data, action) => ({ nested: action.data }) },
       };
       const state = reducer({ queries: {}, mutations: {} }, requestAction);
 
@@ -151,12 +151,11 @@ describe('reducers', () => {
 
       state = reducer(state, {
         type: 'LOCAL_MUTATION',
-        data: 'data',
         meta: {
           mutations: {
             REQUEST: {
               local: true,
-              updateData: (_, action) => action.data,
+              updateData: () => 'data',
             },
           },
         },
@@ -311,9 +310,8 @@ describe('reducers', () => {
         type: 'MUTATION_WITH_CONFIG_WITH_REQUEST_KEY',
         request: { url: '/', method: 'post' },
         meta: {
-          id: '1',
+          requestKey: '1',
           mutations: {
-            getRequestKey: action => action.meta.id,
             REQUEST: (_, action) => action.data,
           },
         },
@@ -408,12 +406,11 @@ describe('reducers', () => {
       const mutationWithOptimisticUpdate = {
         type: 'MUTATION_WITH_OPTIMISTIC_UPDATE',
         request: { url: '/', method: 'post' },
-        data: 'optimistic data',
         meta: {
           mutations: {
             REQUEST: {
               updateData: (_, action) => action.data,
-              updateDataOptimistic: (_, action) => action.data,
+              updateDataOptimistic: () => 'optimistic data',
               revertData: () => 'reverted data',
             },
           },
@@ -528,14 +525,10 @@ describe('reducers', () => {
 
       state = reducer(state, {
         type: 'LOCAL_MUTATION',
-        data: 'data2',
         meta: {
           mutations: {
             QUERY: {
-              updateData: (queryState, action) => [
-                ...queryState.data,
-                action.data,
-              ],
+              updateData: data => [...data, 'data2'],
               local: true,
             },
           },
@@ -558,7 +551,7 @@ describe('reducers', () => {
           url: '/',
         },
         meta: {
-          getData: (queryState, action) => [...queryState.data, action.data],
+          getData: (data, action) => [...data, action.data],
         },
       };
       state = reducer(state, query);

@@ -70,12 +70,7 @@ export default localConfig => {
       (isResponseAction(action) &&
         !config.isRequestActionQuery(getRequestActionFromResponse(action)))
     ) {
-      mutations = mutationsReducer(mutations, action, config, {
-        getRequestKey:
-          action.meta && action.meta.mutations
-            ? action.meta.mutations.getRequestKey
-            : null,
-      });
+      mutations = mutationsReducer(mutations, action, config);
     }
 
     return {

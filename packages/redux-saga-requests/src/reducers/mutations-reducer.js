@@ -4,12 +4,9 @@ import {
   getRequestActionFromResponse,
 } from '../actions';
 
-const mutationConfigHasRequestKey = config =>
-  typeof config !== 'boolean' && !!config.getRequestKey;
-
-const updateMutationsForRequest = (state, action, mutationConfig) => {
-  if (mutationConfigHasRequestKey(mutationConfig)) {
-    const requestKey = mutationConfig.getRequestKey(action);
+const updateMutationsForRequest = (state, action) => {
+  if (action.meta && action.meta.requestKey) {
+    const { requestKey } = action.meta;
 
     return {
       ...state,
@@ -35,9 +32,9 @@ const updateMutationsForRequest = (state, action, mutationConfig) => {
   };
 };
 
-export default (state, action, config, mutationConfig) => {
+export default (state, action, config) => {
   if (!isResponseAction(action)) {
-    return updateMutationsForRequest(state, action, mutationConfig);
+    return updateMutationsForRequest(state, action);
   }
 
   const requestAction = getRequestActionFromResponse(action);
@@ -46,42 +43,40 @@ export default (state, action, config, mutationConfig) => {
   if (isErrorAction(action)) {
     return {
       ...otherMutations,
-      [requestAction.type]: mutationConfigHasRequestKey(mutationConfig)
-        ? {
-            ...currentMutation,
-            [mutationConfig.getRequestKey(requestAction)]: {
-              error: config.getError(state, action, config),
-              pending:
-                currentMutation[mutationConfig.getRequestKey(requestAction)]
-                  .pending - 1,
+      [requestAction.type]:
+        action.meta && action.meta.requestKey
+          ? {
+              ...currentMutation,
+              [action.meta.requestKey]: {
+                error: config.getError(state.error, action),
+                pending: currentMutation[action.meta.requestKey].pending - 1,
+              },
+            }
+          : {
+              error: config.getError(state.error, action),
+              pending: currentMutation.pending - 1,
             },
-          }
-        : {
-            error: config.getError(state, action, config),
-            pending: currentMutation.pending - 1,
-          },
     };
   }
 
   // success or abort case
   const getUpdatedCurrentMutation = () => {
-    if (!mutationConfigHasRequestKey(mutationConfig)) {
+    if (!action.meta || !action.meta.requestKey) {
       return {
         error: null,
         pending: currentMutation.pending - 1,
       };
     }
 
-    const currentRequestKey = mutationConfig.getRequestKey(requestAction);
     const {
-      [currentRequestKey]: mutationForRequestKey,
+      [action.meta.requestKey]: mutationForRequestKey,
       ...remainingMutations
     } = currentMutation;
 
     if (mutationForRequestKey.pending !== 1) {
       return {
         ...remainingMutations,
-        [currentRequestKey]: {
+        [action.meta.requestKey]: {
           error: null,
           pending: mutationForRequestKey.pending - 1,
         },

@@ -27,11 +27,11 @@ const getDataUpdater = mutationConfig => {
   return null;
 };
 
-const requestMutationReducer = (state, action, config, mutationConfig) => {
+const requestMutationReducer = (state, action, mutationConfig) => {
   if (mutationConfig.updateDataOptimistic) {
     return {
       ...state,
-      data: mutationConfig.updateDataOptimistic(state, action, config),
+      data: mutationConfig.updateDataOptimistic(state.data),
     };
   }
 
@@ -40,21 +40,21 @@ const requestMutationReducer = (state, action, config, mutationConfig) => {
 
     return {
       ...state,
-      data: dataUpdater(state, action, config),
+      data: dataUpdater(state.data),
     };
   }
 
   return state;
 };
 
-const responseMutationReducer = (state, action, config, mutationConfig) => {
+const responseMutationReducer = (state, action, mutationConfig) => {
   if (isSuccessAction(action)) {
     const dataUpdater = getDataUpdater(mutationConfig);
 
     return dataUpdater
       ? {
           ...state,
-          data: dataUpdater(state, action, config),
+          data: dataUpdater(state.data, action),
         }
       : state;
   }
@@ -63,7 +63,7 @@ const responseMutationReducer = (state, action, config, mutationConfig) => {
   return mutationConfig.revertData
     ? {
         ...state,
-        data: mutationConfig.revertData(state, action, config),
+        data: mutationConfig.revertData(state.data, action),
       }
     : state;
 };
@@ -76,7 +76,7 @@ const onRequest = state => ({
 
 const onSuccess = (state, action, config) => ({
   ...state,
-  data: config.getData(state, action),
+  data: config.getData(state.data, action),
   pending: state.pending - 1,
   error: null,
 });
@@ -85,7 +85,7 @@ const onError = (state, action, config) => ({
   ...state,
   data: null,
   pending: state.pending - 1,
-  error: config.getError(state, action),
+  error: config.getError(state.error, action),
 });
 
 const onAbort = state => ({
@@ -114,18 +114,18 @@ export default localConfig => {
     if (
       action.meta &&
       action.meta.mutations &&
-      normalizedActionType in action.meta.mutations
+      action.meta.mutations[normalizedActionType]
     ) {
       const mutationConfig = action.meta.mutations[normalizedActionType];
 
       return isResponseAction(action)
-        ? responseMutationReducer(nextState, action, config, mutationConfig)
-        : requestMutationReducer(nextState, action, config, mutationConfig);
+        ? responseMutationReducer(nextState, action, mutationConfig)
+        : requestMutationReducer(nextState, action, mutationConfig);
     }
 
     switch (action.type) {
       case normalizedActionType:
-        return onRequest(nextState, action, config);
+        return onRequest(nextState);
       case success(normalizedActionType):
         return onSuccess(nextState, action, config);
       case error(normalizedActionType):

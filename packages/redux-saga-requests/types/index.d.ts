@@ -1,11 +1,11 @@
 import { AnyAction, Reducer, Middleware } from 'redux';
 
-interface FilterOnActionCallback {
+interface FilterActions {
   (action: AnyAction): boolean;
 }
 
-interface OnActionCallback {
-  (state: any, action: AnyAction): any;
+interface ModifyData {
+  (data: any, action: AnyAction): any;
 }
 
 interface RequestActionMeta {
@@ -14,24 +14,24 @@ interface RequestActionMeta {
   driver?: string;
   runByWatcher?: boolean;
   takeLatest?: boolean;
-  abortOn?: FilterOnActionCallback | string | string[];
-  resetOn?: FilterOnActionCallback | string[];
-  getData?: OnActionCallback;
-  getError?: OnActionCallback;
-  operations?: {
-    getRequestKey?: (action: RequestAction) => string;
+  abortOn?: FilterActions | string | string[];
+  resetOn?: FilterActions | string[];
+  getData?: ModifyData;
+  getError?: (error: any, action: AnyAction) => any;
+  requestKey?: string;
+  mutations?: {
     [actionType: string]:
-      | OnActionCallback
+      | ModifyData
       | {
-          updateData: OnActionCallback;
+          updateData: ModifyData;
         }
       | {
-          updateData?: OnActionCallback;
-          updateDataOptimistic: OnActionCallback;
-          revertData: OnActionCallback;
+          updateData?: ModifyData;
+          updateDataOptimistic: (data: any) => any;
+          revertData: ModifyData;
         }
       | {
-          updateData: OnActionCallback;
+          updateData: (data: any) => any;
           local: true;
         };
   };
@@ -105,8 +105,8 @@ export const sendRequest: (
 ) => any;
 
 interface WatchRequestsConfig {
-  takeLatest?: boolean | FilterOnActionCallback;
-  abortOn?: FilterOnActionCallback | string | string[];
+  takeLatest?: boolean | FilterActions;
+  abortOn?: FilterActions | string | string[];
   getLastActionKey?: (action: AnyAction) => string;
 }
 
@@ -114,9 +114,9 @@ export const watchRequests: (config?: WatchRequestsConfig) => void;
 
 interface NetworkReducerConfig {
   isRequestActionQuery?: (requestAction: RequestAction) => boolean;
-  getData?: OnActionCallback;
-  getError?: OnActionCallback;
-  resetOn?: FilterOnActionCallback | string[];
+  getData?: ModifyData;
+  getError?: (error: any, action: AnyAction) => any;
+  resetOn?: FilterActions | string[];
 }
 
 export const networkReducer: (config: NetworkReducerConfig) => Reducer<any>;

@@ -114,7 +114,7 @@ describe('reducers', () => {
       const RESET = 'RESET';
       const reducer = requestsReducer({
         actionType,
-        getData: (state, action) => ({ nested: action.payload.data }),
+        getData: (data, action) => ({ nested: action.payload.data }),
         resetOn: action => action.type === RESET,
       });
       const initialState = reducer(undefined, {});
@@ -215,11 +215,10 @@ describe('reducers', () => {
         expect(
           reducer(defaultState, {
             type: MUTATION_ACTION,
-            data: 'data',
             meta: {
               mutations: {
                 [actionType]: {
-                  updateDataOptimistic: (state, action) => action.data,
+                  updateDataOptimistic: () => 'data',
                 },
               },
             },
@@ -243,7 +242,7 @@ describe('reducers', () => {
             meta: {
               requestAction: { type: MUTATION_ACTION },
               mutations: {
-                [actionType]: (state, action) => action.data.nested,
+                [actionType]: (data, action) => action.data.nested,
               },
             },
           }),
@@ -267,7 +266,7 @@ describe('reducers', () => {
               requestAction: { type: MUTATION_ACTION },
               mutations: {
                 [actionType]: {
-                  updateData: (state, action) => action.data.nested,
+                  updateData: (data, action) => action.data.nested,
                 },
               },
             },
@@ -289,12 +288,11 @@ describe('reducers', () => {
             type: error(MUTATION_ACTION),
             error: 'error',
             meta: {
-              requestAction: { type: MUTATION_ACTION, oldData: 'oldData' },
+              requestAction: { type: MUTATION_ACTION },
               mutations: {
                 [actionType]: {
                   updateDataOptimistic: (state, action) => action.data,
-                  revertData: (state, action) =>
-                    action.meta.requestAction.oldData,
+                  revertData: () => 'oldData',
                 },
               },
             },
@@ -316,9 +314,10 @@ describe('reducers', () => {
             { ...defaultState, data: 'data' },
             {
               type: error(MUTATION_ACTION),
+              data: 'data2',
               error: 'error',
               meta: {
-                requestAction: { type: MUTATION_ACTION, oldData: 'oldData' },
+                requestAction: { type: MUTATION_ACTION },
                 mutations: {
                   [actionType]: {
                     updateDataOptimistic: (state, action) => action.data,
@@ -343,12 +342,11 @@ describe('reducers', () => {
           reducer(defaultState, {
             type: abort(MUTATION_ACTION),
             meta: {
-              requestAction: { type: MUTATION_ACTION, oldData: 'oldData' },
+              requestAction: { type: MUTATION_ACTION },
               mutations: {
                 [actionType]: {
-                  updateDataOptimistic: (state, action) => action.data,
-                  revertData: (state, action) =>
-                    action.meta.requestAction.oldData,
+                  updateDataOptimistic: () => 'data2',
+                  revertData: () => 'oldData',
                 },
               },
             },
@@ -376,17 +374,16 @@ describe('reducers', () => {
         expect(
           commonReducer(defaultState, {
             type: LOCAL_MUTATION_ACTION,
-            data: 'data',
             meta: {
               mutations: {
                 [actionType]: {
                   local: true,
-                  updateData: (state, action) => action.data,
+                  updateData: () => 'data local',
                 },
               },
             },
           }),
-        ).toEqual({ ...defaultState, data: 'data' });
+        ).toEqual({ ...defaultState, data: 'data local' });
       });
     });
   });

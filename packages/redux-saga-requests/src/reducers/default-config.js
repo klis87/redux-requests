@@ -1,6 +1,6 @@
 export default {
-  getData: (state, action) =>
+  getData: (data, action) =>
     action.payload ? action.payload.data : action.data,
-  getError: (state, action) => (action.payload ? action.payload : action.error),
+  getError: (error, action) => (action.payload ? action.payload : action.error),
   resetOn: [],
 };

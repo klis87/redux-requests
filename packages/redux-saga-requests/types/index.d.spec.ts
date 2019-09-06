@@ -35,6 +35,14 @@ const requestAction: RequestAction = {
     dependentRequestsNumber: 1,
     isDependentRequest: true,
     customKey: 'customValue',
+    requestKey: '1',
+    asMutation: true,
+    mutations: {
+      FETCH: {
+        updateData: () => 'data',
+        revertData: () => 'data',
+      },
+    },
   },
 };
 
@@ -89,8 +97,8 @@ watchRequests({ abortOn: ['TYPE'] });
 
 networkReducer({
   isRequestActionQuery: () => true,
-  getData: (state, action) => action.payload.data,
-  getError: (state, action) => action.payload,
+  getData: (data, action) => action.payload.data,
+  getError: (error, action) => action.payload,
   resetOn: ['RESET'],
 });
 
