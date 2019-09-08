@@ -8,6 +8,4 @@ const requestAction = {
 const fetchDriver = createDriver({});
 createDriver({}, { AbortController: {} });
 createDriver({}, { AbortController: {}, baseURL: '/' });
-fetchDriver.getSuccessPayload({}, {});
-fetchDriver.getErrorPayload({});
-fetchDriver.sendRequest({}, {}, requestAction);
+fetchDriver.sendRequest({}, requestAction);

@@ -19,26 +19,15 @@ describe('mockDriver', () => {
     });
   });
 
-  describe('getAbortSource', () => {
-    it('returns new source', () => {
-      expect(mockDriver.getAbortSource().cancel()).toBe(true);
-    });
-  });
-
-  describe('abortRequest', () => {
-    it('calls cancel method', () => {
-      const abortSource = { cancel: jest.fn() };
-      mockDriver.abortRequest(abortSource);
-      expect(abortSource.cancel).toBeCalledTimes(1);
-    });
-  });
-
   describe('sendRequest', () => {
     it('returns correct response', async () => {
-      const response = await mockDriver.sendRequest({ url: '/' }, null, {
-        type: 'FETCH_LIST',
-        request: { url: '/' },
-      });
+      const response = await mockDriver.sendRequest(
+        { url: '/' },
+        {
+          type: 'FETCH_LIST',
+          request: { url: '/' },
+        },
+      );
       expect(response).toEqual({ data: ['item1', 'item2'] });
     });
 
@@ -47,7 +36,7 @@ describe('mockDriver', () => {
         url: '/',
         body: { id: 1 },
       };
-      const response = await mockDriver.sendRequest(requestConfig, null, {
+      const response = await mockDriver.sendRequest(requestConfig, {
         type: 'FETCH_DETAIL',
         request: requestConfig,
       });
@@ -58,10 +47,13 @@ describe('mockDriver', () => {
       let error;
 
       try {
-        await mockDriver.sendRequest({ url: '/' }, null, {
-          type: 'FETCH_ERROR',
-          request: { url: '/' },
-        });
+        await mockDriver.sendRequest(
+          { url: '/' },
+          {
+            type: 'FETCH_ERROR',
+            request: { url: '/' },
+          },
+        );
       } catch (e) {
         error = e;
       }

@@ -48,11 +48,7 @@ const requestAction: RequestAction = {
 
 let dummyDriver: Driver;
 dummyDriver.requestInstance = {};
-dummyDriver.getAbortSource();
-dummyDriver.abortRequest({});
-dummyDriver.sendRequest({}, {}, requestAction);
-dummyDriver.getSuccessPayload({}, {});
-dummyDriver.getErrorPayload({});
+dummyDriver.sendRequest({}, requestAction);
 
 createRequestInstance({ driver: dummyDriver });
 createRequestInstance({
@@ -97,8 +93,8 @@ watchRequests({ abortOn: ['TYPE'] });
 
 networkReducer({
   isRequestActionQuery: () => true,
-  getData: (data, action) => action.payload.data,
-  getError: (error, action) => action.payload,
+  getData: data => data,
+  getError: error => error,
 });
 
 requestsPromiseMiddleware();

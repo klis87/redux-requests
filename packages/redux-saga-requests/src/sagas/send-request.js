@@ -71,7 +71,7 @@ export default function* sendRequest(
     );
   }
 
-  const abortSource = driver.getAbortSource();
+  let responsePromises = [];
 
   try {
     let response;
@@ -81,17 +81,14 @@ export default function* sendRequest(
       if (action.meta && action.meta.cacheResponse) {
         response = action.meta.cacheResponse;
       } else if (!Array.isArray(actionPayload.request)) {
-        response = yield call(
-          [driver, 'sendRequest'],
-          actionPayload.request,
-          abortSource,
-          action,
-        );
+        responsePromises = [driver.sendRequest(actionPayload.request, action)];
+        response = yield call(() => responsePromises[0]);
       } else {
+        responsePromises = actionPayload.request.map(requestConfig =>
+          driver.sendRequest(requestConfig, action),
+        );
         response = yield all(
-          actionPayload.request.map(requestItem =>
-            call([driver, 'sendRequest'], requestItem, abortSource, action),
-          ),
+          responsePromises.map(responsePromise => call(() => responsePromise)),
         );
         response = response.reduce(
           (prev, current) => {
@@ -154,7 +151,7 @@ export default function* sendRequest(
     return { response };
   } finally {
     if (yield cancelled()) {
-      yield call([driver, 'abortRequest'], abortSource);
+      responsePromises.forEach(promise => promise.cancel && promise.cancel());
 
       if (
         requestsConfig.onAbort &&

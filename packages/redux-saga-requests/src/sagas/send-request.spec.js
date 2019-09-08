@@ -18,30 +18,20 @@ import sendRequest from './send-request';
 
 const nullback = () => {};
 
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
-
 const dummyDriver = requestInstance => ({
   requestInstance,
-  getAbortSource() {
-    return { token: 'token', cancel: nullback };
-  },
-  abortRequest(abortSource) {
-    abortSource.cancel();
-  },
-  async sendRequest() {
-    await sleep(0); // necessary to test cancelled tasks in watch requests
-    return { data: 'response' };
+  sendRequest() {
+    const responsePromise = new Promise(resolve =>
+      resolve({ data: 'response' }),
+    );
+
+    responsePromise.cancel = nullback;
+    return responsePromise;
   },
 });
 
 const dummyErrorDriver = requestInstance => ({
   requestInstance,
-  getAbortSource() {
-    return { token: 'token', cancel: nullback };
-  },
-  abortRequest(abortSource) {
-    abortSource.cancel();
-  },
   sendRequest() {
     throw new Error('responseError');
   },

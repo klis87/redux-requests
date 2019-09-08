@@ -2,38 +2,17 @@ import { createDriver } from './fetch-api-driver';
 
 describe('fetchApiDriver', () => {
   class DummyAbortController {
-    /* eslint-disable-next-line class-methods-use-this */
-    abort() {}
+    constructor() {
+      this.signal = 'signal';
+      this.abort = jest.fn();
+    }
   }
-
-  const fetchInstance = requestConfig => requestConfig;
-  const fetchDriver = createDriver(fetchInstance, {
-    AbortController: DummyAbortController,
-  });
 
   describe('requestInstance', () => {
     it('has correct value', () => {
+      const fetchInstance = requestConfig => requestConfig;
+      const fetchDriver = createDriver(fetchInstance);
       expect(fetchDriver.requestInstance).toBe(fetchInstance);
-    });
-  });
-
-  describe('getAbortSource', () => {
-    it('returns new source', () => {
-      expect(fetchDriver.getAbortSource()).toEqual(new DummyAbortController());
-    });
-  });
-
-  describe('abortRequest', () => {
-    it('calls cancel method', () => {
-      const abortSource = { abort: jest.fn() };
-      fetchDriver.abortRequest(abortSource);
-      expect(abortSource.abort).toBeCalledTimes(1);
-    });
-
-    it('doesnt crash when AbortController not provided', () => {
-      const driver = createDriver(fetchInstance);
-      const abortSource = driver.getAbortSource();
-      driver.abortRequest(abortSource);
     });
   });
 
@@ -48,10 +27,7 @@ describe('fetchApiDriver', () => {
       let error;
 
       try {
-        await driver.sendRequest(
-          { url: '/', responseType: 'notValidType' },
-          { signal: 'signal' },
-        );
+        await driver.sendRequest({ url: '/', responseType: 'notValidType' });
       } catch (e) {
         error = e;
       }
@@ -62,16 +38,12 @@ describe('fetchApiDriver', () => {
     });
 
     it('returns response with data for successful request', async () => {
-      const getResponseData = jest.fn().mockResolvedValue('data');
       const requestInstance = jest.fn().mockResolvedValue({
         ok: true,
-        json: getResponseData,
+        json: jest.fn().mockResolvedValue('data'),
       });
       const driver = createDriver(requestInstance);
-      const response = await driver.sendRequest(
-        { url: '/' },
-        { signal: 'signal' },
-      );
+      const response = await driver.sendRequest({ url: '/' });
 
       expect(response).toEqual({
         data: 'data',
@@ -83,10 +55,10 @@ describe('fetchApiDriver', () => {
         ok: true,
       });
       const driver = createDriver(requestInstance);
-      const response = await driver.sendRequest(
-        { url: '/', responseType: null },
-        { signal: 'signal' },
-      );
+      const response = await driver.sendRequest({
+        url: '/',
+        responseType: null,
+      });
 
       expect(response).toEqual({
         data: null,
@@ -103,7 +75,7 @@ describe('fetchApiDriver', () => {
       let error;
 
       try {
-        await driver.sendRequest({ url: '/' }, { signal: 'signal' });
+        await driver.sendRequest({ url: '/' });
       } catch (e) {
         error = e;
       }
@@ -115,14 +87,70 @@ describe('fetchApiDriver', () => {
       });
     });
 
+    it('throws response without data for error request and errored json', async () => {
+      const getResponse = jest.fn().mockRejectedValue('error');
+      const requestInstance = jest.fn().mockResolvedValue({
+        ok: false,
+        json: getResponse,
+      });
+      const driver = createDriver(requestInstance);
+      let error;
+
+      try {
+        await driver.sendRequest({ url: '/' });
+      } catch (e) {
+        error = e;
+      }
+
+      expect(error).toEqual({
+        ok: false,
+        json: getResponse,
+      });
+    });
+
     it('calls fetchInstance with proper object', async () => {
       const requestInstance = jest.fn().mockResolvedValue({
         ok: true,
         json: () => {},
       });
-      const driver = createDriver(requestInstance);
-      await driver.sendRequest({ url: '/' }, { signal: 'signal' });
+      const driver = createDriver(requestInstance, {
+        AbortController: DummyAbortController,
+      });
+      await driver.sendRequest({ url: '/' });
       expect(requestInstance).toBeCalledWith('/', { signal: 'signal' });
+    });
+
+    it('calls fetchInstance without signal with default AbortController', async () => {
+      const requestInstance = jest.fn().mockResolvedValue({
+        ok: true,
+        json: () => {},
+      });
+      const driver = createDriver(requestInstance);
+      await driver.sendRequest({ url: '/' });
+      expect(requestInstance).toBeCalledWith('/', { signal: undefined });
+    });
+
+    it('returns promise with cancel function which aborts request', async () => {
+      const abort = jest.fn();
+
+      class LocalDummyAbortController {
+        constructor() {
+          this.signal = 'signal';
+          this.abort = abort;
+        }
+      }
+
+      const requestInstance = jest.fn().mockResolvedValue({
+        ok: true,
+        json: () => {},
+      });
+      const driver = createDriver(requestInstance, {
+        AbortController: LocalDummyAbortController,
+      });
+      const promise = driver.sendRequest({ url: '/' });
+      expect(abort).not.toHaveBeenCalled();
+      promise.cancel();
+      expect(abort).toHaveBeenCalledTimes(1);
     });
 
     it('uses baseURL for relative urls', async () => {
@@ -132,8 +160,9 @@ describe('fetchApiDriver', () => {
       });
       const driver = createDriver(requestInstance, {
         baseURL: 'http://domain.com',
+        AbortController: DummyAbortController,
       });
-      await driver.sendRequest({ url: '/' }, { signal: 'signal' });
+      await driver.sendRequest({ url: '/' });
       expect(requestInstance).toBeCalledWith('http://domain.com/', {
         signal: 'signal',
       });
@@ -146,11 +175,9 @@ describe('fetchApiDriver', () => {
       });
       const driver = createDriver(requestInstance, {
         baseURL: 'http://domain.com',
+        AbortController: DummyAbortController,
       });
-      await driver.sendRequest(
-        { url: 'http://another-domain.com/' },
-        { signal: 'signal' },
-      );
+      await driver.sendRequest({ url: 'http://another-domain.com/' });
       expect(requestInstance).toBeCalledWith('http://another-domain.com/', {
         signal: 'signal',
       });

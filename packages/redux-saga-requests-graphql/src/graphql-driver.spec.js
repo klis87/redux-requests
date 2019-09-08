@@ -6,8 +6,6 @@ import { gql } from './gql';
 jest.mock('axios');
 
 describe('graphqlDriver', () => {
-  const graphqlDriver = createDriver({ url: '/graphql' });
-
   describe('requestInstance', () => {
     it('has correct value', () => {
       axios.create.mockReturnValueOnce('axiosInstance');
@@ -17,36 +15,21 @@ describe('graphqlDriver', () => {
     });
   });
 
-  describe('getAbortSource', () => {
-    it('returns new source', () => {
-      const tokenSource = {
-        token: 'token',
-        cancel: () => 'cancelled',
-      };
-
-      axios.CancelToken.source.mockReturnValue(tokenSource);
-      expect(graphqlDriver.getAbortSource()).toBe(tokenSource);
-    });
-  });
-
-  describe('abortRequest', () => {
-    it('calls cancel method', () => {
-      const abortSource = { cancel: jest.fn() };
-      graphqlDriver.abortRequest(abortSource);
-      expect(abortSource.cancel).toBeCalledTimes(1);
-    });
-  });
-
   describe('sendRequest', () => {
     const axiosInstanceMock = jest.fn();
     axios.create.mockReturnValueOnce(axiosInstanceMock);
+    const tokenSource = {
+      token: 'token',
+      cancel: () => jest.fn(),
+    };
+    axios.CancelToken.source.mockReturnValue(tokenSource);
     const driver = createDriver({ url: '/graphql' });
 
     it('returns correct response', async () => {
+      axiosInstanceMock.mockClear();
       axiosInstanceMock.mockResolvedValueOnce({
         data: 'data',
       });
-      axiosInstanceMock.mockClear();
       const query = gql`
         {
           x
@@ -73,10 +56,10 @@ describe('graphqlDriver', () => {
     });
 
     it('rejects response if errors present in response.data', async () => {
+      axiosInstanceMock.mockClear();
       axiosInstanceMock.mockResolvedValueOnce({
         data: { errors: 'errors' },
       });
-      axiosInstanceMock.mockClear();
 
       await expect(
         driver.sendRequest(
@@ -95,8 +78,8 @@ describe('graphqlDriver', () => {
     });
 
     it('rejects response when server error', async () => {
-      axiosInstanceMock.mockRejectedValueOnce('error');
       axiosInstanceMock.mockClear();
+      axiosInstanceMock.mockRejectedValueOnce('error');
 
       await expect(
         driver.sendRequest(
@@ -113,10 +96,10 @@ describe('graphqlDriver', () => {
     });
 
     it('sends request as form data when uploading files', async () => {
+      axiosInstanceMock.mockClear();
       axiosInstanceMock.mockResolvedValueOnce({
         data: 'data',
       });
-      axiosInstanceMock.mockClear();
       const file = new File(['1'], '1.txt', { type: 'text/plain' });
       const query = gql`
         mutation($file: Upload!, $x: Int!) {

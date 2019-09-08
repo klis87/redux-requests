@@ -8,13 +8,8 @@ export const createDriver = ({ url }) => {
 
   return {
     requestInstance: axiosInstance,
-    getAbortSource() {
-      return axios.CancelToken.source();
-    },
-    abortRequest(abortSource) {
-      abortSource.cancel();
-    },
-    sendRequest(requestConfig, abortSource) {
+    sendRequest(requestConfig) {
+      const abortSource = axios.CancelToken.source();
       const { clone, files } = extractFiles({
         query: requestConfig.query,
         variables: requestConfig.variables,
@@ -40,7 +35,7 @@ export const createDriver = ({ url }) => {
         });
       }
 
-      return axiosInstance({
+      const responsePromise = axiosInstance({
         cancelToken: abortSource.token,
         method: 'post',
         data,
@@ -52,6 +47,9 @@ export const createDriver = ({ url }) => {
           return { data: response.data };
         }
       });
+
+      responsePromise.cancel = () => abortSource.cancel();
+      return responsePromise;
     },
   };
 };

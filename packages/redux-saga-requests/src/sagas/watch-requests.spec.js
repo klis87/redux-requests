@@ -6,31 +6,13 @@ import { defaultRequestInstanceConfig } from './create-request-instance';
 import sendRequest from './send-request';
 import watchRequests, { cancelSendRequestOnAction } from './watch-requests';
 
-const nullback = () => {};
-
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 const dummyDriver = requestInstance => ({
   requestInstance,
-  getAbortSource() {
-    return { token: 'token', cancel: nullback };
-  },
-  abortRequest(abortSource) {
-    abortSource.cancel();
-  },
   async sendRequest() {
     await sleep(0); // necessary to test cancelled tasks in watch requests
     return { data: 'response' };
-  },
-  getSuccessPayload(response) {
-    if (Array.isArray(response)) {
-      return response.map(r => r.data);
-    }
-
-    return response.data;
-  },
-  getErrorPayload(e) {
-    return e;
   },
 });
 

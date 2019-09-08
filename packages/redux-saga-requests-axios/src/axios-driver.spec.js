@@ -5,46 +5,39 @@ import { createDriver } from './axios-driver';
 jest.mock('axios');
 
 describe('axiosDriver', () => {
-  const axiosInstance = jest
-    .fn()
-    .mockResolvedValue({ data: 'data', status: 200 });
-  const axiosDriver = createDriver(axiosInstance);
-
   describe('requestInstance', () => {
     it('has correct value', () => {
+      const axiosInstance = {};
+      const axiosDriver = createDriver(axiosInstance);
       expect(axiosDriver.requestInstance).toBe(axiosInstance);
     });
   });
 
-  describe('getAbortSource', () => {
-    it('returns new source', () => {
+  describe('sendRequest', () => {
+    it('returns cancellable promise with correct response', async () => {
+      const axiosInstance = jest
+        .fn()
+        .mockResolvedValue({ data: 'data', status: 200 });
       const tokenSource = {
         token: 'token',
-        cancel: () => 'cancelled',
+        cancel: jest.fn(),
       };
-
+      const axiosDriver = createDriver(axiosInstance);
       axios.CancelToken.source.mockReturnValue(tokenSource);
-      expect(axiosDriver.getAbortSource()).toBe(tokenSource);
-    });
-  });
 
-  describe('abortRequest', () => {
-    it('calls cancel method', () => {
-      const abortSource = { cancel: jest.fn() };
-      axiosDriver.abortRequest(abortSource);
-      expect(abortSource.cancel).toBeCalledTimes(1);
-    });
-  });
+      const responsePromise = axiosDriver.sendRequest(
+        { url: '/' },
+        { token: 'token' },
+      );
 
-  describe('sendRequest', () => {
-    it('returns correct response', async () => {
-      await expect(
-        axiosDriver.sendRequest({ url: '/' }, { token: 'token' }),
-      ).resolves.toEqual({ data: 'data' });
+      await expect(responsePromise).resolves.toEqual({ data: 'data' });
       expect(axiosInstance).toHaveBeenLastCalledWith({
         url: '/',
         cancelToken: 'token',
       });
+      expect(tokenSource.cancel).not.toHaveBeenCalled();
+      responsePromise.cancel();
+      expect(tokenSource.cancel).toHaveBeenCalledTimes(1);
     });
   });
 });

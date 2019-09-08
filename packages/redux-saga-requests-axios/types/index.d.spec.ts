@@ -7,6 +7,4 @@ const requestAction = {
 };
 
 const axiosDriver = createDriver({});
-axiosDriver.getSuccessPayload({}, {});
-axiosDriver.getErrorPayload({});
-axiosDriver.sendRequest({}, {}, requestAction);
+axiosDriver.sendRequest({}, requestAction);

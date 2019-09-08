@@ -26,32 +26,30 @@ export const createDriver = (
   { baseURL = '', AbortController = DummyAbortController } = {},
 ) => ({
   requestInstance: fetchInstance,
-  getAbortSource() {
-    return new AbortController();
-  },
-  abortRequest(abortSource) {
-    abortSource.abort();
-  },
-  sendRequest: async (
-    { url, responseType = 'json', ...requestConfig },
-    abortSource,
-  ) => {
-    const response = await fetchInstance(
+  sendRequest: ({ url, responseType = 'json', ...requestConfig }) => {
+    const abortSource = new AbortController();
+    const responsePromise = fetchInstance(
       isAbsoluteUrl(url) ? url : baseURL + url,
       { signal: abortSource.signal, ...requestConfig },
-    );
+    )
+      .then(response => {
+        if (response.ok) {
+          return getResponseData(response, responseType);
+        }
 
-    if (!response.ok) {
-      try {
-        response.data = await response.json();
-      } catch (e) {
-        // no response data from server
-      }
+        return response.json().then(
+          data => {
+            response.data = data;
+            throw response;
+          },
+          () => {
+            throw response;
+          },
+        );
+      })
+      .then(data => ({ data }));
 
-      throw response;
-    }
-
-    const data = await getResponseData(response, responseType);
-    return { data };
+    responsePromise.cancel = () => abortSource.abort();
+    return responsePromise;
   },
 });

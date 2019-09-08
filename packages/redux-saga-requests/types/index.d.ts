@@ -66,15 +66,7 @@ export const abort: ActionTypeModifier;
 
 export interface Driver {
   requestInstance: any;
-  getAbortSource: () => any;
-  abortRequest: (abortSource: any) => void;
-  sendRequest: (
-    requestConfig: any,
-    abortSource: any,
-    requestAction: RequestAction,
-  ) => any;
-  getSuccessPayload: (response: any, request: any) => any;
-  getErrorPayload: (error: any) => any;
+  sendRequest: (requestConfig: any, requestAction: RequestAction) => any;
 }
 
 interface RequestInstanceConfig {
