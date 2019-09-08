@@ -151,31 +151,4 @@ describe('graphqlDriver', () => {
       });
     });
   });
-
-  describe('getSuccessPayload', () => {
-    it('returns response data', () => {
-      const response = { data: { data: 'data' } };
-      expect(graphqlDriver.getSuccessPayload(response)).toEqual(
-        response.data.data,
-      );
-    });
-
-    it('returns array of response data', () => {
-      const responses = [
-        { data: { data: 'data1' } },
-        { data: { data: 'data2' } },
-      ];
-      expect(graphqlDriver.getSuccessPayload(responses)).toEqual([
-        responses[0].data.data,
-        responses[1].data.data,
-      ]);
-    });
-  });
-
-  describe('getErrorPayload', () => {
-    it('returns error', () => {
-      const error = 'error';
-      expect(graphqlDriver.getErrorPayload(error)).toBe(error);
-    });
-  });
 });

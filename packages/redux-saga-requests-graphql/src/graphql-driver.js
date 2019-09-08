@@ -1,8 +1,6 @@
 import axios from 'axios';
 import { extractFiles } from 'extract-files';
 
-const prepareSuccessPayload = response => response.data.data;
-
 export const createDriver = ({ url }) => {
   const axiosInstance = axios.create({
     baseURL: url,
@@ -51,19 +49,9 @@ export const createDriver = ({ url }) => {
         if (response.data.errors) {
           throw response;
         } else {
-          return response;
+          return { data: response.data };
         }
       });
-    },
-    getSuccessPayload(response) {
-      if (Array.isArray(response)) {
-        return response.map(prepareSuccessPayload);
-      }
-
-      return prepareSuccessPayload(response);
-    },
-    getErrorPayload(error) {
-      return error;
     },
   };
 };

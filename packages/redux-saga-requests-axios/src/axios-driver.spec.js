@@ -5,7 +5,9 @@ import { createDriver } from './axios-driver';
 jest.mock('axios');
 
 describe('axiosDriver', () => {
-  const axiosInstance = requestConfig => requestConfig;
+  const axiosInstance = jest
+    .fn()
+    .mockResolvedValue({ data: 'data', status: 200 });
   const axiosDriver = createDriver(axiosInstance);
 
   describe('requestInstance', () => {
@@ -35,35 +37,14 @@ describe('axiosDriver', () => {
   });
 
   describe('sendRequest', () => {
-    it('returns correct response', () => {
-      expect(axiosDriver.sendRequest({ url: '/' }, { token: 'token' })).toEqual(
-        {
-          url: '/',
-          cancelToken: 'token',
-        },
-      );
-    });
-  });
-
-  describe('getSuccessPayload', () => {
-    it('returns response data', () => {
-      const response = { data: 'data' };
-      expect(axiosDriver.getSuccessPayload(response)).toEqual(response.data);
-    });
-
-    it('returns array of response data', () => {
-      const responses = [{ data: 'data1' }, { data: 'data2' }];
-      expect(axiosDriver.getSuccessPayload(responses)).toEqual([
-        responses[0].data,
-        responses[1].data,
-      ]);
-    });
-  });
-
-  describe('getErrorPayload', () => {
-    it('returns error', () => {
-      const error = 'error';
-      expect(axiosDriver.getErrorPayload(error)).toBe(error);
+    it('returns correct response', async () => {
+      await expect(
+        axiosDriver.sendRequest({ url: '/' }, { token: 'token' }),
+      ).resolves.toEqual({ data: 'data' });
+      expect(axiosInstance).toHaveBeenLastCalledWith({
+        url: '/',
+        cancelToken: 'token',
+      });
     });
   });
 });

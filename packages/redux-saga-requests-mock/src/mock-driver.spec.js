@@ -68,26 +68,4 @@ describe('mockDriver', () => {
       expect(error).toBe('responseError');
     });
   });
-
-  describe('getSuccessPayload', () => {
-    it('returns response data', () => {
-      const response = { data: 'data' };
-      expect(mockDriver.getSuccessPayload(response)).toEqual(response.data);
-    });
-
-    it('returns array of response data', () => {
-      const responses = [{ data: 'data1' }, { data: 'data2' }];
-      expect(mockDriver.getSuccessPayload(responses)).toEqual([
-        responses[0].data,
-        responses[1].data,
-      ]);
-    });
-  });
-
-  describe('getErrorPayload', () => {
-    it('returns error', () => {
-      const error = 'error';
-      expect(mockDriver.getErrorPayload(error)).toBe(error);
-    });
-  });
 });

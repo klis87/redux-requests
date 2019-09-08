@@ -62,10 +62,10 @@ describe('fetchApiDriver', () => {
     });
 
     it('returns response with data for successful request', async () => {
-      const getResponse = jest.fn().mockResolvedValue('data');
+      const getResponseData = jest.fn().mockResolvedValue('data');
       const requestInstance = jest.fn().mockResolvedValue({
         ok: true,
-        json: getResponse,
+        json: getResponseData,
       });
       const driver = createDriver(requestInstance);
       const response = await driver.sendRequest(
@@ -74,8 +74,6 @@ describe('fetchApiDriver', () => {
       );
 
       expect(response).toEqual({
-        ok: true,
-        json: getResponse,
         data: 'data',
       });
     });
@@ -91,7 +89,6 @@ describe('fetchApiDriver', () => {
       );
 
       expect(response).toEqual({
-        ok: true,
         data: null,
       });
     });
@@ -157,28 +154,6 @@ describe('fetchApiDriver', () => {
       expect(requestInstance).toBeCalledWith('http://another-domain.com/', {
         signal: 'signal',
       });
-    });
-  });
-
-  describe('getSuccessPayload', () => {
-    it('returns response data', () => {
-      const response = { data: 'data' };
-      expect(fetchDriver.getSuccessPayload(response)).toEqual(response.data);
-    });
-
-    it('returns array of response data', () => {
-      const responses = [{ data: 'data1' }, { data: 'data2' }];
-      expect(fetchDriver.getSuccessPayload(responses)).toEqual([
-        responses[0].data,
-        responses[1].data,
-      ]);
-    });
-  });
-
-  describe('getErrorPayload', () => {
-    it('returns error', () => {
-      const error = 'error';
-      expect(fetchDriver.getErrorPayload(error)).toBe(error);
     });
   });
 });

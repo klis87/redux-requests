@@ -49,7 +49,10 @@ const responseMutationReducer = (state, action, mutationConfig) => {
     return dataUpdater
       ? {
           ...state,
-          data: dataUpdater(state.data, action),
+          data: dataUpdater(
+            state.data,
+            action.payload ? action.payload.data : action.response.data,
+          ),
         }
       : state;
   }
@@ -58,7 +61,7 @@ const responseMutationReducer = (state, action, mutationConfig) => {
   return mutationConfig.revertData
     ? {
         ...state,
-        data: mutationConfig.revertData(state.data, action),
+        data: mutationConfig.revertData(state.data),
       }
     : state;
 };
@@ -70,21 +73,21 @@ const onRequest = state => ({
 });
 
 const onSuccess = (state, action, config) => ({
-  ...state,
   data: (action.meta && action.meta.getData
     ? action.meta.getData
-    : config.getData)(state.data, action),
+    : config.getData)(
+    action.payload ? action.payload.data : action.response.data,
+  ),
   pending: state.pending - 1,
   error: null,
 });
 
 const onError = (state, action, config) => ({
-  ...state,
   data: null,
   pending: state.pending - 1,
   error: (action.meta && action.meta.getError
     ? action.meta.getError
-    : config.getError)(state.error, action),
+    : config.getError)(action.payload ? action.payload : action.error),
 });
 
 const onAbort = state => ({

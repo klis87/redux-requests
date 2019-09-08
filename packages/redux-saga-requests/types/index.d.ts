@@ -5,7 +5,7 @@ interface FilterActions {
 }
 
 interface ModifyData {
-  (data: any, action: AnyAction): any;
+  (data: any, mutationData: any): any;
 }
 
 interface RequestActionMeta {
@@ -15,8 +15,8 @@ interface RequestActionMeta {
   runByWatcher?: boolean;
   takeLatest?: boolean;
   abortOn?: FilterActions | string | string[];
-  getData?: ModifyData;
-  getError?: (error: any, action: AnyAction) => any;
+  getData?: (data: any) => any;
+  getError?: (error: any) => any;
   requestKey?: string;
   mutations?: {
     [actionType: string]:
@@ -27,7 +27,7 @@ interface RequestActionMeta {
       | {
           updateData?: ModifyData;
           updateDataOptimistic: (data: any) => any;
-          revertData: ModifyData;
+          revertData: (data: any) => any;
         }
       | {
           updateData: (data: any) => any;
@@ -113,8 +113,8 @@ export const watchRequests: (config?: WatchRequestsConfig) => void;
 
 interface NetworkReducerConfig {
   isRequestActionQuery?: (requestAction: RequestAction) => boolean;
-  getData?: ModifyData;
-  getError?: (error: any, action: AnyAction) => any;
+  getData?: (data: any) => any;
+  getError?: (error: any) => any;
 }
 
 export const networkReducer: (config: NetworkReducerConfig) => Reducer<any>;

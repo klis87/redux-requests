@@ -16,19 +16,9 @@ export const abort = getActionWithSuffix(ABORT_SUFFIX);
 
 const isFSA = action => !!action.payload;
 
-export const createSuccessAction = (action, data, response) => ({
+export const createSuccessAction = (action, response) => ({
   type: success(action.type),
-  ...(isFSA(action)
-    ? {
-        payload: {
-          data,
-          response,
-        },
-      }
-    : {
-        data,
-        response,
-      }),
+  ...(isFSA(action) ? { payload: response } : { response }),
   meta: {
     ...action.meta,
     requestAction: action,

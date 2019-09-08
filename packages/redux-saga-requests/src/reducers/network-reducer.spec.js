@@ -49,7 +49,7 @@ describe('reducers', () => {
 
       state = reducer(
         state,
-        createSuccessAction(firstRequest, 'data', { data: 'data' }),
+        createSuccessAction(firstRequest, { data: 'data' }),
       );
       expect(state.queries).toEqual({
         REQUEST: {
@@ -81,7 +81,7 @@ describe('reducers', () => {
 
     it('allows to override config as argument', () => {
       const reducer = networkReducer({
-        getData: (data, action) => ({ nested: action.data }),
+        getData: data => ({ nested: data }),
       });
       const state = reducer(
         { queries: {}, mutations: {} },
@@ -93,7 +93,7 @@ describe('reducers', () => {
           state,
           createSuccessAction(
             { type: 'REQUEST', request: { url: '/' } },
-            'data',
+            { data: 'data' },
           ),
         ),
       ).toEqual({
@@ -113,12 +113,12 @@ describe('reducers', () => {
       const requestAction = {
         type: 'REQUEST',
         request: { url: '/' },
-        meta: { getData: (data, action) => ({ nested: action.data }) },
+        meta: { getData: data => ({ nested: data }) },
       };
       const state = reducer({ queries: {}, mutations: {} }, requestAction);
 
       expect(
-        reducer(state, createSuccessAction(requestAction, 'data')),
+        reducer(state, createSuccessAction(requestAction, { data: 'data' })),
       ).toEqual({
         queries: {
           REQUEST: {
@@ -233,7 +233,7 @@ describe('reducers', () => {
 
       state = reducer(
         state,
-        createSuccessAction(mutationWithoutConfig, 'data'),
+        createSuccessAction(mutationWithoutConfig, { data: 'data' }),
       );
 
       expect(state).toEqual({
@@ -257,7 +257,7 @@ describe('reducers', () => {
         request: { url: '/', method: 'post' },
         meta: {
           mutations: {
-            REQUEST: (_, action) => action.data,
+            REQUEST: (_, data) => data,
           },
         },
       };
@@ -284,7 +284,10 @@ describe('reducers', () => {
         },
       });
 
-      state = reducer(state, createSuccessAction(mutationWithConfig, 'data2'));
+      state = reducer(
+        state,
+        createSuccessAction(mutationWithConfig, { data: 'data2' }),
+      );
 
       expect(state).toEqual({
         queries: {
@@ -312,7 +315,7 @@ describe('reducers', () => {
         meta: {
           requestKey: '1',
           mutations: {
-            REQUEST: (_, action) => action.data,
+            REQUEST: (_, data) => data,
           },
         },
       };
@@ -348,7 +351,9 @@ describe('reducers', () => {
 
       state = reducer(
         state,
-        createSuccessAction(mutationWithConfigWithRequestKey, 'data3'),
+        createSuccessAction(mutationWithConfigWithRequestKey, {
+          data: 'data3',
+        }),
       );
 
       expect(state).toEqual({
@@ -379,7 +384,9 @@ describe('reducers', () => {
 
       state = reducer(
         state,
-        createSuccessAction(mutationWithConfigWithRequestKey, 'data3'),
+        createSuccessAction(mutationWithConfigWithRequestKey, {
+          data: 'data3',
+        }),
       );
 
       expect(state).toEqual({
@@ -409,7 +416,7 @@ describe('reducers', () => {
         meta: {
           mutations: {
             REQUEST: {
-              updateData: (_, action) => action.data,
+              updateData: (data, mutationData) => mutationData,
               updateDataOptimistic: () => 'optimistic data',
               revertData: () => 'reverted data',
             },
@@ -446,7 +453,7 @@ describe('reducers', () => {
 
       state = reducer(
         state,
-        createSuccessAction(mutationWithOptimisticUpdate, 'data4'),
+        createSuccessAction(mutationWithOptimisticUpdate, { data: 'data4' }),
       );
 
       expect(state).toEqual({
@@ -551,15 +558,15 @@ describe('reducers', () => {
           url: '/',
         },
         meta: {
-          getData: (data, action) => [...data, action.data],
+          getData: data => [data],
         },
       };
       state = reducer(state, query);
-      state = reducer(state, createSuccessAction(query, 'data3'));
+      state = reducer(state, createSuccessAction(query, { data: 'data3' }));
       expect(state).toEqual({
         queries: {
           QUERY: {
-            data: ['data', 'data2', 'data3'],
+            data: ['data3'],
             pending: 0,
             error: null,
           },

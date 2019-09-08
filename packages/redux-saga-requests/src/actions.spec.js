@@ -42,11 +42,8 @@ describe('actions', () => {
         request: { url: '/' },
       };
 
-      expect(
-        createSuccessAction(requestAction, 'data', { data: 'data' }),
-      ).toEqual({
+      expect(createSuccessAction(requestAction, { data: 'data' })).toEqual({
         type: 'REQUEST_SUCCESS',
-        data: 'data',
         response: { data: 'data' },
         meta: {
           requestAction,
@@ -62,13 +59,10 @@ describe('actions', () => {
         },
       };
 
-      expect(
-        createSuccessAction(requestAction, 'data', { data: 'data' }),
-      ).toEqual({
+      expect(createSuccessAction(requestAction, { data: 'data' })).toEqual({
         type: 'REQUEST_SUCCESS',
         payload: {
           data: 'data',
-          response: { data: 'data' },
         },
         meta: {
           requestAction,
@@ -85,11 +79,8 @@ describe('actions', () => {
         },
       };
 
-      expect(
-        createSuccessAction(requestAction, 'data', { data: 'data' }),
-      ).toEqual({
+      expect(createSuccessAction(requestAction, { data: 'data' })).toEqual({
         type: 'REQUEST_SUCCESS',
-        data: 'data',
         response: { data: 'data' },
         meta: {
           requestAction,

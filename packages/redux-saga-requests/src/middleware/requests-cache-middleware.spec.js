@@ -38,7 +38,7 @@ describe('middleware', () => {
       const mockStore = configureStore([requestsCacheMiddleware()]);
       const store = mockStore({});
       const action = { type: 'REQUEST', request: { url: '/' } };
-      const responseAction = createSuccessAction(action, null, null);
+      const responseAction = createSuccessAction(action, { data: null });
       store.dispatch(action);
       store.dispatch(responseAction);
       expect(store.getActions()).toEqual([action, responseAction]);
@@ -53,7 +53,7 @@ describe('middleware', () => {
         request: { url: '/' },
         meta: { cache: true },
       };
-      const responseAction = createSuccessAction(action, null, {
+      const responseAction = createSuccessAction(action, {
         data: 'data',
       });
       store.dispatch(action);
@@ -90,7 +90,7 @@ describe('middleware', () => {
         request: { url: '/' },
         meta: { cache: 1 },
       };
-      const responseAction = createSuccessAction(action, null, {
+      const responseAction = createSuccessAction(action, {
         data: 'data',
       });
       store.dispatch(action);
@@ -118,7 +118,7 @@ describe('middleware', () => {
         request: { url: '/' },
         meta: { cache: 1 },
       };
-      const responseAction = createSuccessAction(action, null, {
+      const responseAction = createSuccessAction(action, {
         data: 'data',
       });
       store.dispatch(action);
@@ -151,7 +151,7 @@ describe('middleware', () => {
         request: { url: '/' },
         meta: { cache: true },
       };
-      const responseAction = createSuccessAction(action, null, {
+      const responseAction = createSuccessAction(action, {
         data: 'data',
       });
       store.dispatch(action);
@@ -171,7 +171,7 @@ describe('middleware', () => {
         request: { url: '/' },
         meta: { cache: true },
       };
-      const responseAction = createSuccessAction(action, null, {
+      const responseAction = createSuccessAction(action, {
         data: 'data',
       });
       store.dispatch(action);
@@ -197,7 +197,7 @@ describe('middleware', () => {
         meta: { cache: true, cacheKey: id },
       });
       const createResponseAction = id =>
-        createSuccessAction(createRequestAction(id), id, {
+        createSuccessAction(createRequestAction(id), {
           data: id,
         });
 
@@ -231,7 +231,7 @@ describe('middleware', () => {
         meta: { cache: true, cacheKey: id, cacheSize: 1 },
       });
       const createResponseAction = id =>
-        createSuccessAction(createRequestAction(id), id, {
+        createSuccessAction(createRequestAction(id), {
           data: id,
         });
 

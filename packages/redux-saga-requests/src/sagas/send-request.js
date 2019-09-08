@@ -93,6 +93,13 @@ export default function* sendRequest(
             call([driver, 'sendRequest'], requestItem, abortSource, action),
           ),
         );
+        response = response.reduce(
+          (prev, current) => {
+            prev.data.push(current.data);
+            return prev;
+          },
+          { data: [] },
+        );
       }
     } catch (e) {
       responseError = e;
@@ -121,10 +128,8 @@ export default function* sendRequest(
       }
 
       if (!response) {
-        const errorPayload = yield call(driver.getErrorPayload, responseError);
-
         if (!silent) {
-          yield put(createErrorAction(action, errorPayload));
+          yield put(createErrorAction(action, responseError));
         }
 
         return { error: responseError };
@@ -142,14 +147,8 @@ export default function* sendRequest(
       response = yield call(requestsConfig.onSuccess, response, action);
     }
 
-    const successPayload = yield call(
-      driver.getSuccessPayload,
-      response,
-      actionPayload.request,
-    );
-
     if (!silent) {
-      yield put(createSuccessAction(action, successPayload, response));
+      yield put(createSuccessAction(action, response));
     }
 
     return { response };

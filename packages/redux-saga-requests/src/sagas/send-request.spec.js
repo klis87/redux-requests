@@ -32,16 +32,6 @@ const dummyDriver = requestInstance => ({
     await sleep(0); // necessary to test cancelled tasks in watch requests
     return { data: 'response' };
   },
-  getSuccessPayload(response) {
-    if (Array.isArray(response)) {
-      return response.map(r => r.data);
-    }
-
-    return response.data;
-  },
-  getErrorPayload(e) {
-    return e;
-  },
 });
 
 const dummyErrorDriver = requestInstance => ({
@@ -54,12 +44,6 @@ const dummyErrorDriver = requestInstance => ({
   },
   sendRequest() {
     throw new Error('responseError');
-  },
-  getSuccessPayload(response) {
-    return response.data;
-  },
-  getErrorPayload(e) {
-    return e;
   },
 });
 
@@ -100,7 +84,7 @@ describe('sagas', () => {
           [matchers.put.actionType(action.type), actionWithCacheResponse],
         ])
         .put(
-          createSuccessAction(actionWithCacheResponse, 'data', {
+          createSuccessAction(actionWithCacheResponse, {
             data: 'data',
           }),
         )
@@ -149,7 +133,7 @@ describe('sagas', () => {
 
       return expectSaga(sendRequest, action)
         .provide([[getContext(REQUESTS_CONFIG), config]])
-        .put(createSuccessAction(action, 'response', { data: 'response' }))
+        .put(createSuccessAction(action, { data: 'response' }))
         .returns({ response: { data: 'response' } })
         .run();
     });
@@ -177,7 +161,7 @@ describe('sagas', () => {
             { ...config, driver: { default: dummyDriver() } },
           ],
         ])
-        .put(createSuccessAction(action, 'response', { data: 'response' }))
+        .put(createSuccessAction(action, { data: 'response' }))
         .returns({ response: { data: 'response' } })
         .run();
     });
@@ -199,7 +183,7 @@ describe('sagas', () => {
             },
           ],
         ])
-        .put(createSuccessAction(action, 'response', { data: 'response' }))
+        .put(createSuccessAction(action, { data: 'response' }))
         .returns({ response: { data: 'response' } })
         .run();
     });
@@ -215,14 +199,8 @@ describe('sagas', () => {
           [getContext(REQUESTS_CONFIG), config],
           [matchers.put.actionType(action.type), action],
         ])
-        .put(
-          createSuccessAction(
-            action,
-            ['response', 'response'],
-            [{ data: 'response' }, { data: 'response' }],
-          ),
-        )
-        .returns({ response: [{ data: 'response' }, { data: 'response' }] })
+        .put(createSuccessAction(action, { data: ['response', 'response'] }))
+        .returns({ response: { data: ['response', 'response'] } })
         .run();
     });
 

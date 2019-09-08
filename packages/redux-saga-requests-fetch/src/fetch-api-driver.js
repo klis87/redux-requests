@@ -16,8 +16,6 @@ const getResponseData = (response, responseType) => {
   return response[responseType]();
 };
 
-const prepareSuccessPayload = response => response.data;
-
 class DummyAbortController {
   /* eslint-disable-next-line class-methods-use-this */
   abort() {}
@@ -53,17 +51,7 @@ export const createDriver = (
       throw response;
     }
 
-    response.data = await getResponseData(response, responseType);
-    return response;
-  },
-  getSuccessPayload(response) {
-    if (Array.isArray(response)) {
-      return response.map(prepareSuccessPayload);
-    }
-
-    return prepareSuccessPayload(response);
-  },
-  getErrorPayload(error) {
-    return error;
+    const data = await getResponseData(response, responseType);
+    return { data };
   },
 });

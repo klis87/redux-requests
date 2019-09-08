@@ -3,7 +3,6 @@ import {
   isRequestAction,
   isSuccessAction,
   getRequestActionFromResponse,
-  getActionPayload,
 } from '../actions';
 
 const isCacheValid = cache =>
@@ -66,7 +65,7 @@ export default () => {
       }
 
       cacheMap.set(getCacheKey(requestAction), {
-        response: getActionPayload(action).response,
+        response: action.payload ? action.payload : action.response,
         expiring: getNewCacheTimeout(action.meta.cache),
       });
     }

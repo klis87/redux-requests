@@ -53,12 +53,12 @@ export default (state, action, config) => {
           ? {
               ...currentMutation,
               [action.meta.requestKey]: {
-                error: getError(state.error, action),
+                error: getError(action.payload ? action.payload : action.error),
                 pending: currentMutation[action.meta.requestKey].pending - 1,
               },
             }
           : {
-              error: getError(state.error, action),
+              error: getError(action.payload ? action.payload : action.error),
               pending: currentMutation.pending - 1,
             },
     };
