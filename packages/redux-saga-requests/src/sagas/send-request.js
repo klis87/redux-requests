@@ -98,8 +98,13 @@ export default function* sendRequest(
           { data: [] },
         );
       }
+
+      if (action.meta && !action.meta.cacheResponse && action.meta.getData) {
+        response = { ...response, data: action.meta.getData(response.data) };
+      }
     } catch (e) {
-      responseError = e;
+      responseError =
+        action.meta && action.meta.getError ? action.meta.getError(e) : e;
     }
 
     if (responseError) {

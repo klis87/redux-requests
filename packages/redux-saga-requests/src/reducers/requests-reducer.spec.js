@@ -6,7 +6,6 @@ import {
   createErrorAction,
 } from '../actions';
 import requestsReducer from './requests-reducer';
-import defaultConfig from './default-config';
 
 describe('reducers', () => {
   describe('requestsReducer', () => {
@@ -20,26 +19,19 @@ describe('reducers', () => {
       };
 
       it('returns correct default state', () => {
-        expect(
-          requestsReducer(undefined, {}, actionType, defaultConfig),
-        ).toEqual(defaultState);
+        expect(requestsReducer(undefined, {}, actionType)).toEqual(
+          defaultState,
+        );
       });
 
       it('returns correct state for not handled action', () => {
         const state = 'some_state';
-        expect(requestsReducer(state, {}, actionType, defaultConfig)).toBe(
-          state,
-        );
+        expect(requestsReducer(state, {}, actionType)).toBe(state);
       });
 
       it('returns correct state for request action', () => {
         expect(
-          requestsReducer(
-            defaultState,
-            { type: actionType },
-            actionType,
-            defaultConfig,
-          ),
+          requestsReducer(defaultState, { type: actionType }, actionType),
         ).toEqual({
           data: null,
           error: null,
@@ -53,9 +45,7 @@ describe('reducers', () => {
           type: success(actionType),
           response: { data },
         };
-        expect(
-          requestsReducer(defaultState, action, actionType, defaultConfig),
-        ).toEqual({
+        expect(requestsReducer(defaultState, action, actionType)).toEqual({
           data,
           error: null,
           pending: -1,
@@ -68,9 +58,7 @@ describe('reducers', () => {
           type: error(actionType),
           error: someError,
         };
-        expect(
-          requestsReducer(defaultState, action, actionType, defaultConfig),
-        ).toEqual({
+        expect(requestsReducer(defaultState, action, actionType)).toEqual({
           data: null,
           error: someError,
           pending: -1,
@@ -79,9 +67,7 @@ describe('reducers', () => {
 
       it('returns correct state for abort action', () => {
         const action = { type: abort(actionType) };
-        expect(
-          requestsReducer(defaultState, action, actionType, defaultConfig),
-        ).toEqual({
+        expect(requestsReducer(defaultState, action, actionType)).toEqual({
           data: null,
           error: null,
           pending: -1,
@@ -103,7 +89,6 @@ describe('reducers', () => {
             defaultState,
             createSuccessAction(action, { data: 'data' }),
             actionType,
-            defaultConfig,
           ),
         ).toEqual({
           data: 'data',
@@ -116,7 +101,6 @@ describe('reducers', () => {
             defaultState,
             createErrorAction(action, 'error'),
             actionType,
-            defaultConfig,
           ),
         ).toEqual({
           data: null,
@@ -149,7 +133,6 @@ describe('reducers', () => {
               },
             },
             actionType,
-            defaultConfig,
           ),
         ).toEqual({
           data: 'data',
@@ -173,7 +156,6 @@ describe('reducers', () => {
               },
             },
             actionType,
-            defaultConfig,
           ),
         ).toEqual({
           data: 'response',
@@ -199,7 +181,6 @@ describe('reducers', () => {
               },
             },
             actionType,
-            defaultConfig,
           ),
         ).toEqual({
           data: 'response',
@@ -226,7 +207,6 @@ describe('reducers', () => {
               },
             },
             actionType,
-            defaultConfig,
           ),
         ).toEqual({
           data: 'oldData',
@@ -252,7 +232,6 @@ describe('reducers', () => {
               },
             },
             actionType,
-            defaultConfig,
           ),
         ).toEqual({
           data: 'data',
@@ -278,7 +257,6 @@ describe('reducers', () => {
               },
             },
             actionType,
-            defaultConfig,
           ),
         ).toEqual({
           data: 'oldData',
@@ -312,7 +290,6 @@ describe('reducers', () => {
               },
             },
             actionType,
-            defaultConfig,
           ),
         ).toEqual({ ...defaultState, data: 'data local' });
       });

@@ -32,7 +32,7 @@ const updateMutationsForRequest = (state, action) => {
   };
 };
 
-export default (state, action, config) => {
+export default (state, action) => {
   if (!isResponseAction(action)) {
     return updateMutationsForRequest(state, action);
   }
@@ -41,11 +41,6 @@ export default (state, action, config) => {
   const { [requestAction.type]: currentMutation, ...otherMutations } = state;
 
   if (isErrorAction(action)) {
-    const getError =
-      action.meta && action.meta.getError
-        ? action.meta.getError
-        : config.getError;
-
     return {
       ...otherMutations,
       [requestAction.type]:
@@ -53,12 +48,12 @@ export default (state, action, config) => {
           ? {
               ...currentMutation,
               [action.meta.requestKey]: {
-                error: getError(action.payload ? action.payload : action.error),
+                error: action.payload ? action.payload : action.error,
                 pending: currentMutation[action.meta.requestKey].pending - 1,
               },
             }
           : {
-              error: getError(action.payload ? action.payload : action.error),
+              error: action.payload ? action.payload : action.error,
               pending: currentMutation.pending - 1,
             },
     };

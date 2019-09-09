@@ -72,22 +72,16 @@ const onRequest = state => ({
   error: null,
 });
 
-const onSuccess = (state, action, config) => ({
-  data: (action.meta && action.meta.getData
-    ? action.meta.getData
-    : config.getData)(
-    action.payload ? action.payload.data : action.response.data,
-  ),
+const onSuccess = (state, action) => ({
+  data: action.payload ? action.payload.data : action.response.data,
   pending: state.pending - 1,
   error: null,
 });
 
-const onError = (state, action, config) => ({
+const onError = (state, action) => ({
   data: null,
   pending: state.pending - 1,
-  error: (action.meta && action.meta.getError
-    ? action.meta.getError
-    : config.getError)(action.payload ? action.payload : action.error),
+  error: action.payload ? action.payload : action.error,
 });
 
 const onAbort = state => ({
@@ -95,7 +89,7 @@ const onAbort = state => ({
   pending: state.pending - 1,
 });
 
-export default (state = initialState, action, actionType, config) => {
+export default (state = initialState, action, actionType) => {
   if (
     action.meta &&
     action.meta.mutations &&
@@ -112,11 +106,11 @@ export default (state = initialState, action, actionType, config) => {
     case actionType:
       return onRequest(state);
     case success(actionType):
-      return onSuccess(state, action, config);
+      return onSuccess(state, action);
     case error(actionType):
-      return onError(state, action, config);
+      return onError(state, action);
     case abort(actionType):
-      return onAbort(state, action, config);
+      return onAbort(state);
     default:
       return state;
   }

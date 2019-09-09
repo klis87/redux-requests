@@ -13,19 +13,14 @@ export default localConfig => {
   return (state = { queries: {}, mutations: {} }, action) => {
     const queries = Object.entries(state.queries).reduce(
       (prev, [actionType, query]) => {
-        prev[actionType] = requestsReducer(query, action, actionType, config);
+        prev[actionType] = requestsReducer(query, action, actionType);
         return prev;
       },
       isRequestAction(action) &&
         config.isRequestActionQuery(action) &&
         !(action.type in Object.keys(state.queries))
         ? {
-            [action.type]: requestsReducer(
-              undefined,
-              action,
-              action.type,
-              config,
-            ),
+            [action.type]: requestsReducer(undefined, action, action.type),
           }
         : {},
     );
@@ -37,7 +32,7 @@ export default localConfig => {
       (isResponseAction(action) &&
         !config.isRequestActionQuery(getRequestActionFromResponse(action)))
     ) {
-      mutations = mutationsReducer(mutations, action, config);
+      mutations = mutationsReducer(mutations, action);
     }
 
     return {

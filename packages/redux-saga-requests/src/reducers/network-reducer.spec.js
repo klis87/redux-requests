@@ -79,57 +79,34 @@ describe('reducers', () => {
       });
     });
 
-    it('allows to override config as argument', () => {
-      const reducer = networkReducer({
-        getData: data => ({ nested: data }),
-      });
-      const state = reducer(
-        { queries: {}, mutations: {} },
-        { type: 'REQUEST', request: { url: '/' } },
-      );
+    // it('allows to override config as argument', () => {
+    //   const reducer = networkReducer({
+    //     getData: data => ({ nested: data }),
+    //   });
+    //   const state = reducer(
+    //     { queries: {}, mutations: {} },
+    //     { type: 'REQUEST', request: { url: '/' } },
+    //   );
 
-      expect(
-        reducer(
-          state,
-          createSuccessAction(
-            { type: 'REQUEST', request: { url: '/' } },
-            { data: 'data' },
-          ),
-        ),
-      ).toEqual({
-        queries: {
-          REQUEST: {
-            data: { nested: 'data' },
-            pending: 0,
-            error: null,
-          },
-        },
-        mutations: {},
-      });
-    });
-
-    it('allows to override config with action meta', () => {
-      const reducer = networkReducer();
-      const requestAction = {
-        type: 'REQUEST',
-        request: { url: '/' },
-        meta: { getData: data => ({ nested: data }) },
-      };
-      const state = reducer({ queries: {}, mutations: {} }, requestAction);
-
-      expect(
-        reducer(state, createSuccessAction(requestAction, { data: 'data' })),
-      ).toEqual({
-        queries: {
-          REQUEST: {
-            data: { nested: 'data' },
-            pending: 0,
-            error: null,
-          },
-        },
-        mutations: {},
-      });
-    });
+    //   expect(
+    //     reducer(
+    //       state,
+    //       createSuccessAction(
+    //         { type: 'REQUEST', request: { url: '/' } },
+    //         { data: 'data' },
+    //       ),
+    //     ),
+    //   ).toEqual({
+    //     queries: {
+    //       REQUEST: {
+    //         data: { nested: 'data' },
+    //         pending: 0,
+    //         error: null,
+    //       },
+    //     },
+    //     mutations: {},
+    //   });
+    // });
 
     it('supports mutations', () => {
       const reducer = networkReducer();
@@ -545,28 +522,6 @@ describe('reducers', () => {
         queries: {
           QUERY: {
             data: ['data', 'data2'],
-            pending: 0,
-            error: null,
-          },
-        },
-        mutations: {},
-      });
-
-      const query = {
-        type: 'QUERY',
-        request: {
-          url: '/',
-        },
-        meta: {
-          getData: data => [data],
-        },
-      };
-      state = reducer(state, query);
-      state = reducer(state, createSuccessAction(query, { data: 'data3' }));
-      expect(state).toEqual({
-        queries: {
-          QUERY: {
-            data: ['data3'],
             pending: 0,
             error: null,
           },
