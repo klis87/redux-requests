@@ -1,29 +1,11 @@
 import configureStore from 'redux-mock-store';
 import { advanceBy, advanceTo, clear } from 'jest-date-mock';
 
-import {
-  createSuccessAction,
-  getRequestCache,
-  clearRequestsCache,
-} from '../actions';
+import { createSuccessAction, clearRequestsCache } from '../actions';
 import { requestsCacheMiddleware } from '.';
 
 describe('middleware', () => {
   describe('requestsCacheMiddleware', () => {
-    it('doesnt dispatch anything on getRequestCache action', () => {
-      const mockStore = configureStore([requestsCacheMiddleware()]);
-      const store = mockStore({});
-      store.dispatch(getRequestCache());
-      expect(store.getActions()).toEqual([]);
-    });
-
-    it('returns map on getRequestCache action', () => {
-      const mockStore = configureStore([requestsCacheMiddleware()]);
-      const store = mockStore({});
-      const result = store.dispatch(getRequestCache());
-      expect(result).toEqual(new Map());
-    });
-
     it('doesnt affect non request actions', () => {
       const mockStore = configureStore([requestsCacheMiddleware()]);
       const store = mockStore({});
@@ -31,7 +13,6 @@ describe('middleware', () => {
       const result = store.dispatch(action);
       expect(result).toEqual(action);
       expect(store.getActions()).toEqual([action]);
-      expect(store.dispatch(getRequestCache())).toEqual(new Map());
     });
 
     it('doesnt affect request actions with no meta cache', () => {
@@ -42,7 +23,6 @@ describe('middleware', () => {
       store.dispatch(action);
       store.dispatch(responseAction);
       expect(store.getActions()).toEqual([action, responseAction]);
-      expect(store.dispatch(getRequestCache())).toEqual(new Map());
     });
 
     it('adds cacheResponse to request action when meta cache is true', () => {
@@ -59,17 +39,6 @@ describe('middleware', () => {
       store.dispatch(action);
       store.dispatch(responseAction);
       expect(store.getActions()).toEqual([action, responseAction]);
-      expect(store.dispatch(getRequestCache())).toEqual(
-        new Map([
-          [
-            'REQUEST',
-            {
-              expiring: null,
-              response: { data: 'data' },
-            },
-          ],
-        ]),
-      );
       store.clearActions();
       store.dispatch(action);
       expect(store.getActions()).toEqual([
@@ -157,7 +126,6 @@ describe('middleware', () => {
       store.dispatch(action);
       store.dispatch(responseAction);
       store.dispatch(clearRequestsCache());
-      expect(store.dispatch(getRequestCache())).toEqual(new Map());
       store.clearActions();
       store.dispatch(action);
       expect(store.getActions()).toEqual([action]);
@@ -177,7 +145,6 @@ describe('middleware', () => {
       store.dispatch(action);
       store.dispatch(responseAction);
       store.dispatch(clearRequestsCache('REQUEST'));
-      expect(store.dispatch(getRequestCache())).toEqual(new Map());
       store.clearActions();
       store.dispatch(action);
       expect(store.getActions()).toEqual([action]);
@@ -224,7 +191,7 @@ describe('middleware', () => {
 
     it('supports meta cacheSize', () => {
       const mockStore = configureStore([requestsCacheMiddleware()]);
-      const store = mockStore({});
+      const store = mockStore({ network: { cache: {} } });
       const createRequestAction = id => ({
         type: 'REQUEST',
         request: { url: `/${id}` },

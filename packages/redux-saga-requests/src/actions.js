@@ -2,7 +2,6 @@ import {
   SUCCESS_SUFFIX,
   ERROR_SUFFIX,
   ABORT_SUFFIX,
-  GET_REQUEST_CACHE,
   CLEAR_REQUESTS_CACHE,
 } from './constants';
 
@@ -98,8 +97,6 @@ export const isRequestActionQuery = action => {
     ? request.every(isRequestQuery)
     : isRequestQuery(request));
 };
-
-export const getRequestCache = () => ({ type: GET_REQUEST_CACHE });
 
 export const clearRequestsCache = (...actionTypes) => ({
   type: CLEAR_REQUESTS_CACHE,

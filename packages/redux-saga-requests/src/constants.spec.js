@@ -3,7 +3,6 @@ import {
   ERROR_SUFFIX,
   ABORT_SUFFIX,
   REQUESTS_CONFIG,
-  GET_REQUEST_CACHE,
   CLEAR_REQUESTS_CACHE,
   INCORRECT_PAYLOAD_ERROR,
 } from './constants';
@@ -30,12 +29,6 @@ describe('constants', () => {
   describe('REQUESTS_CONFIG', () => {
     it('has correct value', () => {
       expect(REQUESTS_CONFIG).toBe('REDUX_SAGA_REQUESTS_CONFIG');
-    });
-  });
-
-  describe('GET_REQUEST_CACHE', () => {
-    it('has correct value', () => {
-      expect(GET_REQUEST_CACHE).toBe('GET_REQUEST_CACHE');
     });
   });
 

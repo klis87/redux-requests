@@ -7,16 +7,17 @@ describe('reducers', () => {
       expect(networkReducer()(undefined, {})).toEqual({
         queries: {},
         mutations: {},
+        cache: {},
       });
     });
 
     it('does not crash on non request action on load', () => {
       expect(
         networkReducer()(
-          { queries: {}, mutations: {} },
+          { queries: {}, mutations: {}, cache: {} },
           { type: 'NOT_REQUEST' },
         ),
-      ).toEqual({ queries: {}, mutations: {} });
+      ).toEqual({ queries: {}, mutations: {}, cache: {} });
     });
 
     it('handles read only requests', () => {
@@ -24,7 +25,10 @@ describe('reducers', () => {
       const firstRequest = { type: 'REQUEST', request: { url: '/' } };
       const secondRequest = { type: 'REQUEST_2', request: { url: '/' } };
 
-      let state = reducer({ queries: {}, mutations: {} }, firstRequest);
+      let state = reducer(
+        { queries: {}, mutations: {}, cache: {} },
+        firstRequest,
+      );
       expect(state.queries).toEqual({
         REQUEST: {
           data: null,
@@ -111,7 +115,7 @@ describe('reducers', () => {
     it('supports mutations', () => {
       const reducer = networkReducer();
       reducer(
-        { queries: {}, mutations: {} },
+        { queries: {}, mutations: {}, cache: {} },
         { type: 'REQUEST', request: { url: '/' } },
       );
 
@@ -124,6 +128,7 @@ describe('reducers', () => {
           },
         },
         mutations: {},
+        cache: {},
       };
 
       state = reducer(state, {
@@ -147,6 +152,7 @@ describe('reducers', () => {
           },
         },
         mutations: {},
+        cache: {},
       });
 
       const mutationWithoutConfig = {
@@ -170,6 +176,7 @@ describe('reducers', () => {
             pending: 1,
           },
         },
+        cache: {},
       });
 
       state = reducer(state, createErrorAction(mutationWithoutConfig, 'error'));
@@ -188,6 +195,7 @@ describe('reducers', () => {
             pending: 0,
           },
         },
+        cache: {},
       });
 
       state = reducer(state, mutationWithoutConfig);
@@ -206,6 +214,7 @@ describe('reducers', () => {
             pending: 1,
           },
         },
+        cache: {},
       });
 
       state = reducer(
@@ -227,6 +236,7 @@ describe('reducers', () => {
             pending: 0,
           },
         },
+        cache: {},
       });
 
       const mutationWithConfig = {
@@ -259,6 +269,7 @@ describe('reducers', () => {
             pending: 1,
           },
         },
+        cache: {},
       });
 
       state = reducer(
@@ -284,6 +295,7 @@ describe('reducers', () => {
             pending: 0,
           },
         },
+        cache: {},
       });
 
       const mutationWithConfigWithRequestKey = {
@@ -324,6 +336,7 @@ describe('reducers', () => {
             },
           },
         },
+        cache: {},
       });
 
       state = reducer(
@@ -357,6 +370,7 @@ describe('reducers', () => {
             },
           },
         },
+        cache: {},
       });
 
       state = reducer(
@@ -385,6 +399,7 @@ describe('reducers', () => {
           },
           MUTATION_WITH_CONFIG_WITH_REQUEST_KEY: {},
         },
+        cache: {},
       });
 
       const mutationWithOptimisticUpdate = {
@@ -426,6 +441,7 @@ describe('reducers', () => {
             pending: 1,
           },
         },
+        cache: {},
       });
 
       state = reducer(
@@ -456,6 +472,7 @@ describe('reducers', () => {
             pending: 0,
           },
         },
+        cache: {},
       });
 
       state = reducer(state, mutationWithOptimisticUpdate);
@@ -488,6 +505,7 @@ describe('reducers', () => {
             pending: 0,
           },
         },
+        cache: {},
       });
     });
 
@@ -502,6 +520,7 @@ describe('reducers', () => {
           },
         },
         mutations: {},
+        cache: {},
       };
 
       let state = reducer(initialState, {});
@@ -527,6 +546,7 @@ describe('reducers', () => {
           },
         },
         mutations: {},
+        cache: {},
       });
     });
   });
