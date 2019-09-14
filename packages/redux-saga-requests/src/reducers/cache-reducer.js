@@ -4,6 +4,7 @@ import {
   isSuccessAction,
   getRequestActionFromResponse,
 } from '../actions';
+import updateData from './update-data';
 
 const isCacheValid = cache =>
   cache.expiring === null || Date.now() <= cache.expiring;
@@ -64,6 +65,38 @@ export default (state, action) => {
         expiring: getNewCacheTimeout(action.meta.cache),
       },
     };
+  }
+
+  if (action.meta && action.meta.mutations) {
+    const mutationsToRun = Object.entries(action.meta.mutations).reduce(
+      (prev, [actionType, mutationConfig]) => {
+        const cacheKey = actionType + (mutationConfig.cacheKey || '');
+        const cacheValue = state[cacheKey];
+
+        if (cacheValue && isCacheValid(cacheValue)) {
+          prev[actionType] = mutationConfig;
+        }
+
+        return prev;
+      },
+      {},
+    );
+
+    if (Object.keys(mutationsToRun).length > 0) {
+      state = { ...state };
+      Object.entries(mutationsToRun).forEach(([actionType, mutationConfig]) => {
+        state[actionType] = {
+          ...state[actionType],
+          response: {
+            data: updateData(
+              state[actionType].response.data,
+              action,
+              mutationConfig,
+            ),
+          },
+        };
+      });
+    }
   }
 
   return state;

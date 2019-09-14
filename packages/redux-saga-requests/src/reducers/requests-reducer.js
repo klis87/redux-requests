@@ -1,69 +1,10 @@
-import {
-  success,
-  error,
-  abort,
-  isSuccessAction,
-  isResponseAction,
-} from '../actions';
+import { success, error, abort } from '../actions';
+import updateData from './update-data';
 
 const initialState = {
   data: null,
   pending: 0,
   error: null,
-};
-
-const getDataUpdater = mutationConfig => {
-  if (typeof mutationConfig === 'function') {
-    return mutationConfig;
-  } else if (mutationConfig.updateData) {
-    return mutationConfig.updateData;
-  }
-
-  return null;
-};
-
-const requestMutationReducer = (state, action, mutationConfig) => {
-  if (mutationConfig.updateDataOptimistic) {
-    return {
-      ...state,
-      data: mutationConfig.updateDataOptimistic(state.data),
-    };
-  }
-
-  if (mutationConfig.local) {
-    const dataUpdater = getDataUpdater(mutationConfig);
-
-    return {
-      ...state,
-      data: dataUpdater(state.data),
-    };
-  }
-
-  return state;
-};
-
-const responseMutationReducer = (state, action, mutationConfig) => {
-  if (isSuccessAction(action)) {
-    const dataUpdater = getDataUpdater(mutationConfig);
-
-    return dataUpdater
-      ? {
-          ...state,
-          data: dataUpdater(
-            state.data,
-            action.payload ? action.payload.data : action.response.data,
-          ),
-        }
-      : state;
-  }
-
-  // error or abort case
-  return mutationConfig.revertData
-    ? {
-        ...state,
-        data: mutationConfig.revertData(state.data),
-      }
-    : state;
 };
 
 const onRequest = state => ({
@@ -96,10 +37,8 @@ export default (state = initialState, action, actionType) => {
     action.meta.mutations[actionType]
   ) {
     const mutationConfig = action.meta.mutations[actionType];
-
-    return isResponseAction(action)
-      ? responseMutationReducer(state, action, mutationConfig)
-      : requestMutationReducer(state, action, mutationConfig);
+    const data = updateData(state.data, action, mutationConfig);
+    return data === state.data ? state : { ...state, data };
   }
 
   switch (action.type) {
