@@ -7,4 +7,4 @@ const requestAction = {
 };
 const mockDriver = createDriver({});
 createDriver({}, { timeout: 1 });
-mockDriver.sendRequest({}, requestAction);
+mockDriver({}, requestAction);

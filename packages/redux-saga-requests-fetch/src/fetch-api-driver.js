@@ -24,32 +24,29 @@ class DummyAbortController {
 export const createDriver = (
   fetchInstance,
   { baseURL = '', AbortController = DummyAbortController } = {},
-) => ({
-  requestInstance: fetchInstance,
-  sendRequest: ({ url, responseType = 'json', ...requestConfig }) => {
-    const abortSource = new AbortController();
-    const responsePromise = fetchInstance(
-      isAbsoluteUrl(url) ? url : baseURL + url,
-      { signal: abortSource.signal, ...requestConfig },
-    )
-      .then(response => {
-        if (response.ok) {
-          return getResponseData(response, responseType);
-        }
+) => ({ url, responseType = 'json', ...requestConfig }) => {
+  const abortSource = new AbortController();
+  const responsePromise = fetchInstance(
+    isAbsoluteUrl(url) ? url : baseURL + url,
+    { signal: abortSource.signal, ...requestConfig },
+  )
+    .then(response => {
+      if (response.ok) {
+        return getResponseData(response, responseType);
+      }
 
-        return response.json().then(
-          data => {
-            response.data = data;
-            throw response;
-          },
-          () => {
-            throw response;
-          },
-        );
-      })
-      .then(data => ({ data }));
+      return response.json().then(
+        data => {
+          response.data = data;
+          throw response;
+        },
+        () => {
+          throw response;
+        },
+      );
+    })
+    .then(data => ({ data }));
 
-    responsePromise.cancel = () => abortSource.abort();
-    return responsePromise;
-  },
-});
+  responsePromise.cancel = () => abortSource.abort();
+  return responsePromise;
+};

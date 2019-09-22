@@ -7,4 +7,4 @@ const requestAction = {
 };
 
 const axiosDriver = createDriver({});
-axiosDriver.sendRequest({}, requestAction);
+axiosDriver({}, requestAction);

@@ -60,8 +60,7 @@ export const error: ActionTypeModifier;
 export const abort: ActionTypeModifier;
 
 export interface Driver {
-  requestInstance: any;
-  sendRequest: (requestConfig: any, requestAction: RequestAction) => any;
+  (requestConfig: any, requestAction: RequestAction): any;
 }
 
 interface RequestInstanceConfig {

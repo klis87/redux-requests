@@ -8,13 +8,10 @@ import watchRequests, { cancelSendRequestOnAction } from './watch-requests';
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-const dummyDriver = requestInstance => ({
-  requestInstance,
-  async sendRequest() {
-    await sleep(0); // necessary to test cancelled tasks in watch requests
-    return { data: 'response' };
-  },
-});
+const dummyDriver = () => async () => {
+  await sleep(0); // necessary to test cancelled tasks in watch requests
+  return { data: 'response' };
+};
 
 describe('sagas', () => {
   describe('watchRequests', () => {

@@ -18,24 +18,15 @@ import sendRequest from './send-request';
 
 const nullback = () => {};
 
-const dummyDriver = requestInstance => ({
-  requestInstance,
-  sendRequest() {
-    const responsePromise = new Promise(resolve =>
-      resolve({ data: 'response' }),
-    );
+const dummyDriver = () => () => {
+  const responsePromise = new Promise(resolve => resolve({ data: 'response' }));
+  responsePromise.cancel = nullback;
+  return responsePromise;
+};
 
-    responsePromise.cancel = nullback;
-    return responsePromise;
-  },
-});
-
-const dummyErrorDriver = requestInstance => ({
-  requestInstance,
-  sendRequest() {
-    throw new Error('responseError');
-  },
-});
+const dummyErrorDriver = () => () => {
+  throw new Error('responseError');
+};
 
 describe('sagas', () => {
   describe('sendRequest', () => {

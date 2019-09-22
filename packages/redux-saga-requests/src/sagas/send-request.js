@@ -81,11 +81,11 @@ export default function* sendRequest(
       if (action.meta && action.meta.cacheResponse) {
         response = action.meta.cacheResponse;
       } else if (!Array.isArray(actionPayload.request)) {
-        responsePromises = [driver.sendRequest(actionPayload.request, action)];
+        responsePromises = [driver(actionPayload.request, action)];
         response = yield call(() => responsePromises[0]);
       } else {
         responsePromises = actionPayload.request.map(requestConfig =>
-          driver.sendRequest(requestConfig, action),
+          driver(requestConfig, action),
         );
         response = yield all(
           responsePromises.map(responsePromise => call(() => responsePromise)),

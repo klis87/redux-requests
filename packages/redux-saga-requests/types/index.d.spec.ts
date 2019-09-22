@@ -47,8 +47,7 @@ const requestAction: RequestAction = {
 };
 
 let dummyDriver: Driver;
-dummyDriver.requestInstance = {};
-dummyDriver.sendRequest({}, requestAction);
+dummyDriver({}, requestAction);
 
 createRequestInstance({ driver: dummyDriver });
 createRequestInstance({
