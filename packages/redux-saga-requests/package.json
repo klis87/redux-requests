@@ -70,6 +70,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.2.0",
-    "@redux-saga/delay-p": "^1.0.0"
+    "@redux-saga/delay-p": "^1.0.0",
+    "deepmerge": "4.0.0"
   }
 }
