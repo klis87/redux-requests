@@ -80,17 +80,20 @@ const maybeGetQueryActionType = (action, config) => {
 export default (state, action, config) => {
   if (action.meta && action.meta.mutations) {
     return {
-      ...state,
-      ...Object.keys(action.meta.mutations)
-        .filter(actionType => !!state[actionType])
-        .reduce((prev, actionType) => {
-          prev[actionType] = queryReducer(
-            state[actionType],
-            action,
-            actionType,
-          );
-          return prev;
-        }, {}),
+      queries: {
+        ...state.queries,
+        ...Object.keys(action.meta.mutations)
+          .filter(actionType => !!state.queries[actionType])
+          .reduce((prev, actionType) => {
+            prev[actionType] = queryReducer(
+              state.queries[actionType],
+              action,
+              actionType,
+            );
+            return prev;
+          }, {}),
+      },
+      normalizedData: state.normalizedData,
     };
   }
 
@@ -98,12 +101,15 @@ export default (state, action, config) => {
 
   if (queryActionType) {
     return {
-      ...state,
-      [queryActionType]: queryReducer(
-        state[queryActionType],
-        action,
-        queryActionType,
-      ),
+      queries: {
+        ...state.queries,
+        [queryActionType]: queryReducer(
+          state.queries[queryActionType],
+          action,
+          queryActionType,
+        ),
+      },
+      normalizedData: state.normalizedData,
     };
   }
 

@@ -11,8 +11,15 @@ import cacheReducer from './cache-reducer';
 export default localConfig => {
   const config = { ...defaultConfig, ...localConfig };
 
-  return (state = { queries: {}, mutations: {}, cache: {} }, action) => {
-    const queries = queriesReducer(state.queries, action, config);
+  return (
+    state = { queries: {}, mutations: {}, normalizedData: {}, cache: {} },
+    action,
+  ) => {
+    const { queries, normalizedData } = queriesReducer(
+      { queries: state.queries, normalizedData: state.normalizedData },
+      action,
+      config,
+    );
 
     let { mutations } = state;
 
@@ -26,6 +33,7 @@ export default localConfig => {
 
     return {
       queries,
+      normalizedData,
       mutations,
       cache: cacheReducer(state.cache, action),
     };

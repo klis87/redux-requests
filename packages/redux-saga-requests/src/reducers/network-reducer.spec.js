@@ -7,6 +7,7 @@ describe('reducers', () => {
       expect(networkReducer()(undefined, {})).toEqual({
         queries: {},
         mutations: {},
+        normalizedData: {},
         cache: {},
       });
     });
@@ -14,10 +15,10 @@ describe('reducers', () => {
     it('does not crash on non request action on load', () => {
       expect(
         networkReducer()(
-          { queries: {}, mutations: {}, cache: {} },
+          { queries: {}, mutations: {}, normalizedData: {}, cache: {} },
           { type: 'NOT_REQUEST' },
         ),
-      ).toEqual({ queries: {}, mutations: {}, cache: {} });
+      ).toEqual({ queries: {}, mutations: {}, normalizedData: {}, cache: {} });
     });
 
     it('handles read only requests', () => {
@@ -26,7 +27,7 @@ describe('reducers', () => {
       const secondRequest = { type: 'REQUEST_2', request: { url: '/' } };
 
       let state = reducer(
-        { queries: {}, mutations: {}, cache: {} },
+        { queries: {}, mutations: {}, normalizedData: {}, cache: {} },
         firstRequest,
       );
       expect(state.queries).toEqual({
@@ -115,7 +116,7 @@ describe('reducers', () => {
     it('supports mutations', () => {
       const reducer = networkReducer();
       reducer(
-        { queries: {}, mutations: {}, cache: {} },
+        { queries: {}, mutations: {}, normalizedData: {}, cache: {} },
         { type: 'REQUEST', request: { url: '/' } },
       );
 
@@ -127,6 +128,7 @@ describe('reducers', () => {
             error: null,
           },
         },
+        normalizedData: {},
         mutations: {},
         cache: {},
       };
@@ -151,6 +153,7 @@ describe('reducers', () => {
             error: null,
           },
         },
+        normalizedData: {},
         mutations: {},
         cache: {},
       });
@@ -176,6 +179,7 @@ describe('reducers', () => {
             pending: 1,
           },
         },
+        normalizedData: {},
         cache: {},
       });
 
@@ -195,6 +199,7 @@ describe('reducers', () => {
             pending: 0,
           },
         },
+        normalizedData: {},
         cache: {},
       });
 
@@ -214,6 +219,7 @@ describe('reducers', () => {
             pending: 1,
           },
         },
+        normalizedData: {},
         cache: {},
       });
 
@@ -236,6 +242,7 @@ describe('reducers', () => {
             pending: 0,
           },
         },
+        normalizedData: {},
         cache: {},
       });
 
@@ -270,6 +277,7 @@ describe('reducers', () => {
           },
         },
         cache: {},
+        normalizedData: {},
       });
 
       state = reducer(
@@ -296,6 +304,7 @@ describe('reducers', () => {
           },
         },
         cache: {},
+        normalizedData: {},
       });
 
       const mutationWithConfigWithRequestKey = {
@@ -337,6 +346,7 @@ describe('reducers', () => {
           },
         },
         cache: {},
+        normalizedData: {},
       });
 
       state = reducer(
@@ -371,6 +381,7 @@ describe('reducers', () => {
           },
         },
         cache: {},
+        normalizedData: {},
       });
 
       state = reducer(
@@ -400,6 +411,7 @@ describe('reducers', () => {
           MUTATION_WITH_CONFIG_WITH_REQUEST_KEY: {},
         },
         cache: {},
+        normalizedData: {},
       });
 
       const mutationWithOptimisticUpdate = {
@@ -442,6 +454,7 @@ describe('reducers', () => {
           },
         },
         cache: {},
+        normalizedData: {},
       });
 
       state = reducer(
@@ -473,6 +486,7 @@ describe('reducers', () => {
           },
         },
         cache: {},
+        normalizedData: {},
       });
 
       state = reducer(state, mutationWithOptimisticUpdate);
@@ -506,6 +520,7 @@ describe('reducers', () => {
           },
         },
         cache: {},
+        normalizedData: {},
       });
     });
 
@@ -521,6 +536,7 @@ describe('reducers', () => {
         },
         mutations: {},
         cache: {},
+        normalizedData: {},
       };
 
       let state = reducer(initialState, {});
@@ -547,6 +563,7 @@ describe('reducers', () => {
         },
         mutations: {},
         cache: {},
+        normalizedData: {},
       });
     });
   });
