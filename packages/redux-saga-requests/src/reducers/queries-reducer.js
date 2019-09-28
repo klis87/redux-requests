@@ -7,12 +7,16 @@ import {
   getRequestActionFromResponse,
 } from '../actions';
 import updateData from './update-data';
+import { normalize, mergeData } from '../normalizers';
 
 const initialQuery = {
   data: null,
   pending: 0,
   error: null,
+  normalized: false,
 };
+
+const normalizedInitialQuery = { ...initialQuery, normalized: true };
 
 const onRequest = state => ({
   ...state,
@@ -21,12 +25,14 @@ const onRequest = state => ({
 });
 
 const onSuccess = (state, action) => ({
+  ...state,
   data: action.payload ? action.payload.data : action.response.data,
   pending: state.pending - 1,
   error: null,
 });
 
 const onError = (state, action) => ({
+  ...state,
   data: null,
   pending: state.pending - 1,
   error: action.payload ? action.payload : action.error,
@@ -38,6 +44,13 @@ const onAbort = state => ({
 });
 
 const queryReducer = (state = initialQuery, action, actionType) => {
+  if (state === undefined) {
+    state =
+      action.meta && action.meta.normalize
+        ? normalizedInitialQuery
+        : initialQuery;
+  }
+
   if (
     action.meta &&
     action.meta.mutations &&
@@ -100,14 +113,32 @@ export default (state, action, config) => {
   const queryActionType = maybeGetQueryActionType(action, config);
 
   if (queryActionType) {
+    const updatedQuery = queryReducer(
+      state.queries[queryActionType],
+      action,
+      queryActionType,
+    );
+
+    if (
+      updatedQuery.normalized &&
+      updatedQuery.data &&
+      state.queries[queryActionType].data !== updatedQuery.data
+    ) {
+      const [data, normalizedData] = normalize(updatedQuery.data);
+
+      return {
+        queries: {
+          ...state.queries,
+          [queryActionType]: { ...updatedQuery, data },
+        },
+        normalizedData: mergeData(state.normalizedData, normalizedData),
+      };
+    }
+
     return {
       queries: {
         ...state.queries,
-        [queryActionType]: queryReducer(
-          state.queries[queryActionType],
-          action,
-          queryActionType,
-        ),
+        [queryActionType]: updatedQuery,
       },
       normalizedData: state.normalizedData,
     };
