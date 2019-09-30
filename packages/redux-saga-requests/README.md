@@ -687,7 +687,7 @@ This is a manager of `requestsReducer` instances, so you don't need to write red
 It is recent additional to this library, but it is the recommended way to use it and probably `requestsReducer` will be removed
 from public API. The difference is that you define only one `networkReducer` and config you used in `requestsReducer` now
 you need to move to action.meta. Also, because all remote state is kept in standardized form, not only you don't need to write
-reducers for remote data, but selectors also become redundant! Just use `getQuery`, `getMutation` and React helpers is you use
+reducers for remote data, but selectors also become redundant! Just use `getQuery`, `getMutation` and React helpers if you use
 React.
 
 So how does it work? Before going into that, lets divide all requests into queries and mutations. Queries have `data`, while mutations
