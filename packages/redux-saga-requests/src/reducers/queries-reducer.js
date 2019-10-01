@@ -43,7 +43,7 @@ const onAbort = state => ({
   pending: state.pending - 1,
 });
 
-const queryReducer = (state = initialQuery, action, actionType) => {
+const queryReducer = (state, action, actionType) => {
   if (state === undefined) {
     state =
       action.meta && action.meta.normalize
@@ -62,8 +62,6 @@ const queryReducer = (state = initialQuery, action, actionType) => {
   }
 
   switch (action.type) {
-    case actionType:
-      return onRequest(state);
     case success(actionType):
       return onSuccess(state, action);
     case error(actionType):
@@ -71,7 +69,7 @@ const queryReducer = (state = initialQuery, action, actionType) => {
     case abort(actionType):
       return onAbort(state);
     default:
-      return state;
+      return onRequest(state);
   }
 };
 
@@ -122,7 +120,8 @@ export default (state, action, config) => {
     if (
       updatedQuery.normalized &&
       updatedQuery.data &&
-      state.queries[queryActionType].data !== updatedQuery.data
+      (!state.queries[queryActionType] ||
+        state.queries[queryActionType].data !== updatedQuery.data)
     ) {
       const [data, normalizedData] = normalize(updatedQuery.data);
 
