@@ -500,6 +500,94 @@ describe('reducers', () => {
 
         expect(state.normalizedData).toBe(initialState.normalizedData);
       });
+
+      it('should normalize data with nested ids and arrays on query success', () => {
+        expect(
+          queriesReducer(
+            { queries: {}, normalizedData: {} },
+            createSuccessAction(requestAction, {
+              data: {
+                root: {
+                  id: '1',
+                  name: 'name',
+                  nested: [{ id: '2', v: 2 }, { id: '3', v: 3 }],
+                },
+              },
+            }),
+            defaultConfig,
+          ),
+        ).toEqual({
+          queries: {
+            FETCH_BOOK: {
+              ...defaultState,
+              pending: -1,
+              data: {
+                root: '@@1',
+              },
+            },
+          },
+          normalizedData: {
+            '@@1': {
+              id: '1',
+              name: 'name',
+              nested: ['@@2', '@@3'],
+            },
+            '@@2': { id: '2', v: 2 },
+            '@@3': { id: '3', v: 3 },
+          },
+        });
+      });
+
+      it('should merge normalized data on query success', () => {
+        expect(
+          queriesReducer(
+            {
+              queries: {},
+              normalizedData: { '@@1': { id: '1', a: 'a', b: 'b' } },
+            },
+            createSuccessAction(requestAction, {
+              data: { id: '1', a: 'd', c: 'c' },
+            }),
+            defaultConfig,
+          ),
+        ).toEqual({
+          queries: {
+            FETCH_BOOK: {
+              ...defaultState,
+              pending: -1,
+              data: '@@1',
+            },
+          },
+          normalizedData: { '@@1': { id: '1', a: 'd', b: 'b', c: 'c' } },
+        });
+      });
+
+      it('should update normalized data on mutation success', () => {
+        expect(
+          queriesReducer(
+            {
+              queries: {},
+              normalizedData: { '@@1': { id: '1', a: 'a', b: 'b' } },
+            },
+            createSuccessAction(
+              {
+                type: 'UPDATE_BOOK',
+                request: { url: '/', method: 'put' },
+                meta: {
+                  normalize: true,
+                },
+              },
+              {
+                data: { id: '1', a: 'd', c: 'c' },
+              },
+            ),
+            defaultConfig,
+          ),
+        ).toEqual({
+          queries: {},
+          normalizedData: { '@@1': { id: '1', a: 'd', b: 'b', c: 'c' } },
+        });
+      });
     });
   });
 });

@@ -5,6 +5,7 @@ import {
   isRequestAction,
   isResponseAction,
   getRequestActionFromResponse,
+  isRequestActionQuery,
 } from '../actions';
 import updateData from './update-data';
 import { normalize, mergeData } from '../normalizers';
@@ -18,6 +19,9 @@ const initialQuery = {
 
 const normalizedInitialQuery = { ...initialQuery, normalized: true };
 
+const getDataFromResponseAction = action =>
+  action.payload ? action.payload.data : action.response.data;
+
 const onRequest = state => ({
   ...state,
   pending: state.pending + 1,
@@ -26,7 +30,7 @@ const onRequest = state => ({
 
 const onSuccess = (state, action) => ({
   ...state,
-  data: action.payload ? action.payload.data : action.response.data,
+  data: getDataFromResponseAction(action),
   pending: state.pending - 1,
   error: null,
 });
@@ -89,6 +93,17 @@ const maybeGetQueryActionType = (action, config) => {
 };
 
 export default (state, action, config) => {
+  let { normalizedData } = state;
+
+  if (
+    isResponseAction(action) &&
+    action.meta.normalize &&
+    !isRequestActionQuery(getRequestActionFromResponse(action))
+  ) {
+    const [, newNormalizedData] = normalize(getDataFromResponseAction(action));
+    normalizedData = mergeData(normalizedData, newNormalizedData);
+  }
+
   if (action.meta && action.meta.mutations) {
     return {
       queries: {
@@ -104,7 +119,7 @@ export default (state, action, config) => {
             return prev;
           }, {}),
       },
-      normalizedData: state.normalizedData,
+      normalizedData,
     };
   }
 
@@ -123,14 +138,14 @@ export default (state, action, config) => {
       (!state.queries[queryActionType] ||
         state.queries[queryActionType].data !== updatedQuery.data)
     ) {
-      const [data, normalizedData] = normalize(updatedQuery.data);
+      const [data, newNormalizedData] = normalize(updatedQuery.data);
 
       return {
         queries: {
           ...state.queries,
           [queryActionType]: { ...updatedQuery, data },
         },
-        normalizedData: mergeData(state.normalizedData, normalizedData),
+        normalizedData: mergeData(normalizedData, newNormalizedData),
       };
     }
 
@@ -139,9 +154,16 @@ export default (state, action, config) => {
         ...state.queries,
         [queryActionType]: updatedQuery,
       },
-      normalizedData: state.normalizedData,
+      normalizedData,
     };
   }
 
-  return state;
+  if (state.normalizedData === normalizedData) {
+    return state;
+  }
+
+  return {
+    ...state,
+    normalizedData,
+  };
 };
