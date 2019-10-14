@@ -102,6 +102,9 @@ export default (state, action, config) => {
   ) {
     const [, newNormalizedData] = normalize(getDataFromResponseAction(action));
     normalizedData = mergeData(normalizedData, newNormalizedData);
+  } else if (action.meta && action.meta.localData) {
+    const [, newNormalizedData] = normalize(action.meta.localData);
+    normalizedData = mergeData(normalizedData, newNormalizedData);
   }
 
   if (action.meta && action.meta.mutations) {

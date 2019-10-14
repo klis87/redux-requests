@@ -640,6 +640,87 @@ describe('reducers', () => {
           },
         });
       });
+
+      it('should update normalized query data with local mutation', () => {
+        expect(
+          queriesReducer(
+            {
+              queries: {
+                FETCH_BOOK: {
+                  data: ['@@1'],
+                  pending: 0,
+                  error: null,
+                  normalized: true,
+                },
+              },
+              normalizedData: { '@@1': { id: '1', x: 1 } },
+            },
+            {
+              type: 'ADD_BOOK_LOCALLY',
+              meta: {
+                // normalize: true,
+                mutations: {
+                  FETCH_BOOK: {
+                    updateData: data => [...data, { id: '2', x: 2 }],
+                    local: true,
+                  },
+                },
+              },
+            },
+            defaultConfig,
+          ),
+        ).toEqual({
+          queries: {
+            FETCH_BOOK: {
+              data: ['@@1', '@@2'],
+              pending: 0,
+              error: null,
+              normalized: true,
+            },
+          },
+          normalizedData: {
+            '@@1': { id: '1', x: 1 },
+            '@@2': { id: '2', x: 2 },
+          },
+        });
+      });
+
+      it('should update normalized query data with localData', () => {
+        expect(
+          queriesReducer(
+            {
+              queries: {
+                FETCH_BOOK: {
+                  data: ['@@1'],
+                  pending: 0,
+                  error: null,
+                  normalized: true,
+                },
+              },
+              normalizedData: { '@@1': { id: '1', x: 1 } },
+            },
+            {
+              type: 'UPDATE_BOOK_LOCALLY',
+              meta: {
+                localData: { id: '1', x: 2 },
+              },
+            },
+            defaultConfig,
+          ),
+        ).toEqual({
+          queries: {
+            FETCH_BOOK: {
+              data: ['@@1'],
+              pending: 0,
+              error: null,
+              normalized: true,
+            },
+          },
+          normalizedData: {
+            '@@1': { id: '1', x: 2 },
+          },
+        });
+      });
     });
   });
 });
