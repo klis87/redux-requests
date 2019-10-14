@@ -111,11 +111,22 @@ export default (state, action, config) => {
         ...Object.keys(action.meta.mutations)
           .filter(actionType => !!state.queries[actionType])
           .reduce((prev, actionType) => {
-            prev[actionType] = queryReducer(
+            const updatedQuery = queryReducer(
               state.queries[actionType],
               action,
               actionType,
             );
+
+            if (
+              updatedQuery.normalized &&
+              updatedQuery.data !== state.queries[actionType].data
+            ) {
+              const [newdata, newNormalizedData] = normalize(updatedQuery.data);
+              normalizedData = mergeData(normalizedData, newNormalizedData);
+              prev[actionType] = { ...updatedQuery, data: newdata };
+            } else {
+              prev[actionType] = updatedQuery;
+            }
             return prev;
           }, {}),
       },

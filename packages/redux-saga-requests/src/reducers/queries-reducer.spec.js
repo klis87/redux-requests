@@ -588,6 +588,58 @@ describe('reducers', () => {
           normalizedData: { '@@1': { id: '1', a: 'd', b: 'b', c: 'c' } },
         });
       });
+
+      it('should update normalized query data on mutation success if defined in meta', () => {
+        expect(
+          queriesReducer(
+            {
+              queries: {
+                FETCH_BOOK: {
+                  data: ['@@1'],
+                  pending: 0,
+                  error: null,
+                  normalized: true,
+                },
+              },
+              normalizedData: { '@@1': { id: '1', x: 1 } },
+            },
+            createSuccessAction(
+              {
+                type: 'ADD_BOOK',
+                request: { url: '/', method: 'put' },
+                meta: {
+                  normalize: true,
+                  mutations: {
+                    FETCH_BOOK: (data, mutationData) => [
+                      ...data,
+                      mutationData,
+                      { id: '3', x: 3 },
+                    ],
+                  },
+                },
+              },
+              {
+                data: { id: '2', x: 2 },
+              },
+            ),
+            defaultConfig,
+          ),
+        ).toEqual({
+          queries: {
+            FETCH_BOOK: {
+              data: ['@@1', '@@2', '@@3'],
+              pending: 0,
+              error: null,
+              normalized: true,
+            },
+          },
+          normalizedData: {
+            '@@1': { id: '1', x: 1 },
+            '@@2': { id: '2', x: 2 },
+            '@@3': { id: '3', x: 3 },
+          },
+        });
+      });
     });
   });
 });
