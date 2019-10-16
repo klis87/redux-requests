@@ -6,6 +6,7 @@ import {
   isResponseAction,
   getRequestActionFromResponse,
   isRequestActionQuery,
+  isErrorAction,
 } from '../actions';
 import updateData from './update-data';
 import { normalize, mergeData } from '../normalizers';
@@ -95,6 +96,18 @@ const maybeGetQueryActionType = (action, config) => {
 export default (state, action, config) => {
   let { normalizedData } = state;
 
+  if (isRequestAction(action) && action.meta && action.meta.optimisticData) {
+    const [, newNormalizedData] = normalize(action.meta.optimisticData);
+    normalizedData = mergeData(normalizedData, newNormalizedData);
+  } else if (
+    isResponseAction(action) &&
+    isErrorAction(action) &&
+    action.meta.revertedData
+  ) {
+    const [, newNormalizedData] = normalize(action.meta.revertedData);
+    normalizedData = mergeData(normalizedData, newNormalizedData);
+  }
+
   if (
     isResponseAction(action) &&
     action.meta.normalize &&
@@ -172,12 +185,10 @@ export default (state, action, config) => {
     };
   }
 
-  if (state.normalizedData === normalizedData) {
-    return state;
-  }
-
-  return {
-    ...state,
-    normalizedData,
-  };
+  return state.normalizedData === normalizedData
+    ? state
+    : {
+        ...state,
+        normalizedData,
+      };
 };

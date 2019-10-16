@@ -26,9 +26,10 @@ interface RequestActionMeta {
           updateDataOptimistic?: (data: any) => any;
           revertData?: (data: any) => any;
           local?: boolean;
-          cacheKey?: string;
         };
   };
+  optimisticData: any;
+  revertedData: any;
   cache?: boolean | number;
   cacheKey?: string;
   cacheSize?: number;
