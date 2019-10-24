@@ -450,6 +450,7 @@ describe('reducers', () => {
         error: null,
         pending: 0,
         normalized: true,
+        usedKeys: [],
       };
       const requestAction = {
         type: 'FETCH_BOOK',
@@ -474,6 +475,7 @@ describe('reducers', () => {
               ...defaultState,
               pending: -1,
               data: '@@1',
+              usedKeys: { '': ['id', 'name'] },
             },
           },
           normalizedData: { '@@1': { id: '1', name: 'name' } },
@@ -488,6 +490,7 @@ describe('reducers', () => {
               pending: 0,
               error: null,
               normalized: true,
+              usedKeys: { '': ['id', 'name'] },
             },
           },
           normalizedData: {},
@@ -524,6 +527,10 @@ describe('reducers', () => {
               data: {
                 root: '@@1',
               },
+              usedKeys: {
+                '.root': ['id', 'name', 'nested'],
+                '.root.nested': ['id', 'v'],
+              },
             },
           },
           normalizedData: {
@@ -556,6 +563,7 @@ describe('reducers', () => {
               ...defaultState,
               pending: -1,
               data: '@@1',
+              usedKeys: { '': ['id', 'a', 'c'] },
             },
           },
           normalizedData: { '@@1': { id: '1', a: 'd', b: 'b', c: 'c' } },
@@ -631,6 +639,7 @@ describe('reducers', () => {
               pending: 0,
               error: null,
               normalized: true,
+              usedKeys: { '': ['id', 'x'] },
             },
           },
           normalizedData: {
@@ -676,6 +685,7 @@ describe('reducers', () => {
               pending: 0,
               error: null,
               normalized: true,
+              usedKeys: { '': ['id', 'x'] },
             },
           },
           normalizedData: {

@@ -18,7 +18,11 @@ const initialQuery = {
   normalized: false,
 };
 
-const normalizedInitialQuery = { ...initialQuery, normalized: true };
+const normalizedInitialQuery = {
+  ...initialQuery,
+  normalized: true,
+  usedKeys: {},
+};
 
 const getDataFromResponseAction = action =>
   action.payload ? action.payload.data : action.response.data;
@@ -137,9 +141,11 @@ export default (state, action, config) => {
               updatedQuery.normalized &&
               updatedQuery.data !== state.queries[actionType].data
             ) {
-              const [newdata, newNormalizedData] = normalize(updatedQuery.data);
+              const [newdata, newNormalizedData, usedKeys] = normalize(
+                updatedQuery.data,
+              );
               normalizedData = mergeData(normalizedData, newNormalizedData);
-              prev[actionType] = { ...updatedQuery, data: newdata };
+              prev[actionType] = { ...updatedQuery, data: newdata, usedKeys };
             } else {
               prev[actionType] = updatedQuery;
             }
@@ -165,12 +171,12 @@ export default (state, action, config) => {
       (!state.queries[queryActionType] ||
         state.queries[queryActionType].data !== updatedQuery.data)
     ) {
-      const [data, newNormalizedData] = normalize(updatedQuery.data);
+      const [data, newNormalizedData, usedKeys] = normalize(updatedQuery.data);
 
       return {
         queries: {
           ...state.queries,
-          [queryActionType]: { ...updatedQuery, data },
+          [queryActionType]: { ...updatedQuery, data, usedKeys },
         },
         normalizedData: mergeData(normalizedData, newNormalizedData),
       };
