@@ -18,26 +18,44 @@ export const stipFromDeps = (data, root = true) => {
   return data;
 };
 
-export const getDependencies = data => {
+export const getDependencies = (data, usedKeys, path = '') => {
+  usedKeys = usedKeys || {};
+
   if (Array.isArray(data)) {
-    return data.reduce(
-      (prev, current) => [...prev, ...getDependencies(current)],
-      [],
-    );
+    return [
+      data.reduce(
+        (prev, current) => [
+          ...prev,
+          ...getDependencies(current, usedKeys, path)[0],
+        ],
+        [],
+      ),
+      usedKeys,
+    ];
   }
 
   if (data !== null && typeof data === 'object') {
-    return Object.values(data).reduce(
-      (prev, v) => [...prev, ...getDependencies(v)],
-      data.id ? [data] : [],
-    );
+    if (data.id) {
+      usedKeys[path] = Object.keys(data);
+    }
+
+    return [
+      Object.entries(data).reduce(
+        (prev, [k, v]) => [
+          ...prev,
+          ...getDependencies(v, usedKeys, `${path}.${k}`)[0],
+        ],
+        data.id ? [data] : [],
+      ),
+      usedKeys,
+    ];
   }
 
-  return [];
+  return [[], usedKeys];
 };
 
 export const normalize = data => {
-  const dependencies = getDependencies(data);
+  const [dependencies, usedKeys] = getDependencies(data);
 
   return [
     stipFromDeps(data, true),
@@ -47,5 +65,6 @@ export const normalize = data => {
         : stipFromDeps(v, false);
       return prev;
     }, {}),
+    usedKeys,
   ];
 };

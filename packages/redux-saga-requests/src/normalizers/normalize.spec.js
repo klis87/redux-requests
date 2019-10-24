@@ -2,48 +2,54 @@ import { getDependencies, normalize } from './normalize';
 
 describe('getDependencies', () => {
   it('returns empty array for simple values', () => {
-    expect(getDependencies('')).toEqual([]);
-    expect(getDependencies(1)).toEqual([]);
-    expect(getDependencies(false)).toEqual([]);
-    expect(getDependencies(null)).toEqual([]);
+    expect(getDependencies('')).toEqual([[], {}]);
+    expect(getDependencies(1)).toEqual([[], {}]);
+    expect(getDependencies(false)).toEqual([[], {}]);
+    expect(getDependencies(null)).toEqual([[], {}]);
   });
 
   it('returns empty array for values without ids', () => {
-    expect(getDependencies({})).toEqual([]);
-    expect(getDependencies([])).toEqual([]);
-    expect(getDependencies({ nested: [1, 2, 3] })).toEqual([]);
+    expect(getDependencies({})).toEqual([[], {}]);
+    expect(getDependencies([])).toEqual([[], {}]);
+    expect(getDependencies({ nested: [1, 2, 3] })).toEqual([[], {}]);
   });
 
   it('finds direct dependency', () => {
     expect(getDependencies({ id: 1, key: 'value' })).toEqual([
-      {
-        id: 1,
-        key: 'value',
-      },
+      [
+        {
+          id: 1,
+          key: 'value',
+        },
+      ],
+      { '': ['id', 'key'] },
     ]);
   });
 
   it('finds nested dependency', () => {
     expect(getDependencies({ nested: { id: 1, key: 'value' } })).toEqual([
-      {
-        id: 1,
-        key: 'value',
-      },
+      [
+        {
+          id: 1,
+          key: 'value',
+        },
+      ],
+      { '.nested': ['id', 'key'] },
     ]);
   });
 
   it('finds dependencies from array', () => {
-    expect(
-      getDependencies([{ id: '1', v: 'a' }, { nested: { id: '2', v: 'b' } }]),
-    ).toEqual([{ id: '1', v: 'a' }, { id: '2', v: 'b' }]);
+    expect(getDependencies([{ id: '1', v: 'a' }, { id: '2', v: 'b' }])).toEqual(
+      [[{ id: '1', v: 'a' }, { id: '2', v: 'b' }], { '': ['id', 'v'] }],
+    );
   });
 
   it('finds dependencies of dependencies', () => {
     expect(
       getDependencies({ id: '1', v: 'a', nested: { id: '2', v: 'b' } }),
     ).toEqual([
-      { id: '1', v: 'a', nested: { id: '2', v: 'b' } },
-      { id: '2', v: 'b' },
+      [{ id: '1', v: 'a', nested: { id: '2', v: 'b' } }, { id: '2', v: 'b' }],
+      { '': ['id', 'v', 'nested'], '.nested': ['id', 'v'] },
     ]);
   });
 
@@ -54,7 +60,11 @@ describe('getDependencies', () => {
         v: 'a',
         nested: { id: '2', v: 'b' },
         list: [
-          { id: '3' },
+          {
+            id: '3',
+            nestedInList: { id: '5', v: 'c' },
+            nestedList: [{ id: '6', v: 'd' }],
+          },
           {
             id: '4',
             nestedInList: { id: '5', v: 'c' },
@@ -63,41 +73,61 @@ describe('getDependencies', () => {
         ],
       }),
     ).toEqual([
+      [
+        {
+          id: '1',
+          v: 'a',
+          nested: { id: '2', v: 'b' },
+          list: [
+            {
+              id: '3',
+              nestedInList: { id: '5', v: 'c' },
+              nestedList: [{ id: '6', v: 'd' }],
+            },
+            {
+              id: '4',
+              nestedInList: { id: '5', v: 'c' },
+              nestedList: [{ id: '6', v: 'd' }],
+            },
+          ],
+        },
+        { id: '2', v: 'b' },
+        {
+          id: '3',
+          nestedInList: { id: '5', v: 'c' },
+          nestedList: [{ id: '6', v: 'd' }],
+        },
+        { id: '5', v: 'c' },
+        { id: '6', v: 'd' },
+        {
+          id: '4',
+          nestedInList: { id: '5', v: 'c' },
+          nestedList: [{ id: '6', v: 'd' }],
+        },
+        { id: '5', v: 'c' },
+        { id: '6', v: 'd' },
+      ],
       {
-        id: '1',
-        v: 'a',
-        nested: { id: '2', v: 'b' },
-        list: [
-          { id: '3' },
-          {
-            id: '4',
-            nestedInList: { id: '5', v: 'c' },
-            nestedList: [{ id: '6', v: 'd' }],
-          },
-        ],
+        '': ['id', 'v', 'nested', 'list'],
+        '.nested': ['id', 'v'],
+        '.list': ['id', 'nestedInList', 'nestedList'],
+        '.list.nestedInList': ['id', 'v'],
+        '.list.nestedList': ['id', 'v'],
       },
-      { id: '2', v: 'b' },
-      { id: '3' },
-      {
-        id: '4',
-        nestedInList: { id: '5', v: 'c' },
-        nestedList: [{ id: '6', v: 'd' }],
-      },
-      { id: '5', v: 'c' },
-      { id: '6', v: 'd' },
     ]);
   });
 });
 
 describe('normalize', () => {
   it('should do nothing when no id', () => {
-    expect(normalize({ key: 'value' })).toEqual([{ key: 'value' }, {}]);
+    expect(normalize({ key: 'value' })).toEqual([{ key: 'value' }, {}, {}]);
   });
 
   it('should normalize data with single id', () => {
     expect(normalize({ id: '1', key: 'value' })).toEqual([
       '@@1',
       { '@@1': { id: '1', key: 'value' } },
+      { '': ['id', 'key'] },
     ]);
   });
 
@@ -108,6 +138,7 @@ describe('normalize', () => {
         nested: '@@1',
       },
       { '@@1': { id: '1', key: 'value' } },
+      { '.nested': ['id', 'key'] },
     ]);
   });
 
@@ -129,6 +160,10 @@ describe('normalize', () => {
         },
       },
       { '@@1': { id: '1', key: 'value' }, '@@2': { id: '2', a: 1 } },
+      {
+        '.wrapper.nested': ['id', 'key'],
+        '.wrapper.anotherNested.deeplyNested': ['id', 'a'],
+      },
     ]);
   });
 
@@ -145,6 +180,7 @@ describe('normalize', () => {
         '@@1': { id: '1', k: 'v', nested: '@@2' },
         '@@2': { id: '2', key: 'value' },
       },
+      { '': ['id', 'k', 'nested'], '.nested': ['id', 'key'] },
     ]);
   });
 
@@ -160,6 +196,7 @@ describe('normalize', () => {
         arrayWithIds: ['@@1', '@@2'],
       },
       { '@@1': { id: '1', k: 'a' }, '@@2': { id: '2', k: 'b' } },
+      { '.arrayWithIds': ['id', 'k'] },
     ]);
   });
 
@@ -172,7 +209,11 @@ describe('normalize', () => {
           v: 'a',
           nested: { id: '2', v: 'b' },
           list: [
-            { id: '3' },
+            {
+              id: '3',
+              nestedInList: { id: '5', v: 'c' },
+              nestedList: [{ id: '6', v: 'd' }],
+            },
             {
               id: '4',
               nestedInList: { id: '5', v: 'c' },
@@ -193,7 +234,7 @@ describe('normalize', () => {
         },
 
         '@@2': { id: '2', v: 'b' },
-        '@@3': { id: '3' },
+        '@@3': { id: '3', nestedInList: '@@5', nestedList: ['@@6'] },
         '@@4': {
           id: '4',
           nestedInList: '@@5',
@@ -201,6 +242,13 @@ describe('normalize', () => {
         },
         '@@5': { id: '5', v: 'c' },
         '@@6': { id: '6', v: 'd' },
+      },
+      {
+        '.nested': ['withoutId', 'id', 'v', 'nested', 'list'],
+        '.nested.nested': ['id', 'v'],
+        '.nested.list': ['id', 'nestedInList', 'nestedList'],
+        '.nested.list.nestedInList': ['id', 'v'],
+        '.nested.list.nestedList': ['id', 'v'],
       },
     ]);
   });
@@ -217,6 +265,10 @@ describe('normalize', () => {
         anotherNested: '@@1',
       },
       { '@@1': { id: '1', key: 'value', a: 1 } },
+      {
+        '.nested': ['id', 'key'],
+        '.anotherNested': ['id', 'a'],
+      },
     ]);
   });
 
@@ -232,6 +284,10 @@ describe('normalize', () => {
         anotherNested: '@@1',
       },
       { '@@1': { id: '1', a: 3, b: 2, nested: { x: 2, y: 2 } } },
+      {
+        '.nested': ['id', 'a', 'nested'],
+        '.anotherNested': ['id', 'a', 'b', 'nested'],
+      },
     ]);
   });
 });
