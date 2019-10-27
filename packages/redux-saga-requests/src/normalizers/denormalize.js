@@ -1,24 +1,19 @@
-export const denormalize = (data, normalizedData, dependencies, path = '') => {
+export const denormalize = (data, normalizedData, usedKeys, path = '') => {
   if (typeof data === 'string' && data.startsWith('@@')) {
-    return denormalize(
-      normalizedData[data],
-      normalizedData,
-      dependencies,
-      path,
-    );
+    return denormalize(normalizedData[data], normalizedData, usedKeys, path);
   }
 
   if (Array.isArray(data)) {
-    return data.map(v => denormalize(v, normalizedData, dependencies, path));
+    return data.map(v => denormalize(v, normalizedData, usedKeys, path));
   }
 
   if (data !== null && typeof data === 'object') {
-    const objectEntries = dependencies[path]
-      ? Object.entries(data).filter(([k]) => dependencies[path].includes(k))
+    const objectEntries = usedKeys[path]
+      ? Object.entries(data).filter(([k]) => usedKeys[path].includes(k))
       : Object.entries(data);
 
     return objectEntries.reduce((prev, [k, v]) => {
-      prev[k] = denormalize(v, normalizedData, dependencies, `${path}.${k}`);
+      prev[k] = denormalize(v, normalizedData, usedKeys, `${path}.${k}`);
       return prev;
     }, {});
   }

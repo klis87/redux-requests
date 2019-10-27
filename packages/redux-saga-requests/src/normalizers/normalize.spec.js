@@ -232,7 +232,6 @@ describe('normalize', () => {
           nested: '@@2',
           list: ['@@3', '@@4'],
         },
-
         '@@2': { id: '2', v: 'b' },
         '@@3': { id: '3', nestedInList: '@@5', nestedList: ['@@6'] },
         '@@4': {
