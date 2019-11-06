@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import { getMutation } from 'redux-saga-requests';
@@ -13,12 +13,9 @@ const Mutation = ({
   component: Component,
   ...extraProps
 }) => {
-  const mutationSelector = useMemo(
-    () => selector || getMutation({ type, requestKey }),
-    [selector, type, requestKey],
+  const mutation = useSelector(
+    selector || (state => getMutation(state, { type, requestKey })),
   );
-
-  const mutation = useSelector(mutationSelector);
 
   if (children) {
     return children(mutation);

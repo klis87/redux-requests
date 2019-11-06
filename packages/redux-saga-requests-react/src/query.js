@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import { getQuery } from 'redux-saga-requests';
@@ -21,12 +21,9 @@ const Query = ({
   loadingComponentProps,
   ...extraProps
 }) => {
-  const querySelector = useMemo(
-    () => selector || getQuery({ type, defaultData, multiple }),
-    [selector, type, defaultData, multiple],
+  const query = useSelector(
+    selector || (state => getQuery(state, { type, defaultData, multiple })),
   );
-
-  const query = useSelector(querySelector);
 
   const dataEmpty = isDataEmpty(query);
 
