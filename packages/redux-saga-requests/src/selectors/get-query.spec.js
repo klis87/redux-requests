@@ -5,13 +5,20 @@ describe('selectors', () => {
     const state = {
       network: {
         queries: {
-          QUERY: { pending: 1, error: null, data: 'data', normalized: false },
+          QUERY: {
+            pending: 1,
+            error: null,
+            data: 'data',
+            normalized: false,
+            ref: {},
+          },
           QUERY2: {
             pending: 0,
             error: null,
             data: ['@@1', '@@2'],
             normalized: true,
             usedKeys: { '': ['id', 'x'] },
+            ref: {},
           },
           QUERY3: {
             pending: 0,
@@ -23,6 +30,7 @@ describe('selectors', () => {
               '.nested': ['id', 'list'],
               '.nested.list': ['id'],
             },
+            ref: {},
           },
         },
         mutations: {},

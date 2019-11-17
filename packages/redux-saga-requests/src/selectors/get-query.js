@@ -2,13 +2,17 @@ import { createSelectorCreator, defaultMemoize } from 'reselect';
 
 import { denormalize, getDependentKeys } from '../normalizers';
 
-const isEqual = (currentVal, previousVal) => {
-  if (currentVal.queryState !== previousVal.queryState) {
+const isQueryEqual = (currentVal, previousVal) => {
+  if (
+    currentVal.data !== previousVal.data ||
+    currentVal.pending !== previousVal.pending ||
+    currentVal.error !== previousVal.error
+  ) {
     return false;
   }
 
   if (
-    currentVal.queryState.data === null &&
+    currentVal.data === null &&
     (currentVal.multiple !== previousVal.multiple ||
       currentVal.defaultData !== previousVal.defaultData)
   ) {
@@ -16,18 +20,18 @@ const isEqual = (currentVal, previousVal) => {
   }
 
   if (
-    currentVal.queryState.normalized &&
+    currentVal.normalized &&
     currentVal.normalizedData !== previousVal.normalizedData
   ) {
     const currentDependencies = getDependentKeys(
-      currentVal.queryState.data,
+      currentVal.data,
       currentVal.normalizedData,
-      currentVal.queryState.usedKeys,
+      currentVal.usedKeys,
     );
     const previousDependencies = getDependentKeys(
-      previousVal.queryState.data,
+      previousVal.data,
       previousVal.normalizedData,
-      previousVal.queryState.usedKeys,
+      previousVal.usedKeys,
     );
 
     if (currentDependencies.size !== previousDependencies.size) {
@@ -47,14 +51,10 @@ const isEqual = (currentVal, previousVal) => {
   return true;
 };
 
-const createCustomSelector = createSelectorCreator(defaultMemoize, isEqual);
-
-const defaultQueryState = {
-  data: null,
-  pending: 0,
-  error: null,
-  normalized: false,
-};
+const createCustomSelector = createSelectorCreator(
+  defaultMemoize,
+  isQueryEqual,
+);
 
 const getData = (data, multiple, defaultData) => {
   if (data !== null) {
@@ -72,36 +72,92 @@ const getData = (data, multiple, defaultData) => {
   return data;
 };
 
-const getQueryState = (state, type) =>
-  state.network.queries[type] || defaultQueryState;
+const getQueryState = (state, type) => state.network.queries[type];
 
 const createQuerySelector = type =>
   createCustomSelector(
-    (state, defaultData, multiple) => ({
+    (state, defaultData, multiple) => {
+      // in order not to keep queryState.ref reference in selector memoize
+      const { data, pending, error, normalized, usedKeys } = getQueryState(
+        state,
+        type,
+      );
+
+      return {
+        data,
+        pending,
+        error,
+        normalized,
+        usedKeys,
+        multiple,
+        defaultData,
+        normalizedData: state.network.normalizedData,
+      };
+    },
+    ({
+      data,
+      pending,
+      error,
+      usedKeys,
+      normalized,
+      normalizedData,
       defaultData,
       multiple,
-      queryState: getQueryState(state, type),
-      normalizedData: state.network.normalizedData,
-    }),
-    ({ queryState, normalizedData, defaultData, multiple }) => ({
-      data: queryState.normalized
+    }) => ({
+      data: normalized
         ? denormalize(
-            getData(queryState.data, multiple, defaultData),
+            getData(data, multiple, defaultData),
             normalizedData,
-            queryState.usedKeys,
+            usedKeys,
           )
-        : getData(queryState.data, multiple, defaultData),
-      loading: queryState.pending > 0,
-      error: queryState.error,
+        : getData(data, multiple, defaultData),
+      loading: pending > 0,
+      error,
     }),
   );
+
+const defaultQuery = {
+  data: null,
+  loading: false,
+  error: null,
+};
+
+const defaultQueryMultiple = {
+  ...defaultQuery,
+  data: [],
+};
+
+const defaultQueriesWithCustomData = new Map();
+
+const getDefaultQuery = (defaultData, multiple) => {
+  if (
+    defaultData !== undefined &&
+    defaultQueriesWithCustomData.get(defaultData)
+  ) {
+    return defaultQueriesWithCustomData.get(defaultData);
+  }
+
+  if (defaultData !== undefined) {
+    const query = { ...defaultQuery, data: defaultData };
+    defaultQueriesWithCustomData.set(defaultData, query);
+    return query;
+  }
+
+  return multiple ? defaultQueryMultiple : defaultQuery;
+};
 
 const querySelectors = new WeakMap();
 
 export default (state, { type, defaultData, multiple = false }) => {
-  if (!querySelectors[type]) {
-    querySelectors[type] = createQuerySelector(type);
+  const queryState = getQueryState(state, type);
+
+  if (!queryState) {
+    return getDefaultQuery(defaultData, multiple);
   }
 
-  return querySelectors[type](state, defaultData, multiple);
+  if (!querySelectors.get(queryState.ref)) {
+    querySelectors.set(queryState.ref, createQuerySelector(type));
+  }
+
+  return querySelectors.get(queryState.ref)(state, defaultData, multiple);
 };
