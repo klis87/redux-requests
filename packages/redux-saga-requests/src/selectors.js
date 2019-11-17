@@ -7,19 +7,22 @@ import {
 import { denormalize, getDependentKeys } from './normalizers';
 
 const isEqual = (currentVal, previousVal) => {
+  if (currentVal.queryState !== previousVal.queryState) {
+    return false;
+  }
+
   if (
-    currentVal &&
-    previousVal &&
-    typeof currentVal === 'object' &&
-    'normalized' in currentVal &&
-    'normalizedData' in currentVal
+    currentVal.queryState.data === null &&
+    (currentVal.multiple !== previousVal.multiple ||
+      currentVal.defaultData !== previousVal.defaultData)
   ) {
-    if (
-      !currentVal.normalized ||
-      currentVal.normalizedData === previousVal.normalizedData
-    ) {
-      return true;
-    }
+    return false;
+  }
+
+  if (
+    currentVal.queryState.normalized &&
+    currentVal.normalizedData !== previousVal.normalizedData
+  ) {
     const currentDependencies = getDependentKeys(
       currentVal.queryState.data,
       currentVal.normalizedData,
@@ -43,11 +46,9 @@ const isEqual = (currentVal, previousVal) => {
         return false;
       }
     }
-
-    return true;
   }
 
-  return currentVal === previousVal;
+  return true;
 };
 
 const createCustomSelector = createSelectorCreator(defaultMemoize, isEqual);
@@ -80,16 +81,14 @@ const getQueryState = (state, type) =>
 
 const createQuerySelector = type =>
   createCustomSelector(
-    state => getQueryState(state, type),
-    state => ({
+    (state, defaultData, multiple) => ({
+      defaultData,
+      multiple,
       queryState: getQueryState(state, type),
-      normalized: getQueryState(state, type).normalized,
       normalizedData: state.network.normalizedData,
     }),
-    (state, defaultData) => defaultData,
-    (state, defaultData, multiple) => multiple,
-    (queryState, { normalized, normalizedData }, defaultData, multiple) => ({
-      data: normalized
+    ({ queryState, normalizedData, defaultData, multiple }) => ({
+      data: queryState.normalized
         ? denormalize(
             getData(queryState.data, multiple, defaultData),
             normalizedData,

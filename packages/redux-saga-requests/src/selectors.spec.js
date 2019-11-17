@@ -75,6 +75,12 @@ describe('selectors', () => {
       });
     });
 
+    it('doesnt recompute when multiple is changed when data not empty', () => {
+      expect(getQuery(state, { type: 'QUERY', multiple: true })).toBe(
+        getQuery(state, { type: 'QUERY', multiple: false }),
+      );
+    });
+
     it('returns transformed query state if found', () => {
       expect(getQuery(state, { type: 'QUERY' })).toEqual({
         data: 'data',
@@ -92,18 +98,6 @@ describe('selectors', () => {
 
       expect(query2).toBe(getQuery({ ...state }, { type: 'QUERY2' }));
       expect(query).toBe(getQuery({ ...state }, { type: 'QUERY' }));
-
-      const queryWithMultiple = getQuery(
-        { ...state },
-        {
-          type: 'QUERY',
-          multiple: true,
-        },
-      );
-      expect(query).not.toBe(queryWithMultiple);
-      expect(queryWithMultiple).toBe(
-        getQuery({ ...state }, { type: 'QUERY', multiple: true }),
-      );
     });
 
     it('denormalizes data if necessary', () => {
