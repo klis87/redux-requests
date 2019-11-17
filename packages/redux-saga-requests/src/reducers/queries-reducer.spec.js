@@ -14,6 +14,8 @@ describe('reducers', () => {
         error: null,
         pending: 0,
         normalized: false,
+        ref: {},
+        usedKeys: null,
       };
       const requestAction = {
         type: 'FETCH_BOOK',
@@ -451,6 +453,7 @@ describe('reducers', () => {
         pending: 0,
         normalized: true,
         usedKeys: [],
+        ref: {},
       };
       const requestAction = {
         type: 'FETCH_BOOK',
@@ -491,6 +494,7 @@ describe('reducers', () => {
               error: null,
               normalized: true,
               usedKeys: { '': ['id', 'name'] },
+              ref: {},
             },
           },
           normalizedData: {},
@@ -607,6 +611,7 @@ describe('reducers', () => {
                   pending: 0,
                   error: null,
                   normalized: true,
+                  ref: {},
                 },
               },
               normalizedData: { '@@1': { id: '1', x: 1 } },
@@ -640,6 +645,7 @@ describe('reducers', () => {
               error: null,
               normalized: true,
               usedKeys: { '': ['id', 'x'] },
+              ref: {},
             },
           },
           normalizedData: {
@@ -660,6 +666,7 @@ describe('reducers', () => {
                   pending: 0,
                   error: null,
                   normalized: true,
+                  ref: {},
                 },
               },
               normalizedData: { '@@1': { id: '1', x: 1 } },
@@ -686,6 +693,7 @@ describe('reducers', () => {
               error: null,
               normalized: true,
               usedKeys: { '': ['id', 'x'] },
+              ref: {},
             },
           },
           normalizedData: {
@@ -705,6 +713,7 @@ describe('reducers', () => {
                   pending: 0,
                   error: null,
                   normalized: true,
+                  ref: {},
                 },
               },
               normalizedData: { '@@1': { id: '1', x: 1 } },
@@ -724,6 +733,7 @@ describe('reducers', () => {
               pending: 0,
               error: null,
               normalized: true,
+              ref: {},
             },
           },
           normalizedData: {
@@ -742,6 +752,7 @@ describe('reducers', () => {
                   pending: 0,
                   error: null,
                   normalized: true,
+                  ref: {},
                 },
               },
               normalizedData: { '@@1': { id: '1', x: 1 } },
@@ -762,6 +773,7 @@ describe('reducers', () => {
               pending: 0,
               error: null,
               normalized: true,
+              ref: {},
             },
           },
           normalizedData: {
@@ -780,6 +792,7 @@ describe('reducers', () => {
                   pending: 0,
                   error: null,
                   normalized: true,
+                  ref: {},
                 },
               },
               normalizedData: { '@@1': { id: '1', x: 2 } },
@@ -801,6 +814,7 @@ describe('reducers', () => {
               pending: 0,
               error: null,
               normalized: true,
+              ref: {},
             },
           },
           normalizedData: {

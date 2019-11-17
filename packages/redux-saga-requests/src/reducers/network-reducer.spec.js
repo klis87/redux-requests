@@ -36,6 +36,8 @@ describe('reducers', () => {
           pending: 1,
           error: null,
           normalized: false,
+          usedKeys: null,
+          ref: {},
         },
       });
 
@@ -46,12 +48,16 @@ describe('reducers', () => {
           pending: 1,
           error: null,
           normalized: false,
+          usedKeys: null,
+          ref: {},
         },
         REQUEST_2: {
           data: null,
           pending: 1,
           error: null,
           normalized: false,
+          usedKeys: null,
+          ref: {},
         },
       });
 
@@ -65,12 +71,16 @@ describe('reducers', () => {
           pending: 0,
           error: null,
           normalized: false,
+          usedKeys: null,
+          ref: {},
         },
         REQUEST_2: {
           data: null,
           pending: 1,
           error: null,
           normalized: false,
+          usedKeys: null,
+          ref: {},
         },
       });
 
@@ -81,12 +91,16 @@ describe('reducers', () => {
           pending: 0,
           error: null,
           normalized: false,
+          usedKeys: null,
+          ref: {},
         },
         REQUEST_2: {
           data: null,
           pending: 0,
           error: 'error',
           normalized: false,
+          usedKeys: null,
+          ref: {},
         },
       });
     });
@@ -134,6 +148,8 @@ describe('reducers', () => {
             pending: 0,
             error: null,
             normalized: false,
+            usedKeys: null,
+            ref: {},
           },
         },
         normalizedData: {},
@@ -160,6 +176,8 @@ describe('reducers', () => {
             pending: 0,
             error: null,
             normalized: false,
+            usedKeys: null,
+            ref: {},
           },
         },
         normalizedData: {},
@@ -181,6 +199,8 @@ describe('reducers', () => {
             pending: 0,
             error: null,
             normalized: false,
+            usedKeys: null,
+            ref: {},
           },
         },
         mutations: {
@@ -202,6 +222,8 @@ describe('reducers', () => {
             pending: 0,
             error: null,
             normalized: false,
+            usedKeys: null,
+            ref: {},
           },
         },
         mutations: {
@@ -223,6 +245,8 @@ describe('reducers', () => {
             pending: 0,
             error: null,
             normalized: false,
+            usedKeys: null,
+            ref: {},
           },
         },
         mutations: {
@@ -247,6 +271,8 @@ describe('reducers', () => {
             pending: 0,
             error: null,
             normalized: false,
+            usedKeys: null,
+            ref: {},
           },
         },
         mutations: {
@@ -278,6 +304,8 @@ describe('reducers', () => {
             pending: 0,
             error: null,
             normalized: false,
+            usedKeys: null,
+            ref: {},
           },
         },
         mutations: {
@@ -306,6 +334,8 @@ describe('reducers', () => {
             pending: 0,
             error: null,
             normalized: false,
+            usedKeys: null,
+            ref: {},
           },
         },
         mutations: {
@@ -343,6 +373,8 @@ describe('reducers', () => {
             pending: 0,
             error: null,
             normalized: false,
+            usedKeys: null,
+            ref: {},
           },
         },
         mutations: {
@@ -379,6 +411,8 @@ describe('reducers', () => {
             pending: 0,
             error: null,
             normalized: false,
+            usedKeys: null,
+            ref: {},
           },
         },
         mutations: {
@@ -415,6 +449,8 @@ describe('reducers', () => {
             pending: 0,
             error: null,
             normalized: false,
+            usedKeys: null,
+            ref: {},
           },
         },
         mutations: {
@@ -455,6 +491,8 @@ describe('reducers', () => {
             pending: 0,
             error: null,
             normalized: false,
+            usedKeys: null,
+            ref: {},
           },
         },
         mutations: {
@@ -488,6 +526,8 @@ describe('reducers', () => {
             pending: 0,
             error: null,
             normalized: false,
+            usedKeys: null,
+            ref: {},
           },
         },
         mutations: {
@@ -523,6 +563,8 @@ describe('reducers', () => {
             pending: 0,
             error: null,
             normalized: false,
+            usedKeys: null,
+            ref: {},
           },
         },
         mutations: {
@@ -554,6 +596,8 @@ describe('reducers', () => {
             pending: 0,
             error: null,
             normalized: false,
+            usedKeys: null,
+            ref: {},
           },
         },
         mutations: {},
@@ -582,6 +626,8 @@ describe('reducers', () => {
             pending: 0,
             error: null,
             normalized: false,
+            usedKeys: null,
+            ref: {},
           },
         },
         mutations: {},

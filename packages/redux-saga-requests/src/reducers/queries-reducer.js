@@ -11,18 +11,14 @@ import {
 import updateData from './update-data';
 import { normalize, mergeData } from '../normalizers';
 
-const initialQuery = {
+const getInitialQuery = normalized => ({
   data: null,
   pending: 0,
   error: null,
-  normalized: false,
-};
-
-const normalizedInitialQuery = {
-  ...initialQuery,
-  normalized: true,
-  usedKeys: {},
-};
+  ref: {},
+  normalized,
+  usedKeys: normalized ? {} : null,
+});
 
 const getDataFromResponseAction = action =>
   action.payload ? action.payload.data : action.response.data;
@@ -54,10 +50,7 @@ const onAbort = state => ({
 
 const queryReducer = (state, action, actionType) => {
   if (state === undefined) {
-    state =
-      action.meta && action.meta.normalize
-        ? normalizedInitialQuery
-        : initialQuery;
+    state = getInitialQuery(!!(action.meta && action.meta.normalize));
   }
 
   if (
