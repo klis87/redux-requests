@@ -1,4 +1,4 @@
-import { getQuery } from './selectors';
+import getQuery from './get-query';
 
 describe('selectors', () => {
   describe('getQuery', () => {

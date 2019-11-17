@@ -1,10 +1,6 @@
-import {
-  createSelectorCreator,
-  createSelector,
-  defaultMemoize,
-} from 'reselect';
+import { createSelectorCreator, defaultMemoize } from 'reselect';
 
-import { denormalize, getDependentKeys } from './normalizers';
+import { denormalize, getDependentKeys } from '../normalizers';
 
 const isEqual = (currentVal, previousVal) => {
   if (currentVal.queryState !== previousVal.queryState) {
@@ -100,45 +96,12 @@ const createQuerySelector = type =>
     }),
   );
 
-const querySelectors = {};
+const querySelectors = new WeakMap();
 
-export const getQuery = (state, { type, defaultData, multiple = false }) => {
+export default (state, { type, defaultData, multiple = false }) => {
   if (!querySelectors[type]) {
     querySelectors[type] = createQuerySelector(type);
   }
 
   return querySelectors[type](state, defaultData, multiple);
-};
-
-const defaultMutation = {
-  loading: false,
-  error: null,
-};
-
-const mutationSelectors = {};
-
-const createMutationSelector = type =>
-  createSelector(
-    state => state.network.mutations[type],
-    (state, requestKey) => requestKey,
-    (mutationState, requestKey) => {
-      if (!mutationState || (requestKey && !mutationState[requestKey])) {
-        return defaultMutation;
-      }
-
-      const mutation = requestKey ? mutationState[requestKey] : mutationState;
-
-      return {
-        loading: mutation.pending > 0,
-        error: mutation.error,
-      };
-    },
-  );
-
-export const getMutation = (state, { type, requestKey }) => {
-  if (!mutationSelectors[type]) {
-    mutationSelectors[type] = createMutationSelector(type);
-  }
-
-  return mutationSelectors[type](state, requestKey);
 };
