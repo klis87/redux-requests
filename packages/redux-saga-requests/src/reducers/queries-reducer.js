@@ -23,31 +23,6 @@ const getInitialQuery = normalized => ({
 const getDataFromResponseAction = action =>
   action.payload ? action.payload.data : action.response.data;
 
-const onRequest = state => ({
-  ...state,
-  pending: state.pending + 1,
-  error: null,
-});
-
-const onSuccess = (state, action) => ({
-  ...state,
-  data: getDataFromResponseAction(action),
-  pending: state.pending - 1,
-  error: null,
-});
-
-const onError = (state, action) => ({
-  ...state,
-  data: null,
-  pending: state.pending - 1,
-  error: action.payload ? action.payload : action.error,
-});
-
-const onAbort = state => ({
-  ...state,
-  pending: state.pending - 1,
-});
-
 const queryReducer = (state, action, actionType) => {
   if (state === undefined) {
     state = getInitialQuery(!!(action.meta && action.meta.normalize));
@@ -65,13 +40,30 @@ const queryReducer = (state, action, actionType) => {
 
   switch (action.type) {
     case success(actionType):
-      return onSuccess(state, action);
+      return {
+        ...state,
+        data: getDataFromResponseAction(action),
+        pending: state.pending - 1,
+        error: null,
+      };
     case error(actionType):
-      return onError(state, action);
+      return {
+        ...state,
+        data: null,
+        pending: state.pending - 1,
+        error: action.payload ? action.payload : action.error,
+      };
     case abort(actionType):
-      return onAbort(state);
+      return {
+        ...state,
+        pending: state.pending - 1,
+      };
     default:
-      return onRequest(state);
+      return {
+        ...state,
+        pending: state.pending + 1,
+        error: null,
+      };
   }
 };
 
