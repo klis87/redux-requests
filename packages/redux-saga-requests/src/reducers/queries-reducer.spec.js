@@ -602,6 +602,11 @@ describe('reducers', () => {
       });
 
       it('should update normalized query data on mutation success if defined in meta', () => {
+        const updateData = jest.fn((data, mutationData) => [
+          ...data,
+          mutationData,
+          { id: '3', x: 3 },
+        ]);
         expect(
           queriesReducer(
             {
@@ -612,6 +617,7 @@ describe('reducers', () => {
                   error: null,
                   normalized: true,
                   ref: {},
+                  usedKeys: { '': ['id', 'x'] },
                 },
               },
               normalizedData: { '@@1': { id: '1', x: 1 } },
@@ -623,11 +629,7 @@ describe('reducers', () => {
                 meta: {
                   normalize: true,
                   mutations: {
-                    FETCH_BOOK: (data, mutationData) => [
-                      ...data,
-                      mutationData,
-                      { id: '3', x: 3 },
-                    ],
+                    FETCH_BOOK: updateData,
                   },
                 },
               },
@@ -654,6 +656,10 @@ describe('reducers', () => {
             '@@3': { id: '3', x: 3 },
           },
         });
+        expect(updateData).toBeCalledWith([{ id: '1', x: 1 }], {
+          id: '2',
+          x: 2,
+        });
       });
 
       it('should update normalized query data with local mutation', () => {
@@ -666,6 +672,9 @@ describe('reducers', () => {
                   pending: 0,
                   error: null,
                   normalized: true,
+                  usedKeys: {
+                    '': ['id', 'x'],
+                  },
                   ref: {},
                 },
               },

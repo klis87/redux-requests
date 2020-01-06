@@ -10,6 +10,7 @@ import {
 } from '../actions';
 import updateData from './update-data';
 import { normalize, mergeData } from '../normalizers';
+import { getQuery } from '../selectors';
 
 const getInitialQuery = normalized => ({
   data: null,
@@ -23,7 +24,7 @@ const getInitialQuery = normalized => ({
 const getDataFromResponseAction = action =>
   action.payload ? action.payload.data : action.response.data;
 
-const queryReducer = (state, action, actionType) => {
+const queryReducer = (state, action, actionType, normalizedData) => {
   if (state === undefined) {
     state = getInitialQuery(!!(action.meta && action.meta.normalize));
   }
@@ -34,7 +35,18 @@ const queryReducer = (state, action, actionType) => {
     action.meta.mutations[actionType]
   ) {
     const mutationConfig = action.meta.mutations[actionType];
-    const data = updateData(state.data, action, mutationConfig);
+    const data = updateData(
+      state.normalized
+        ? getQuery(
+            {
+              network: { normalizedData, queries: { [actionType]: state } },
+            },
+            { type: actionType },
+          ).data
+        : state.data,
+      action,
+      mutationConfig,
+    );
     return data === state.data ? state : { ...state, data };
   }
 
@@ -120,6 +132,7 @@ export default (state, action, config) => {
               state.queries[actionType],
               action,
               actionType,
+              normalizedData,
             );
 
             if (
