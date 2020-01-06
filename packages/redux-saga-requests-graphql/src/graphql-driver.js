@@ -42,7 +42,7 @@ export const createDriver = ({ url }) => {
       if (response.data.errors) {
         throw response;
       } else {
-        return { data: response.data };
+        return response.data;
       }
     });
 
