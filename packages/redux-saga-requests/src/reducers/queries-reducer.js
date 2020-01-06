@@ -7,6 +7,7 @@ import {
   getRequestActionFromResponse,
   isRequestActionQuery,
   isErrorAction,
+  isSuccessAction,
 } from '../actions';
 import updateData from './update-data';
 import { normalize, mergeData } from '../normalizers';
@@ -107,10 +108,9 @@ export default (state, action, config) => {
   ) {
     const [, newNormalizedData] = normalize(action.meta.revertedData);
     normalizedData = mergeData(normalizedData, newNormalizedData);
-  }
-
-  if (
+  } else if (
     isResponseAction(action) &&
+    isSuccessAction(action) &&
     action.meta.normalize &&
     !isRequestActionQuery(getRequestActionFromResponse(action))
   ) {
