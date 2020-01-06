@@ -61,7 +61,7 @@ module.exports = [
         },
       ],
     },
-    devtool: 'eval',
+    devtool: 'eval-source-map',
     mode: 'development',
     plugins: [
       new webpack.HotModuleReplacementPlugin(),
