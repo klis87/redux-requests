@@ -95,31 +95,41 @@ const maybeGetQueryActionType = (action, config) => {
   return null;
 };
 
-export default (state, action, config) => {
-  let { normalizedData } = state;
-
+const updateNormalizedData = (normalizedData, action) => {
   if (isRequestAction(action) && action.meta && action.meta.optimisticData) {
     const [, newNormalizedData] = normalize(action.meta.optimisticData);
-    normalizedData = mergeData(normalizedData, newNormalizedData);
-  } else if (
+    return mergeData(normalizedData, newNormalizedData);
+  }
+
+  if (
     isResponseAction(action) &&
     isErrorAction(action) &&
     action.meta.revertedData
   ) {
     const [, newNormalizedData] = normalize(action.meta.revertedData);
-    normalizedData = mergeData(normalizedData, newNormalizedData);
-  } else if (
+    return mergeData(normalizedData, newNormalizedData);
+  }
+
+  if (
     isResponseAction(action) &&
     isSuccessAction(action) &&
     action.meta.normalize &&
     !isRequestActionQuery(getRequestActionFromResponse(action))
   ) {
     const [, newNormalizedData] = normalize(getDataFromResponseAction(action));
-    normalizedData = mergeData(normalizedData, newNormalizedData);
-  } else if (action.meta && action.meta.localData) {
-    const [, newNormalizedData] = normalize(action.meta.localData);
-    normalizedData = mergeData(normalizedData, newNormalizedData);
+    return mergeData(normalizedData, newNormalizedData);
   }
+
+  if (action.meta && action.meta.localData) {
+    const [, newNormalizedData] = normalize(action.meta.localData);
+    return mergeData(normalizedData, newNormalizedData);
+  }
+
+  return normalizedData;
+};
+
+export default (state, action, config) => {
+  let normalizedData = updateNormalizedData(state.normalizedData, action);
 
   if (action.meta && action.meta.mutations) {
     return {
