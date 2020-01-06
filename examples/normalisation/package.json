@@ -1,0 +1,33 @@
+{
+  "name": "redux-saga-requests-normalisation-example",
+  "version": "1.0.0",
+  "description": "redux-saga-requests normalisation example",
+  "main": "src/index.js",
+  "repository": "git@github.com:klis87/redux-saga-requests.git",
+  "author": "Konrad Lisiczynski <klisiczynski@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "node dev-server"
+  },
+  "dependencies": {
+    "@babel/polyfill": "7.4.4",
+    "apollo-server-express": "2.9.2",
+    "express": "4.17.1",
+    "graphql": "14.5.4",
+    "react": "16.9.0",
+    "react-dom": "16.9.0",
+    "react-redux": "7.1.1",
+    "redux": "4.0.4",
+    "redux-saga": "1.0.5"
+  },
+  "devDependencies": {
+    "@babel/core": "7.5.5",
+    "@babel/plugin-proposal-object-rest-spread": "7.5.5",
+    "@babel/preset-env": "7.5.5",
+    "@babel/preset-react": "7.0.0",
+    "babel-loader": "8.0.6",
+    "html-webpack-plugin": "3.2.0",
+    "webpack": "4.39.3",
+    "webpack-dev-middleware": "3.7.0"
+  }
+}
