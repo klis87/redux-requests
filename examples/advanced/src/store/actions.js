@@ -26,9 +26,9 @@ export const fetchPost = id => ({
   request: [{ url: `/posts/${id}` }, { url: `/posts/${id}/comments` }],
   meta: {
     abortOn: CLEAR_POST,
-    getData: (state, action) => ({
-      ...action.data[0],
-      comments: action.data[1],
+    getData: data => ({
+      ...data[0],
+      comments: data[1],
     }),
     resetOn: [CLEAR_POST],
   },

@@ -61,17 +61,14 @@ export const deleteBook = book => ({
     variables: { id: book.id },
   },
   meta: {
-    deletedBook: book,
+    requestKey: book.id,
     mutations: {
-      getRequestKey: action => action.meta.deletedBook.id,
       [FETCH_BOOKS]: {
-        updateDataOptimistic: (state, action) => ({
-          books: state.data.books.filter(
-            v => v.id !== action.meta.deletedBook.id,
-          ),
+        updateDataOptimistic: data => ({
+          books: data.books.filter(v => v.id !== book.id),
         }),
-        revertData: (state, action) => ({
-          books: [action.meta.deletedBook, ...state.data.books],
+        revertData: data => ({
+          books: [book, ...data.books],
         }),
       },
     },
@@ -91,14 +88,11 @@ export const likeBook = id => ({
     variables: { id },
   },
   meta: {
-    id,
+    requestKey: id,
     mutations: {
-      getRequestKey: action => action.meta.id,
       [FETCH_BOOKS]: {
-        updateData: (state, action) => ({
-          books: state.data.books.map(v =>
-            v.id === action.meta.id ? { ...v, liked: true } : v,
-          ),
+        updateData: data => ({
+          books: data.books.map(v => (v.id === id ? { ...v, liked: true } : v)),
         }),
       },
     },
@@ -118,13 +112,12 @@ export const unlikeBook = id => ({
     variables: { id },
   },
   meta: {
-    id,
+    requestKey: id,
     mutations: {
-      getRequestKey: action => action.meta.id,
       [FETCH_BOOKS]: {
-        updateData: (state, action) => ({
-          books: state.data.books.map(v =>
-            v.id === action.meta.id ? { ...v, liked: false } : v,
+        updateData: data => ({
+          books: data.books.map(v =>
+            v.id === id ? { ...v, liked: false } : v,
           ),
         }),
       },
