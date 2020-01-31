@@ -8,13 +8,17 @@ import queriesReducer from './queries-reducer';
 import mutationsReducer from './mutations-reducer';
 import cacheReducer from './cache-reducer';
 
+const defaultState = {
+  queries: {},
+  mutations: {},
+  normalizedData: {},
+  cache: {},
+};
+
 export default localConfig => {
   const config = { ...defaultConfig, ...localConfig };
 
-  return (
-    state = { queries: {}, mutations: {}, normalizedData: {}, cache: {} },
-    action,
-  ) => {
+  return (state = defaultState, action) => {
     const { queries, normalizedData } = queriesReducer(
       { queries: state.queries, normalizedData: state.normalizedData },
       action,

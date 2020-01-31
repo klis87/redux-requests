@@ -167,8 +167,12 @@ export default (state, action, config) => {
   const queryActionType = maybeGetQueryActionType(action, config);
 
   if (queryActionType) {
+    const queryType =
+      action.meta && typeof action.meta.requestKey !== 'undefined'
+        ? queryActionType + action.meta.requestKey
+        : queryActionType;
     const updatedQuery = queryReducer(
-      state.queries[queryActionType],
+      state.queries[queryType],
       action,
       queryActionType,
     );
@@ -176,15 +180,15 @@ export default (state, action, config) => {
     if (
       updatedQuery.normalized &&
       updatedQuery.data &&
-      (!state.queries[queryActionType] ||
-        state.queries[queryActionType].data !== updatedQuery.data)
+      (!state.queries[queryType] ||
+        state.queries[queryType].data !== updatedQuery.data)
     ) {
       const [data, newNormalizedData, usedKeys] = normalize(updatedQuery.data);
 
       return {
         queries: {
           ...state.queries,
-          [queryActionType]: { ...updatedQuery, data, usedKeys },
+          [queryType]: { ...updatedQuery, data, usedKeys },
         },
         normalizedData: mergeData(normalizedData, newNormalizedData),
       };
@@ -193,7 +197,7 @@ export default (state, action, config) => {
     return {
       queries: {
         ...state.queries,
-        [queryActionType]: updatedQuery,
+        [queryType]: updatedQuery,
       },
       normalizedData,
     };

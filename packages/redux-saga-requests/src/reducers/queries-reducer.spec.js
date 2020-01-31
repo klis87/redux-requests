@@ -149,6 +149,98 @@ describe('reducers', () => {
       });
     });
 
+    describe('with requestKey', () => {
+      const defaultState = {
+        data: null,
+        error: null,
+        pending: 0,
+        normalized: false,
+        ref: {},
+        usedKeys: null,
+      };
+      const requestAction = {
+        type: 'FETCH_BOOK',
+        request: { url: '/ ' },
+        meta: {
+          requestKey: 1,
+        },
+      };
+
+      it('handles request query action', () => {
+        expect(
+          queriesReducer(
+            { queries: {}, normalizedData: {} },
+            requestAction,
+            defaultConfig,
+          ),
+        ).toEqual({
+          queries: {
+            FETCH_BOOK1: {
+              ...defaultState,
+              pending: 1,
+            },
+          },
+          normalizedData: {},
+        });
+      });
+
+      it('handles success query action', () => {
+        expect(
+          queriesReducer(
+            { queries: {}, normalizedData: {} },
+            createSuccessAction(requestAction, { data: 'data' }),
+            defaultConfig,
+          ),
+        ).toEqual({
+          queries: {
+            FETCH_BOOK1: {
+              ...defaultState,
+              pending: -1,
+              data: 'data',
+            },
+          },
+          normalizedData: {},
+        });
+      });
+
+      it('handles error query action', () => {
+        expect(
+          queriesReducer(
+            { queries: {}, normalizedData: {} },
+            createErrorAction(requestAction, 'error'),
+            defaultConfig,
+          ),
+        ).toEqual({
+          queries: {
+            FETCH_BOOK1: {
+              ...defaultState,
+              pending: -1,
+              error: 'error',
+            },
+          },
+          normalizedData: {},
+        });
+      });
+
+      it('handles abort query action', () => {
+        expect(
+          queriesReducer(
+            { queries: {}, normalizedData: {} },
+            createAbortAction(requestAction),
+            defaultConfig,
+          ),
+        ).toEqual({
+          queries: {
+            FETCH_BOOK1: {
+              ...defaultState,
+              pending: -1,
+            },
+          },
+          normalizedData: {},
+        });
+      });
+    });
+
     describe('with mutations', () => {
       const initialState = {
         queries: {
