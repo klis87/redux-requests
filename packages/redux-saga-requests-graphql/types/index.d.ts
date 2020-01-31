@@ -6,4 +6,4 @@ interface GraphqlDriverConfig {
 
 export const createDriver: (config: GraphqlDriverConfig) => Driver;
 
-export const gql: (query: string | TemplateStringsArray) => string;
+export const gql: (query: string) => string;
