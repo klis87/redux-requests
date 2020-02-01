@@ -7,6 +7,7 @@ import { reactComponentPropType } from './propTypesValidators';
 
 const Query = ({
   type,
+  requestKey,
   selector,
   defaultData,
   multiple,
@@ -22,7 +23,8 @@ const Query = ({
   ...extraProps
 }) => {
   const query = useSelector(
-    selector || (state => getQuery(state, { type, defaultData, multiple })),
+    selector ||
+      (state => getQuery(state, { type, requestKey, defaultData, multiple })),
   );
 
   const dataEmpty = isDataEmpty(query);
@@ -60,6 +62,7 @@ Query.defaultProps = {
 
 Query.propTypes = {
   type: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+  requestKey: PropTypes.string,
   selector: PropTypes.func,
   multiple: PropTypes.bool,
   defaultData: PropTypes.any,

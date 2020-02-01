@@ -12,6 +12,7 @@ interface ErrorProps {
 
 interface QueryProps<QueryStateData> {
   type?: string;
+  requestKey?: string;
   multiple?: boolean;
   defaultData?: any;
   selector?: (state: any) => QueryState<QueryStateData>;
@@ -50,6 +51,7 @@ export class Mutation extends React.Component<MutationProps> {}
 
 export function useQuery<QueryStateData = any>(props: {
   type: string;
+  requestKey?: string;
   multiple?: boolean;
   defaultData?: any;
 }): QueryState<QueryStateData>;
