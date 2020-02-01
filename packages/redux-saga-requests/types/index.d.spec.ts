@@ -86,7 +86,6 @@ watchRequests();
 watchRequests({
   takeLatest: true,
   abortOn: 'TYPE',
-  getLastActionKey: action => action.type,
 });
 watchRequests({ abortOn: ['TYPE'] });
 

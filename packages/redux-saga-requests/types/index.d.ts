@@ -93,7 +93,6 @@ export const sendRequest: (
 interface WatchRequestsConfig {
   takeLatest?: boolean | FilterActions;
   abortOn?: FilterActions | string | string[];
-  getLastActionKey?: (action: AnyAction) => string;
 }
 
 export const watchRequests: (config?: WatchRequestsConfig) => void;

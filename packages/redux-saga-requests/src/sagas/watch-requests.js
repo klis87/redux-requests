@@ -11,8 +11,11 @@ const delay =
 const watchRequestsDefaultConfig = {
   takeLatest: isRequestActionQuery,
   abortOn: null,
-  getLastActionKey: action => action.type,
 };
+
+const getLastActionKey = action =>
+  action.type +
+  (action.meta && action.meta.requestKey ? action.meta.requestKey : '');
 
 export function* cancelSendRequestOnAction(abortOn, task) {
   const { abortingAction } = yield race({
@@ -30,12 +33,14 @@ const isWatchable = a =>
   isRequestAction(a) && (!a.meta || a.meta.runByWatcher !== false);
 
 export default function* watchRequests(commonConfig = {}) {
+  // TODO: we should think about cleaning this for requests with requestKey,
+  // otherwise it could lead to memory leak
   const lastTasks = {};
   const config = { ...watchRequestsDefaultConfig, ...commonConfig };
 
   while (true) {
     const action = yield take(isWatchable);
-    const lastActionKey = config.getLastActionKey(action);
+    const lastActionKey = getLastActionKey(action);
     const takeLatest =
       action.meta && action.meta.takeLatest !== undefined
         ? action.meta.takeLatest

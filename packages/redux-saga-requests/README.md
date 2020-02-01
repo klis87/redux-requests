@@ -186,9 +186,6 @@ same form which you can pass to `redux-saga` `take` effect, for example `'LOGOUT
 - `takeLatest: boolean | action => boolean`: if `true`, when a new request will be dispatched while a pending of the same type is still running,
 the previous one will be automatically aborted, default is `true` for `GET` requests and `false` for the rest ones, or,
 for GraphQL, `true` for queries and `false` for mutations
-- `getLastActionKey: action => string`: a key generator to match actions of the same type, typically you won't need to adjust it,
-but it might come in handy when you want some actions with the same `type` to be treated as a different one,
-default is `action => action.type`.
 
 So, for instance, you could do this:
 ```js

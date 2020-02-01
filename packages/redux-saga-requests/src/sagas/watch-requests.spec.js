@@ -178,21 +178,19 @@ describe('sagas', () => {
         .silentRun(100);
     });
 
-    it('respects getLastActionKey override to distinguish actions of the same type', () => {
-      return expectSaga(watchRequests, {
-        getLastActionKey: a => a.type + a.meta.as,
-      })
+    it('respects meta requestKet to distinguish actions of the same type', () => {
+      return expectSaga(watchRequests)
         .provide([[getContext(REQUESTS_CONFIG), config]])
         .not.put.actionType('FETCH_ABORT')
         .dispatch({
           type: 'FETCH',
           request: { url: '/url' },
-          meta: { as: 'version1' },
+          meta: { requestKey: '1' },
         })
         .dispatch({
           type: 'FETCH',
           request: { url: '/url' },
-          meta: { as: 'version2' },
+          meta: { requestKey: '2' },
         })
         .silentRun(100);
     });
