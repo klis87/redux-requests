@@ -32,6 +32,20 @@ describe('selectors', () => {
             },
             ref: {},
           },
+          QUERY11: {
+            pending: 1,
+            error: null,
+            data: 'data2',
+            normalized: false,
+            ref: {},
+          },
+          QUERY12: {
+            pending: 1,
+            error: null,
+            data: 'data3',
+            normalized: false,
+            ref: {},
+          },
         },
         mutations: {},
         normalizedData: {
@@ -97,8 +111,27 @@ describe('selectors', () => {
       });
     });
 
+    it('works with query requestKey', () => {
+      expect(getQuery(state, { type: 'QUERY', requestKey: '11' })).toEqual({
+        data: 'data2',
+        loading: true,
+        error: null,
+      });
+    });
+
     it('memoizes queries', () => {
       const query = getQuery(state, { type: 'QUERY' });
+      expect(query).toBe(getQuery(state, { type: 'QUERY' }));
+
+      const query11 = getQuery(state, { type: 'QUERY', requestKey: '11' });
+      expect(query).not.toBe(query11);
+      expect(query11).toBe(
+        getQuery(state, { type: 'QUERY', requestKey: '11' }),
+      );
+      expect(query11).not.toBe(
+        getQuery(state, { type: 'QUERY', requestKey: '12' }),
+      );
+
       expect(query).toBe(getQuery(state, { type: 'QUERY' }));
 
       const query2 = getQuery({ ...state }, { type: 'QUERY2' });

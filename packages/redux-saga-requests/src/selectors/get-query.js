@@ -72,15 +72,17 @@ const getData = (data, multiple, defaultData) => {
   return data;
 };
 
-const getQueryState = (state, type) => state.network.queries[type];
+const getQueryState = (state, type, requestKey = '') =>
+  state.network.queries[type + requestKey];
 
-const createQuerySelector = type =>
+const createQuerySelector = (type, requestKey) =>
   createCustomSelector(
     (state, defaultData, multiple) => {
       // in order not to keep queryState.ref reference in selector memoize
       const { data, pending, error, normalized, usedKeys } = getQueryState(
         state,
         type,
+        requestKey,
       );
 
       return {
@@ -148,15 +150,15 @@ const getDefaultQuery = (defaultData, multiple) => {
 
 const querySelectors = new WeakMap();
 
-export default (state, { type, defaultData, multiple = false }) => {
-  const queryState = getQueryState(state, type);
+export default (state, { type, requestKey, defaultData, multiple = false }) => {
+  const queryState = getQueryState(state, type, requestKey);
 
   if (!queryState) {
     return getDefaultQuery(defaultData, multiple);
   }
 
   if (!querySelectors.get(queryState.ref)) {
-    querySelectors.set(queryState.ref, createQuerySelector(type));
+    querySelectors.set(queryState.ref, createQuerySelector(type, requestKey));
   }
 
   return querySelectors.get(queryState.ref)(state, defaultData, multiple);

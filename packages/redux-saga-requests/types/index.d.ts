@@ -149,6 +149,7 @@ export interface QueryState<QueryStateData> {
 
 export function getQuery<QueryStateData = any>(props: {
   type?: string;
+  requestKey?: string;
   multiple?: boolean;
   defaultData?: any;
 }): (state: any) => QueryState<QueryStateData>;
