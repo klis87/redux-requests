@@ -9,16 +9,29 @@ describe('reducers', () => {
         mutations: {},
         normalizedData: {},
         cache: {},
+        requestsKeys: {},
       });
     });
 
     it('does not crash on non request action on load', () => {
       expect(
         networkReducer()(
-          { queries: {}, mutations: {}, normalizedData: {}, cache: {} },
+          {
+            queries: {},
+            mutations: {},
+            normalizedData: {},
+            cache: {},
+            requestsKeys: {},
+          },
           { type: 'NOT_REQUEST' },
         ),
-      ).toEqual({ queries: {}, mutations: {}, normalizedData: {}, cache: {} });
+      ).toEqual({
+        queries: {},
+        mutations: {},
+        normalizedData: {},
+        cache: {},
+        requestsKeys: {},
+      });
     });
 
     it('handles read only requests', () => {
@@ -27,7 +40,13 @@ describe('reducers', () => {
       const secondRequest = { type: 'REQUEST_2', request: { url: '/' } };
 
       let state = reducer(
-        { queries: {}, mutations: {}, normalizedData: {}, cache: {} },
+        {
+          queries: {},
+          mutations: {},
+          normalizedData: {},
+          cache: {},
+          requestsKeys: {},
+        },
         firstRequest,
       );
       expect(state.queries).toEqual({
@@ -137,7 +156,13 @@ describe('reducers', () => {
     it('supports mutations', () => {
       const reducer = networkReducer();
       reducer(
-        { queries: {}, mutations: {}, normalizedData: {}, cache: {} },
+        {
+          queries: {},
+          mutations: {},
+          normalizedData: {},
+          cache: {},
+          requestsKeys: {},
+        },
         { type: 'REQUEST', request: { url: '/' } },
       );
 
@@ -155,6 +180,7 @@ describe('reducers', () => {
         normalizedData: {},
         mutations: {},
         cache: {},
+        requestsKeys: {},
       };
 
       state = reducer(state, {
@@ -183,6 +209,7 @@ describe('reducers', () => {
         normalizedData: {},
         mutations: {},
         cache: {},
+        requestsKeys: {},
       });
 
       const mutationWithoutConfig = {
@@ -211,6 +238,7 @@ describe('reducers', () => {
         },
         normalizedData: {},
         cache: {},
+        requestsKeys: {},
       });
 
       state = reducer(state, createErrorAction(mutationWithoutConfig, 'error'));
@@ -234,6 +262,7 @@ describe('reducers', () => {
         },
         normalizedData: {},
         cache: {},
+        requestsKeys: {},
       });
 
       state = reducer(state, mutationWithoutConfig);
@@ -257,6 +286,7 @@ describe('reducers', () => {
         },
         normalizedData: {},
         cache: {},
+        requestsKeys: {},
       });
 
       state = reducer(
@@ -283,6 +313,7 @@ describe('reducers', () => {
         },
         normalizedData: {},
         cache: {},
+        requestsKeys: {},
       });
 
       const mutationWithConfig = {
@@ -319,6 +350,7 @@ describe('reducers', () => {
           },
         },
         cache: {},
+        requestsKeys: {},
         normalizedData: {},
       });
 
@@ -349,6 +381,7 @@ describe('reducers', () => {
           },
         },
         cache: {},
+        requestsKeys: {},
         normalizedData: {},
       });
 
@@ -394,6 +427,9 @@ describe('reducers', () => {
           },
         },
         cache: {},
+        requestsKeys: {
+          MUTATION_WITH_CONFIG_WITH_REQUEST_KEY: ['1'],
+        },
         normalizedData: {},
       });
 
@@ -432,6 +468,9 @@ describe('reducers', () => {
           },
         },
         cache: {},
+        requestsKeys: {
+          MUTATION_WITH_CONFIG_WITH_REQUEST_KEY: ['1'],
+        },
         normalizedData: {},
       });
 
@@ -465,6 +504,9 @@ describe('reducers', () => {
           MUTATION_WITH_CONFIG_WITH_REQUEST_KEY: {},
         },
         cache: {},
+        requestsKeys: {
+          MUTATION_WITH_CONFIG_WITH_REQUEST_KEY: ['1'],
+        },
         normalizedData: {},
       });
 
@@ -512,6 +554,9 @@ describe('reducers', () => {
         },
         cache: {},
         normalizedData: {},
+        requestsKeys: {
+          MUTATION_WITH_CONFIG_WITH_REQUEST_KEY: ['1'],
+        },
       });
 
       state = reducer(
@@ -546,6 +591,9 @@ describe('reducers', () => {
           },
         },
         cache: {},
+        requestsKeys: {
+          MUTATION_WITH_CONFIG_WITH_REQUEST_KEY: ['1'],
+        },
         normalizedData: {},
       });
 
@@ -584,6 +632,9 @@ describe('reducers', () => {
         },
         cache: {},
         normalizedData: {},
+        requestsKeys: {
+          MUTATION_WITH_CONFIG_WITH_REQUEST_KEY: ['1'],
+        },
       });
     });
 
@@ -603,6 +654,7 @@ describe('reducers', () => {
         mutations: {},
         cache: {},
         normalizedData: {},
+        requestsKeys: {},
       };
 
       let state = reducer(initialState, {});
@@ -633,6 +685,7 @@ describe('reducers', () => {
         mutations: {},
         cache: {},
         normalizedData: {},
+        requestsKeys: {},
       });
     });
   });

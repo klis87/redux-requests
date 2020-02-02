@@ -6,6 +6,7 @@ import {
 import defaultConfig from './default-config';
 import queriesReducer from './queries-reducer';
 import mutationsReducer from './mutations-reducer';
+import requestKeysReducer from './requests-keys-reducer';
 import cacheReducer from './cache-reducer';
 
 const defaultState = {
@@ -13,6 +14,7 @@ const defaultState = {
   mutations: {},
   normalizedData: {},
   cache: {},
+  requestsKeys: {},
 };
 
 export default localConfig => {
@@ -36,9 +38,15 @@ export default localConfig => {
     }
 
     return {
-      queries,
+      ...requestKeysReducer(
+        {
+          queries,
+          mutations,
+          requestsKeys: state.requestsKeys,
+        },
+        action,
+      ),
       normalizedData,
-      mutations,
       cache: cacheReducer(state.cache, action),
     };
   };

@@ -18,6 +18,7 @@ interface RequestActionMeta {
   getData?: (data: any) => any;
   getError?: (error: any) => any;
   requestKey?: string;
+  requestsCapacity?: number;
   mutations?: {
     [actionType: string]:
       | ModifyData
