@@ -419,11 +419,9 @@ describe('reducers', () => {
             error: null,
             pending: 0,
           },
-          MUTATION_WITH_CONFIG_WITH_REQUEST_KEY: {
-            1: {
-              error: null,
-              pending: 2,
-            },
+          MUTATION_WITH_CONFIG_WITH_REQUEST_KEY1: {
+            error: null,
+            pending: 2,
           },
         },
         cache: {},
@@ -460,11 +458,9 @@ describe('reducers', () => {
             error: null,
             pending: 0,
           },
-          MUTATION_WITH_CONFIG_WITH_REQUEST_KEY: {
-            1: {
-              error: null,
-              pending: 1,
-            },
+          MUTATION_WITH_CONFIG_WITH_REQUEST_KEY1: {
+            error: null,
+            pending: 1,
           },
         },
         cache: {},
@@ -501,7 +497,10 @@ describe('reducers', () => {
             error: null,
             pending: 0,
           },
-          MUTATION_WITH_CONFIG_WITH_REQUEST_KEY: {},
+          MUTATION_WITH_CONFIG_WITH_REQUEST_KEY1: {
+            error: null,
+            pending: 0,
+          },
         },
         cache: {},
         requestsKeys: {
@@ -546,7 +545,10 @@ describe('reducers', () => {
             error: null,
             pending: 0,
           },
-          MUTATION_WITH_CONFIG_WITH_REQUEST_KEY: {},
+          MUTATION_WITH_CONFIG_WITH_REQUEST_KEY1: {
+            error: null,
+            pending: 0,
+          },
           MUTATION_WITH_OPTIMISTIC_UPDATE: {
             error: null,
             pending: 1,
@@ -584,7 +586,10 @@ describe('reducers', () => {
             error: null,
             pending: 0,
           },
-          MUTATION_WITH_CONFIG_WITH_REQUEST_KEY: {},
+          MUTATION_WITH_CONFIG_WITH_REQUEST_KEY1: {
+            error: null,
+            pending: 0,
+          },
           MUTATION_WITH_OPTIMISTIC_UPDATE: {
             error: null,
             pending: 0,
@@ -624,7 +629,10 @@ describe('reducers', () => {
             error: null,
             pending: 0,
           },
-          MUTATION_WITH_CONFIG_WITH_REQUEST_KEY: {},
+          MUTATION_WITH_CONFIG_WITH_REQUEST_KEY1: {
+            error: null,
+            pending: 0,
+          },
           MUTATION_WITH_OPTIMISTIC_UPDATE: {
             error: 'error',
             pending: 0,
