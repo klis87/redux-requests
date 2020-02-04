@@ -15,6 +15,7 @@ export default (state, action) => {
       [mutationType]: {
         error: null,
         pending: (state[mutationType] ? state[mutationType].pending : 0) + 1,
+        ref: state[mutationType] ? state[mutationType].ref : {},
       },
     };
   }
@@ -30,6 +31,7 @@ export default (state, action) => {
       [mutationType]: {
         error: action.payload ? action.payload : action.error,
         pending: state[mutationType].pending - 1,
+        ref: state[mutationType].ref,
       },
     };
   }
@@ -40,6 +42,7 @@ export default (state, action) => {
     [mutationType]: {
       error: null,
       pending: state[mutationType].pending - 1,
+      ref: state[mutationType].ref,
     },
   };
 };

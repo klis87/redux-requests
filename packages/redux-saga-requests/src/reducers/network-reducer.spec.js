@@ -234,6 +234,7 @@ describe('reducers', () => {
           MUTATION_WITHOUT_CONFIG: {
             error: null,
             pending: 1,
+            ref: {},
           },
         },
         normalizedData: {},
@@ -258,6 +259,7 @@ describe('reducers', () => {
           MUTATION_WITHOUT_CONFIG: {
             error: 'error',
             pending: 0,
+            ref: {},
           },
         },
         normalizedData: {},
@@ -282,6 +284,7 @@ describe('reducers', () => {
           MUTATION_WITHOUT_CONFIG: {
             error: null,
             pending: 1,
+            ref: {},
           },
         },
         normalizedData: {},
@@ -309,6 +312,7 @@ describe('reducers', () => {
           MUTATION_WITHOUT_CONFIG: {
             error: null,
             pending: 0,
+            ref: {},
           },
         },
         normalizedData: {},
@@ -343,10 +347,12 @@ describe('reducers', () => {
           MUTATION_WITHOUT_CONFIG: {
             error: null,
             pending: 0,
+            ref: {},
           },
           MUTATION_WITH_CONFIG: {
             error: null,
             pending: 1,
+            ref: {},
           },
         },
         cache: {},
@@ -374,10 +380,12 @@ describe('reducers', () => {
           MUTATION_WITHOUT_CONFIG: {
             error: null,
             pending: 0,
+            ref: {},
           },
           MUTATION_WITH_CONFIG: {
             error: null,
             pending: 0,
+            ref: {},
           },
         },
         cache: {},
@@ -414,14 +422,17 @@ describe('reducers', () => {
           MUTATION_WITHOUT_CONFIG: {
             error: null,
             pending: 0,
+            ref: {},
           },
           MUTATION_WITH_CONFIG: {
             error: null,
             pending: 0,
+            ref: {},
           },
           MUTATION_WITH_CONFIG_WITH_REQUEST_KEY1: {
             error: null,
             pending: 2,
+            ref: {},
           },
         },
         cache: {},
@@ -453,14 +464,17 @@ describe('reducers', () => {
           MUTATION_WITHOUT_CONFIG: {
             error: null,
             pending: 0,
+            ref: {},
           },
           MUTATION_WITH_CONFIG: {
             error: null,
             pending: 0,
+            ref: {},
           },
           MUTATION_WITH_CONFIG_WITH_REQUEST_KEY1: {
             error: null,
             pending: 1,
+            ref: {},
           },
         },
         cache: {},
@@ -492,14 +506,17 @@ describe('reducers', () => {
           MUTATION_WITHOUT_CONFIG: {
             error: null,
             pending: 0,
+            ref: {},
           },
           MUTATION_WITH_CONFIG: {
             error: null,
             pending: 0,
+            ref: {},
           },
           MUTATION_WITH_CONFIG_WITH_REQUEST_KEY1: {
             error: null,
             pending: 0,
+            ref: {},
           },
         },
         cache: {},
@@ -540,18 +557,22 @@ describe('reducers', () => {
           MUTATION_WITHOUT_CONFIG: {
             error: null,
             pending: 0,
+            ref: {},
           },
           MUTATION_WITH_CONFIG: {
             error: null,
             pending: 0,
+            ref: {},
           },
           MUTATION_WITH_CONFIG_WITH_REQUEST_KEY1: {
             error: null,
             pending: 0,
+            ref: {},
           },
           MUTATION_WITH_OPTIMISTIC_UPDATE: {
             error: null,
             pending: 1,
+            ref: {},
           },
         },
         cache: {},
@@ -581,18 +602,22 @@ describe('reducers', () => {
           MUTATION_WITHOUT_CONFIG: {
             error: null,
             pending: 0,
+            ref: {},
           },
           MUTATION_WITH_CONFIG: {
             error: null,
             pending: 0,
+            ref: {},
           },
           MUTATION_WITH_CONFIG_WITH_REQUEST_KEY1: {
             error: null,
             pending: 0,
+            ref: {},
           },
           MUTATION_WITH_OPTIMISTIC_UPDATE: {
             error: null,
             pending: 0,
+            ref: {},
           },
         },
         cache: {},
@@ -624,18 +649,22 @@ describe('reducers', () => {
           MUTATION_WITHOUT_CONFIG: {
             error: null,
             pending: 0,
+            ref: {},
           },
           MUTATION_WITH_CONFIG: {
             error: null,
             pending: 0,
+            ref: {},
           },
           MUTATION_WITH_CONFIG_WITH_REQUEST_KEY1: {
             error: null,
             pending: 0,
+            ref: {},
           },
           MUTATION_WITH_OPTIMISTIC_UPDATE: {
             error: 'error',
             pending: 0,
+            ref: {},
           },
         },
         cache: {},

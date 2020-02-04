@@ -5,30 +5,33 @@ const defaultMutation = {
   error: null,
 };
 
-const mutationSelectors = {};
+const getMutationState = (state, type, requestKey = '') =>
+  state.network.mutations[type + requestKey];
 
-const createMutationSelector = type =>
+const mutationSelectors = new WeakMap();
+
+const createMutationSelector = (type, requestKey) =>
   createSelector(
-    state => state.network.mutations[type],
-    (state, requestKey) => requestKey,
-    (mutationState, requestKey) => {
-      if (!mutationState || (requestKey && !mutationState[requestKey])) {
-        return defaultMutation;
-      }
-
-      const mutation = requestKey ? mutationState[requestKey] : mutationState;
-
-      return {
-        loading: mutation.pending > 0,
-        error: mutation.error,
-      };
-    },
+    state => getMutationState(state, type, requestKey),
+    mutationState => ({
+      loading: mutationState.pending > 0,
+      error: mutationState.error,
+    }),
   );
 
 export default (state, { type, requestKey }) => {
-  if (!mutationSelectors[type]) {
-    mutationSelectors[type] = createMutationSelector(type);
+  const mutationState = getMutationState(state, type, requestKey);
+
+  if (!mutationState) {
+    return defaultMutation;
   }
 
-  return mutationSelectors[type](state, requestKey);
+  if (!mutationSelectors.get(mutationState.ref)) {
+    mutationSelectors.set(
+      mutationState.ref,
+      createMutationSelector(type, requestKey),
+    );
+  }
+
+  return mutationSelectors.get(mutationState.ref)(state);
 };
