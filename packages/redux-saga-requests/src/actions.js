@@ -98,7 +98,7 @@ export const isRequestActionQuery = action => {
     : isRequestQuery(request));
 };
 
-export const clearRequestsCache = (...actionTypes) => ({
+export const clearRequestsCache = (...cacheKeys) => ({
   type: CLEAR_REQUESTS_CACHE,
-  actionTypes,
+  cacheKeys,
 });

@@ -2,7 +2,12 @@ import requestsKeysReducer from './requests-keys-reducer';
 
 describe('reducers', () => {
   describe('requestsKeysReducer', () => {
-    const defaultState = { queries: {}, mutations: {}, requestsKeys: {} };
+    const defaultState = {
+      queries: {},
+      mutations: {},
+      cache: {},
+      requestsKeys: {},
+    };
 
     it('doesnt do anything for not request actions', () => {
       expect(requestsKeysReducer(defaultState, { type: 'NOT_REQUEST' })).toBe(

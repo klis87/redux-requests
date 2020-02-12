@@ -7,7 +7,7 @@ export default (state, action) => {
     action.meta &&
     action.meta.requestKey !== undefined
   ) {
-    let { queries, mutations, requestsKeys } = state;
+    let { queries, mutations, cache, requestsKeys } = state;
 
     if (!requestsKeys[action.type]) {
       requestsKeys = {
@@ -53,13 +53,21 @@ export default (state, action) => {
 
         if (isQuery) {
           queries = copiedStorage;
+
+          const copiedCache = { ...cache };
+
+          exceedingRequestsKeys.forEach(k => {
+            delete copiedCache[action.type + k];
+          });
+
+          cache = copiedCache;
         } else {
           mutations = copiedStorage;
         }
       }
     }
 
-    return { queries, mutations, requestsKeys };
+    return { queries, mutations, cache, requestsKeys };
   }
 
   return state;

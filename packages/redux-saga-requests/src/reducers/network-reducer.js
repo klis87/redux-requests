@@ -42,12 +42,12 @@ export default localConfig => {
         {
           queries,
           mutations,
+          cache: cacheReducer(state.cache, action),
           requestsKeys: state.requestsKeys,
         },
         action,
       ),
       normalizedData,
-      cache: cacheReducer(state.cache, action),
     };
   };
 };
