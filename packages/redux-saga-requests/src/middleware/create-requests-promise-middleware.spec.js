@@ -1,12 +1,12 @@
 import configureStore from 'redux-mock-store';
 
 import { success, error, abort } from '../actions';
-import { requestsPromiseMiddleware } from '.';
+import { createRequestsPromiseMiddleware } from '.';
 
 describe('middleware', () => {
-  describe('requestsPromiseMiddleware', () => {
+  describe('createRequestsPromiseMiddleware', () => {
     describe('withoutAutoMode', () => {
-      const mockStore = configureStore([requestsPromiseMiddleware()]);
+      const mockStore = configureStore([createRequestsPromiseMiddleware()]);
 
       it('doesnt affect non request actions', () => {
         const action = { type: 'NOT_REQUEST' };
@@ -133,7 +133,7 @@ describe('middleware', () => {
 
     describe('withAutoMode', () => {
       const mockStore = configureStore([
-        requestsPromiseMiddleware({ auto: true }),
+        createRequestsPromiseMiddleware({ auto: true }),
       ]);
 
       it('doesnt affect non request actions', () => {

@@ -1,15 +1,4 @@
 export { success, error, abort, clearRequestsCache } from './actions';
-export { networkReducer } from './reducers';
-export {
-  requestsPromiseMiddleware,
-  requestsCacheMiddleware,
-  serverRequestsFilterMiddleware,
-} from './middleware';
-export {
-  createRequestInstance,
-  getRequestInstance,
-  sendRequest,
-  watchRequests,
-  countServerRequests,
-} from './sagas';
+export { getRequestInstance, sendRequest, countServerRequests } from './sagas';
+export { default as handleRequests } from './handle-requests';
 export { getQuery, getMutation } from './selectors';

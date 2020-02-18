@@ -32,11 +32,10 @@ export const deletePhotoOptimistic = photo => ({
     method: 'delete',
   },
   meta: {
-    deletedPhoto: photo,
     mutations: {
       [FETCH_PHOTO]: {
         updateDataOptimistic: () => null,
-        revertData: (state, action) => action.meta.deletedPhoto,
+        revertData: () => photo,
       },
     },
   },
@@ -54,12 +53,10 @@ export const deletePost = id => ({
     method: 'delete',
   },
   meta: {
-    id,
+    requestKey: id,
     mutations: {
-      getRequestKey: action => String(action.meta.id),
       [FETCH_POSTS]: {
-        updateData: (state, action) =>
-          state.data.filter(v => v.id !== action.meta.id),
+        updateData: data => data.filter(v => v.id !== id),
       },
     },
   },
@@ -72,13 +69,11 @@ export const deletePostOptimistic = post => ({
     method: 'delete',
   },
   meta: {
-    deletedPost: post,
+    requestKey: post.id,
     mutations: {
-      getRequestKey: action => String(action.meta.deletedPost.id),
       [FETCH_POSTS]: {
-        updateDataOptimistic: (state, action) =>
-          state.data.filter(v => v.id !== action.meta.deletedPost.id),
-        revertData: (state, action) => [action.meta.deletedPost, ...state.data],
+        updateDataOptimistic: data => data.filter(v => v.id !== post.id),
+        revertData: data => [post, ...data],
       },
     },
   },

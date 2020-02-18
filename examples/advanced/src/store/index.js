@@ -1,11 +1,7 @@
 import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import axios from 'axios';
-import {
-  createRequestInstance,
-  watchRequests,
-  networkReducer,
-} from 'redux-saga-requests';
+import { handleRequests } from 'redux-saga-requests';
 import { createDriver } from 'redux-saga-requests-axios';
 
 import {
@@ -20,19 +16,20 @@ import {
   errorCounterSaga,
 } from './sagas';
 
-function* rootSaga(axiosInstance) {
-  yield createRequestInstance({
+export const configureStore = () => {
+  const { requestsReducer, requestsSaga } = handleRequests({
+    driver: createDriver(
+      axios.create({
+        baseURL: 'https://jsonplaceholder.typicode.com',
+      }),
+    ),
     onRequest: requestCounterSaga,
     onSuccess: responseCounterSaga,
     onError: errorCounterSaga,
-    driver: createDriver(axiosInstance),
   });
-  yield watchRequests();
-}
 
-export const configureStore = () => {
   const reducers = combineReducers({
-    network: networkReducer(),
+    network: requestsReducer,
     abortCounter: abortCounterReducer,
     requestCounter: requestCounterReducer,
     responseCounter: responseCounterReducer,
@@ -50,9 +47,6 @@ export const configureStore = () => {
     composeEnhancers(applyMiddleware(sagaMiddleware)),
   );
 
-  const axiosInstance = axios.create({
-    baseURL: 'https://jsonplaceholder.typicode.com',
-  });
-  sagaMiddleware.run(rootSaga, axiosInstance);
+  sagaMiddleware.run(requestsSaga);
   return store;
 };
