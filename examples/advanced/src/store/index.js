@@ -1,5 +1,6 @@
 import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
 import createSagaMiddleware from 'redux-saga';
+import { all } from 'redux-saga/effects';
 import axios from 'axios';
 import { handleRequests } from 'redux-saga-requests';
 import { createDriver } from 'redux-saga-requests-axios';
@@ -17,7 +18,7 @@ import {
 } from './sagas';
 
 export const configureStore = () => {
-  const { requestsReducer, requestsSaga } = handleRequests({
+  const { requestsReducer, requestsSagas } = handleRequests({
     driver: createDriver(
       axios.create({
         baseURL: 'https://jsonplaceholder.typicode.com',
@@ -47,6 +48,10 @@ export const configureStore = () => {
     composeEnhancers(applyMiddleware(sagaMiddleware)),
   );
 
-  sagaMiddleware.run(requestsSaga);
+  function* rootSaga() {
+    yield all(requestsSagas);
+  }
+
+  sagaMiddleware.run(rootSaga);
   return store;
 };

@@ -2,8 +2,12 @@ import React from 'react';
 import { Query } from 'redux-saga-requests-react';
 import { useDispatch } from 'react-redux';
 
-import { FETCH_BOOKS, FETCH_BOOKS_SCREENING_ACTORS } from '../store/constants';
-import { resetBooks, fetchBooks } from '../store/actions';
+import {
+  FETCH_BOOKS,
+  FETCH_BOOK,
+  FETCH_BOOKS_SCREENING_ACTORS,
+} from '../store/constants';
+import { resetBooks, fetchBook } from '../store/actions';
 import Spinner from './spinner';
 
 const RequestError = () => (
@@ -61,6 +65,37 @@ const App = () => {
             })
           }
         </Query>
+        <hr />
+        <h2>Book</h2>
+        <button type="button" onClick={() => dispatch(fetchBook(1))}>
+          fetch book 1
+        </button>
+        <button type="button" onClick={() => dispatch(fetchBook(2))}>
+          fetch book 2
+        </button>
+        <button type="button" onClick={() => dispatch(fetchBook(3))}>
+          fetch book 3
+        </button>
+        <button type="button" onClick={() => dispatch(fetchBook(4))}>
+          fetch book 4
+        </button>
+        {['1', '2', '3', '4'].map(i => (
+          <Query
+            key={i}
+            type={FETCH_BOOK}
+            requestKey={i}
+            errorComponent={RequestError}
+            loadingComponent={Spinner}
+            noDataMessage={<p>There is no entity currently.</p>}
+          >
+            {({ data }) => (
+              <div>
+                <h3>{data.title}</h3>
+                <div>{data.author}</div>
+              </div>
+            )}
+          </Query>
+        ))}
       </div>
     </div>
   );

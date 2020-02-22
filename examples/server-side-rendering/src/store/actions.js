@@ -1,4 +1,8 @@
-import { FETCH_BOOKS, FETCH_BOOKS_SCREENING_ACTORS } from './constants';
+import {
+  FETCH_BOOKS,
+  FETCH_BOOK,
+  FETCH_BOOKS_SCREENING_ACTORS,
+} from './constants';
 
 export const fetchBooks = () => ({
   type: FETCH_BOOKS,
@@ -7,6 +11,21 @@ export const fetchBooks = () => ({
   },
   meta: {
     dependentRequestsNumber: 1,
+    cache: 5,
+    normalize: true,
+  },
+});
+
+export const fetchBook = id => ({
+  type: FETCH_BOOK,
+  request: {
+    url: `/api/books/${id}`,
+  },
+  meta: {
+    cache: true,
+    normalize: true,
+    requestKey: id,
+    requestsCapacity: 3,
   },
 });
 

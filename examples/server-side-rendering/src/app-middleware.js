@@ -21,6 +21,18 @@ const books = [
     author: 'Michael Crichton',
     liked: true,
   },
+  {
+    id: '3',
+    title: 'Jurassic Park 2',
+    author: 'Michael Crichton',
+    liked: true,
+  },
+  {
+    id: '4',
+    title: 'Jurassic Park 3',
+    author: 'Michael Crichton',
+    liked: true,
+  },
 ];
 
 const bookScreeningActors = [
@@ -46,6 +58,17 @@ router.get('/api/books', async (req, res) => {
   res.send(JSON.stringify(books));
 });
 
+router.get('/api/books/:id', async (req, res) => {
+  const { id } = req.params;
+
+  if (!id || !books.find(v => v.id === id)) {
+    return res.sendStatus(404).send();
+  }
+
+  await sleep();
+  res.send(JSON.stringify(books.find(v => v.id === id)));
+});
+
 router.get('/api/bookScreeningActors', async (req, res) => {
   const { bookIds } = req.query;
 
@@ -64,34 +87,28 @@ router.get('/favicon.ico', (req, res) => {
 });
 
 router.use((req, res) => {
-  const store = configureStore();
-  const serverRequestActions = {};
-  store
-    .runSaga(serverRequestActions)
-    .toPromise()
-    .then(() => {
-      if (serverRequestActions.errorActions.length > 0) {
-        res.status(400).send('something went wrong');
-      } else {
-        const html = renderToString(
-          <Provider store={store}>
-            <App />
-          </Provider>,
-        );
+  const { store, requestsPromise } = configureStore();
 
-        res.render('index', {
-          html,
-          initialState: JSON.stringify(store.getState()),
-          serverRequestActions: JSON.stringify(
-            serverRequestActions.requestActionsToIgnore,
-          ),
-          layout: false,
-        });
-      }
+  requestsPromise
+    .then(serverRequestActions => {
+      const html = renderToString(
+        <Provider store={store}>
+          <App />
+        </Provider>,
+      );
+
+      res.render('index', {
+        html,
+        initialState: JSON.stringify(store.getState()),
+        serverRequestActions: JSON.stringify(
+          serverRequestActions.requestActionsToIgnore,
+        ),
+        layout: false,
+      });
     })
     .catch(e => {
-      console.log('saga error', e);
-      res.status(400).send('some error');
+      console.log('error', e);
+      res.status(400).send('something went wrong');
     });
 });
 

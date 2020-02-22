@@ -5,5 +5,8 @@ export {
   default as createRequestsPromiseMiddleware,
 } from './create-requests-promise-middleware';
 export {
-  default as serverRequestsFilterMiddleware,
-} from './server-requests-filter-middleware';
+  default as createClientSsrMiddleware,
+} from './create-client-ssr-middleware';
+export {
+  default as createServerSsrMiddleware,
+} from './create-server-ssr-middleware';

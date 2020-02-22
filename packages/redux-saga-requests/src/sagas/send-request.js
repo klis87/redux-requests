@@ -45,12 +45,7 @@ export default function* sendRequest(
 
   if (dispatchRequestAction && !silent) {
     action = { ...action, meta: { ...action.meta, runByWatcher: false } };
-    action = yield put(action); // to be affected by requestsCacheMiddleware and serverRequestsFilterMiddleware
-
-    // only possible when using  serverRequestsFilterMiddleware
-    if (action === null) {
-      return { serverSide: true };
-    }
+    action = yield put(action); // to be affected by requestsCacheMiddleware and clientSSRMiddleware
   }
 
   const driver = yield call(getDriver, requestsConfig, action);
@@ -80,6 +75,8 @@ export default function* sendRequest(
     try {
       if (action.meta && action.meta.cacheResponse) {
         response = action.meta.cacheResponse;
+      } else if (action.meta && action.meta.ssrResponse) {
+        response = action.meta.ssrResponse;
       } else if (!Array.isArray(actionPayload.request)) {
         responsePromises = [driver(actionPayload.request, action)];
         response = yield call(() => responsePromises[0]);
@@ -99,7 +96,12 @@ export default function* sendRequest(
         );
       }
 
-      if (action.meta && !action.meta.cacheResponse && action.meta.getData) {
+      if (
+        action.meta &&
+        !action.meta.cacheResponse &&
+        !action.meta.ssrResponse &&
+        action.meta.getData
+      ) {
         response = { ...response, data: action.meta.getData(response.data) };
       }
     } catch (e) {

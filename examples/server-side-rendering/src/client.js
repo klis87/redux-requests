@@ -7,8 +7,7 @@ import { configureStore } from './store';
 import App from './components/app';
 
 const initialState = window.__INITIAL_STATE__;
-const store = configureStore(initialState);
-store.runSaga();
+const { store } = configureStore(initialState);
 
 const renderApp = () => {
   hydrate(
