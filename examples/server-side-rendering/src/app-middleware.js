@@ -90,7 +90,7 @@ router.use((req, res) => {
   const { store, requestsPromise } = configureStore();
 
   requestsPromise
-    .then(serverRequestActions => {
+    .then(() => {
       const html = renderToString(
         <Provider store={store}>
           <App />
@@ -100,9 +100,6 @@ router.use((req, res) => {
       res.render('index', {
         html,
         initialState: JSON.stringify(store.getState()),
-        serverRequestActions: JSON.stringify(
-          serverRequestActions.requestActionsToIgnore,
-        ),
         layout: false,
       });
     })

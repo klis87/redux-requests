@@ -1,26 +1,12 @@
 import { END } from 'redux-saga';
 
-import {
-  getRequestActionFromResponse,
-  isRequestAction,
-  isResponseAction,
-  isSuccessAction,
-} from '../actions';
+import { isRequestAction, isResponseAction, isSuccessAction } from '../actions';
 
 export default ({ requestsPromise }) => {
   let index = 0;
-  const serverRequestActions = {
-    requestActionsToIgnore: [],
-    successActions: [],
-    errorActions: [],
-  };
-  let active = true;
+  const serverSuccessActions = [];
 
   return store => next => action => {
-    if (!active) {
-      return next(action);
-    }
-
     if (isRequestAction(action)) {
       index +=
         action.meta && action.meta.dependentRequestsNumber !== undefined
@@ -28,23 +14,17 @@ export default ({ requestsPromise }) => {
           : 1;
     } else if (isResponseAction(action)) {
       if (!isSuccessAction(action)) {
-        serverRequestActions.errorActions.push(action);
         store.dispatch(END);
-        requestsPromise.reject(serverRequestActions);
-        active = false;
+        requestsPromise.reject(action);
         return next(action);
       }
 
-      serverRequestActions.successActions.push(action);
+      serverSuccessActions.push(action);
       index -= action.meta.isDependentRequest ? 2 : 1;
 
       if (index === 0) {
-        serverRequestActions.requestActionsToIgnore = serverRequestActions.successActions
-          .map(getRequestActionFromResponse)
-          .map(a => ({ type: a.type }));
         store.dispatch(END);
-        requestsPromise.resolve(serverRequestActions);
-        active = false;
+        requestsPromise.resolve(serverSuccessActions);
       }
     }
 

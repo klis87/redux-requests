@@ -1,35 +1,28 @@
 import { isRequestAction } from '../actions';
 import { getQuery } from '../selectors';
 
-export default ({ serverRequestActions }) => {
-  const actionsToBeIgnored = serverRequestActions.slice();
+export default () => store => next => action => {
+  if (!isRequestAction(action)) {
+    return next(action);
+  }
 
-  return store => next => action => {
-    const actionToBeIgnoredIndex = actionsToBeIgnored.findIndex(
-      a => a.type === action.type,
-    );
+  const state = store.getState();
+  const actionsToIgnore = state.network.ssr;
 
-    if (actionToBeIgnoredIndex === -1) {
-      return next(action);
-    }
+  if (actionsToIgnore.findIndex(v => v === action.type) === -1) {
+    return next(action);
+  }
 
-    if (!isRequestAction(action)) {
-      return next(action);
-    }
+  const query = getQuery(state, {
+    type: action.type,
+    requestKey: action.meta && action.meta.requestKey,
+  });
 
-    const query = getQuery(store.getState(), {
-      type: action.type,
-      requestKey: action.meta && action.meta.requestKey,
-    });
-
-    actionsToBeIgnored.splice(actionToBeIgnoredIndex, 1);
-
-    return next({
-      ...action,
-      meta: {
-        ...action.meta,
-        ssrResponse: { data: query.data },
-      },
-    });
-  };
+  return next({
+    ...action,
+    meta: {
+      ...action.meta,
+      ssrResponse: { data: query.data },
+    },
+  });
 };

@@ -22,7 +22,7 @@ function* rootSaga(requestsSagas) {
 }
 
 export const configureStore = (initialState = undefined) => {
-  const ssr = !initialState; // if initiaState is not passed, it means we run it on server
+  const ssr = !initialState; // if initialState is not passed, it means we run it on server
 
   const {
     requestsReducer,
@@ -35,10 +35,8 @@ export const configureStore = (initialState = undefined) => {
         baseURL: 'http://localhost:3000',
       }),
     ),
-    serverSsr: ssr,
-    clientSsr: !ssr,
+    ssr: ssr ? 'server' : 'client',
     cache: true,
-    serverRequestActions: !ssr && window.__SERVER_REQUEST_ACTIONS__,
   });
 
   const reducers = combineReducers({

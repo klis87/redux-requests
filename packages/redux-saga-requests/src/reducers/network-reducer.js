@@ -8,6 +8,7 @@ import queriesReducer from './queries-reducer';
 import mutationsReducer from './mutations-reducer';
 import requestKeysReducer from './requests-keys-reducer';
 import cacheReducer from './cache-reducer';
+import ssrReducer from './ssr-reducer';
 
 const defaultState = {
   queries: {},
@@ -48,6 +49,7 @@ export default localConfig => {
         action,
       ),
       normalizedData,
+      ssr: config.ssr ? ssrReducer(state.ssr, action, config.ssr) : null,
     };
   };
 };

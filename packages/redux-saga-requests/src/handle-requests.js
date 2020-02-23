@@ -27,19 +27,17 @@ const handleRequests = ({
   onSuccess,
   onError,
   onAbort,
-  serverRequestActions,
   cache = false,
   promisify = false,
-  clientSsr = false,
-  serverSsr = false,
+  ssr = null,
 }) => {
-  const requestsPromise = serverSsr ? defer() : null;
+  const requestsPromise = ssr === 'server' ? defer() : null;
 
   return {
-    requestsReducer: networkReducer(),
+    requestsReducer: networkReducer({ ssr }),
     requestsMiddleware: [
-      serverSsr && createServerSsrMiddleware({ requestsPromise }),
-      clientSsr && createClientSsrMiddleware({ serverRequestActions }),
+      ssr === 'server' && createServerSsrMiddleware({ requestsPromise }),
+      ssr === 'client' && createClientSsrMiddleware(),
       cache && requestsCacheMiddleware,
       promisify && createRequestsPromiseMiddleware(),
     ].filter(Boolean),
@@ -53,7 +51,6 @@ const handleRequests = ({
       }),
       fork(watchRequests),
     ],
-
     requestsPromise,
   };
 };
