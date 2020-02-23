@@ -1,15 +1,8 @@
 import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
 import createSagaMiddleware from 'redux-saga';
-import { all, put, call } from 'redux-saga/effects';
+import { put, call, all } from 'redux-saga/effects';
 import axios from 'axios';
-import {
-  createRequestInstance,
-  watchRequests,
-  serverRequestsFilterMiddleware,
-  countServerRequests,
-  sendRequest,
-  networkReducer,
-} from 'redux-saga-requests';
+import { handleRequests, sendRequest } from 'redux-saga-requests';
 import { createDriver } from 'redux-saga-requests-axios';
 
 import { fetchBooks, fetchBooksScreeningActors } from './actions';
@@ -24,28 +17,32 @@ function* bookSaga() {
   }
 }
 
-function* rootSaga(ssr = false, serverRequestActions) {
-  yield createRequestInstance({
+function* rootSaga(requestsSagas) {
+  yield all([...requestsSagas, call(bookSaga)]);
+}
+
+export const configureStore = (initialState = undefined) => {
+  const ssr = !initialState; // if initiaState is not passed, it means we run it on server
+
+  const {
+    requestsReducer,
+    requestsMiddleware,
+    requestsSagas,
+    requestsPromise,
+  } = handleRequests({
     driver: createDriver(
       axios.create({
         baseURL: 'http://localhost:3000',
       }),
     ),
+    serverSsr: ssr,
+    clientSsr: !ssr,
+    cache: true,
+    serverRequestActions: !ssr && window.__SERVER_REQUEST_ACTIONS__,
   });
 
-  yield all(
-    [
-      ssr && call(countServerRequests, { serverRequestActions }),
-      call(watchRequests),
-      call(bookSaga),
-    ].filter(Boolean),
-  );
-}
-
-export const configureStore = (initialState = undefined) => {
-  const ssr = !initialState; // if initiaState is not passed, it means we run it on server
   const reducers = combineReducers({
-    network: networkReducer(),
+    network: requestsReducer,
   });
 
   const sagaMiddleware = createSagaMiddleware();
@@ -54,13 +51,7 @@ export const configureStore = (initialState = undefined) => {
       ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
       : compose;
 
-  const middlewares = [
-    !ssr &&
-      serverRequestsFilterMiddleware({
-        serverRequestActions: window.__SERVER_REQUEST_ACTIONS__,
-      }),
-    sagaMiddleware,
-  ].filter(Boolean);
+  const middlewares = [...requestsMiddleware, sagaMiddleware];
 
   const store = createStore(
     reducers,
@@ -68,7 +59,7 @@ export const configureStore = (initialState = undefined) => {
     composeEnhancers(applyMiddleware(...middlewares)),
   );
 
-  store.runSaga = serverRequestActions =>
-    sagaMiddleware.run(rootSaga, ssr, serverRequestActions);
-  return store;
+  sagaMiddleware.run(rootSaga, requestsSagas);
+
+  return { store, requestsPromise };
 };

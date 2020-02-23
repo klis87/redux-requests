@@ -51,7 +51,7 @@ const bookScreeningActors = [
   },
 ];
 
-const sleep = () => new Promise(resolve => setTimeout(resolve, 500));
+const sleep = () => new Promise(resolve => setTimeout(resolve, 2000));
 
 router.get('/api/books', async (req, res) => {
   await sleep();
