@@ -119,19 +119,6 @@ describe('sagas', () => {
         .run();
     });
 
-    it('returns serverSide true when request action dispatch returns null', () => {
-      const action = { type: 'FETCH', request: { url: '/url' } };
-
-      return expectSaga(sendRequest, action, { dispatchRequestAction: true })
-        .provide([
-          [getContext(REQUESTS_CONFIG), config],
-          [matchers.put.actionType(action.type), null],
-        ])
-        .not.put(createSuccessAction(action, 'response', { data: 'response' }))
-        .returns({ serverSide: true })
-        .run();
-    });
-
     it('uses default driver from driver config object', () => {
       const action = { type: 'FETCH', request: { url: '/url' } };
 

@@ -10,6 +10,7 @@ describe('reducers', () => {
         normalizedData: {},
         cache: {},
         requestsKeys: {},
+        ssr: null,
       });
     });
 
@@ -22,6 +23,7 @@ describe('reducers', () => {
             normalizedData: {},
             cache: {},
             requestsKeys: {},
+            ssr: null,
           },
           { type: 'NOT_REQUEST' },
         ),
@@ -31,6 +33,7 @@ describe('reducers', () => {
         normalizedData: {},
         cache: {},
         requestsKeys: {},
+        ssr: null,
       });
     });
 
@@ -46,6 +49,7 @@ describe('reducers', () => {
           normalizedData: {},
           cache: {},
           requestsKeys: {},
+          ssr: null,
         },
         firstRequest,
       );
@@ -162,6 +166,7 @@ describe('reducers', () => {
           normalizedData: {},
           cache: {},
           requestsKeys: {},
+          ssr: null,
         },
         { type: 'REQUEST', request: { url: '/' } },
       );
@@ -181,6 +186,7 @@ describe('reducers', () => {
         mutations: {},
         cache: {},
         requestsKeys: {},
+        ssr: null,
       };
 
       state = reducer(state, {
@@ -210,6 +216,7 @@ describe('reducers', () => {
         mutations: {},
         cache: {},
         requestsKeys: {},
+        ssr: null,
       });
 
       const mutationWithoutConfig = {
@@ -240,6 +247,7 @@ describe('reducers', () => {
         normalizedData: {},
         cache: {},
         requestsKeys: {},
+        ssr: null,
       });
 
       state = reducer(state, createErrorAction(mutationWithoutConfig, 'error'));
@@ -265,6 +273,7 @@ describe('reducers', () => {
         normalizedData: {},
         cache: {},
         requestsKeys: {},
+        ssr: null,
       });
 
       state = reducer(state, mutationWithoutConfig);
@@ -290,6 +299,7 @@ describe('reducers', () => {
         normalizedData: {},
         cache: {},
         requestsKeys: {},
+        ssr: null,
       });
 
       state = reducer(
@@ -318,6 +328,7 @@ describe('reducers', () => {
         normalizedData: {},
         cache: {},
         requestsKeys: {},
+        ssr: null,
       });
 
       const mutationWithConfig = {
@@ -356,8 +367,9 @@ describe('reducers', () => {
           },
         },
         cache: {},
-        requestsKeys: {},
         normalizedData: {},
+        requestsKeys: {},
+        ssr: null,
       });
 
       state = reducer(
@@ -391,6 +403,7 @@ describe('reducers', () => {
         cache: {},
         requestsKeys: {},
         normalizedData: {},
+        ssr: null,
       });
 
       const mutationWithConfigWithRequestKey = {
@@ -440,6 +453,7 @@ describe('reducers', () => {
           MUTATION_WITH_CONFIG_WITH_REQUEST_KEY: ['1'],
         },
         normalizedData: {},
+        ssr: null,
       });
 
       state = reducer(
@@ -482,6 +496,7 @@ describe('reducers', () => {
           MUTATION_WITH_CONFIG_WITH_REQUEST_KEY: ['1'],
         },
         normalizedData: {},
+        ssr: null,
       });
 
       state = reducer(
@@ -524,6 +539,7 @@ describe('reducers', () => {
           MUTATION_WITH_CONFIG_WITH_REQUEST_KEY: ['1'],
         },
         normalizedData: {},
+        ssr: null,
       });
 
       const mutationWithOptimisticUpdate = {
@@ -580,6 +596,7 @@ describe('reducers', () => {
         requestsKeys: {
           MUTATION_WITH_CONFIG_WITH_REQUEST_KEY: ['1'],
         },
+        ssr: null,
       });
 
       state = reducer(
@@ -625,6 +642,7 @@ describe('reducers', () => {
           MUTATION_WITH_CONFIG_WITH_REQUEST_KEY: ['1'],
         },
         normalizedData: {},
+        ssr: null,
       });
 
       state = reducer(state, mutationWithOptimisticUpdate);
@@ -672,6 +690,7 @@ describe('reducers', () => {
         requestsKeys: {
           MUTATION_WITH_CONFIG_WITH_REQUEST_KEY: ['1'],
         },
+        ssr: null,
       });
     });
 
@@ -692,6 +711,7 @@ describe('reducers', () => {
         cache: {},
         normalizedData: {},
         requestsKeys: {},
+        ssr: null,
       };
 
       let state = reducer(initialState, {});
@@ -723,6 +743,7 @@ describe('reducers', () => {
         cache: {},
         normalizedData: {},
         requestsKeys: {},
+        ssr: null,
       });
     });
   });
