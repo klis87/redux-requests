@@ -23,7 +23,8 @@ export default (state, action) => {
   if (
     isSuccessAction(action) &&
     action.meta.cache &&
-    !action.meta.cacheResponse
+    !action.meta.cacheResponse &&
+    !action.meta.ssrResponse
   ) {
     const requestAction = getRequestActionFromResponse(action);
 
