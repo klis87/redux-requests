@@ -25,7 +25,7 @@ describe('middleware', () => {
     it('dispatches END and rejects promise on error response', async () => {
       const requestsPromise = defer();
       const mockStore = configureStore([
-        createServerSsrMiddleware({ requestsPromise }),
+        createServerSsrMiddleware(requestsPromise),
       ]);
       const store = mockStore({});
       const result = store.dispatch(errorAction);
@@ -37,7 +37,7 @@ describe('middleware', () => {
     it('dispatches END and resolves promise on finished successful requests', async () => {
       const requestsPromise = defer();
       const mockStore = configureStore([
-        createServerSsrMiddleware({ requestsPromise }),
+        createServerSsrMiddleware(requestsPromise),
       ]);
       const store = mockStore({});
       store.dispatch(requestAction);
@@ -60,7 +60,7 @@ describe('middleware', () => {
     it('supports dependent actions', async () => {
       const requestsPromise = defer();
       const mockStore = configureStore([
-        createServerSsrMiddleware({ requestsPromise }),
+        createServerSsrMiddleware(requestsPromise),
       ]);
       const store = mockStore({});
       const firstRequestAction = {

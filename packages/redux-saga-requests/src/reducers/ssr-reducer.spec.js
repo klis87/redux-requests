@@ -1,15 +1,16 @@
+import defaultConfig from '../default-config';
 import { createSuccessAction } from '../actions';
 import ssrReducer from './ssr-reducer';
 
 describe('reducers', () => {
   describe('ssrReducer', () => {
     it('returns empty array as default state', () => {
-      expect(ssrReducer(undefined, {}, null)).toEqual([]);
+      expect(ssrReducer(undefined, {})).toEqual([]);
     });
 
     it('doesnt do anything if ssr option is falsy', () => {
       const state = [];
-      expect(ssrReducer(state, {}, null)).toBe(state);
+      expect(ssrReducer(state, {})).toBe(state);
     });
 
     it('appends request action type for success response when ssr option is server', () => {
@@ -20,7 +21,7 @@ describe('reducers', () => {
             { type: 'REQUEST', request: { url: '/' } },
             'data',
           ),
-          'server',
+          { ...defaultConfig, ssr: 'server' },
         ),
       ).toEqual(['REQUEST', 'REQUEST']);
     });
@@ -35,8 +36,7 @@ describe('reducers', () => {
             request: { url: '/' },
             meta: { ssrResponse: { data: 'data' } },
           },
-
-          'client',
+          { ...defaultConfig, ssr: 'client' },
         ),
       ).toEqual(['REQUEST']);
     });
@@ -51,8 +51,7 @@ describe('reducers', () => {
             request: { url: '/' },
             meta: { ssrResponse: { data: 'data' } },
           },
-
-          'client',
+          { ...defaultConfig, ssr: 'client' },
         ),
       ).toEqual(['REQUEST', 'REQUEST']);
     });

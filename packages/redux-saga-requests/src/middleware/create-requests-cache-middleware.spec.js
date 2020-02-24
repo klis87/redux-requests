@@ -2,12 +2,12 @@ import configureStore from 'redux-mock-store';
 import { advanceBy, advanceTo, clear } from 'jest-date-mock';
 
 import { createSuccessAction } from '../actions';
-import { requestsCacheMiddleware } from '.';
+import { createRequestsCacheMiddleware } from '.';
 
 describe('middleware', () => {
-  describe('requestsCacheMiddleware', () => {
+  describe('createRequestsCacheMiddleware', () => {
     it('doesnt affect non request actions', () => {
-      const mockStore = configureStore([requestsCacheMiddleware]);
+      const mockStore = configureStore([createRequestsCacheMiddleware()]);
       const store = mockStore({});
       const action = { type: 'NOT_REQUEST' };
       const result = store.dispatch(action);
@@ -16,7 +16,7 @@ describe('middleware', () => {
     });
 
     it('doesnt affect request actions with no meta cache', () => {
-      const mockStore = configureStore([requestsCacheMiddleware]);
+      const mockStore = configureStore([createRequestsCacheMiddleware()]);
       const store = mockStore({});
       const action = { type: 'REQUEST', request: { url: '/' } };
       const responseAction = createSuccessAction(action, { data: null });
@@ -26,7 +26,7 @@ describe('middleware', () => {
     });
 
     it('adds cacheResponse to request action when meta cache is true and cache is infinite', () => {
-      const mockStore = configureStore([requestsCacheMiddleware]);
+      const mockStore = configureStore([createRequestsCacheMiddleware()]);
       const store = mockStore({
         network: {
           queries: { REQUEST: { ref: {}, data: 'data' } },
@@ -51,7 +51,7 @@ describe('middleware', () => {
     it('adds cacheResponse to request action when meta cache is 1 and cache not expired', () => {
       try {
         advanceTo(new Date());
-        const mockStore = configureStore([requestsCacheMiddleware]);
+        const mockStore = configureStore([createRequestsCacheMiddleware()]);
         const store = mockStore({
           network: {
             queries: { REQUEST: { ref: {}, data: 'data' } },
@@ -79,7 +79,7 @@ describe('middleware', () => {
     it('doesnt add cacheResponse to request action when meta cache is 1 and cache expired', () => {
       try {
         advanceTo(new Date());
-        const mockStore = configureStore([requestsCacheMiddleware]);
+        const mockStore = configureStore([createRequestsCacheMiddleware()]);
         const store = mockStore({
           network: {
             queries: { REQUEST: { ref: {}, data: 'data' } },
@@ -100,7 +100,7 @@ describe('middleware', () => {
     });
 
     it('doesnt do anything to request action when meta cache is true but cache not present', () => {
-      const mockStore = configureStore([requestsCacheMiddleware]);
+      const mockStore = configureStore([createRequestsCacheMiddleware()]);
       const store = mockStore({
         network: {
           queries: { REQUEST: { ref: {}, data: 'data' } },

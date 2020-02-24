@@ -1,9 +1,9 @@
-import { isRequestAction, isRequestActionQuery } from '../actions';
+import defaultConfig from '../default-config';
 
 // TODO: this should be rewritten to more functional style, we need things like filter object helpers
-export default (state, action) => {
+export default (state, action, config = defaultConfig) => {
   if (
-    isRequestAction(action) &&
+    config.isRequestAction(action) &&
     action.meta &&
     action.meta.requestKey !== undefined
   ) {
@@ -30,7 +30,7 @@ export default (state, action) => {
       action.meta.requestsCapacity &&
       requestsKeys[action.type].length > action.meta.requestsCapacity
     ) {
-      const isQuery = isRequestActionQuery(action);
+      const isQuery = config.isRequestActionQuery(action);
       const requestsStorage = isQuery ? queries : mutations;
 
       const numberOfExceedingRequests =

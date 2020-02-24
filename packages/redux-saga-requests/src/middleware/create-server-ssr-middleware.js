@@ -1,13 +1,14 @@
 import { END } from 'redux-saga';
 
-import { isRequestAction, isResponseAction, isSuccessAction } from '../actions';
+import defaultConfig from '../default-config';
+import { isResponseAction, isSuccessAction } from '../actions';
 
-export default ({ requestsPromise }) => {
+export default (requestsPromise, config = defaultConfig) => {
   let index = 0;
   const serverSuccessActions = [];
 
   return store => next => action => {
-    if (isRequestAction(action)) {
+    if (config.isRequestAction(action)) {
       index +=
         action.meta && action.meta.dependentRequestsNumber !== undefined
           ? action.meta.dependentRequestsNumber + 1

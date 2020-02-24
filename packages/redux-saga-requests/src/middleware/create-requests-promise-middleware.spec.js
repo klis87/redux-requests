@@ -1,5 +1,6 @@
 import configureStore from 'redux-mock-store';
 
+import defaultConfig from '../default-config';
 import { success, error, abort } from '../actions';
 import { createRequestsPromiseMiddleware } from '.';
 
@@ -133,7 +134,10 @@ describe('middleware', () => {
 
     describe('withAutoMode', () => {
       const mockStore = configureStore([
-        createRequestsPromiseMiddleware({ auto: true }),
+        createRequestsPromiseMiddleware({
+          ...defaultConfig,
+          autoPromisify: true,
+        }),
       ]);
 
       it('doesnt affect non request actions', () => {

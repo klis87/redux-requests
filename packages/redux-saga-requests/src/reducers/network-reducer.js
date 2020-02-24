@@ -1,9 +1,5 @@
-import {
-  isRequestAction,
-  isResponseAction,
-  getRequestActionFromResponse,
-} from '../actions';
-import defaultConfig from './default-config';
+import defaultConfig from '../default-config';
+import { isResponseAction, getRequestActionFromResponse } from '../actions';
 import queriesReducer from './queries-reducer';
 import mutationsReducer from './mutations-reducer';
 import requestKeysReducer from './requests-keys-reducer';
@@ -18,38 +14,35 @@ const defaultState = {
   requestsKeys: {},
 };
 
-export default localConfig => {
-  const config = { ...defaultConfig, ...localConfig };
+export default (config = defaultConfig) => (state = defaultState, action) => {
+  const { queries, normalizedData } = queriesReducer(
+    { queries: state.queries, normalizedData: state.normalizedData },
+    action,
+    config,
+  );
 
-  return (state = defaultState, action) => {
-    const { queries, normalizedData } = queriesReducer(
-      { queries: state.queries, normalizedData: state.normalizedData },
+  let { mutations } = state;
+
+  if (
+    (config.isRequestAction(action) && !config.isRequestActionQuery(action)) ||
+    (isResponseAction(action) &&
+      !config.isRequestActionQuery(getRequestActionFromResponse(action)))
+  ) {
+    mutations = mutationsReducer(mutations, action);
+  }
+
+  return {
+    ...requestKeysReducer(
+      {
+        queries,
+        mutations,
+        cache: cacheReducer(state.cache, action),
+        requestsKeys: state.requestsKeys,
+      },
       action,
       config,
-    );
-
-    let { mutations } = state;
-
-    if (
-      (isRequestAction(action) && !config.isRequestActionQuery(action)) ||
-      (isResponseAction(action) &&
-        !config.isRequestActionQuery(getRequestActionFromResponse(action)))
-    ) {
-      mutations = mutationsReducer(mutations, action);
-    }
-
-    return {
-      ...requestKeysReducer(
-        {
-          queries,
-          mutations,
-          cache: cacheReducer(state.cache, action),
-          requestsKeys: state.requestsKeys,
-        },
-        action,
-      ),
-      normalizedData,
-      ssr: config.ssr ? ssrReducer(state.ssr, action, config.ssr) : null,
-    };
+    ),
+    normalizedData,
+    ssr: config.ssr ? ssrReducer(state.ssr, action, config) : null,
   };
 };

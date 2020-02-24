@@ -1,19 +1,22 @@
+import defaultConfig from '../default-config';
 import {
   success,
-  isRequestAction,
   isResponseAction,
   getRequestActionFromResponse,
 } from '../actions';
 
-const shouldActionBePromisified = (action, auto) =>
-  (auto && !(action.meta && action.meta.asPromise === false)) ||
+const shouldActionBePromisified = (action, autoPromisify) =>
+  (autoPromisify && !(action.meta && action.meta.asPromise === false)) ||
   (action.meta && action.meta.asPromise);
 
-export default ({ auto = false } = {}) => {
+export default (config = defaultConfig) => {
   const requestMap = new Map();
 
   return () => next => action => {
-    if (isRequestAction(action) && shouldActionBePromisified(action, auto)) {
+    if (
+      config.isRequestAction(action) &&
+      shouldActionBePromisified(action, config.autoPromisify)
+    ) {
       return new Promise((resolve, reject) => {
         requestMap.set(action, (response, error) =>
           error ? reject(response) : resolve(response),
@@ -26,7 +29,7 @@ export default ({ auto = false } = {}) => {
     if (isResponseAction(action)) {
       const requestAction = getRequestActionFromResponse(action);
 
-      if (shouldActionBePromisified(requestAction, auto)) {
+      if (shouldActionBePromisified(requestAction, config.autoPromisify)) {
         const requestActionPromise = requestMap.get(requestAction);
         requestActionPromise(
           action,

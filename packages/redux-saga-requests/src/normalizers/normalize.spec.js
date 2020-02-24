@@ -293,7 +293,7 @@ describe('normalize', () => {
   it('should support configurable normalisation options', () => {
     expect(
       normalize([{ id: '1', key: 'a' }, { _id: '2', key: 'b' }], {
-        getObjectKey: obj => obj._id + obj.key,
+        getNormalisationObjectKey: obj => obj._id + obj.key,
         shouldObjectBeNormalized: obj => obj._id,
       }),
     ).toEqual([

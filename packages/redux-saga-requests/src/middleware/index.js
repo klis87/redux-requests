@@ -1,6 +1,6 @@
 export {
-  default as requestsCacheMiddleware,
-} from './requests-cache-middleware';
+  default as createRequestsCacheMiddleware,
+} from './create-requests-cache-middleware';
 export {
   default as createRequestsPromiseMiddleware,
 } from './create-requests-promise-middleware';

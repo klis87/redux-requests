@@ -1,26 +1,15 @@
 import { setContext } from 'redux-saga/effects';
 
+import defaultConfig from '../default-config';
 import { REQUESTS_CONFIG } from '../constants';
-import createRequestInstance, {
-  defaultRequestInstanceConfig,
-} from './create-request-instance';
+import createRequestInstance from './create-request-instance';
 
 describe('sagas', () => {
   describe('createRequestInstance', () => {
-    it('use config with correcy default value', () => {
-      expect(defaultRequestInstanceConfig).toEqual({
-        driver: null,
-        onRequest: null,
-        onSuccess: null,
-        onError: null,
-        onAbort: null,
-      });
-    });
-
     it('returns correct effect with default config', () => {
       expect(createRequestInstance()).toEqual(
         setContext({
-          [REQUESTS_CONFIG]: defaultRequestInstanceConfig,
+          [REQUESTS_CONFIG]: defaultConfig,
         }),
       );
     });

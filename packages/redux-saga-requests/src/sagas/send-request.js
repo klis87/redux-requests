@@ -12,7 +12,6 @@ import {
   createErrorAction,
   createAbortAction,
   getActionPayload,
-  isRequestAction,
 } from '../actions';
 import {
   INCORRECT_PAYLOAD_ERROR,
@@ -21,10 +20,10 @@ import {
 } from '../constants';
 import { getRequestsConfig } from './get-request-instance';
 
-const getDriver = (requestsConfig, action) =>
+const getDriver = (config, action) =>
   action.meta && action.meta.driver
-    ? requestsConfig.driver[action.meta.driver]
-    : requestsConfig.driver.default || requestsConfig.driver;
+    ? config.driver[action.meta.driver]
+    : config.driver.default || config.driver;
 
 export default function* sendRequest(
   action,
@@ -37,22 +36,23 @@ export default function* sendRequest(
     runOnAbort = null,
   } = {},
 ) {
-  if (!isRequestAction(action)) {
+  const config = yield getRequestsConfig();
+
+  if (!config.isRequestAction(action)) {
     throw new Error(INCORRECT_PAYLOAD_ERROR);
   }
   const runByInterceptor = yield getContext(RUN_BY_INTERCEPTOR);
-  const requestsConfig = yield getRequestsConfig();
 
   if (dispatchRequestAction && !silent) {
     action = { ...action, meta: { ...action.meta, runByWatcher: false } };
     action = yield put(action); // to be affected by requestsCacheMiddleware and clientSSRMiddleware
   }
 
-  const driver = yield call(getDriver, requestsConfig, action);
+  const driver = yield call(getDriver, config, action);
   const actionPayload = getActionPayload(action);
 
   if (
-    requestsConfig.onRequest &&
+    config.onRequest &&
     (runOnRequest !== null
       ? runOnRequest
       : runByInterceptor !== INTERCEPTORS.ON_REQUEST)
@@ -60,7 +60,7 @@ export default function* sendRequest(
     yield setContext({ [RUN_BY_INTERCEPTOR]: INTERCEPTORS.ON_REQUEST });
 
     actionPayload.request = yield call(
-      requestsConfig.onRequest,
+      config.onRequest,
       actionPayload.request,
       action,
     );
@@ -111,7 +111,7 @@ export default function* sendRequest(
 
     if (responseError) {
       if (
-        requestsConfig.onError &&
+        config.onError &&
         (runOnError !== null
           ? runOnError
           : runByInterceptor !== INTERCEPTORS.ON_ERROR)
@@ -119,7 +119,7 @@ export default function* sendRequest(
         yield setContext({ [RUN_BY_INTERCEPTOR]: INTERCEPTORS.ON_ERROR });
 
         const { response: onErrorResponse, error: onErrorError } = yield call(
-          requestsConfig.onError,
+          config.onError,
           responseError,
           action,
         );
@@ -141,14 +141,14 @@ export default function* sendRequest(
     }
 
     if (
-      requestsConfig.onSuccess &&
+      config.onSuccess &&
       (runOnSuccess !== null
         ? runOnSuccess
         : runByInterceptor !== INTERCEPTORS.ON_SUCCESS &&
           runByInterceptor !== INTERCEPTORS.ON_ERROR)
     ) {
       yield setContext({ [RUN_BY_INTERCEPTOR]: INTERCEPTORS.ON_SUCCESS });
-      response = yield call(requestsConfig.onSuccess, response, action);
+      response = yield call(config.onSuccess, response, action);
     }
 
     if (!silent) {
@@ -161,13 +161,13 @@ export default function* sendRequest(
       responsePromises.forEach(promise => promise.cancel && promise.cancel());
 
       if (
-        requestsConfig.onAbort &&
+        config.onAbort &&
         (runOnAbort !== null
           ? runOnAbort
           : runByInterceptor !== INTERCEPTORS.ON_ABORT)
       ) {
         yield setContext({ [RUN_BY_INTERCEPTOR]: INTERCEPTORS.ON_ABORT });
-        yield call(requestsConfig.onAbort, action);
+        yield call(config.onAbort, action);
       }
 
       if (!silent) {

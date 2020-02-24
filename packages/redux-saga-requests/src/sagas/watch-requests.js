@@ -1,17 +1,12 @@
 import { call, fork, join, take, race, cancel } from 'redux-saga/effects';
 
-import { isRequestAction, isRequestActionQuery } from '../actions';
+import defaultConfig from '../default-config';
 import sendRequest from './send-request';
 
 /* eslint-disable */
 const delay =
   require('redux-saga').delay || require('@redux-saga/delay-p').default;
 /* eslint-enable */
-
-const watchRequestsDefaultConfig = {
-  takeLatest: isRequestActionQuery,
-  abortOn: null,
-};
 
 const getLastActionKey = action =>
   action.type +
@@ -29,17 +24,16 @@ export function* cancelSendRequestOnAction(abortOn, task) {
   }
 }
 
-const isWatchable = a =>
-  isRequestAction(a) && (!a.meta || a.meta.runByWatcher !== false);
+const isWatchable = (a, config) =>
+  config.isRequestAction(a) && (!a.meta || a.meta.runByWatcher !== false);
 
-export default function* watchRequests(commonConfig = {}) {
+export default function* watchRequests(config = defaultConfig) {
   // TODO: we should think about cleaning this for requests with requestKey,
   // otherwise it could lead to memory leak
   const lastTasks = {};
-  const config = { ...watchRequestsDefaultConfig, ...commonConfig };
 
   while (true) {
-    const action = yield take(isWatchable);
+    const action = yield take(a => isWatchable(a, config));
     const lastActionKey = getLastActionKey(action);
     const takeLatest =
       action.meta && action.meta.takeLatest !== undefined

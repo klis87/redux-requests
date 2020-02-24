@@ -4,10 +4,11 @@ import { networkReducer } from './reducers';
 import { createRequestInstance, watchRequests } from './sagas';
 import {
   createRequestsPromiseMiddleware,
-  requestsCacheMiddleware,
+  createRequestsCacheMiddleware,
   createClientSsrMiddleware,
   createServerSsrMiddleware,
 } from './middleware';
+import defaultConfig from './default-config';
 
 const defer = () => {
   let res;
@@ -21,37 +22,22 @@ const defer = () => {
   return promise;
 };
 
-const handleRequests = ({
-  driver,
-  onRequest,
-  onSuccess,
-  onError,
-  onAbort,
-  cache = false,
-  promisify = false,
-  ssr = null,
-}) => {
-  const requestsPromise = ssr === 'server' ? defer() : null;
+const handleRequests = userConfig => {
+  const config = { ...defaultConfig, ...userConfig };
+  const requestsPromise = config.ssr === 'server' ? defer() : null;
 
   return {
-    requestsReducer: networkReducer({ ssr }),
+    requestsReducer: networkReducer(config),
     requestsMiddleware: [
-      ssr === 'server' && createServerSsrMiddleware({ requestsPromise }),
-      ssr === 'client' && createClientSsrMiddleware(),
-      cache && requestsCacheMiddleware,
-      promisify && createRequestsPromiseMiddleware(),
+      config.ssr === 'server' &&
+        createServerSsrMiddleware(requestsPromise, config),
+      config.ssr === 'client' && createClientSsrMiddleware(config),
+      config.cache && createRequestsCacheMiddleware(config),
+      config.promisify && createRequestsPromiseMiddleware(config),
     ].filter(Boolean),
-    requestsSagas: [
-      createRequestInstance({
-        driver,
-        onRequest,
-        onSuccess,
-        onError,
-        onAbort,
-      }),
-      fork(watchRequests),
-    ],
+    requestsSagas: [createRequestInstance(config), fork(watchRequests)],
     requestsPromise,
   };
 };
+
 export default handleRequests;

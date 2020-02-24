@@ -1,10 +1,10 @@
+import defaultConfig from '../default-config';
 import {
   createSuccessAction,
   createErrorAction,
   createAbortAction,
 } from '../actions';
 import queriesReducer from './queries-reducer';
-import defaultConfig from './default-config';
 
 describe('reducers', () => {
   describe('queriesReducer', () => {
@@ -1058,29 +1058,7 @@ describe('reducers', () => {
         });
       });
 
-      it('should allow custom getObjectKey', () => {
-        expect(
-          queriesReducer(
-            { queries: {}, normalizedData: {} },
-            createSuccessAction(requestAction, {
-              data: { id: '1', name: 'name' },
-            }),
-            { ...defaultConfig, getObjectKey: obj => obj.id + obj.name },
-          ),
-        ).toEqual({
-          queries: {
-            FETCH_BOOK: {
-              ...defaultState,
-              pending: -1,
-              data: '@@1name',
-              usedKeys: { '': ['id', 'name'] },
-            },
-          },
-          normalizedData: { '@@1name': { id: '1', name: 'name' } },
-        });
-      });
-
-      it('should allow custom shouldObjectBeNormalized', () => {
+      it('should allow custom shouldObjectBeNormalized and getNormalisationObjectKey', () => {
         expect(
           queriesReducer(
             { queries: {}, normalizedData: {} },
@@ -1089,7 +1067,7 @@ describe('reducers', () => {
             }),
             {
               ...defaultConfig,
-              getObjectKey: obj => obj._id,
+              getNormalisationObjectKey: obj => obj._id,
               shouldObjectBeNormalized: obj => !!obj._id,
             },
           ),

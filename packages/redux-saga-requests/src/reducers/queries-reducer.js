@@ -1,11 +1,10 @@
+import defaultConfig from '../default-config';
 import {
   success,
   error,
   abort,
-  isRequestAction,
   isResponseAction,
   getRequestActionFromResponse,
-  isRequestActionQuery,
   isErrorAction,
   isSuccessAction,
 } from '../actions';
@@ -81,7 +80,7 @@ const queryReducer = (state, action, actionType, normalizedData) => {
 };
 
 const maybeGetQueryActionType = (action, config) => {
-  if (isRequestAction(action) && config.isRequestActionQuery(action)) {
+  if (config.isRequestAction(action) && config.isRequestActionQuery(action)) {
     return action.type;
   }
 
@@ -96,7 +95,11 @@ const maybeGetQueryActionType = (action, config) => {
 };
 
 const updateNormalizedData = (normalizedData, action, config) => {
-  if (isRequestAction(action) && action.meta && action.meta.optimisticData) {
+  if (
+    config.isRequestAction(action) &&
+    action.meta &&
+    action.meta.optimisticData
+  ) {
     const [, newNormalizedData] = normalize(action.meta.optimisticData, config);
     return mergeData(normalizedData, newNormalizedData);
   }
@@ -114,7 +117,7 @@ const updateNormalizedData = (normalizedData, action, config) => {
     isResponseAction(action) &&
     isSuccessAction(action) &&
     action.meta.normalize &&
-    !isRequestActionQuery(getRequestActionFromResponse(action))
+    !config.isRequestActionQuery(getRequestActionFromResponse(action))
   ) {
     const [, newNormalizedData] = normalize(
       getDataFromResponseAction(action),
@@ -131,7 +134,7 @@ const updateNormalizedData = (normalizedData, action, config) => {
   return normalizedData;
 };
 
-export default (state, action, config) => {
+export default (state, action, config = defaultConfig) => {
   let normalizedData = updateNormalizedData(
     state.normalizedData,
     action,

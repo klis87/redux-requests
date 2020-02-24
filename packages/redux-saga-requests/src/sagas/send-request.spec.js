@@ -13,7 +13,7 @@ import {
   RUN_BY_INTERCEPTOR,
   INTERCEPTORS,
 } from '../constants';
-import { defaultRequestInstanceConfig } from './create-request-instance';
+import defaultConfig from '../default-config';
 import sendRequest from './send-request';
 
 const nullback = () => {};
@@ -30,7 +30,7 @@ const dummyErrorDriver = () => () => {
 
 describe('sagas', () => {
   describe('sendRequest', () => {
-    const config = { ...defaultRequestInstanceConfig, driver: dummyDriver() };
+    const config = { ...defaultConfig, driver: dummyDriver() };
 
     it('throws when request action is of incorrect type', async () => {
       const action = { type: 'TYPE' };
@@ -188,7 +188,7 @@ describe('sagas', () => {
         .provide([
           [
             getContext(REQUESTS_CONFIG),
-            { ...defaultRequestInstanceConfig, driver: dummyErrorDriver() },
+            { ...defaultConfig, driver: dummyErrorDriver() },
           ],
         ])
         .put(createErrorAction(action, new Error('responseError')))
@@ -203,7 +203,7 @@ describe('sagas', () => {
         .provide([
           [
             getContext(REQUESTS_CONFIG),
-            { ...defaultRequestInstanceConfig, driver: dummyErrorDriver() },
+            { ...defaultConfig, driver: dummyErrorDriver() },
           ],
         ])
         .not.put(createErrorAction(action, new Error('responseError')))
@@ -217,7 +217,7 @@ describe('sagas', () => {
         .provide([
           [
             getContext(REQUESTS_CONFIG),
-            { ...defaultRequestInstanceConfig, driver: dummyDriver() },
+            { ...defaultConfig, driver: dummyDriver() },
           ],
           [cancelled(), true],
         ])
@@ -232,7 +232,7 @@ describe('sagas', () => {
         .provide([
           [
             getContext(REQUESTS_CONFIG),
-            { ...defaultRequestInstanceConfig, driver: dummyDriver() },
+            { ...defaultConfig, driver: dummyDriver() },
           ],
           [cancelled(), true],
         ])

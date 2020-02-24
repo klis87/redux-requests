@@ -1,6 +1,6 @@
+import defaultConfig from '../default-config';
 import { normalize } from './normalize';
 import { mergeData } from './merge-data';
-import { defaultConfig } from './default-config';
 
 export const updateNormalizedData = (
   mutation,

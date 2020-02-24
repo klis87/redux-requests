@@ -1,14 +1,14 @@
 import { mergeData } from './merge-data';
-import { defaultConfig } from './default-config';
+import defaultConfig from '../default-config';
 
-export const stipFromDeps = (data, config, root = true) => {
+const stipFromDeps = (data, config, root = true) => {
   if (Array.isArray(data)) {
     return data.map(v => stipFromDeps(v, config));
   }
 
   if (data !== null && typeof data === 'object') {
     if (config.shouldObjectBeNormalized(data) && root) {
-      return `@@${config.getObjectKey(data)}`;
+      return `@@${config.getNormalisationObjectKey(data)}`;
     }
 
     return Object.entries(data).reduce((prev, [k, v]) => {
@@ -61,14 +61,13 @@ export const getDependencies = (
   return [[], usedKeys];
 };
 
-export const normalize = (data, userConfig = {}) => {
-  const config = { ...defaultConfig, ...userConfig };
+export const normalize = (data, config = defaultConfig) => {
   const [dependencies, usedKeys] = getDependencies(data, config);
 
   return [
     stipFromDeps(data, config, true),
     dependencies.reduce((prev, v) => {
-      const key = config.getObjectKey(v);
+      const key = config.getNormalisationObjectKey(v);
       prev[`@@${key}`] = prev[`@@${key}`]
         ? mergeData(prev[`@@${key}`], stipFromDeps(v, config, false))
         : stipFromDeps(v, config, false);

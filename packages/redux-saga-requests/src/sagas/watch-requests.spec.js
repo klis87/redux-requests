@@ -1,8 +1,8 @@
 import { getContext } from 'redux-saga/effects';
 import { expectSaga } from 'redux-saga-test-plan';
 
+import defaultConfig from '../default-config';
 import { REQUESTS_CONFIG } from '../constants';
-import { defaultRequestInstanceConfig } from './create-request-instance';
 import sendRequest from './send-request';
 import watchRequests, { cancelSendRequestOnAction } from './watch-requests';
 
@@ -15,7 +15,7 @@ const dummyDriver = () => async () => {
 
 describe('sagas', () => {
   describe('watchRequests', () => {
-    const config = { ...defaultRequestInstanceConfig, driver: dummyDriver() };
+    const config = { ...defaultConfig, driver: dummyDriver() };
     const action = { type: 'FETCH', request: { url: '/url' } };
 
     it('forks sendRequests for request action', () => {
@@ -56,7 +56,7 @@ describe('sagas', () => {
     });
 
     it('forks cancelSendRequestOnAction on abort action', () => {
-      return expectSaga(watchRequests, { abortOn: 'ABORT' })
+      return expectSaga(watchRequests, { ...defaultConfig, abortOn: 'ABORT' })
         .provide([[getContext(REQUESTS_CONFIG), config]])
         .fork.fn(cancelSendRequestOnAction)
         .dispatch(action)
@@ -64,7 +64,7 @@ describe('sagas', () => {
     });
 
     it('cancels request on abort action', () => {
-      return expectSaga(watchRequests, { abortOn: 'ABORT' })
+      return expectSaga(watchRequests, { ...defaultConfig, abortOn: 'ABORT' })
         .provide([[getContext(REQUESTS_CONFIG), config]])
         .put.actionType('FETCH_ABORT')
         .dispatch(action)
@@ -82,7 +82,7 @@ describe('sagas', () => {
     });
 
     it('doesnt cancel request without abort action', () => {
-      return expectSaga(watchRequests, { abortOn: 'ABORT' })
+      return expectSaga(watchRequests, { ...defaultConfig, abortOn: 'ABORT' })
         .provide([[getContext(REQUESTS_CONFIG), config]])
         .not.put.actionType('FETCH_ABORT')
         .dispatch(action)
@@ -156,7 +156,7 @@ describe('sagas', () => {
     });
 
     it('allows override takeLatest config', () => {
-      return expectSaga(watchRequests, { takeLatest: false })
+      return expectSaga(watchRequests, { ...defaultConfig, takeLatest: false })
         .provide([[getContext(REQUESTS_CONFIG), config]])
         .not.put.actionType('FETCH_ABORT')
         .dispatch(action)
@@ -170,7 +170,7 @@ describe('sagas', () => {
         meta: { takeLatest: false },
       };
 
-      return expectSaga(watchRequests, { takeLatest: true })
+      return expectSaga(watchRequests, { ...defaultConfig, takeLatest: true })
         .provide([[getContext(REQUESTS_CONFIG), config]])
         .not.put.actionType('FETCH_ABORT')
         .dispatch(actionWithMeta)

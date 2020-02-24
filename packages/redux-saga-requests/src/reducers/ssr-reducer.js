@@ -1,18 +1,22 @@
+import defaultConfig from '../default-config';
 import {
   getRequestActionFromResponse,
-  isRequestAction,
   isResponseAction,
   isSuccessAction,
 } from '../actions';
 
-export default (state = [], action, ssr) => {
-  if (ssr === 'server' && isResponseAction(action) && isSuccessAction(action)) {
+export default (state = [], action, config = defaultConfig) => {
+  if (
+    config.ssr === 'server' &&
+    isResponseAction(action) &&
+    isSuccessAction(action)
+  ) {
     return [...state, getRequestActionFromResponse(action).type];
   }
 
   if (
-    ssr === 'client' &&
-    isRequestAction(action) &&
+    config.ssr === 'client' &&
+    config.isRequestAction(action) &&
     action.meta &&
     action.meta.ssrResponse
   ) {
