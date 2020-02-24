@@ -1,8 +1,13 @@
 import { normalize } from './normalize';
 import { mergeData } from './merge-data';
+import { defaultConfig } from './default-config';
 
-export const updateNormalizedData = (mutation, normalizedData) => {
-  const [, dataToMerge] = normalize(mutation);
+export const updateNormalizedData = (
+  mutation,
+  normalizedData,
+  config = defaultConfig,
+) => {
+  const [, dataToMerge] = normalize(mutation, config);
 
   if (Object.keys(dataToMerge).length > 0) {
     const normalizedDataCopy = { ...normalizedData };

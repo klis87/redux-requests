@@ -1057,6 +1057,54 @@ describe('reducers', () => {
           },
         });
       });
+
+      it('should allow custom getObjectKey', () => {
+        expect(
+          queriesReducer(
+            { queries: {}, normalizedData: {} },
+            createSuccessAction(requestAction, {
+              data: { id: '1', name: 'name' },
+            }),
+            { ...defaultConfig, getObjectKey: obj => obj.id + obj.name },
+          ),
+        ).toEqual({
+          queries: {
+            FETCH_BOOK: {
+              ...defaultState,
+              pending: -1,
+              data: '@@1name',
+              usedKeys: { '': ['id', 'name'] },
+            },
+          },
+          normalizedData: { '@@1name': { id: '1', name: 'name' } },
+        });
+      });
+
+      it('should allow custom shouldObjectBeNormalized', () => {
+        expect(
+          queriesReducer(
+            { queries: {}, normalizedData: {} },
+            createSuccessAction(requestAction, {
+              data: { _id: '1', name: 'name' },
+            }),
+            {
+              ...defaultConfig,
+              getObjectKey: obj => obj._id,
+              shouldObjectBeNormalized: obj => !!obj._id,
+            },
+          ),
+        ).toEqual({
+          queries: {
+            FETCH_BOOK: {
+              ...defaultState,
+              pending: -1,
+              data: '@@1',
+              usedKeys: { '': ['_id', 'name'] },
+            },
+          },
+          normalizedData: { '@@1': { _id: '1', name: 'name' } },
+        });
+      });
     });
   });
 });

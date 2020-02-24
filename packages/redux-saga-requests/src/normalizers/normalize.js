@@ -1,16 +1,18 @@
 import { mergeData } from './merge-data';
+import { defaultConfig } from './default-config';
 
-export const stipFromDeps = (data, root = true) => {
+export const stipFromDeps = (data, config, root = true) => {
   if (Array.isArray(data)) {
-    return data.map(v => stipFromDeps(v));
+    return data.map(v => stipFromDeps(v, config));
   }
 
   if (data !== null && typeof data === 'object') {
-    if (data.id && root) {
-      return `@@${data.id}`;
+    if (config.shouldObjectBeNormalized(data) && root) {
+      return `@@${config.getObjectKey(data)}`;
     }
+
     return Object.entries(data).reduce((prev, [k, v]) => {
-      prev[k] = stipFromDeps(v);
+      prev[k] = stipFromDeps(v, config);
       return prev;
     }, {});
   }
@@ -18,7 +20,12 @@ export const stipFromDeps = (data, root = true) => {
   return data;
 };
 
-export const getDependencies = (data, usedKeys, path = '') => {
+export const getDependencies = (
+  data,
+  config = defaultConfig,
+  usedKeys,
+  path = '',
+) => {
   usedKeys = usedKeys || {};
 
   if (Array.isArray(data)) {
@@ -26,7 +33,7 @@ export const getDependencies = (data, usedKeys, path = '') => {
       data.reduce(
         (prev, current) => [
           ...prev,
-          ...getDependencies(current, usedKeys, path)[0],
+          ...getDependencies(current, config, usedKeys, path)[0],
         ],
         [],
       ),
@@ -35,7 +42,7 @@ export const getDependencies = (data, usedKeys, path = '') => {
   }
 
   if (data !== null && typeof data === 'object') {
-    if (data.id) {
+    if (config.shouldObjectBeNormalized(data)) {
       usedKeys[path] = Object.keys(data);
     }
 
@@ -43,9 +50,9 @@ export const getDependencies = (data, usedKeys, path = '') => {
       Object.entries(data).reduce(
         (prev, [k, v]) => [
           ...prev,
-          ...getDependencies(v, usedKeys, `${path}.${k}`)[0],
+          ...getDependencies(v, config, usedKeys, `${path}.${k}`)[0],
         ],
-        data.id ? [data] : [],
+        config.shouldObjectBeNormalized(data) ? [data] : [],
       ),
       usedKeys,
     ];
@@ -54,15 +61,17 @@ export const getDependencies = (data, usedKeys, path = '') => {
   return [[], usedKeys];
 };
 
-export const normalize = data => {
-  const [dependencies, usedKeys] = getDependencies(data);
+export const normalize = (data, userConfig = {}) => {
+  const config = { ...defaultConfig, ...userConfig };
+  const [dependencies, usedKeys] = getDependencies(data, config);
 
   return [
-    stipFromDeps(data, true),
+    stipFromDeps(data, config, true),
     dependencies.reduce((prev, v) => {
-      prev[`@@${v.id}`] = prev[`@@${v.id}`]
-        ? mergeData(prev[`@@${v.id}`], stipFromDeps(v, false))
-        : stipFromDeps(v, false);
+      const key = config.getObjectKey(v);
+      prev[`@@${key}`] = prev[`@@${key}`]
+        ? mergeData(prev[`@@${key}`], stipFromDeps(v, config, false))
+        : stipFromDeps(v, config, false);
       return prev;
     }, {}),
     usedKeys,

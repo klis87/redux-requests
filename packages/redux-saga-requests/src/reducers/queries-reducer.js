@@ -95,9 +95,9 @@ const maybeGetQueryActionType = (action, config) => {
   return null;
 };
 
-const updateNormalizedData = (normalizedData, action) => {
+const updateNormalizedData = (normalizedData, action, config) => {
   if (isRequestAction(action) && action.meta && action.meta.optimisticData) {
-    const [, newNormalizedData] = normalize(action.meta.optimisticData);
+    const [, newNormalizedData] = normalize(action.meta.optimisticData, config);
     return mergeData(normalizedData, newNormalizedData);
   }
 
@@ -106,7 +106,7 @@ const updateNormalizedData = (normalizedData, action) => {
     isErrorAction(action) &&
     action.meta.revertedData
   ) {
-    const [, newNormalizedData] = normalize(action.meta.revertedData);
+    const [, newNormalizedData] = normalize(action.meta.revertedData, config);
     return mergeData(normalizedData, newNormalizedData);
   }
 
@@ -116,12 +116,15 @@ const updateNormalizedData = (normalizedData, action) => {
     action.meta.normalize &&
     !isRequestActionQuery(getRequestActionFromResponse(action))
   ) {
-    const [, newNormalizedData] = normalize(getDataFromResponseAction(action));
+    const [, newNormalizedData] = normalize(
+      getDataFromResponseAction(action),
+      config,
+    );
     return mergeData(normalizedData, newNormalizedData);
   }
 
   if (action.meta && action.meta.localData) {
-    const [, newNormalizedData] = normalize(action.meta.localData);
+    const [, newNormalizedData] = normalize(action.meta.localData, config);
     return mergeData(normalizedData, newNormalizedData);
   }
 
@@ -129,7 +132,11 @@ const updateNormalizedData = (normalizedData, action) => {
 };
 
 export default (state, action, config) => {
-  let normalizedData = updateNormalizedData(state.normalizedData, action);
+  let normalizedData = updateNormalizedData(
+    state.normalizedData,
+    action,
+    config,
+  );
 
   if (action.meta && action.meta.mutations) {
     return {
@@ -151,6 +158,7 @@ export default (state, action, config) => {
             ) {
               const [newdata, newNormalizedData, usedKeys] = normalize(
                 updatedQuery.data,
+                config,
               );
               normalizedData = mergeData(normalizedData, newNormalizedData);
               prev[actionType] = { ...updatedQuery, data: newdata, usedKeys };
@@ -183,7 +191,10 @@ export default (state, action, config) => {
       (!state.queries[queryType] ||
         state.queries[queryType].data !== updatedQuery.data)
     ) {
-      const [data, newNormalizedData, usedKeys] = normalize(updatedQuery.data);
+      const [data, newNormalizedData, usedKeys] = normalize(
+        updatedQuery.data,
+        config,
+      );
 
       return {
         queries: {
