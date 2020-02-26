@@ -24,9 +24,14 @@ const getInitialQuery = normalized => ({
 const getDataFromResponseAction = action =>
   action.payload ? action.payload.data : action.response.data;
 
-const queryReducer = (state, action, actionType, normalizedData) => {
+const shouldBeNormalized = (action, config) =>
+  action.meta && action.meta.normalize !== undefined
+    ? action.meta.normalize
+    : config.normalize;
+
+const queryReducer = (state, action, actionType, config, normalizedData) => {
   if (state === undefined) {
-    state = getInitialQuery(!!(action.meta && action.meta.normalize));
+    state = getInitialQuery(shouldBeNormalized(action, config));
   }
 
   if (
@@ -116,7 +121,7 @@ const updateNormalizedData = (normalizedData, action, config) => {
   if (
     isResponseAction(action) &&
     isSuccessAction(action) &&
-    action.meta.normalize &&
+    shouldBeNormalized(action, config) &&
     !config.isRequestActionQuery(getRequestActionFromResponse(action))
   ) {
     const [, newNormalizedData] = normalize(
@@ -152,6 +157,7 @@ export default (state, action, config = defaultConfig) => {
               state.queries[actionType],
               action,
               actionType,
+              config,
               normalizedData,
             );
 
@@ -186,6 +192,7 @@ export default (state, action, config = defaultConfig) => {
       state.queries[queryType],
       action,
       queryActionType,
+      config,
     );
 
     if (

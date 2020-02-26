@@ -14,6 +14,7 @@ export default {
   isRequestActionQuery,
   takeLatest: isRequestActionQuery,
   abortOn: null,
+  normalize: false,
   getNormalisationObjectKey: obj => obj.id,
   shouldObjectBeNormalized: obj => obj.id !== undefined,
 };
