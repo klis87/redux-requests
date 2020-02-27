@@ -4,6 +4,7 @@ import queriesReducer from './queries-reducer';
 import mutationsReducer from './mutations-reducer';
 import requestKeysReducer from './requests-keys-reducer';
 import cacheReducer from './cache-reducer';
+import requestsResetReducer from './requests-reset-reducer';
 import ssrReducer from './ssr-reducer';
 
 const defaultState = {
@@ -34,9 +35,14 @@ export default (config = defaultConfig) => (state = defaultState, action) => {
   return {
     ...requestKeysReducer(
       {
-        queries,
-        mutations,
-        cache: cacheReducer(state.cache, action),
+        ...requestsResetReducer(
+          {
+            queries,
+            mutations,
+            cache: cacheReducer(state.cache, action),
+          },
+          action,
+        ),
         requestsKeys: state.requestsKeys,
       },
       action,

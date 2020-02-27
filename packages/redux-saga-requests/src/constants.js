@@ -10,5 +10,6 @@ export const INTERCEPTORS = {
   ON_ABORT: 'onAbort',
 };
 export const CLEAR_REQUESTS_CACHE = 'CLEAR_REQUESTS_CACHE';
+export const RESET_REQUESTS = 'RESET_REQUESTS';
 export const INCORRECT_PAYLOAD_ERROR =
   "Incorrect payload for request action. Action must have form of { type: 'TYPE', request: {} }, { type: 'TYPE', request: [{}, {}] }, { type: 'TYPE', payload: { request: {} } } or { type: 'TYPE', payload: { request: [{}, {}] } }";
