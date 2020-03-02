@@ -54,7 +54,7 @@ const users = [
   {
     id: 'b',
     name: 'b',
-    favouriteBook: books[11],
+    favouriteBook: books[0],
     likedBooks: books.slice(11, 20),
     bestFriend: {
       id: 'a',

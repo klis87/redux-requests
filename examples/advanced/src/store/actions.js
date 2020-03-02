@@ -1,44 +1,30 @@
 import {
   FETCH_PHOTO,
-  CLEAR_PHOTO,
   FETCH_POST,
-  CLEAR_POST,
+  ABORT_PHOTO,
+  ABORT_POST,
   INCREMENT_REQUEST_COUNTER,
   INCREMENT_RESPONSE_COUNTER,
   INCREMENT_ERROR_COUNTER,
 } from './constants';
 
-export const clearPhoto = () => ({
-  type: CLEAR_PHOTO,
-  meta: {
-    mutations: {
-      FETCH_PHOTO: { updateData: () => null, local: true },
-    },
-  },
-});
+export const abortPhoto = () => ({ type: ABORT_PHOTO });
 
 export const fetchPhoto = id => ({
   type: FETCH_PHOTO,
   request: { url: `/photos/${id}` },
   meta: {
-    abortOn: CLEAR_PHOTO,
+    abortOn: ABORT_PHOTO,
   },
 });
 
-export const clearPost = () => ({
-  type: CLEAR_POST,
-  meta: {
-    mutations: {
-      FETCH_POST: { updateData: () => null, local: true },
-    },
-  },
-});
+export const abortPost = () => ({ type: ABORT_POST });
 
 export const fetchPost = id => ({
   type: FETCH_POST,
   request: [{ url: `/posts/${id}` }, { url: `/posts/${id}/comments` }],
   meta: {
-    abortOn: CLEAR_POST,
+    abortOn: ABORT_POST,
     getData: data => ({
       ...data[0],
       comments: data[1],

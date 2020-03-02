@@ -57,7 +57,6 @@ const App = () => {
           noDataMessage={<p>There is no entity currently.</p>}
         >
           {({ data }) =>
-            console.log('data', data) ||
             data.users.map(user => {
               return (
                 <div key={user.id}>

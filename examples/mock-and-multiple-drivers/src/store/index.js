@@ -1,5 +1,6 @@
 import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
 import createSagaMiddleware from 'redux-saga';
+import { all } from 'redux-saga/effects';
 import axios from 'axios';
 import { handleRequests } from 'redux-saga-requests';
 import { createDriver as createAxiosDriver } from 'redux-saga-requests-axios';
@@ -8,7 +9,7 @@ import { createDriver as createMockDriver } from 'redux-saga-requests-mock';
 import { FETCH_PHOTO } from './constants';
 
 export const configureStore = () => {
-  const { requestsReducer, requestsSaga } = handleRequests({
+  const { requestsReducer, requestsSagas } = handleRequests({
     driver: {
       default: createAxiosDriver(
         axios.create({
@@ -49,11 +50,15 @@ export const configureStore = () => {
       window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) ||
     compose;
 
+  function* rootSaga() {
+    yield all(requestsSagas);
+  }
+
   const store = createStore(
     reducers,
     composeEnhancers(applyMiddleware(sagaMiddleware)),
   );
 
-  sagaMiddleware.run(requestsSaga);
+  sagaMiddleware.run(rootSaga);
   return store;
 };

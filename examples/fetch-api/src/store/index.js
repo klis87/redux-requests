@@ -4,8 +4,6 @@ import { all } from 'redux-saga/effects';
 import { handleRequests } from 'redux-saga-requests';
 import { createDriver } from 'redux-saga-requests-fetch';
 
-import { abortCounterReducer } from './reducers';
-
 export const configureStore = () => {
   const { requestsReducer, requestsSagas } = handleRequests({
     driver: createDriver(window.fetch, {
@@ -16,7 +14,6 @@ export const configureStore = () => {
 
   const reducers = combineReducers({
     network: requestsReducer,
-    abortCounter: abortCounterReducer,
   });
 
   const sagaMiddleware = createSagaMiddleware();

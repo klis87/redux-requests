@@ -1,22 +1,16 @@
 import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
 import createSagaMiddleware from 'redux-saga';
-import {
-  createRequestInstance,
-  watchRequests,
-  networkReducer,
-} from 'redux-saga-requests';
+import { all } from 'redux-saga/effects';
+import { handleRequests } from 'redux-saga-requests';
 import { createDriver } from 'redux-saga-requests-graphql';
 
-function* rootSaga() {
-  yield createRequestInstance({
+export const configureStore = () => {
+  const { requestsReducer, requestsSagas } = handleRequests({
     driver: createDriver({ url: 'http://localhost:3000/graphql' }),
   });
-  yield watchRequests();
-}
 
-export const configureStore = () => {
   const reducers = combineReducers({
-    network: networkReducer(),
+    network: requestsReducer,
   });
 
   const sagaMiddleware = createSagaMiddleware();
@@ -29,6 +23,10 @@ export const configureStore = () => {
     reducers,
     composeEnhancers(applyMiddleware(sagaMiddleware)),
   );
+
+  function* rootSaga() {
+    yield all(requestsSagas);
+  }
 
   sagaMiddleware.run(rootSaga);
   return store;

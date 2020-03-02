@@ -1,8 +1,9 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
+import { resetRequests } from 'redux-saga-requests';
 import { Query } from 'redux-saga-requests-react';
 
-import { fetchPhoto, clearPhoto, fetchPost, clearPost } from '../store/actions';
+import { fetchPhoto, fetchPost } from '../store/actions';
 import { FETCH_PHOTO, FETCH_POST } from '../store/constants';
 import Spinner from './spinner';
 import Photo from './photo';
@@ -30,7 +31,7 @@ const App = () => {
         <button
           type="button"
           style={buttonStyle}
-          onClick={() => dispatch(clearPhoto())}
+          onClick={() => dispatch(resetRequests([FETCH_PHOTO]))}
         >
           Clear
         </button>
@@ -63,7 +64,7 @@ const App = () => {
         <button
           type="button"
           style={buttonStyle}
-          onClick={() => dispatch(clearPost())}
+          onClick={() => dispatch(resetRequests([FETCH_POST]))}
         >
           Clear
         </button>

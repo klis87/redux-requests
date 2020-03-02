@@ -29,18 +29,6 @@ export const fetchBook = id => ({
   },
 });
 
-export const resetBooks = () => ({
-  type: 'RESET_BOOKS',
-  meta: {
-    mutations: {
-      [FETCH_BOOKS]: {
-        local: true,
-        updateData: () => null,
-      },
-    },
-  },
-});
-
 export const fetchBooksScreeningActors = bookIds => ({
   type: FETCH_BOOKS_SCREENING_ACTORS,
   request: {

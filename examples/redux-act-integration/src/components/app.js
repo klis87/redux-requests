@@ -1,13 +1,14 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { resetRequests } from 'redux-saga-requests';
 import { Query, Mutation } from 'redux-saga-requests-react';
 
 import {
   fetchPhoto,
-  clearPhoto,
+  abortPhoto,
   deletePhoto,
   fetchPosts,
-  clearPosts,
+  abortPosts,
   deletePost,
 } from '../store/actions';
 import Spinner from './spinner';
@@ -39,9 +40,16 @@ const App = () => {
         <button
           type="button"
           style={buttonStyle}
-          onClick={() => dispatch(clearPhoto())}
+          onClick={() => dispatch(abortPhoto())}
         >
-          Clear
+          Abort
+        </button>
+        <button
+          type="button"
+          style={buttonStyle}
+          onClick={() => dispatch(resetRequests([fetchPhoto]))}
+        >
+          Reset
         </button>
         <button
           type="button"
@@ -89,9 +97,16 @@ const App = () => {
         <button
           type="button"
           style={buttonStyle}
-          onClick={() => dispatch(clearPosts())}
+          onClick={() => dispatch(abortPosts())}
         >
-          Clear
+          Abort
+        </button>
+        <button
+          type="button"
+          style={buttonStyle}
+          onClick={() => dispatch(resetRequests([fetchPosts]))}
+        >
+          Reset
         </button>
         <button
           type="button"

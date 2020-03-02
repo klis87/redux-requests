@@ -1,6 +1,6 @@
 import { createAction } from 'redux-act';
 
-export const clearPhoto = createAction('clear photo');
+export const abortPhoto = createAction('abort photo');
 
 export const fetchPhoto = createAction(
   'fetch photo',
@@ -8,8 +8,7 @@ export const fetchPhoto = createAction(
     request: { url: `/photos/${id}` },
   }),
   () => ({
-    abortOn: clearPhoto,
-    resetOn: [clearPhoto],
+    abortOn: abortPhoto,
   }),
 );
 
@@ -25,7 +24,7 @@ export const deletePhoto = createAction(
   }),
 );
 
-export const clearPosts = createAction('clear posts');
+export const abortPosts = createAction('abort posts');
 
 export const fetchPosts = createAction(
   'fetch posts',
@@ -33,8 +32,7 @@ export const fetchPosts = createAction(
     request: { url: '/posts/' },
   }),
   () => ({
-    abortOn: clearPosts,
-    resetOn: [clearPosts],
+    abortOn: abortPosts,
   }),
 );
 
@@ -44,12 +42,10 @@ export const deletePost = createAction(
     request: { url: `/posts/${id}`, method: 'delete' },
   }),
   id => ({
-    id,
+    requestKey: String(id),
     mutations: {
-      getRequestKey: action => String(action.meta.id),
       [fetchPosts]: {
-        updateData: (state, action) =>
-          state.data.filter(v => v.id !== action.meta.id),
+        updateData: data => data.filter(v => v.id !== id),
       },
     },
   }),

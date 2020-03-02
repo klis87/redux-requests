@@ -1,4 +1,5 @@
 import React from 'react';
+import { resetRequests } from 'redux-saga-requests';
 import { Query } from 'redux-saga-requests-react';
 import { useDispatch } from 'react-redux';
 
@@ -7,7 +8,7 @@ import {
   FETCH_BOOK,
   FETCH_BOOKS_SCREENING_ACTORS,
 } from '../store/constants';
-import { resetBooks, fetchBook, fetchBooks } from '../store/actions';
+import { fetchBook, fetchBooks } from '../store/actions';
 import Spinner from './spinner';
 
 const RequestError = () => (
@@ -56,7 +57,10 @@ const App = () => {
         ))}
         <hr />
         <h2>Books</h2>
-        <button type="button" onClick={() => dispatch(resetBooks())}>
+        <button
+          type="button"
+          onClick={() => dispatch(resetRequests([FETCH_BOOKS]))}
+        >
           reset books
         </button>
         <button type="button" onClick={() => dispatch(fetchBooks())}>
