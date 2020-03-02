@@ -131,5 +131,41 @@ describe('reducers', () => {
         cache: { QUERY3: {} },
       });
     });
+
+    it('handles passed requests types as functions', () => {
+      const queryAction = () => ({});
+      queryAction.toString = () => 'QUERY';
+
+      expect(
+        requestsResetReducer(
+          {
+            queries: {
+              QUERY: {
+                data: 'data',
+                pending: 1,
+                error: 'error',
+                normalized: false,
+                usedKeys: null,
+              },
+            },
+            mutations: {},
+            cache: {},
+          },
+          resetRequests([queryAction]),
+        ),
+      ).toEqual({
+        queries: {
+          QUERY: {
+            data: null,
+            pending: 1,
+            error: null,
+            normalized: false,
+            usedKeys: null,
+          },
+        },
+        mutations: {},
+        cache: {},
+      });
+    });
   });
 });

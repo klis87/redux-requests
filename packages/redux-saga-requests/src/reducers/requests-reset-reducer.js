@@ -1,7 +1,14 @@
 import { RESET_REQUESTS } from '../constants';
 
+const getRequestTypeString = requestType =>
+  typeof requestType === 'function' ? requestType.toString() : requestType;
+
 const getKeys = requests =>
-  requests.map(v => (typeof v === 'object' ? v.requestType + v.requestKey : v));
+  requests.map(v =>
+    typeof v === 'object'
+      ? getRequestTypeString(v.requestType) + v.requestKey
+      : getRequestTypeString(v),
+  );
 
 const resetQuery = query => ({
   ...query,
