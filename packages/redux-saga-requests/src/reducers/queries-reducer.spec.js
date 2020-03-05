@@ -743,7 +743,10 @@ describe('reducers', () => {
                 root: {
                   id: '1',
                   name: 'name',
-                  nested: [{ id: '2', v: 2 }, { id: '3', v: 3 }],
+                  nested: [
+                    { id: '2', v: 2 },
+                    { id: '3', v: 3 },
+                  ],
                 },
               },
             }),

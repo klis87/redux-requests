@@ -107,7 +107,10 @@ describe('updateNormalizedData', () => {
         {
           id: 1,
           nested: {
-            deeplyNested: [{ id: 3, x: 33 }, { id: 4, x: 4 }],
+            deeplyNested: [
+              { id: 3, x: 33 },
+              { id: 4, x: 4 },
+            ],
           },
         },
         {

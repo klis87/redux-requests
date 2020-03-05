@@ -39,16 +39,28 @@ describe('getDependencies', () => {
   });
 
   it('finds dependencies from array', () => {
-    expect(getDependencies([{ id: '1', v: 'a' }, { id: '2', v: 'b' }])).toEqual(
-      [[{ id: '1', v: 'a' }, { id: '2', v: 'b' }], { '': ['id', 'v'] }],
-    );
+    expect(
+      getDependencies([
+        { id: '1', v: 'a' },
+        { id: '2', v: 'b' },
+      ]),
+    ).toEqual([
+      [
+        { id: '1', v: 'a' },
+        { id: '2', v: 'b' },
+      ],
+      { '': ['id', 'v'] },
+    ]);
   });
 
   it('finds dependencies of dependencies', () => {
     expect(
       getDependencies({ id: '1', v: 'a', nested: { id: '2', v: 'b' } }),
     ).toEqual([
-      [{ id: '1', v: 'a', nested: { id: '2', v: 'b' } }, { id: '2', v: 'b' }],
+      [
+        { id: '1', v: 'a', nested: { id: '2', v: 'b' } },
+        { id: '2', v: 'b' },
+      ],
       { '': ['id', 'v', 'nested'], '.nested': ['id', 'v'] },
     ]);
   });
@@ -188,7 +200,10 @@ describe('normalize', () => {
     expect(
       normalize({
         arrayWithoutIds: [1, 2, 3],
-        arrayWithIds: [{ id: '1', k: 'a' }, { id: '2', k: 'b' }],
+        arrayWithIds: [
+          { id: '1', k: 'a' },
+          { id: '2', k: 'b' },
+        ],
       }),
     ).toEqual([
       {
@@ -292,10 +307,16 @@ describe('normalize', () => {
 
   it('should support configurable normalisation options', () => {
     expect(
-      normalize([{ id: '1', key: 'a' }, { _id: '2', key: 'b' }], {
-        getNormalisationObjectKey: obj => obj._id + obj.key,
-        shouldObjectBeNormalized: obj => obj._id,
-      }),
+      normalize(
+        [
+          { id: '1', key: 'a' },
+          { _id: '2', key: 'b' },
+        ],
+        {
+          getNormalisationObjectKey: obj => obj._id + obj.key,
+          shouldObjectBeNormalized: obj => obj._id,
+        },
+      ),
     ).toEqual([
       [{ id: '1', key: 'a' }, '@@2b'],
       { '@@2b': { _id: '2', key: 'b' } },

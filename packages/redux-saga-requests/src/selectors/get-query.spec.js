@@ -143,7 +143,10 @@ describe('selectors', () => {
 
     it('denormalizes data if necessary', () => {
       expect(getQuery(state, { type: 'QUERY2' })).toEqual({
-        data: [{ id: 1, x: 1 }, { id: 2, x: 2 }],
+        data: [
+          { id: 1, x: 1 },
+          { id: 2, x: 2 },
+        ],
         loading: false,
         error: null,
       });
@@ -182,12 +185,18 @@ describe('selectors', () => {
         { type: 'QUERY2' },
       );
       expect(query).toEqual({
-        data: [{ id: 1, x: 1 }, { id: 2, x: 2 }],
+        data: [
+          { id: 1, x: 1 },
+          { id: 2, x: 2 },
+        ],
         loading: false,
         error: null,
       });
       expect(query2).toEqual({
-        data: [{ id: 1, x: 1 }, { id: 2, x: 3 }],
+        data: [
+          { id: 1, x: 1 },
+          { id: 2, x: 3 },
+        ],
         loading: false,
         error: null,
       });
@@ -229,7 +238,10 @@ describe('selectors', () => {
         { type: 'QUERY2' },
       );
       expect(query).toEqual({
-        data: [{ id: 1, x: 1 }, { id: 2, x: 2 }],
+        data: [
+          { id: 1, x: 1 },
+          { id: 2, x: 2 },
+        ],
         loading: false,
         error: null,
       });
