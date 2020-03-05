@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
-import { getQuery } from 'redux-saga-requests';
+import { getQuerySelector } from 'redux-saga-requests';
 
 import { reactComponentPropType } from './propTypesValidators';
 
@@ -23,8 +23,7 @@ const Query = ({
   ...extraProps
 }) => {
   const query = useSelector(
-    selector ||
-      (state => getQuery(state, { type, requestKey, defaultData, multiple })),
+    selector || getQuerySelector({ type, requestKey, defaultData, multiple }),
   );
 
   const dataEmpty = isDataEmpty(query);

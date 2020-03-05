@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
-import { getMutation } from 'redux-saga-requests';
+import { getMutationSelector } from 'redux-saga-requests';
 
 import { reactComponentPropType } from './propTypesValidators';
 
@@ -14,7 +14,7 @@ const Mutation = ({
   ...extraProps
 }) => {
   const mutation = useSelector(
-    selector || (state => getMutation(state, { type, requestKey })),
+    selector || getMutationSelector({ type, requestKey }),
   );
 
   if (children) {

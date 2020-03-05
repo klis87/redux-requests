@@ -1,8 +1,8 @@
 import { useSelector } from 'react-redux';
-import { getQuery } from 'redux-saga-requests';
+import { getQuerySelector } from 'redux-saga-requests';
 
 const useQuery = props => {
-  return useSelector(state => getQuery(state, props));
+  return useSelector(getQuerySelector(props));
 };
 
 export default useQuery;

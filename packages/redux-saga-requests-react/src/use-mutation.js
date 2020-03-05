@@ -1,8 +1,8 @@
 import { useSelector } from 'react-redux';
-import { getMutation } from 'redux-saga-requests';
+import { getMutationSelector } from 'redux-saga-requests';
 
 const useMutation = props => {
-  return useSelector(state => getMutation(state, props));
+  return useSelector(getMutationSelector(props));
 };
 
 export default useMutation;
