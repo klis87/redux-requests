@@ -15,7 +15,9 @@ describe('Mutation', () => {
       <Provider
         store={mockStore({
           request: {
-            mutations: { [MUTATION_TYPE]: { pending: 1, error: 'error' } },
+            mutations: {
+              [MUTATION_TYPE]: { pending: 1, error: 'error', ref: {} },
+            },
           },
         })}
       >
@@ -38,7 +40,7 @@ describe('Mutation', () => {
         store={mockStore({
           network: {
             mutations: {
-              [MUTATION_TYPE]: { pending: 1, error: 'error' },
+              [MUTATION_TYPE]: { pending: 1, error: 'error', ref: {} },
             },
           },
         })}
@@ -84,7 +86,7 @@ describe('Mutation', () => {
         store={mockStore({
           network: {
             mutations: {
-              [MUTATION_TYPE]: { x: { pending: 1, error: 'error' } },
+              [`${MUTATION_TYPE}x`]: { pending: 1, error: 'error', ref: {} },
             },
           },
         })}
@@ -109,7 +111,7 @@ describe('Mutation', () => {
         store={mockStore({
           network: {
             mutations: {
-              [MUTATION_TYPE]: { x: { pending: 1, error: 'error' } },
+              [MUTATION_TYPE]: { x: { pending: 1, error: 'error', ref: {} } },
             },
           },
         })}
@@ -140,7 +142,7 @@ describe('Mutation', () => {
         store={mockStore({
           network: {
             mutations: {
-              [MUTATION_TYPE]: { pending: 1, error: 'error' },
+              [MUTATION_TYPE]: { pending: 1, error: 'error', ref: {} },
             },
           },
         })}

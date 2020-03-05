@@ -14,7 +14,7 @@ describe('Query', () => {
     const component = renderer.create(
       <Provider
         store={mockStore({
-          request: { data: 'data', error: null, loading: false },
+          request: { data: 'data', error: null, loading: false, ref: {} },
         })}
       >
         <Query selector={state => state.request}>
@@ -31,7 +31,7 @@ describe('Query', () => {
         store={mockStore({
           network: {
             queries: {
-              [QUERY_TYPE]: { data: 'data', error: null, pending: 0 },
+              [QUERY_TYPE]: { data: 'data', error: null, pending: 0, ref: {} },
             },
           },
         })}
@@ -63,7 +63,7 @@ describe('Query', () => {
         store={mockStore({
           network: {
             queries: {
-              [QUERY_TYPE]: { data: null, error: null, pending: 0 },
+              [QUERY_TYPE]: { data: null, error: null, pending: 0, ref: {} },
             },
           },
         })}
@@ -81,7 +81,7 @@ describe('Query', () => {
         store={mockStore({
           network: {
             queries: {
-              [QUERY_TYPE]: { data: [], error: null, pending: 0 },
+              [QUERY_TYPE]: { data: [], error: null, pending: 0, ref: {} },
             },
           },
         })}
@@ -106,7 +106,7 @@ describe('Query', () => {
         store={mockStore({
           network: {
             queries: {
-              [QUERY_TYPE]: { data: 'empty', error: null, pending: 0 },
+              [QUERY_TYPE]: { data: 'empty', error: null, pending: 0, ref: {} },
             },
           },
         })}
@@ -129,7 +129,7 @@ describe('Query', () => {
         store={mockStore({
           network: {
             queries: {
-              [QUERY_TYPE]: { data: null, error: null, pending: 0 },
+              [QUERY_TYPE]: { data: null, error: null, pending: 0, ref: {} },
             },
           },
         })}
@@ -148,7 +148,7 @@ describe('Query', () => {
         store={mockStore({
           network: {
             queries: {
-              [QUERY_TYPE]: { data: null, error: null, pending: 0 },
+              [QUERY_TYPE]: { data: null, error: null, pending: 0, ref: {} },
             },
           },
         })}
@@ -167,7 +167,7 @@ describe('Query', () => {
         store={mockStore({
           network: {
             queries: {
-              [QUERY_TYPE]: { data: null, error: null, pending: 0 },
+              [QUERY_TYPE]: { data: null, error: null, pending: 0, ref: {} },
             },
           },
         })}
@@ -187,7 +187,7 @@ describe('Query', () => {
         store={mockStore({
           network: {
             queries: {
-              [QUERY_TYPE]: { data: 'data', error: null, pending: 1 },
+              [QUERY_TYPE]: { data: 'data', error: null, pending: 1, ref: {} },
             },
           },
         })}
@@ -207,7 +207,7 @@ describe('Query', () => {
         store={mockStore({
           network: {
             queries: {
-              [QUERY_TYPE]: { data: 'data', error: null, pending: 1 },
+              [QUERY_TYPE]: { data: 'data', error: null, pending: 1, ref: {} },
             },
           },
         })}
@@ -237,7 +237,12 @@ describe('Query', () => {
             store={mockStore({
               network: {
                 queries: {
-                  [QUERY_TYPE]: { data: 'data', error: null, pending: 1 },
+                  [QUERY_TYPE]: {
+                    data: 'data',
+                    error: null,
+                    pending: 1,
+                    ref: {},
+                  },
                 },
               },
             })}
@@ -260,7 +265,7 @@ describe('Query', () => {
         store={mockStore({
           network: {
             queries: {
-              [QUERY_TYPE]: { data: 'data', error: null, pending: 1 },
+              [QUERY_TYPE]: { data: 'data', error: null, pending: 1, ref: {} },
             },
           },
         })}
@@ -280,7 +285,12 @@ describe('Query', () => {
         store={mockStore({
           network: {
             queries: {
-              [QUERY_TYPE]: { data: 'data', error: 'error', pending: 0 },
+              [QUERY_TYPE]: {
+                data: 'data',
+                error: 'error',
+                pending: 0,
+                ref: {},
+              },
             },
           },
         })}
@@ -304,7 +314,12 @@ describe('Query', () => {
         store={mockStore({
           network: {
             queries: {
-              [QUERY_TYPE]: { data: 'data', error: 'error', pending: 0 },
+              [QUERY_TYPE]: {
+                data: 'data',
+                error: 'error',
+                pending: 0,
+                ref: {},
+              },
             },
           },
         })}
@@ -334,7 +349,12 @@ describe('Query', () => {
             store={mockStore({
               network: {
                 queries: {
-                  [QUERY_TYPE]: { data: 'data', error: 'error', pending: 0 },
+                  [QUERY_TYPE]: {
+                    data: 'data',
+                    error: 'error',
+                    pending: 0,
+                    ref: {},
+                  },
                 },
               },
             })}
@@ -363,7 +383,7 @@ describe('Query', () => {
         store={mockStore({
           network: {
             queries: {
-              [QUERY_TYPE]: { data: 'data', error: null, pending: 0 },
+              [QUERY_TYPE]: { data: 'data', error: null, pending: 0, ref: {} },
             },
           },
         })}
