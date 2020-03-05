@@ -27,9 +27,7 @@ describe('graphqlDriver', () => {
     `;
     await expect(
       driver({ query, headers: { header: 'header' } }, { token: 'token' }),
-    ).resolves.toEqual({
-      data: 'data',
-    });
+    ).resolves.toEqual('data');
     await expect(axiosInstanceMock).toBeCalledWith({
       cancelToken: 'token',
       method: 'post',
