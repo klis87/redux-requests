@@ -75,8 +75,6 @@ interface RequestInstanceConfig {
 
 export const createRequestInstance: (config: RequestInstanceConfig) => any;
 
-export const getRequestInstance: (driverType?: string) => any;
-
 interface SendRequestConfig {
   dispatchRequestAction?: boolean;
   silent?: boolean;

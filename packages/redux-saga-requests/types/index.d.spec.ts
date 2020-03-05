@@ -4,7 +4,6 @@ import {
   abort,
   Driver,
   createRequestInstance,
-  getRequestInstance,
   sendRequest,
   watchRequests,
   networkReducer,
@@ -63,9 +62,6 @@ const requestInstanceConfig = {
 };
 
 createRequestInstance(requestInstanceConfig);
-
-getRequestInstance();
-getRequestInstance('notDefault');
 
 sendRequest(requestAction);
 sendRequest({ type: 'type', payload: { request: {} } });
