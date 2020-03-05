@@ -7,4 +7,9 @@ export {
 } from './actions';
 export { sendRequest } from './sagas';
 export { default as handleRequests } from './handle-requests';
-export { getQuery, getMutation } from './selectors';
+export {
+  getQuery,
+  getMutation,
+  getQuerySelector,
+  getMutationSelector,
+} from './selectors';
