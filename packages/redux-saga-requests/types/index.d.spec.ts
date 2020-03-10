@@ -3,16 +3,14 @@ import {
   error,
   abort,
   Driver,
-  createRequestInstance,
   sendRequest,
-  watchRequests,
-  networkReducer,
-  requestsPromiseMiddleware,
-  requestsCacheMiddleware,
   clearRequestsCache,
-  serverRequestsFilterMiddleware,
-  countServerRequests,
   RequestAction,
+  handleRequests,
+  getQuery,
+  getQuerySelector,
+  getMutation,
+  getMutationSelector,
 } from './index';
 
 success('type');
@@ -46,22 +44,23 @@ const requestAction: RequestAction = {
 };
 
 let dummyDriver: Driver;
-dummyDriver({}, requestAction);
+dummyDriver({}, requestAction)
+  .then(v => v)
+  .catch(e => {
+    throw e;
+  });
 
-createRequestInstance({ driver: dummyDriver });
-createRequestInstance({
+handleRequests({ driver: dummyDriver });
+handleRequests({
   driver: { default: dummyDriver, anotherDriver: dummyDriver },
-});
-
-const requestInstanceConfig = {
-  driver: dummyDriver,
   onRequest: (request, action) => request,
   onSuccess: (response, action) => response,
   onError: (error, action) => ({ error }),
   onAbort: action => {},
-};
-
-createRequestInstance(requestInstanceConfig);
+  takeLatest: true,
+  abortOn: 'TYPE',
+  isRequestActionQuery: () => true,
+});
 
 sendRequest(requestAction);
 sendRequest({ type: 'type', payload: { request: {} } });
@@ -78,29 +77,22 @@ sendRequest(
   },
 );
 
-watchRequests();
-watchRequests({
-  takeLatest: true,
-  abortOn: 'TYPE',
-});
-watchRequests({ abortOn: ['TYPE'] });
-
-networkReducer({
-  isRequestActionQuery: () => true,
-  getData: data => data,
-  getError: error => error,
-});
-
-requestsPromiseMiddleware();
-requestsPromiseMiddleware({ auto: true });
-
-requestsCacheMiddleware();
-
 clearRequestsCache();
 clearRequestsCache('TYPE');
 clearRequestsCache('TYPE', 'ANOTHER_TYPE');
 
-serverRequestsFilterMiddleware({ serverRequestActions: [{ type: 'REQUEST' }] });
+getQuery({}, { type: 'Mutation', requestKey: '1' });
 
-countServerRequests({ serverRequestActions: {} });
-countServerRequests({ serverRequestActions: {}, finishOnFirstError: false });
+const querySelector = getQuerySelector({ type: 'Query' });
+querySelector({}, { type: 'Query' });
+
+const query = getQuery<{ key: string }>({}, { type: 'Query' });
+query.data.key = '1';
+
+const querySelector2 = getQuerySelector<{ key: string }>({ type: 'Query' });
+const query2 = querySelector2({}, { type: 'Query' });
+query2.data.key = '1';
+
+getMutation({}, { type: 'Mutation', requestKey: '1' });
+const mutationSelector = getMutationSelector({ type: 'Mutation' });
+mutationSelector({}, { type: 'Mutation' });

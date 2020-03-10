@@ -19,6 +19,7 @@ interface RequestActionMeta {
   getError?: (error: any) => any;
   requestKey?: string;
   requestsCapacity?: number;
+  normalize?: boolean;
   mutations?: {
     [actionType: string]:
       | ModifyData
@@ -29,11 +30,10 @@ interface RequestActionMeta {
           local?: boolean;
         };
   };
-  optimisticData: any;
-  revertedData: any;
+  optimisticData?: any;
+  revertedData?: any;
+  localData?: any;
   cache?: boolean | number;
-  cacheKey?: string;
-  cacheSize?: number;
   dependentRequestsNumber?: number;
   isDependentRequest?: boolean;
   [extraProperty: string]: any;
@@ -62,18 +62,38 @@ export const error: ActionTypeModifier;
 export const abort: ActionTypeModifier;
 
 export interface Driver {
-  (requestConfig: any, requestAction: RequestAction): any;
+  (requestConfig: any, requestAction: RequestAction): Promise<any>;
 }
 
-interface RequestInstanceConfig {
+interface HandleRequestConfig {
   driver: Driver | { default: Driver; [driverType: string]: Driver };
   onRequest?: (request: any, action: RequestAction) => any;
   onSuccess?: (response: any, action: RequestAction) => any;
   onError?: (error: any, action: RequestAction) => any;
   onAbort?: (action: RequestAction) => void;
+  cache?: boolean;
+  promisify?: boolean;
+  autoPromisify?: boolean;
+  ssr?: null | 'client' | 'server';
+  isRequestAction?: (action: AnyAction) => boolean;
+  isRequestActionQuery?: (requestAction: RequestAction) => boolean;
+  takeLatest?: boolean | FilterActions;
+  abortOn?: FilterActions | string | string[];
+  normalize?: boolean;
+  getNormalisationObjectKey?: (obj: any) => boolean;
+  shouldObjectBeNormalized?: (obj: any) => boolean;
 }
 
-export const createRequestInstance: (config: RequestInstanceConfig) => any;
+interface handleRequestsResponse {
+  requestsReducer: Reducer;
+  requestsMiddleware: Middleware[];
+  requestsSagas: any[];
+  requestsPromise: Promise<any> | null;
+}
+
+export function handleRequests(
+  config: HandleRequestConfig,
+): handleRequestsResponse;
 
 interface SendRequestConfig {
   dispatchRequestAction?: boolean;
@@ -89,56 +109,16 @@ export const sendRequest: (
   config?: SendRequestConfig,
 ) => any;
 
-interface WatchRequestsConfig {
-  takeLatest?: boolean | FilterActions;
-  abortOn?: FilterActions | string | string[];
-}
-
-export const watchRequests: (config?: WatchRequestsConfig) => void;
-
-interface NetworkReducerConfig {
-  isRequestActionQuery?: (requestAction: RequestAction) => boolean;
-  getData?: (data: any) => any;
-  getError?: (error: any) => any;
-}
-
-export const networkReducer: (config: NetworkReducerConfig) => Reducer<any>;
-
-interface RequestsPromiseMiddlewareConfig {
-  auto?: Boolean;
-}
-
-export const requestsPromiseMiddleware: (
-  config?: RequestsPromiseMiddlewareConfig,
-) => Middleware;
-
-export const requestsCacheMiddleware: () => Middleware;
-
 export const clearRequestsCache: (
   ...actionTypes: string[]
 ) => { type: string; actionTypes: string[] };
 
-interface ServerRequestsFilterMiddlewareConfig {
-  serverRequestActions: { type: string }[];
-}
-
-export const serverRequestsFilterMiddleware: (
-  config: ServerRequestsFilterMiddlewareConfig,
-) => Middleware;
-
-interface ServerRequestActions {
-  requestActionsToIgnore?: { type: string }[];
-  successActions?: { type: string; [extraProperty: string]: any }[];
-  dependentSuccessActions?: { type: string; [extraProperty: string]: any }[];
-  errorActions?: { type: string; [extraProperty: string]: any }[];
-}
-
-interface CountServerRequestsConfig {
-  serverRequestActions: ServerRequestActions;
-  finishOnFirstError?: boolean;
-}
-
-export const countServerRequests: (config: CountServerRequestsConfig) => void;
+export const resetRequests: (
+  requests: (string | { requestType: string; requestKey: string })[],
+) => {
+  type: string;
+  requests: (string | { requestType: string; requestKey: string })[];
+};
 
 export interface QueryState<QueryStateData> {
   data: QueryStateData;
@@ -146,19 +126,45 @@ export interface QueryState<QueryStateData> {
   loading: boolean;
 }
 
-export function getQuery<QueryStateData = any>(props: {
+export function getQuery<QueryStateData = any>(
+  state: any,
+  props: {
+    type: string;
+    requestKey?: string;
+    multiple?: boolean;
+    defaultData?: any;
+  },
+): QueryState<QueryStateData>;
+
+export function getQuerySelector<QueryStateData = any>(props: {
   type: string;
   requestKey?: string;
   multiple?: boolean;
   defaultData?: any;
-}): (state: any) => QueryState<QueryStateData>;
+}): (
+  state: any,
+  props: {
+    type: string;
+    requestKey?: string;
+    multiple?: boolean;
+    defaultData?: any;
+  },
+) => QueryState<QueryStateData>;
 
 export interface MutationState {
   loading: boolean;
   error: any;
 }
 
-export function getMutation(props: {
+export function getMutation(
+  state: any,
+  props: {
+    type: string;
+    requestKey?: string;
+  },
+): MutationState;
+
+export function getMutationSelector(props: {
   type: string;
   requestKey?: string;
-}): (state: any) => MutationState;
+}): typeof getMutation;
