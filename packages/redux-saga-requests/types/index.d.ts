@@ -12,7 +12,6 @@ interface RequestActionMeta {
   asPromise?: boolean;
   asMutation?: boolean;
   driver?: string;
-  runByWatcher?: boolean;
   takeLatest?: boolean;
   abortOn?: FilterActions | string | string[];
   getData?: (data: any) => any;
