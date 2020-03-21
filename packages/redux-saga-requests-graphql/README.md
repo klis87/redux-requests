@@ -49,18 +49,15 @@ Regarding GraphQL, let's assume we have the following GraphQL schema:
   }
 ```
 
-To use this driver, just import it and pass to `createRequestInstance`, like you would do
+To use this driver, just import it and pass to `handleRequests`, like you would do
 with other drivers:
 ```js
-import { createRequestInstance, watchRequests } from 'redux-saga-requests';
+import { handleRequests } from 'redux-saga-requests';
 import { createDriver } from 'redux-saga-requests-graphql';
 
-function* rootSaga() {
- yield createRequestInstance({
-    driver: createDriver({ url: 'http://localhost:3000/graphql' }),
-  });
-  yield watchRequests();
-}
+handleRequests({
+  driver: createDriver({ url: 'http://localhost:3000/graphql' }),
+});
 ```
 
 In order to send a query, just do it in a similar fashion to other drivers. The only

@@ -25,28 +25,20 @@ For general usage, see [redux-saga-requests docs](https://github.com/klis87/redu
 ## Purpose
 
 This library is totally optional, but it reduces boilerplate of using `react-saga-requests`
-state from `networkReducer` or `requestsReducer` inside React components. It provides the following hooks and components:
+state inside React components. It provides the following hooks and components:
 
 ### `useQuery`
 
-`useQuery` is a hook which uses `useSelector` from `react-redux` together with `getQuery` selector from
-`redux-saga-requests`. It accepts the same arguments as `getQuery`. You could
-easily use `useSelector` directly, but then you would need to remember not to recreate selector during each
-render. `useQuery` does this for you. So, without `useQuery`:
+`useQuery` is a hook which uses `useSelector` from `react-redux` together with `getQuerySelector` from
+`redux-saga-requests`. It accepts the same arguments as `getQuerySelector`. You could
+easily use `useSelector` directly, but `useQuery` is slightly less verbose. So, without `useQuery`:
 ```js
 import React from 'react';
-import { getQuery } from 'redux-saga-requests';
+import { getQuerySelector } from 'redux-saga-requests';
 import { useSelector } from 'react-redux';
 
-// you must use `getQuery` outside of component
-const booksSelector = getQuery({ type: 'FETCH_BOOKS' });
-
 const Books = () => {
-  // You cannot use `getQuery` inside component (unless you would memoize it) because it would be recreated
-  // during each render, so it could not memoize return value
-  // const books = useSelector(getQuery({ type: 'FETCH_BOOKS' }));
-
-  const books = useSelector(booksSelector)
+  const books = useSelector(getQuerySelector({ type: 'FETCH_BOOKS' }))
   // ...
 };
 ```
@@ -66,8 +58,8 @@ const Books = () => {
 
 `Query` simplifies rendering queries data, loading spinners and server errors. It automatically connects to Redux store
 by using `useQuery` under the hood. It has the following props:
-- `requestSelector`: refer to `getQuery`
-- `type: string`: refer to `getQuery`
+- `type: string`: refer to `getQuery` form the core library
+- `selector`: if you already have a query selector, pass it here instead of `type`
 - `multiple`: refer to `getQuery`
 - `defaultObject`: refer to `getQuery`
 - `children` - render function receiving `query` object, called when data is not empty according to `isDataEmpty` prop
@@ -88,8 +80,8 @@ Minimalistic example:
 import { Query } from 'redux-saga-requests-react';
 
 <Query
-  requestSelector={state => state.request}
-  // or type={REQUEST_TYPE}
+  type={REQUEST_TYPE}
+  // or selector={myQuerySelector}
 >
   {({ data }) => (
     <div>
@@ -110,8 +102,8 @@ const DataComponent = ({ query, extraLabelProp }) => (
 );
 
 <Query
-  requestSelector={state => state.request}
-  // or type={REQUEST_TYPE}
+  type={REQUEST_TYPE}
+  // or selector={myQuerySelector}
   component={DataComponent}
   extraLabelProp="label"
 />
@@ -135,8 +127,8 @@ const ErrorComponent = ({ error, label }) => (
 );
 
 <Query
-  requestSelector={state => state.request}
-  // or type={REQUEST_TYPE}
+  type={REQUEST_TYPE}
+  // or selector={myQuerySelector}
   isDataEmpty={query =>
     Array.isArray(query.data) ? query.data.length === 0 : !query.data}
   showLoaderDuringRefetch={false}
@@ -156,8 +148,8 @@ const ErrorComponent = ({ error, label }) => (
 
 ### `useMutation`
 
-`useMutation` is a hook which uses `useSelector` from `react-redux` together with `getMutation` selector from
-`redux-saga-requests`. It accepts the same arguments as `getMutation`. Like in case of `useMutation`, you could
+`useMutation` is a hook which uses `useSelector` from `react-redux` together with `getMutationSelector` from
+`redux-saga-requests`. It accepts the same arguments as `getMutation`. Like in case of `useQuery`, you could
 easily use `useSelector` directly, but then you would need to remember not to recreate selector during each
 render.
 
@@ -176,7 +168,7 @@ const Books = () => {
 
 `Mutation` Converts `useMutation` into component with render prop. It has the following props:
 - `type: string`: refer to `useMutation`
-- `requestSelector`: refer to `useMutation`
+- `selector`: if you already have a mutation selector, pass it here instead of `type`
 - `requestKey: string`: refer to `useMutation`
 - `children` - render function receiving object with `loading` flag and `error` property
 - `component` - alternative prop to `children`, you can pass your custom component here, which will receive `loading` and `error` props, plus any additional props passed to `Mutation`
@@ -187,7 +179,7 @@ import { Mutation } from 'redux-saga-requests-react';
 
 <Mutation
   type={MUTATION_TYPE}
-  requestSelector={state => state.request} // only when using requestsReducer
+  // or selector={myMutationSelector}
 >
   {({ loading, error }) => {
     if (error) {

@@ -25,26 +25,23 @@ or you can just use CDN: `https://unpkg.com/redux-saga-requests-fetch`.
 For a general usage, see [redux-saga-requests docs](https://github.com/klis87/redux-saga-requests).
 
 Regarding Fetch API related usage, here you can see a typical setup:
-```javascript
+```js
 import 'isomorphic-fetch'; // or a different fetch polyfill
-import { createRequestInstance, watchRequests } from 'redux-saga-requests';
+import { handleRequests } from 'redux-saga-requests';
 import { createDriver } from 'redux-saga-requests-fetch';
 
-function* rootSaga() {
-  yield createRequestInstance({
-    driver: createDriver(
-      window.fetch,
-      {
-        baseURL: 'https://my-domain.com' // optional - it works like axios baseURL, prepending all relative urls
-        AbortController: window.AbortController, // optional, if your browser supports AbortController or you use a polyfill like https://github.com/mo/abortcontroller-polyfill
-      }
-    ),
-  });
-  yield watchRequests();
-}
+handleRequests({
+  driver: createDriver(
+    window.fetch,
+    {
+      baseURL: 'https://my-domain.com' // optional - it works like axios baseURL, prepending all relative urls
+      AbortController: window.AbortController, // optional, if your browser supports AbortController or you use a polyfill like https://github.com/mo/abortcontroller-polyfill
+    }
+  ),
+});
 ```
 And in order to create Fetch API requests, below:
-```javascript
+```js
 fetch('/users', {
   method: 'POST',
   body: JSON.stringify(data),
@@ -54,7 +51,7 @@ fetch('/users', {
 });
 ```
 should be translated to this:
-```javascript
+```js
 const fetchUsers = () => ({
   type: 'FETCH_USERS',
   request: {

@@ -41,35 +41,32 @@ const fetchPhoto = id => ({
   request: { url: `/photos/${id}` },
 });
 
-function* rootSaga() {
-  yield createRequestInstance({
-    driver: createDriver(
-      {
-        [FETCH_PHOTO]: requestConfig => {
-          // mock normal response for id 1 and 404 error fot the rest
-          const id = requestConfig.url.split('/')[2];
+handleRequests({
+  driver: createDriver(
+    {
+      [FETCH_PHOTO]: requestConfig => {
+        // mock normal response for id 1 and 404 error fot the rest
+        const id = requestConfig.url.split('/')[2];
 
-          if (id === '1') {
-            return {
-              data: {
-                albumId: 1,
-                id: 1,
-                title: 'accusamus beatae ad facilis cum similique qui sunt',
-              },
-            };
-          }
+        if (id === '1') {
+          return {
+            data: {
+              albumId: 1,
+              id: 1,
+              title: 'accusamus beatae ad facilis cum similique qui sunt',
+            },
+          };
+        }
 
-          throw { status: 404 };
-        },
+        throw { status: 404 };
       },
-      {
-        timeout: 1000, // optional, in ms, defining how much time mock request would take, useful for testing spinners
-        getDataFromResponse: response => response.data // optional, if you mock Axios or Fetch API, you dont need to worry about it
-      },
-    ),
-  });
-  yield watchRequests();
-}
+    },
+    {
+      timeout: 1000, // optional, in ms, defining how much time mock request would take, useful for testing spinners
+      getDataFromResponse: response => response.data // optional, if you mock Axios or Fetch API, you dont need to worry about it
+    },
+  ),
+});
 ```
 
 ## Licence
