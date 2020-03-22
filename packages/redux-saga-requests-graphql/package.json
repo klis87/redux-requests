@@ -35,7 +35,7 @@
     "prepublish": "yarn run build"
   },
   "peerDependencies": {
-    "redux-saga-requests": ">=0.22.0"
+    "redux-saga-requests": ">=0.27.0"
   },
   "dependencies": {
     "axios": ">=0.16.0",
