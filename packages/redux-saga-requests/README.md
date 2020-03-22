@@ -23,6 +23,7 @@ integrations could be added, as they are implemented in a plugin fashion.
 - [Selectors](#selectors-arrow_up)
 - [Reducers](#reducers-arrow_up)
 - [Middleware](#middleware-arrow_up)
+- [handleRequests](#handleRequests-arrow_up)
 - [sendRequest](#sendRequest-arrow_up)
 - [Interceptors](#interceptors-arrow_up)
 - [FSA](#fsa-arrow_up)
@@ -849,6 +850,40 @@ option to `handleRequests`, which will include SSR middleware in `requestsMiddle
 3. The last thing you need to do is to pass `ssr: 'client` to `handleRequests`, like you noticed in previous step on the client side, What does it do? Well, it will ignore request actions which match
 those already dispatched during SSR. Why? Because otherwise with universal code the same job done on the server
 would be repeated on the client.
+
+## handleRequests [:arrow_up:](#table-of-content)
+
+As you probably noticed in other chapters, `handleRequests` is a function which gets some options
+and returns object with the following keys:
+- `requestsReducer`: ready to use reducer managing the whole remote state, you need to attach it
+to `requests` key in `combineReducers`
+- `requestsSagas`: list of sagas you have to use like in examples
+- `requestsMiddleware`: list of optional middleware you should put before sagaMiddleware, only applicable
+when option `cache`, `promisify` or `ssr` is used
+- `requestsPromise`: promise which is resolved after all requests are finished, only with `ssr: 'server'` option
+
+Below you can see all available options for `handleRequests`:
+- `driver`: the only option which is required, a driver or object of drivers if you use multiple drivers
+- `onRequest`: see interceptors
+- `onSuccess`: see interceptors
+- `onError`: see interceptors
+- `onAbort`: see interceptors
+- `cache`: see Cache middleware
+- `promisify`: see Promise middleware
+- `autoPromisify`: see Promise middleware
+- `ssr`: see Server side rendering middleware
+- `isRequestAction: (action: AnyAction) => boolean`: here you can adjust which actions are treated
+as request actions, usually you don't need to worry about it, might be useful for custom drivers
+- `isRequestActionQuery: (requestAction: RequestAction) => boolean`: if this function returns true,
+request action is treated as query, if false, as mutation, probably only useful for custom drivers
+- `takeLatest: boolean || (action: requestAction) => boolean`: if true, pending requests of a given type
+are automatically cancelled if a new request of a given type is fired, by default queries are run as `takeLatest: true`
+and mutations as `takeLatest: false`
+- `abortOn: string | string[] | action => boolean`: for example `[LOGOUT]`, or `action => action.type === LOGOUT`,
+you can use it to automatically abort all requests for a given action
+- `normalize`: by default `false`, see normalisation
+- `getNormalisationObjectKey`: see normalisation
+- `shouldObjectBeNormalized`: see normalisation
 
 ## sendRequest [:arrow_up:](#table-of-content)
 
