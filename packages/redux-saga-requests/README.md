@@ -20,12 +20,12 @@ integrations could be added, as they are implemented in a plugin fashion.
 - [Installation](#installation-arrow_up)
 - [Usage](#usage-arrow_up)
 - [Actions](#actions-arrow_up)
-- [Reducers](#reducers-arrow_up)
 - [Selectors](#selectors-arrow_up)
+- [Reducers](#reducers-arrow_up)
+- [Middleware](#middleware-arrow_up)
+- [sendRequest](#sendRequest-arrow_up)
 - [Interceptors](#interceptors-arrow_up)
 - [FSA](#fsa-arrow_up)
-- [Promise middleware](#promise-middleware-arrow_up)
-- [Cache middleware](#cache-middleware-arrow_up)
 - [Usage with Fetch API](#usage-with-fetch-api-arrow_up)
 - [Usage with GraphQL](#usage-with-graphql-arrow_up)
 - [Mocking](#mocking-arrow_up)
@@ -582,7 +582,7 @@ Notice `success`, `error` and `abort` helpers, they just add proper suffixes to
 request actions for convenience, so in our case they return `FETCH_BOOKS_SUCCESS`,
 `FETCH_BOOKS_ERROR` and `FETCH_BOOKS_ABORT` respectively.
 
-## Middleware
+## Middleware [:arrow_up:](#table-of-content)
 
 Some options passed to `handleRequests` will cause it to return an additional key - `requestsMiddleware`.
 Those options are `promisify`, `cache` and `ssr`, all of which can be used independently in any
@@ -619,7 +619,7 @@ const configureStore = () => {
 };
 ```
 
-### Promise middleware [:arrow_up:](#table-of-content)
+### Promise middleware
 
 What if you dispatch a request action somewhere and you would like to get a response in the same place?
 Dispatching action by default just returns the dispatched action itself, but you can change this behaviour
@@ -657,7 +657,7 @@ class Books extends Component {
 Also, you can pass an optional `autoPromisify: true` flag to `handleRequests`, which will just
 promisify all requests - so no need to use `meta.asPromise: true` anymore.
 
-### Cache middleware [:arrow_up:](#table-of-content)
+### Cache middleware
 
 Sometimes you might want your responses to be cached for an amount of time or even forever (until the page is not reloaded at least).
 Or, putting it another way, you would like to send a given request no more often than once for an amount of time. You can easily
@@ -717,7 +717,7 @@ So it is like cache invalidation operation.
 Also, cache is compatible with SSR by default, so if you dispatch a request action with meta cache
 on your server, this information will be passed to client inside state.
 
-### Server side rendering middleware [:arrow_up:](#table-of-content)
+### Server side rendering middleware
 
 Server side rendering is a very complex topic and there are many ways how to go about it.
 Many people use the strategy around React components, for instance they attach static methods to components which
@@ -850,7 +850,7 @@ option to `handleRequests`, which will include SSR middleware in `requestsMiddle
 those already dispatched during SSR. Why? Because otherwise with universal code the same job done on the server
 would be repeated on the client.
 
-## `sendRequest`
+## sendRequest [:arrow_up:](#table-of-content)
 
 When you dispatch a request action, under the hood `sendRequest` saga is called.
 Typically you don't need to use, as dispatching Redux action as usual is enough.
@@ -1296,7 +1296,7 @@ There are also 3 action meta options dedicated for normalized data:
 
 Just attached an object or objects with ids there to update data, for example:
 ```js
-const likeBooks = (ids) => ({
+const likeBooks = ids => ({
   type: 'LIKE_BOOKS',
   meta: {
     localData: ids.map(id => ({ id, liked: true })),
