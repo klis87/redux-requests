@@ -50,7 +50,9 @@ export default function* watchRequests(config = defaultConfig) {
       }
     }
 
-    const newTask = yield fork(sendRequest, action);
+    const newTask = yield fork(sendRequest, action, {
+      dispatchRequestAction: false,
+    });
 
     if (takeLatest) {
       lastTasks[lastActionKey] = newTask;

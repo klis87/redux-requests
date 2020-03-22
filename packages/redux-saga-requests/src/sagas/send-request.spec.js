@@ -37,7 +37,7 @@ describe('sagas', () => {
       let sagaError;
 
       try {
-        await expectSaga(sendRequest, action)
+        await expectSaga(sendRequest, action, { dispatchRequestAction: false })
           .provide([[getContext(REQUESTS_CONFIG), config]])
           .run();
       } catch (e) {
@@ -112,7 +112,7 @@ describe('sagas', () => {
     it('dispatches and returns success action', () => {
       const action = { type: 'FETCH', request: { url: '/url' } };
 
-      return expectSaga(sendRequest, action)
+      return expectSaga(sendRequest, action, { dispatchRequestAction: false })
         .provide([[getContext(REQUESTS_CONFIG), config]])
         .put(createSuccessAction(action, { data: 'response' }))
         .returns({ response: { data: 'response' } })
@@ -122,7 +122,7 @@ describe('sagas', () => {
     it('uses default driver from driver config object', () => {
       const action = { type: 'FETCH', request: { url: '/url' } };
 
-      return expectSaga(sendRequest, action)
+      return expectSaga(sendRequest, action, { dispatchRequestAction: false })
         .provide([
           [
             getContext(REQUESTS_CONFIG),
@@ -141,7 +141,7 @@ describe('sagas', () => {
         meta: { driver: 'another' },
       };
 
-      return expectSaga(sendRequest, action)
+      return expectSaga(sendRequest, action, { dispatchRequestAction: false })
         .provide([
           [
             getContext(REQUESTS_CONFIG),
@@ -162,7 +162,7 @@ describe('sagas', () => {
         request: [{ url: '/' }, { url: '/path' }],
       };
 
-      return expectSaga(sendRequest, action)
+      return expectSaga(sendRequest, action, { dispatchRequestAction: false })
         .provide([
           [getContext(REQUESTS_CONFIG), config],
           [matchers.put.actionType(action.type), action],
@@ -184,7 +184,7 @@ describe('sagas', () => {
     it('dispatches and returns error action on error', () => {
       const action = { type: 'FETCH', request: { url: '/url' } };
 
-      return expectSaga(sendRequest, action)
+      return expectSaga(sendRequest, action, { dispatchRequestAction: false })
         .provide([
           [
             getContext(REQUESTS_CONFIG),
@@ -213,7 +213,7 @@ describe('sagas', () => {
     it('dispatches abort action on cancellation', () => {
       const action = { type: 'FETCH', request: { url: '/url' } };
 
-      return expectSaga(sendRequest, action)
+      return expectSaga(sendRequest, action, { dispatchRequestAction: false })
         .provide([
           [
             getContext(REQUESTS_CONFIG),
@@ -244,7 +244,7 @@ describe('sagas', () => {
       const action = { type: 'FETCH', request: { url: '/url' } };
       const onRequest = request => request;
 
-      return expectSaga(sendRequest, action)
+      return expectSaga(sendRequest, action, { dispatchRequestAction: false })
         .provide([[getContext(REQUESTS_CONFIG), { ...config, onRequest }]])
         .call(onRequest, action.request, action)
         .run();
@@ -254,7 +254,10 @@ describe('sagas', () => {
       const action = { type: 'FETCH', request: { url: '/url' } };
       const onRequest = request => request;
 
-      return expectSaga(sendRequest, action, { runOnRequest: false })
+      return expectSaga(sendRequest, action, {
+        runOnRequest: false,
+        dispatchRequestAction: false,
+      })
         .provide([[getContext(REQUESTS_CONFIG), { ...config, onRequest }]])
         .not.call(onRequest, action.request, action)
         .run();
@@ -264,7 +267,7 @@ describe('sagas', () => {
       const action = { type: 'FETCH', request: { url: '/url' } };
       const onRequest = request => request;
 
-      return expectSaga(sendRequest, action)
+      return expectSaga(sendRequest, action, { dispatchRequestAction: false })
         .provide([
           [getContext(REQUESTS_CONFIG), { ...config, onRequest }],
           [getContext(RUN_BY_INTERCEPTOR), INTERCEPTORS.ON_REQUEST],
@@ -277,7 +280,10 @@ describe('sagas', () => {
       const action = { type: 'FETCH', request: { url: '/url' } };
       const onRequest = request => request;
 
-      return expectSaga(sendRequest, action, { runOnRequest: true })
+      return expectSaga(sendRequest, action, {
+        runOnRequest: true,
+        dispatchRequestAction: false,
+      })
         .provide([
           [getContext(REQUESTS_CONFIG), { ...config, onRequest }],
           [getContext(RUN_BY_INTERCEPTOR), INTERCEPTORS.ON_REQUEST],
@@ -290,7 +296,7 @@ describe('sagas', () => {
       const action = { type: 'FETCH', request: { url: '/url' } };
       const onSuccess = response => response;
 
-      return expectSaga(sendRequest, action)
+      return expectSaga(sendRequest, action, { dispatchRequestAction: false })
         .provide([[getContext(REQUESTS_CONFIG), { ...config, onSuccess }]])
         .call(onSuccess, { data: 'response' }, action)
         .run();
@@ -300,7 +306,10 @@ describe('sagas', () => {
       const action = { type: 'FETCH', request: { url: '/url' } };
       const onSuccess = response => response;
 
-      return expectSaga(sendRequest, action, { runOnSuccess: false })
+      return expectSaga(sendRequest, action, {
+        runOnSuccess: false,
+        dispatchRequestAction: false,
+      })
         .provide([[getContext(REQUESTS_CONFIG), { ...config, onSuccess }]])
         .not.call(onSuccess, { data: 'response' }, action)
         .run();
@@ -310,7 +319,7 @@ describe('sagas', () => {
       const action = { type: 'FETCH', request: { url: '/url' } };
       const onSuccess = response => response;
 
-      return expectSaga(sendRequest, action)
+      return expectSaga(sendRequest, action, { dispatchRequestAction: false })
         .provide([
           [getContext(REQUESTS_CONFIG), { ...config, onSuccess }],
           [getContext(RUN_BY_INTERCEPTOR), INTERCEPTORS.ON_SUCCESS],
@@ -323,7 +332,7 @@ describe('sagas', () => {
       const action = { type: 'FETCH', request: { url: '/url' } };
       const onSuccess = response => response;
 
-      return expectSaga(sendRequest, action)
+      return expectSaga(sendRequest, action, { dispatchRequestAction: false })
         .provide([
           [getContext(REQUESTS_CONFIG), { ...config, onSuccess }],
           [getContext(RUN_BY_INTERCEPTOR), INTERCEPTORS.ON_ERROR],
@@ -336,7 +345,7 @@ describe('sagas', () => {
       const action = { type: 'FETCH', request: { url: '/url' } };
       const onError = e => ({ error: e });
 
-      return expectSaga(sendRequest, action)
+      return expectSaga(sendRequest, action, { dispatchRequestAction: false })
         .provide([
           [
             getContext(REQUESTS_CONFIG),
@@ -351,7 +360,10 @@ describe('sagas', () => {
       const action = { type: 'FETCH', request: { url: '/url' } };
       const onError = e => ({ error: e });
 
-      return expectSaga(sendRequest, action, { runOnError: false })
+      return expectSaga(sendRequest, action, {
+        runOnError: false,
+        dispatchRequestAction: false,
+      })
         .provide([
           [
             getContext(REQUESTS_CONFIG),
@@ -367,7 +379,7 @@ describe('sagas', () => {
       const onError = e => ({ error: e });
       const onSuccess = response => response;
 
-      return expectSaga(sendRequest, action)
+      return expectSaga(sendRequest, action, { dispatchRequestAction: false })
         .provide([
           [
             getContext(REQUESTS_CONFIG),
@@ -383,7 +395,7 @@ describe('sagas', () => {
       const onError = () => ({ response: { data: 'response' } });
       const onSuccess = response => response;
 
-      return expectSaga(sendRequest, action)
+      return expectSaga(sendRequest, action, { dispatchRequestAction: false })
         .provide([
           [
             getContext(REQUESTS_CONFIG),
@@ -398,7 +410,7 @@ describe('sagas', () => {
       const action = { type: 'FETCH', request: { url: '/url' } };
       const onAbort = () => {};
 
-      return expectSaga(sendRequest, action)
+      return expectSaga(sendRequest, action, { dispatchRequestAction: false })
         .provide([
           [getContext(REQUESTS_CONFIG), { ...config, onAbort }],
           [cancelled(), true],
@@ -411,7 +423,10 @@ describe('sagas', () => {
       const action = { type: 'FETCH', request: { url: '/url' } };
       const onAbort = () => {};
 
-      return expectSaga(sendRequest, action, { runOnAbort: false })
+      return expectSaga(sendRequest, action, {
+        runOnAbort: false,
+        dispatchRequestAction: false,
+      })
         .provide([
           [getContext(REQUESTS_CONFIG), { ...config, onAbort }],
           [cancelled(), true],
@@ -424,7 +439,7 @@ describe('sagas', () => {
       const action = { type: 'FETCH', request: { url: '/url' } };
       const onAbort = () => {};
 
-      return expectSaga(sendRequest, action)
+      return expectSaga(sendRequest, action, { dispatchRequestAction: false })
         .provide([
           [getContext(REQUESTS_CONFIG), { ...config, onAbort }],
           [getContext(RUN_BY_INTERCEPTOR), INTERCEPTORS.ON_ABORT],

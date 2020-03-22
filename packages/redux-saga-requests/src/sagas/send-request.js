@@ -28,7 +28,7 @@ const getDriver = (config, action) =>
 export default function* sendRequest(
   action,
   {
-    dispatchRequestAction = false,
+    dispatchRequestAction = true,
     silent = false,
     runOnRequest = null,
     runOnSuccess = null,

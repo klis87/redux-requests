@@ -21,7 +21,7 @@ describe('sagas', () => {
     it('forks sendRequests for request action', () => {
       return expectSaga(watchRequests)
         .provide([[getContext(REQUESTS_CONFIG), config]])
-        .fork(sendRequest, action)
+        .fork(sendRequest, action, { dispatchRequestAction: false })
         .dispatch(action)
         .silentRun(100);
     });
@@ -34,7 +34,7 @@ describe('sagas', () => {
 
       return expectSaga(watchRequests)
         .provide([[getContext(REQUESTS_CONFIG), config]])
-        .fork(sendRequest, batchAction)
+        .fork(sendRequest, batchAction, { dispatchRequestAction: false })
         .dispatch(batchAction)
         .silentRun(100);
     });
