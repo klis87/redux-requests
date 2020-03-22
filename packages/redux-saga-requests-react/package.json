@@ -1,6 +1,6 @@
 {
   "name": "redux-saga-requests-react",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "React bindings for Redux-Saga-Requests, Redux-Saga addon to simplify AJAX requests",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -70,7 +70,7 @@
     "react-test-renderer": "16.13.0",
     "redux": "4.0.5",
     "redux-mock-store": "1.5.4",
-    "redux-saga-requests": "^0.26.1",
+    "redux-saga-requests": "^0.27.0",
     "rimraf": "3.0.2",
     "typescript": "3.8.3",
     "webpack": "4.42.0",
