@@ -30,7 +30,7 @@ export const configureStore = () => {
   });
 
   const reducers = combineReducers({
-    network: requestsReducer,
+    requests: requestsReducer,
     abortCounter: abortCounterReducer,
     requestCounter: requestCounterReducer,
     responseCounter: responseCounterReducer,

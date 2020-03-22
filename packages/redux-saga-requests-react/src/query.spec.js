@@ -25,11 +25,11 @@ describe('Query', () => {
     expect(component.toJSON()).toMatchSnapshot();
   });
 
-  it('maps type to query when using networkReducer', () => {
+  it('maps type to query', () => {
     const component = renderer.create(
       <Provider
         store={mockStore({
-          network: {
+          requests: {
             queries: {
               [QUERY_TYPE]: { data: 'data', error: null, pending: 0, ref: {} },
             },
@@ -42,11 +42,11 @@ describe('Query', () => {
     expect(component.toJSON()).toMatchSnapshot();
   });
 
-  it('maps type to default query data when request state is not yet in networkReducer ', () => {
+  it('maps type to default query data when request state not found', () => {
     const component = renderer.create(
       <Provider
         store={mockStore({
-          network: {
+          requests: {
             queries: {},
           },
         })}
@@ -61,7 +61,7 @@ describe('Query', () => {
     const component = renderer.create(
       <Provider
         store={mockStore({
-          network: {
+          requests: {
             queries: {
               [QUERY_TYPE]: { data: null, error: null, pending: 0, ref: {} },
             },
@@ -79,7 +79,7 @@ describe('Query', () => {
     const component = renderer.create(
       <Provider
         store={mockStore({
-          network: {
+          requests: {
             queries: {
               [QUERY_TYPE]: { data: [], error: null, pending: 0, ref: {} },
             },
@@ -104,7 +104,7 @@ describe('Query', () => {
     const component = renderer.create(
       <Provider
         store={mockStore({
-          network: {
+          requests: {
             queries: {
               [QUERY_TYPE]: { data: 'empty', error: null, pending: 0, ref: {} },
             },
@@ -127,7 +127,7 @@ describe('Query', () => {
     const component = renderer.create(
       <Provider
         store={mockStore({
-          network: {
+          requests: {
             queries: {
               [QUERY_TYPE]: { data: null, error: null, pending: 0, ref: {} },
             },
@@ -146,7 +146,7 @@ describe('Query', () => {
     const component = renderer.create(
       <Provider
         store={mockStore({
-          network: {
+          requests: {
             queries: {
               [QUERY_TYPE]: { data: null, error: null, pending: 0, ref: {} },
             },
@@ -165,7 +165,7 @@ describe('Query', () => {
     const component = renderer.create(
       <Provider
         store={mockStore({
-          network: {
+          requests: {
             queries: {
               [QUERY_TYPE]: { data: null, error: null, pending: 0, ref: {} },
             },
@@ -185,7 +185,7 @@ describe('Query', () => {
     const component = renderer.create(
       <Provider
         store={mockStore({
-          network: {
+          requests: {
             queries: {
               [QUERY_TYPE]: { data: 'data', error: null, pending: 1, ref: {} },
             },
@@ -205,7 +205,7 @@ describe('Query', () => {
     const component = renderer.create(
       <Provider
         store={mockStore({
-          network: {
+          requests: {
             queries: {
               [QUERY_TYPE]: { data: 'data', error: null, pending: 1, ref: {} },
             },
@@ -235,7 +235,7 @@ describe('Query', () => {
         renderer.create(
           <Provider
             store={mockStore({
-              network: {
+              requests: {
                 queries: {
                   [QUERY_TYPE]: {
                     data: 'data',
@@ -263,7 +263,7 @@ describe('Query', () => {
     const component = renderer.create(
       <Provider
         store={mockStore({
-          network: {
+          requests: {
             queries: {
               [QUERY_TYPE]: { data: 'data', error: null, pending: 1, ref: {} },
             },
@@ -283,7 +283,7 @@ describe('Query', () => {
     const component = renderer.create(
       <Provider
         store={mockStore({
-          network: {
+          requests: {
             queries: {
               [QUERY_TYPE]: {
                 data: 'data',
@@ -312,7 +312,7 @@ describe('Query', () => {
     const component = renderer.create(
       <Provider
         store={mockStore({
-          network: {
+          requests: {
             queries: {
               [QUERY_TYPE]: {
                 data: 'data',
@@ -347,7 +347,7 @@ describe('Query', () => {
         renderer.create(
           <Provider
             store={mockStore({
-              network: {
+              requests: {
                 queries: {
                   [QUERY_TYPE]: {
                     data: 'data',
@@ -381,7 +381,7 @@ describe('Query', () => {
     const component = renderer.create(
       <Provider
         store={mockStore({
-          network: {
+          requests: {
             queries: {
               [QUERY_TYPE]: { data: 'data', error: null, pending: 0, ref: {} },
             },

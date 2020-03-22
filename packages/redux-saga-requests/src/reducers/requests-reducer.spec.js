@@ -1,10 +1,10 @@
 import { createSuccessAction, createErrorAction } from '../actions';
-import { networkReducer } from '.';
+import { requestsReducer } from '.';
 
 describe('reducers', () => {
-  describe('networkReducer', () => {
+  describe('requestsReducer', () => {
     it('has initial state as empty object', () => {
-      expect(networkReducer()(undefined, {})).toEqual({
+      expect(requestsReducer()(undefined, {})).toEqual({
         queries: {},
         mutations: {},
         normalizedData: {},
@@ -16,7 +16,7 @@ describe('reducers', () => {
 
     it('does not crash on non request action on load', () => {
       expect(
-        networkReducer()(
+        requestsReducer()(
           {
             queries: {},
             mutations: {},
@@ -38,7 +38,7 @@ describe('reducers', () => {
     });
 
     it('handles read only requests', () => {
-      const reducer = networkReducer();
+      const reducer = requestsReducer();
       const firstRequest = { type: 'REQUEST', request: { url: '/' } };
       const secondRequest = { type: 'REQUEST_2', request: { url: '/' } };
 
@@ -129,7 +129,7 @@ describe('reducers', () => {
     });
 
     // it('allows to override config as argument', () => {
-    //   const reducer = networkReducer({
+    //   const reducer = requestsReducer({
     //     getData: data => ({ nested: data }),
     //   });
     //   const state = reducer(
@@ -158,7 +158,7 @@ describe('reducers', () => {
     // });
 
     it('supports mutations', () => {
-      const reducer = networkReducer();
+      const reducer = requestsReducer();
       reducer(
         {
           queries: {},
@@ -695,7 +695,7 @@ describe('reducers', () => {
     });
 
     it('supports SSR', () => {
-      const reducer = networkReducer();
+      const reducer = requestsReducer();
       const initialState = {
         queries: {
           QUERY: {

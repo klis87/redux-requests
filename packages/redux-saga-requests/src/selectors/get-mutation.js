@@ -6,7 +6,7 @@ const defaultMutation = {
 };
 
 const getMutationState = (state, type, requestKey = '') =>
-  state.network.mutations[type + requestKey];
+  state.requests.mutations[type + requestKey];
 
 const mutationSelectors = new WeakMap();
 

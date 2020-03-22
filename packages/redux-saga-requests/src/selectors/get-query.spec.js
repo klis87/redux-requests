@@ -3,7 +3,7 @@ import getQuery from './get-query';
 describe('selectors', () => {
   describe('getQuery', () => {
     const state = {
-      network: {
+      requests: {
         queries: {
           QUERY: {
             pending: 1,
@@ -61,7 +61,7 @@ describe('selectors', () => {
     it('returns fallback query state if not found', () => {
       expect(
         getQuery(
-          { network: { queries: {}, mutations: {} } },
+          { requests: { queries: {}, mutations: {} } },
           { type: 'QUERY' },
         ),
       ).toEqual({
@@ -74,7 +74,7 @@ describe('selectors', () => {
     it('replaces data as null with [] when multiple true', () => {
       expect(
         getQuery(
-          { network: { queries: {}, mutations: {} } },
+          { requests: { queries: {}, mutations: {} } },
           { type: 'QUERY', multiple: true },
         ),
       ).toEqual({
@@ -87,7 +87,7 @@ describe('selectors', () => {
     it('replaces data as custom object with {} when defaultData defined', () => {
       expect(
         getQuery(
-          { network: { queries: {}, mutations: {} } },
+          { requests: { queries: {}, mutations: {} } },
           { type: 'QUERY', defaultData: {} },
         ),
       ).toEqual({
@@ -155,7 +155,7 @@ describe('selectors', () => {
     it('doesnt recompute on normalizedData update for not normalized query', () => {
       const query = getQuery(state, { type: 'QUERY' });
       const query2 = getQuery(
-        { ...state, network: { ...state.network, normalizedData: {} } },
+        { ...state, requests: { ...state.requests, normalizedData: {} } },
         { type: 'QUERY' },
       );
       expect(query).toBe(query2);
@@ -174,10 +174,10 @@ describe('selectors', () => {
       const query2 = getQuery(
         {
           ...state,
-          network: {
-            ...state.network,
+          requests: {
+            ...state.requests,
             normalizedData: {
-              ...state.network.normalizedData,
+              ...state.requests.normalizedData,
               '@@2': { id: 2, x: 3, y: 'a' },
             },
           },
@@ -207,10 +207,10 @@ describe('selectors', () => {
       const query2 = getQuery(
         {
           ...state,
-          network: {
-            ...state.network,
+          requests: {
+            ...state.requests,
             normalizedData: {
-              ...state.network.normalizedData,
+              ...state.requests.normalizedData,
               '@@4': { id: 4, list: ['@@5', '@@6'] },
               '@@5': { id: 5 },
               '@@6': { id: 6 },
@@ -227,10 +227,10 @@ describe('selectors', () => {
       const query2 = getQuery(
         {
           ...state,
-          network: {
-            ...state.network,
+          requests: {
+            ...state.requests,
             normalizedData: {
-              ...state.network.normalizedData,
+              ...state.requests.normalizedData,
               '@@3': { id: 3, x: 4, y: 'a' },
             },
           },

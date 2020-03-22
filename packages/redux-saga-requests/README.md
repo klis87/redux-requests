@@ -758,7 +758,7 @@ option to `handleRequests`, which will include SSR middleware in `requestsMiddle
       });
 
       const reducers = combineReducers({
-        network: requestsReducer,
+        requests: requestsReducer,
       });
 
       const sagaMiddleware = createSagaMiddleware();

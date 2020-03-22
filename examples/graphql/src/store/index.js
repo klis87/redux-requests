@@ -10,7 +10,7 @@ export const configureStore = () => {
   });
 
   const reducers = combineReducers({
-    network: requestsReducer,
+    requests: requestsReducer,
   });
 
   const sagaMiddleware = createSagaMiddleware();

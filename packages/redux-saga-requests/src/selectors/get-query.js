@@ -73,7 +73,7 @@ const getData = (data, multiple, defaultData) => {
 };
 
 const getQueryState = (state, type, requestKey = '') =>
-  state.network.queries[type + requestKey];
+  state.requests.queries[type + requestKey];
 
 const createQuerySelector = (type, requestKey) =>
   createCustomSelector(
@@ -93,7 +93,7 @@ const createQuerySelector = (type, requestKey) =>
         usedKeys,
         multiple,
         defaultData,
-        normalizedData: state.network.normalizedData,
+        normalizedData: state.requests.normalizedData,
       };
     },
     ({

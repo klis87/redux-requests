@@ -34,11 +34,11 @@ describe('Mutation', () => {
     expect(component.toJSON()).toMatchSnapshot();
   });
 
-  it('maps type to mutation when using networkReducer', () => {
+  it('maps type to mutation', () => {
     const component = renderer.create(
       <Provider
         store={mockStore({
-          network: {
+          requests: {
             mutations: {
               [MUTATION_TYPE]: { pending: 1, error: 'error', ref: {} },
             },
@@ -58,11 +58,11 @@ describe('Mutation', () => {
     expect(component.toJSON()).toMatchSnapshot();
   });
 
-  it('maps type to default mutation when no type in networkReducer', () => {
+  it('maps type to default mutation when no type found', () => {
     const component = renderer.create(
       <Provider
         store={mockStore({
-          network: {
+          requests: {
             mutations: {},
           },
         })}
@@ -84,7 +84,7 @@ describe('Mutation', () => {
     const component = renderer.create(
       <Provider
         store={mockStore({
-          network: {
+          requests: {
             mutations: {
               [`${MUTATION_TYPE}x`]: { pending: 1, error: 'error', ref: {} },
             },
@@ -109,7 +109,7 @@ describe('Mutation', () => {
     const component = renderer.create(
       <Provider
         store={mockStore({
-          network: {
+          requests: {
             mutations: {
               [MUTATION_TYPE]: { x: { pending: 1, error: 'error', ref: {} } },
             },
@@ -140,7 +140,7 @@ describe('Mutation', () => {
     const component = renderer.create(
       <Provider
         store={mockStore({
-          network: {
+          requests: {
             mutations: {
               [MUTATION_TYPE]: { pending: 1, error: 'error', ref: {} },
             },

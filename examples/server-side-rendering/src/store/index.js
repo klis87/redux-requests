@@ -8,9 +8,7 @@ import { createDriver } from 'redux-saga-requests-axios';
 import { fetchBooks, fetchBooksScreeningActors } from './actions';
 
 function* bookSaga() {
-  const { response } = yield call(sendRequest, fetchBooks(), {
-    dispatchRequestAction: true,
-  });
+  const { response } = yield call(sendRequest, fetchBooks());
 
   if (response) {
     yield put(fetchBooksScreeningActors(response.data.map(v => v.id)));
@@ -40,7 +38,7 @@ export const configureStore = (initialState = undefined) => {
   });
 
   const reducers = combineReducers({
-    network: requestsReducer,
+    requests: requestsReducer,
   });
 
   const sagaMiddleware = createSagaMiddleware();

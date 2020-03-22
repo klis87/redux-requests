@@ -7,7 +7,7 @@ export default (config = defaultConfig) => store => next => action => {
   }
 
   const state = store.getState();
-  const actionsToIgnore = state.network.ssr;
+  const actionsToIgnore = state.requests.ssr;
 
   if (actionsToIgnore.findIndex(v => v === action.type) === -1) {
     return next(action);

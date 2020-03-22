@@ -28,7 +28,7 @@ describe('middleware', () => {
     it('adds cacheResponse to request action when meta cache is true and cache is infinite', () => {
       const mockStore = configureStore([createRequestsCacheMiddleware()]);
       const store = mockStore({
-        network: {
+        requests: {
           queries: { REQUEST: { ref: {}, data: 'data' } },
           cache: { REQUEST: null },
         },
@@ -53,7 +53,7 @@ describe('middleware', () => {
         advanceTo(new Date());
         const mockStore = configureStore([createRequestsCacheMiddleware()]);
         const store = mockStore({
-          network: {
+          requests: {
             queries: { REQUEST: { ref: {}, data: 'data' } },
             cache: { REQUEST: Date.now() },
           },
@@ -81,7 +81,7 @@ describe('middleware', () => {
         advanceTo(new Date());
         const mockStore = configureStore([createRequestsCacheMiddleware()]);
         const store = mockStore({
-          network: {
+          requests: {
             queries: { REQUEST: { ref: {}, data: 'data' } },
             cache: { REQUEST: Date.now() },
           },
@@ -102,7 +102,7 @@ describe('middleware', () => {
     it('doesnt do anything to request action when meta cache is true but cache not present', () => {
       const mockStore = configureStore([createRequestsCacheMiddleware()]);
       const store = mockStore({
-        network: {
+        requests: {
           queries: { REQUEST: { ref: {}, data: 'data' } },
           cache: {},
         },

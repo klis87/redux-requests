@@ -1,6 +1,6 @@
 import { fork } from 'redux-saga/effects';
 
-import { networkReducer } from './reducers';
+import { requestsReducer } from './reducers';
 import { createRequestInstance, watchRequests } from './sagas';
 import {
   createRequestsPromiseMiddleware,
@@ -27,7 +27,7 @@ const handleRequests = userConfig => {
   const requestsPromise = config.ssr === 'server' ? defer() : null;
 
   return {
-    requestsReducer: networkReducer(config),
+    requestsReducer: requestsReducer(config),
     requestsMiddleware: [
       config.ssr === 'server' &&
         createServerSsrMiddleware(requestsPromise, config),

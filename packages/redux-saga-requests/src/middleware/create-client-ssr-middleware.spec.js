@@ -15,7 +15,7 @@ describe('middleware', () => {
     it('adds meta.ssrResponse to request action if request in ssr state', () => {
       const mockStore = configureStore([createClientSsrMiddleware()]);
       const store = mockStore({
-        network: {
+        requests: {
           queries: {
             REQUEST: {
               data: 'data',
@@ -38,7 +38,7 @@ describe('middleware', () => {
     it('doesnt do anything to request action if request not in ssr state', () => {
       const mockStore = configureStore([createClientSsrMiddleware()]);
       const store = mockStore({
-        network: {
+        requests: {
           queries: {
             REQUEST: {
               data: 'data',
@@ -57,7 +57,7 @@ describe('middleware', () => {
     it('adds meta.ssrResponse to request action with requestKey if request in ssr state', () => {
       const mockStore = configureStore([createClientSsrMiddleware()]);
       const store = mockStore({
-        network: {
+        requests: {
           queries: {
             REQUEST1: {
               data: 'data',

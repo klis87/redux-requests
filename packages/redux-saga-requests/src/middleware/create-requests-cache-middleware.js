@@ -14,7 +14,7 @@ export default (config = defaultConfig) => store => next => action => {
   ) {
     const cacheKey = getCacheKey(action);
     const state = store.getState();
-    const cacheValue = state.network.cache[cacheKey];
+    const cacheValue = state.requests.cache[cacheKey];
 
     if (cacheValue !== undefined && isCacheValid(cacheValue)) {
       const query = getQuery(state, {
