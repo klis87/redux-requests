@@ -4,6 +4,7 @@ export {
   abort,
   clearRequestsCache,
   resetRequests,
+  abortRequests,
 } from './actions';
 export { sendRequest } from './sagas';
 export { default as handleRequests } from './handle-requests';
