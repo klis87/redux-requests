@@ -6,7 +6,15 @@ export const createDriver = axiosInstance => requestConfig => {
   const responsePromise = axiosInstance({
     cancelToken: abortSource.token,
     ...requestConfig,
-  }).then(response => ({ data: response.data }));
+  })
+    .then(response => ({ data: response.data }))
+    .catch(error => {
+      if (axios.isCancel(error)) {
+        throw 'REQUEST_ABORTED';
+      }
+
+      throw error;
+    });
 
   responsePromise.cancel = () => abortSource.cancel();
   return responsePromise;
