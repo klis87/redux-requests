@@ -4,6 +4,17 @@ import {
   createErrorAction,
   createAbortAction,
 } from '../actions';
+import { ABORT_REQUESTS } from '../constants';
+
+const getRequestTypeString = requestType =>
+  typeof requestType === 'function' ? requestType.toString() : requestType;
+
+const getKeys = requests =>
+  requests.map(v =>
+    typeof v === 'object'
+      ? getRequestTypeString(v.requestType) + v.requestKey
+      : getRequestTypeString(v),
+  );
 
 const getDriver = (config, action) =>
   action.meta && action.meta.driver
@@ -14,10 +25,27 @@ const getLastActionKey = action =>
   action.type +
   (action.meta && action.meta.requestKey ? action.meta.requestKey : '');
 
+// TODO: remove to more functional style, we need object maps and filters
 const createSendRequestMiddleware = config => {
+  // TODO: clean not pending promises sometimes
   const pendingRequests = {};
 
   return store => next => action => {
+    if (action.type === ABORT_REQUESTS) {
+      const clearAll = !action.requests;
+      const keys = !clearAll && getKeys(action.requests);
+
+      if (!action.requests) {
+        Object.values(pendingRequests).forEach(promise => promise.cancel());
+      } else {
+        Object.entries(pendingRequests)
+          .filter(([k]) => keys.includes(k))
+          .forEach(([, promise]) => promise.cancel());
+      }
+
+      return next(action);
+    }
+
     const isWatchable =
       config.isRequestAction(action) &&
       (!action.meta || action.meta.runByWatcher !== false);
@@ -41,10 +69,8 @@ const createSendRequestMiddleware = config => {
 
       const responsePromise = driver(actionPayload.request, action);
 
-      if (takeLatest) {
-        if (responsePromise.cancel) {
-          pendingRequests[lastActionKey] = responsePromise;
-        }
+      if (responsePromise.cancel) {
+        pendingRequests[lastActionKey] = responsePromise;
       }
 
       responsePromise
