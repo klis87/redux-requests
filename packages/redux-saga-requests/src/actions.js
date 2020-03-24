@@ -4,6 +4,7 @@ import {
   ABORT_SUFFIX,
   CLEAR_REQUESTS_CACHE,
   RESET_REQUESTS,
+  ABORT_REQUESTS,
 } from './constants';
 
 const getActionWithSuffix = suffix => actionType => actionType + suffix;
@@ -107,5 +108,10 @@ export const clearRequestsCache = (...cacheKeys) => ({
 
 export const resetRequests = (requests = null) => ({
   type: RESET_REQUESTS,
+  requests,
+});
+
+export const abortRequests = (requests = null) => ({
+  type: ABORT_REQUESTS,
   requests,
 });

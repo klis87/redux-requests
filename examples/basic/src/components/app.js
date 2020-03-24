@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { resetRequests } from 'redux-saga-requests';
+import { resetRequests, abortRequests } from 'redux-saga-requests';
 import { Query } from 'redux-saga-requests-react';
 
 import { fetchPhoto, fetchPost } from '../store/actions';
@@ -34,6 +34,13 @@ const App = () => {
           onClick={() => dispatch(resetRequests([FETCH_PHOTO]))}
         >
           Clear
+        </button>
+        <button
+          type="button"
+          style={buttonStyle}
+          onClick={() => dispatch(abortRequests([FETCH_PHOTO]))}
+        >
+          Abort
         </button>
         <button
           type="button"
