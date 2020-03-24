@@ -52,42 +52,52 @@ const createSendRequestMiddleware = config => {
       config.isRequestAction(action) &&
       (!action.meta || action.meta.runByWatcher !== false)
     ) {
-      const driver = getDriver(config, action);
+      let responsePromises;
       const actionPayload = getActionPayload(action);
-      const lastActionKey = getLastActionKey(action);
-      const takeLatest =
-        action.meta && action.meta.takeLatest !== undefined
-          ? action.meta.takeLatest
-          : typeof config.takeLatest === 'function'
-          ? config.takeLatest(action)
-          : config.takeLatest;
-
-      if (takeLatest && pendingRequests[lastActionKey]) {
-        pendingRequests[lastActionKey].forEach(r => r.cancel());
-      }
-
       const isBatchedRequest = Array.isArray(actionPayload.request);
-      const responsePromises = isBatchedRequest
-        ? actionPayload.request.map(r => driver(r, action))
-        : [driver(actionPayload.request, action)];
 
-      if (responsePromises[0].cancel) {
-        pendingRequests[lastActionKey] = responsePromises;
+      if (action.meta && action.meta.cacheResponse) {
+        responsePromises = [Promise.resolve(action.meta.cacheResponse)];
+      } else if (action.meta && action.meta.ssrResponse) {
+        responsePromises = [Promise.resolve(action.meta.ssrResponse)];
+      } else {
+        const driver = getDriver(config, action);
+        const lastActionKey = getLastActionKey(action);
+        const takeLatest =
+          action.meta && action.meta.takeLatest !== undefined
+            ? action.meta.takeLatest
+            : typeof config.takeLatest === 'function'
+            ? config.takeLatest(action)
+            : config.takeLatest;
+
+        if (takeLatest && pendingRequests[lastActionKey]) {
+          pendingRequests[lastActionKey].forEach(r => r.cancel());
+        }
+
+        responsePromises = isBatchedRequest
+          ? actionPayload.request.map(r => driver(r, action))
+          : [driver(actionPayload.request, action)];
+
+        if (responsePromises[0].cancel) {
+          pendingRequests[lastActionKey] = responsePromises;
+        }
       }
 
       Promise.all(responsePromises)
-        .then(response =>
-          isBatchedRequest
-            ? response.reduce(
-                (prev, current) => {
-                  prev.data.push(current.data);
-                  return prev;
-                },
-                { data: [] },
-              )
-            : response[0],
-        )
         .then(response => {
+          response =
+            isBatchedRequest &&
+            !action.meta.cacheResponse &&
+            !action.meta.ssrResponse
+              ? response.reduce(
+                  (prev, current) => {
+                    prev.data.push(current.data);
+                    return prev;
+                  },
+                  { data: [] },
+                )
+              : response[0];
+
           if (
             action.meta &&
             !action.meta.cacheResponse &&
