@@ -78,6 +78,13 @@ const App = () => {
         <button
           type="button"
           style={buttonStyle}
+          onClick={() => dispatch(abortRequests([FETCH_POST]))}
+        >
+          Abort
+        </button>
+        <button
+          type="button"
+          style={buttonStyle}
           onClick={() => dispatch(fetchPost(1))}
         >
           Fetch post with id 1

@@ -36,21 +36,22 @@ const createSendRequestMiddleware = config => {
       const keys = !clearAll && getKeys(action.requests);
 
       if (!action.requests) {
-        Object.values(pendingRequests).forEach(promise => promise.cancel());
+        Object.values(pendingRequests).forEach(requests =>
+          requests.forEach(r => r.cancel()),
+        );
       } else {
         Object.entries(pendingRequests)
           .filter(([k]) => keys.includes(k))
-          .forEach(([, promise]) => promise.cancel());
+          .forEach(([, requests]) => requests.forEach(r => r.cancel()));
       }
 
       return next(action);
     }
 
-    const isWatchable =
+    if (
       config.isRequestAction(action) &&
-      (!action.meta || action.meta.runByWatcher !== false);
-
-    if (isWatchable) {
+      (!action.meta || action.meta.runByWatcher !== false)
+    ) {
       const driver = getDriver(config, action);
       const actionPayload = getActionPayload(action);
       const lastActionKey = getLastActionKey(action);
@@ -61,19 +62,31 @@ const createSendRequestMiddleware = config => {
           ? config.takeLatest(action)
           : config.takeLatest;
 
-      if (takeLatest) {
-        if (pendingRequests[lastActionKey]) {
-          pendingRequests[lastActionKey].cancel();
-        }
+      if (takeLatest && pendingRequests[lastActionKey]) {
+        pendingRequests[lastActionKey].forEach(r => r.cancel());
       }
 
-      const responsePromise = driver(actionPayload.request, action);
+      const isBatchedRequest = Array.isArray(actionPayload.request);
+      const responsePromises = isBatchedRequest
+        ? actionPayload.request.map(r => driver(r, action))
+        : [driver(actionPayload.request, action)];
 
-      if (responsePromise.cancel) {
-        pendingRequests[lastActionKey] = responsePromise;
+      if (responsePromises[0].cancel) {
+        pendingRequests[lastActionKey] = responsePromises;
       }
 
-      responsePromise
+      Promise.all(responsePromises)
+        .then(response =>
+          isBatchedRequest
+            ? response.reduce(
+                (prev, current) => {
+                  prev.data.push(current.data);
+                  return prev;
+                },
+                { data: [] },
+              )
+            : response[0],
+        )
         .then(response => {
           if (
             action.meta &&
