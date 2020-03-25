@@ -1,6 +1,6 @@
 module.exports = {
   output: {
-    library: 'ReduxSagaRequestsAxios',
+    library: 'ReduxSagaRequestsPromiseDriver',
     libraryTarget: 'umd',
   },
   module: {
