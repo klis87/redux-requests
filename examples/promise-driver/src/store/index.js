@@ -6,7 +6,9 @@ import { createDriver } from 'redux-saga-requests-promise-driver';
 
 export const configureStore = () => {
   const { requestsReducer, requestsSagas } = handleRequests({
-    driver: createDriver(),
+    driver: createDriver({
+      AbortController: window.AbortController,
+    }),
   });
 
   const reducers = combineReducers({
