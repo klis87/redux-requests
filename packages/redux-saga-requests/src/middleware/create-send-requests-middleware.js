@@ -25,8 +25,37 @@ const getLastActionKey = action =>
   action.type +
   (action.meta && action.meta.requestKey ? action.meta.requestKey : '');
 
+// test interceptors
+const onRequest = (request, action, store) => {
+  store.dispatch({ type: 'MAKING_REQUEST' });
+
+  if (Array.isArray(request)) {
+    return request.map(r => ({ ...r, url: r.url.replace('/1', '/11') }));
+  }
+
+  return { ...request, url: request.url + '1' };
+};
+
+const onResponse = (response, action, store) => {
+  store.dispatch({ type: 'MAKING_RESPONSE' });
+  return { data: { ...response.data, extra: 1 } };
+};
+
+const onError = (error, action, store) => {
+  store.dispatch({ type: 'MAKING_ERROR' });
+  throw error;
+};
+
+const onAbort = (action, store) => {
+  store.dispatch({ type: 'MAKING_ABORT' });
+};
+
 // TODO: remove to more functional style, we need object maps and filters
 const createSendRequestMiddleware = config => {
+  config.onRequest = onRequest;
+  config.onResponse = onResponse;
+  config.onError = onError;
+  config.onAbort = onAbort;
   // TODO: clean not pending promises sometimes
   const pendingRequests = {};
 
@@ -52,6 +81,13 @@ const createSendRequestMiddleware = config => {
       config.isRequestAction(action) &&
       (!action.meta || action.meta.runByWatcher !== false)
     ) {
+      if (config.onRequest) {
+        action = {
+          ...action,
+          request: config.onRequest(action.request, action, store),
+        };
+      }
+
       let responsePromises;
       const actionPayload = getActionPayload(action);
       const isBatchedRequest = Array.isArray(actionPayload.request);
@@ -110,6 +146,14 @@ const createSendRequestMiddleware = config => {
           return response;
         })
         .then(response => {
+          if (
+            config.onResponse &&
+            !action.meta.cacheResponse &&
+            !action.meta.ssrResponse
+          ) {
+            response = config.onResponse(response, action, store);
+          }
+
           store.dispatch(createSuccessAction(action, response));
         })
         .catch(error => {
@@ -119,12 +163,21 @@ const createSendRequestMiddleware = config => {
             action.meta &&
             action.meta.getError
           ) {
-            throw action.meta.getError(error);
+            error = action.meta.getError(error);
           }
+
+          if (error !== 'REQUEST_ABORTED' && config.onError) {
+            return config.onError(error, action, store);
+          }
+
           throw error;
         })
         .catch(error => {
           if (error === 'REQUEST_ABORTED') {
+            if (config.onAbort) {
+              config.onAbort(action, store);
+            }
+
             store.dispatch(createAbortAction(action));
           } else {
             store.dispatch(createErrorAction(action, error));
