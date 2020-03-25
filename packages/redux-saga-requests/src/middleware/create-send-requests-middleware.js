@@ -42,8 +42,19 @@ const onResponse = (response, action, store) => {
 };
 
 const onError = (error, action, store) => {
-  store.dispatch({ type: 'MAKING_ERROR' });
-  throw error;
+  store.dispatch({ type: 'MAKING_ERROR_AMENDMENT' });
+
+  return {
+    data: {
+      albumId: 1,
+      id: 11,
+      title: 'amended',
+      url: 'https://via.placeholder.com/600/1ee8a4',
+      thumbnailUrl: 'https://via.placeholder.com/150/1ee8a4',
+    },
+  };
+
+  // throw error;
 };
 
 const onAbort = (action, store) => {
@@ -120,6 +131,32 @@ const createSendRequestMiddleware = config => {
       }
 
       Promise.all(responsePromises)
+        .catch(error => {
+          if (
+            error !== 'REQUEST_ABORTED' &&
+            action.meta &&
+            action.meta.getError
+          ) {
+            error = action.meta.getError(error);
+          }
+
+          if (error !== 'REQUEST_ABORTED' && config.onError) {
+            return [config.onError(error, action, store)];
+          }
+
+          throw error;
+        })
+        .catch(error => {
+          if (error === 'REQUEST_ABORTED') {
+            if (config.onAbort) {
+              config.onAbort(action, store);
+            }
+
+            store.dispatch(createAbortAction(action));
+          } else {
+            store.dispatch(createErrorAction(action, error));
+          }
+        })
         .then(response => {
           response =
             isBatchedRequest &&
@@ -155,33 +192,6 @@ const createSendRequestMiddleware = config => {
           }
 
           store.dispatch(createSuccessAction(action, response));
-        })
-        .catch(error => {
-          console.log('error is', error);
-          if (
-            error !== 'REQUEST_ABORTED' &&
-            action.meta &&
-            action.meta.getError
-          ) {
-            error = action.meta.getError(error);
-          }
-
-          if (error !== 'REQUEST_ABORTED' && config.onError) {
-            return config.onError(error, action, store);
-          }
-
-          throw error;
-        })
-        .catch(error => {
-          if (error === 'REQUEST_ABORTED') {
-            if (config.onAbort) {
-              config.onAbort(action, store);
-            }
-
-            store.dispatch(createAbortAction(action));
-          } else {
-            store.dispatch(createErrorAction(action, error));
-          }
         });
     }
 
