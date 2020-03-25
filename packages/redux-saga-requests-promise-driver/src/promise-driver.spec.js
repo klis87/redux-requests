@@ -5,7 +5,7 @@ describe('promiseDriver', () => {
     const promise = Promise.resolve('data');
     const promiseDriver = createDriver();
 
-    const responsePromise = promiseDriver(promise);
+    const responsePromise = promiseDriver({ promise });
 
     await expect(responsePromise).resolves.toEqual({ data: 'data' });
   });
