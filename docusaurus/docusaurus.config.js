@@ -1,10 +1,10 @@
 module.exports = {
   title: 'redux-saga-requests',
   tagline: 'Redux requests made simpler',
-  url: 'https://klis87.github.io/redux-saga-requests',
-  baseUrl: '/',
+  url: 'https://strdr4605.github.io/redux-saga-requests',
+  baseUrl: '/redux-saga-requests/',
   favicon: 'img/favicon.ico',
-  organizationName: 'klis87', // Usually your GitHub org/user name.
+  organizationName: 'strdr4605', // Usually your GitHub org/user name.
   projectName: 'redux-saga-requests', // Usually your repo name.
   themeConfig: {
     navbar: {
