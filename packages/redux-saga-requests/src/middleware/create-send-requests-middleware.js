@@ -99,6 +99,8 @@ const createSendRequestMiddleware = config => {
         };
       }
 
+      action = next(action);
+
       let responsePromises;
       const actionPayload = getActionPayload(action);
       const isBatchedRequest = Array.isArray(actionPayload.request);
@@ -130,7 +132,7 @@ const createSendRequestMiddleware = config => {
         }
       }
 
-      Promise.all(responsePromises)
+      return Promise.all(responsePromises)
         .catch(error => {
           if (
             error !== 'REQUEST_ABORTED' &&
@@ -152,10 +154,14 @@ const createSendRequestMiddleware = config => {
               config.onAbort(action, store);
             }
 
-            store.dispatch(createAbortAction(action));
-          } else {
-            store.dispatch(createErrorAction(action, error));
+            const abortAction = createAbortAction(action);
+            store.dispatch(abortAction);
+            throw abortAction;
           }
+
+          const errorAction = createErrorAction(action, error);
+          store.dispatch(errorAction);
+          throw errorAction;
         })
         .then(response => {
           response =
@@ -191,7 +197,9 @@ const createSendRequestMiddleware = config => {
             response = config.onResponse(response, action, store);
           }
 
-          store.dispatch(createSuccessAction(action, response));
+          const successAction = createSuccessAction(action, response);
+          store.dispatch(successAction);
+          return successAction;
         });
     }
 
