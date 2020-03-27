@@ -1,3 +1,5 @@
+/* eslint-disable global-require */
+/* eslint-disable import/no-extraneous-dependencies */
 module.exports = {
   title: 'redux-saga-requests',
   tagline: 'Redux requests made simpler',
@@ -7,6 +9,9 @@ module.exports = {
   organizationName: 'strdr4605', // Usually your GitHub org/user name.
   projectName: 'redux-saga-requests', // Usually your repo name.
   themeConfig: {
+    prism: {
+      theme: require('prism-react-renderer/themes/nightOwl'),
+    },
     navbar: {
       title: 'redux-saga-requests',
       // logo: {
