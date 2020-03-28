@@ -13,6 +13,7 @@ module.exports = {
       theme: require('prism-react-renderer/themes/nightOwl'),
     },
     navbar: {
+      hideOnScroll: true,
       title: 'redux-saga-requests',
       // logo: {
       //   alt: 'redux-saga-requests Logo',
