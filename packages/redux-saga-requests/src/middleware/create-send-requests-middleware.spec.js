@@ -333,8 +333,14 @@ describe('middleware', () => {
       const onErrorMockStore = configureStore([
         createSendRequestsMiddleware({
           ...testConfig,
-          onError: (error, action, store) => {
-            return Promise.resolve({ data: 'data' });
+          onError: async (error, action, store) => {
+            const successAction = await store.dispatch({
+              type: 'REQUEST',
+              request: { response: { data: 'data' } },
+              meta: { silent: true },
+            });
+
+            return successAction.response;
           },
         }),
       ]);
