@@ -1,9 +1,5 @@
-// import { fork } from 'redux-saga/effects';
-
 import { requestsReducer } from './reducers';
-// import { createRequestInstance, watchRequests } from './sagas';
 import {
-  // createRequestsPromiseMiddleware,
   createRequestsCacheMiddleware,
   createClientSsrMiddleware,
   createServerSsrMiddleware,
@@ -34,10 +30,8 @@ const handleRequests = userConfig => {
         createServerSsrMiddleware(requestsPromise, config),
       config.ssr === 'client' && createClientSsrMiddleware(config),
       config.cache && createRequestsCacheMiddleware(config),
-      // config.promisify && createRequestsPromiseMiddleware(config),
       createSendRequestsMiddleware(config),
     ].filter(Boolean),
-    // requestsSagas: [createRequestInstance(config), fork(watchRequests)],
     requestsPromise,
   };
 };

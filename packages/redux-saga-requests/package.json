@@ -37,7 +37,6 @@
     "prepublish": "yarn run build"
   },
   "peerDependencies": {
-    "redux-saga": ">=0.15.0",
     "reselect": ">=4.0.0"
   },
   "devDependencies": {
@@ -60,8 +59,6 @@
     "npm-run-all": "4.1.5",
     "redux": "4.0.5",
     "redux-mock-store": "1.5.4",
-    "redux-saga": "0.16.2",
-    "redux-saga-test-plan": "3.7.0",
     "reselect": "4.0.0",
     "rimraf": "3.0.2",
     "typescript": "3.8.3",
@@ -70,7 +67,6 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.2.0",
-    "@redux-saga/delay-p": "^1.0.0",
     "deepmerge": "^4.0.0"
   }
 }
