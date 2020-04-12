@@ -1,5 +1,3 @@
-import { END } from 'redux-saga';
-
 import defaultConfig from '../default-config';
 import { isResponseAction, isSuccessAction } from '../actions';
 
@@ -15,7 +13,6 @@ export default (requestsPromise, config = defaultConfig) => {
           : 1;
     } else if (isResponseAction(action)) {
       if (!isSuccessAction(action)) {
-        store.dispatch(END);
         requestsPromise.reject(action);
         return next(action);
       }
@@ -24,7 +21,6 @@ export default (requestsPromise, config = defaultConfig) => {
       index -= action.meta.isDependentRequest ? 2 : 1;
 
       if (index === 0) {
-        store.dispatch(END);
         requestsPromise.resolve(serverSuccessActions);
       }
     }
