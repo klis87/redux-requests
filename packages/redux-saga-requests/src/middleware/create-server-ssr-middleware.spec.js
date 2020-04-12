@@ -1,5 +1,4 @@
 import configureStore from 'redux-mock-store';
-import { END } from 'redux-saga';
 
 import { createSuccessAction, createErrorAction } from '../actions';
 import { createServerSsrMiddleware } from '.';
@@ -30,7 +29,7 @@ describe('middleware', () => {
       const store = mockStore({});
       const result = store.dispatch(errorAction);
       expect(result).toBe(errorAction);
-      expect(store.getActions()).toEqual([END, errorAction]);
+      expect(store.getActions()).toEqual([errorAction]);
       await expect(requestsPromise).rejects.toBe(errorAction);
     });
 
@@ -48,7 +47,6 @@ describe('middleware', () => {
         requestAction,
         requestAction,
         successAction,
-        END,
         successAction,
       ]);
       await expect(requestsPromise).resolves.toEqual([
@@ -93,7 +91,6 @@ describe('middleware', () => {
         secondRequestAction,
         thirdRequestAction,
         secondResponseAction,
-        END,
         thirdResponseAction,
       ]);
       await expect(requestsPromise).resolves.toEqual([
