@@ -25,48 +25,8 @@ const getLastActionKey = action =>
   action.type +
   (action.meta && action.meta.requestKey ? action.meta.requestKey : '');
 
-// test interceptors
-const onRequest = (request, action, store) => {
-  store.dispatch({ type: 'MAKING_REQUEST' });
-
-  if (Array.isArray(request)) {
-    return request.map(r => ({ ...r, url: r.url.replace('/1', '/11') }));
-  }
-
-  return { ...request, url: request.url + '1' };
-};
-
-const onResponse = (response, action, store) => {
-  store.dispatch({ type: 'MAKING_RESPONSE' });
-  return { data: { ...response.data, extra: 1 } };
-};
-
-const onError = (error, action, store) => {
-  store.dispatch({ type: 'MAKING_ERROR_AMENDMENT' });
-
-  return {
-    data: {
-      albumId: 1,
-      id: 11,
-      title: 'amended',
-      url: 'https://via.placeholder.com/600/1ee8a4',
-      thumbnailUrl: 'https://via.placeholder.com/150/1ee8a4',
-    },
-  };
-
-  // throw error;
-};
-
-const onAbort = (action, store) => {
-  store.dispatch({ type: 'MAKING_ABORT' });
-};
-
 // TODO: remove to more functional style, we need object maps and filters
 const createSendRequestMiddleware = config => {
-  config.onRequest = onRequest;
-  config.onResponse = onResponse;
-  config.onError = onError;
-  config.onAbort = onAbort;
   // TODO: clean not pending promises sometimes
   const pendingRequests = {};
 
@@ -166,8 +126,8 @@ const createSendRequestMiddleware = config => {
         .then(response => {
           response =
             isBatchedRequest &&
-            !action.meta.cacheResponse &&
-            !action.meta.ssrResponse
+            (!action.meta ||
+              (!action.meta.cacheResponse && !action.meta.ssrResponse))
               ? response.reduce(
                   (prev, current) => {
                     prev.data.push(current.data);
@@ -191,12 +151,15 @@ const createSendRequestMiddleware = config => {
         .then(response => {
           if (
             config.onResponse &&
-            !action.meta.cacheResponse &&
-            !action.meta.ssrResponse
+            (!action.meta ||
+              (!action.meta.cacheResponse && !action.meta.ssrResponse))
           ) {
-            response = config.onResponse(response, action, store);
+            return config.onResponse(response, action, store);
           }
 
+          return response;
+        })
+        .then(response => {
           const successAction = createSuccessAction(action, response);
           store.dispatch(successAction);
           return successAction;
