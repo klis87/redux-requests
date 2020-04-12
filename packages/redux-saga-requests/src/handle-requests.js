@@ -7,7 +7,7 @@ import {
   createRequestsCacheMiddleware,
   createClientSsrMiddleware,
   createServerSsrMiddleware,
-  createSendRequestMiddleware,
+  createSendRequestsMiddleware,
 } from './middleware';
 import defaultConfig from './default-config';
 
@@ -35,7 +35,7 @@ const handleRequests = userConfig => {
       config.ssr === 'client' && createClientSsrMiddleware(config),
       config.cache && createRequestsCacheMiddleware(config),
       // config.promisify && createRequestsPromiseMiddleware(config),
-      createSendRequestMiddleware(config),
+      createSendRequestsMiddleware(config),
     ].filter(Boolean),
     // requestsSagas: [createRequestInstance(config), fork(watchRequests)],
     requestsPromise,
