@@ -63,6 +63,22 @@ describe('middleware', () => {
       expect(getActions()).toEqual([requestAction, successAction]);
     });
 
+    it('resolves on success but doesnt dispatch in silent mode', async () => {
+      const requestAction = {
+        type: 'REQUEST',
+        request: { response: { data: 'data' } },
+        meta: { silent: true },
+      };
+
+      const { dispatch, getActions } = mockStore({});
+      const successAction = createSuccessAction(requestAction, {
+        data: 'data',
+      });
+      const result = await dispatch(requestAction);
+      expect(result).toEqual(successAction);
+      expect(getActions()).toEqual([]);
+    });
+
     it('dispatches requests and resolves on success for batch request', async () => {
       const requestAction = {
         type: 'REQUEST',
@@ -124,6 +140,20 @@ describe('middleware', () => {
       const result = dispatch(requestAction);
       await expect(result).rejects.toEqual(errorAction);
       expect(getActions()).toEqual([requestAction, errorAction]);
+    });
+
+    it('rejects on error but doesnt dispatch in silent mode', async () => {
+      const requestAction = {
+        type: 'REQUEST',
+        request: { error: 'error' },
+        meta: { silent: true },
+      };
+
+      const { dispatch, getActions } = mockStore({});
+      const errorAction = createErrorAction(requestAction, 'error');
+      const result = dispatch(requestAction);
+      await expect(result).rejects.toEqual(errorAction);
+      expect(getActions()).toEqual([]);
     });
 
     it('dispatches requests and rejects on abort', async () => {
