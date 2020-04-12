@@ -48,10 +48,7 @@ const createSendRequestMiddleware = config => {
       return next(action);
     }
 
-    if (
-      config.isRequestAction(action) &&
-      (!action.meta || action.meta.runByWatcher !== false)
-    ) {
+    if (config.isRequestAction(action)) {
       if (config.onRequest) {
         action = {
           ...action,
@@ -59,7 +56,9 @@ const createSendRequestMiddleware = config => {
         };
       }
 
-      action = next(action);
+      if (!action.meta || !action.meta.silent) {
+        action = next(action);
+      }
 
       let responsePromises;
       const actionPayload = getActionPayload(action);
@@ -115,12 +114,20 @@ const createSendRequestMiddleware = config => {
             }
 
             const abortAction = createAbortAction(action);
-            store.dispatch(abortAction);
+
+            if (!action.meta || !action.meta.silent) {
+              store.dispatch(abortAction);
+            }
+
             throw abortAction;
           }
 
           const errorAction = createErrorAction(action, error);
-          store.dispatch(errorAction);
+
+          if (!action.meta || !action.meta.silent) {
+            store.dispatch(errorAction);
+          }
+
           throw errorAction;
         })
         .then(response => {
@@ -161,7 +168,11 @@ const createSendRequestMiddleware = config => {
         })
         .then(response => {
           const successAction = createSuccessAction(action, response);
-          store.dispatch(successAction);
+
+          if (!action.meta || !action.meta.silent) {
+            store.dispatch(successAction);
+          }
+
           return successAction;
         });
     }
