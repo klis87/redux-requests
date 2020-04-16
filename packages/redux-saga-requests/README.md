@@ -914,7 +914,7 @@ The following options are possible:
 - `dispatchRequestAction`: useful if you use `sendRequest` to react on already dispatched request action not to duplicate it, default as `true`
 - `silent: boolean;`: passing `false` can disable dispatching all Redux actions for this request, default as `false`
 - `runOnRequest: boolean;`: passing `false` can block `onRequest` interceptor, more in the next chapter, default as `true`
-- `runOnSuccess: boolean;`: passing `false` can block `onResponse` interceptor, default as `true`
+- `runOnSuccess: boolean;`: passing `false` can block `onSuccess` interceptor, default as `true`
 - `runOnError: boolean;`: passing `false` can block `onError` interceptor, default as `true`
 - `runOnAbort: boolean;`: passing `false` can block `onAbort` interceptor, default as `true`
 
