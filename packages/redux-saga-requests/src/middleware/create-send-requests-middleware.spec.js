@@ -59,7 +59,7 @@ describe('middleware', () => {
         data: 'data',
       });
       const result = await dispatch(requestAction);
-      expect(result).toEqual(successAction);
+      expect(result).toEqual({ action: successAction, data: 'data' });
       expect(getActions()).toEqual([requestAction, successAction]);
     });
 
@@ -75,7 +75,7 @@ describe('middleware', () => {
         data: 'data',
       });
       const result = await dispatch(requestAction);
-      expect(result).toEqual(successAction);
+      expect(result).toEqual({ action: successAction, data: 'data' });
       expect(getActions()).toEqual([]);
     });
 
@@ -93,7 +93,10 @@ describe('middleware', () => {
         data: ['data1', 'data2'],
       });
       const result = await dispatch(requestAction);
-      expect(result).toEqual(successAction);
+      expect(result).toEqual({
+        action: successAction,
+        data: ['data1', 'data2'],
+      });
       expect(getActions()).toEqual([requestAction, successAction]);
     });
 
@@ -109,7 +112,7 @@ describe('middleware', () => {
         data: 'data cached',
       });
       const result = await dispatch(requestAction);
-      expect(result).toEqual(successAction);
+      expect(result).toEqual({ action: successAction, data: 'data cached' });
       expect(getActions()).toEqual([requestAction, successAction]);
     });
 
@@ -125,11 +128,11 @@ describe('middleware', () => {
         data: 'data ssr',
       });
       const result = await dispatch(requestAction);
-      expect(result).toEqual(successAction);
+      expect(result).toEqual({ action: successAction, data: 'data ssr' });
       expect(getActions()).toEqual([requestAction, successAction]);
     });
 
-    it('dispatches requests and rejects on error', async () => {
+    it('dispatches requests and resolves on error', async () => {
       const requestAction = {
         type: 'REQUEST',
         request: { error: 'error' },
@@ -138,11 +141,14 @@ describe('middleware', () => {
       const { dispatch, getActions } = mockStore({});
       const errorAction = createErrorAction(requestAction, 'error');
       const result = dispatch(requestAction);
-      await expect(result).rejects.toEqual(errorAction);
+      await expect(result).resolves.toEqual({
+        action: errorAction,
+        error: 'error',
+      });
       expect(getActions()).toEqual([requestAction, errorAction]);
     });
 
-    it('rejects on error but doesnt dispatch in silent mode', async () => {
+    it('resolves on error but doesnt dispatch in silent mode', async () => {
       const requestAction = {
         type: 'REQUEST',
         request: { error: 'error' },
@@ -152,11 +158,14 @@ describe('middleware', () => {
       const { dispatch, getActions } = mockStore({});
       const errorAction = createErrorAction(requestAction, 'error');
       const result = dispatch(requestAction);
-      await expect(result).rejects.toEqual(errorAction);
+      await expect(result).resolves.toEqual({
+        action: errorAction,
+        error: 'error',
+      });
       expect(getActions()).toEqual([]);
     });
 
-    it('dispatches requests and rejects on abort', async () => {
+    it('dispatches requests and resolves on abort', async () => {
       const requestAction = {
         type: 'REQUEST',
         request: { response: { data: 'data' } },
@@ -170,8 +179,14 @@ describe('middleware', () => {
       const abortAction = createAbortAction(requestAction);
       const result1 = dispatch(requestAction);
       const result2 = dispatch(requestAction);
-      await expect(result1).rejects.toEqual(abortAction);
-      await expect(result2).resolves.toEqual(successAction);
+      await expect(result1).resolves.toEqual({
+        action: abortAction,
+        isAborted: true,
+      });
+      await expect(result2).resolves.toEqual({
+        action: successAction,
+        data: 'data',
+      });
       expect(getActions()).toEqual([
         requestAction,
         requestAction,
@@ -191,8 +206,14 @@ describe('middleware', () => {
       const result1 = dispatch(requestAction);
       const result2 = dispatch(requestAction);
       dispatch(abortRequests());
-      await expect(result1).rejects.toEqual(abortAction);
-      await expect(result2).rejects.toEqual(abortAction);
+      await expect(result1).resolves.toEqual({
+        action: abortAction,
+        isAborted: true,
+      });
+      await expect(result2).resolves.toEqual({
+        action: abortAction,
+        isAborted: true,
+      });
       expect(getActions()).toEqual([
         requestAction,
         requestAction,
@@ -231,9 +252,18 @@ describe('middleware', () => {
         { requestType: 'REQUEST3', requestKey: '1' },
       ]);
       dispatch(abortRequestAction);
-      await expect(result1).resolves.toEqual(responseAction1);
-      await expect(result2).rejects.toEqual(responseAction2);
-      await expect(result3).rejects.toEqual(responseAction3);
+      await expect(result1).resolves.toEqual({
+        action: responseAction1,
+        data: 'data',
+      });
+      await expect(result2).resolves.toEqual({
+        action: responseAction2,
+        isAborted: true,
+      });
+      await expect(result3).resolves.toEqual({
+        action: responseAction3,
+        isAborted: true,
+      });
       expect(getActions()).toEqual([
         requestAction1,
         requestAction2,
@@ -269,7 +299,7 @@ describe('middleware', () => {
         data: 'dataUpdated',
       });
       const result = await dispatch(requestAction);
-      expect(result).toEqual(successAction);
+      expect(result).toEqual({ action: successAction, data: 'dataUpdated' });
       expect(getActions()).toEqual([
         { type: 'MAKING_REQUEST' },
         requestActionUpdated,
@@ -296,7 +326,7 @@ describe('middleware', () => {
         data: 'dataUpdated',
       });
       const result = await dispatch(requestAction);
-      expect(result).toEqual(successAction);
+      expect(result).toEqual({ action: successAction, data: 'dataUpdated' });
       expect(getActions()).toEqual([
         requestAction,
         { type: 'MAKING_RESPONSE' },
@@ -321,7 +351,10 @@ describe('middleware', () => {
       const { dispatch, getActions } = onErrorMockStore({});
       const errorAction = createErrorAction(requestAction, 'errorUpdated');
       const result = dispatch(requestAction);
-      await expect(result).rejects.toEqual(errorAction);
+      await expect(result).resolves.toEqual({
+        action: errorAction,
+        error: 'errorUpdated',
+      });
       expect(getActions()).toEqual([
         requestAction,
         { type: 'MAKING_ERROR' },
@@ -334,13 +367,13 @@ describe('middleware', () => {
         createSendRequestsMiddleware({
           ...testConfig,
           onError: async (error, action, store) => {
-            const successAction = await store.dispatch({
+            const { data } = await store.dispatch({
               type: 'REQUEST',
               request: { response: { data: 'data' } },
               meta: { silent: true },
             });
 
-            return successAction.response;
+            return { data };
           },
         }),
       ]);
@@ -353,7 +386,10 @@ describe('middleware', () => {
         data: 'data',
       });
       const result = dispatch(requestAction);
-      await expect(result).resolves.toEqual(successAction);
+      await expect(result).resolves.toEqual({
+        action: successAction,
+        data: 'data',
+      });
       expect(getActions()).toEqual([requestAction, successAction]);
     });
 
@@ -374,7 +410,10 @@ describe('middleware', () => {
       const abortAction = createAbortAction(requestAction);
       const result = dispatch(requestAction);
       dispatch(abortRequests());
-      await expect(result).rejects.toEqual(abortAction);
+      await expect(result).resolves.toEqual({
+        action: abortAction,
+        isAborted: true,
+      });
       expect(getActions()).toEqual([
         requestAction,
         abortRequests(),
