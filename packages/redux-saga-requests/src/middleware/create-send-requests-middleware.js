@@ -161,12 +161,12 @@ const createSendRequestMiddleware = config => {
         })
         .then(response => {
           if (
-            config.onResponse &&
-            (!action.meta || !action.meta.runOnResponse) &&
+            config.onSuccess &&
+            (!action.meta || !action.meta.runOnSuccess) &&
             (!action.meta ||
               (!action.meta.cacheResponse && !action.meta.ssrResponse))
           ) {
-            return config.onResponse(response, action, store);
+            return config.onSuccess(response, action, store);
           }
 
           return response;
