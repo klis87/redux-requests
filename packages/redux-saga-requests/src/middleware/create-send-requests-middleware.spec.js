@@ -307,11 +307,11 @@ describe('middleware', () => {
       ]);
     });
 
-    it('supports onResponse interceptor', async () => {
+    it('supports onSuccess interceptor', async () => {
       const onSuccessMockStore = configureStore([
         createSendRequestsMiddleware({
           ...testConfig,
-          onResponse: (response, action, store) => {
+          onSuccess: (response, action, store) => {
             store.dispatch({ type: 'MAKING_RESPONSE' });
             return Promise.resolve({ data: `${response.data}Updated` });
           },
