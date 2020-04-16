@@ -53,6 +53,9 @@ export const createAbortAction = action => ({
 export const getActionPayload = action =>
   action.payload === undefined ? action : action.payload;
 
+export const getResponseFromSuccessAction = action =>
+  action.payload ? action.payload : action.response;
+
 export const isRequestAction = action => {
   const actionPayload = getActionPayload(action);
 
