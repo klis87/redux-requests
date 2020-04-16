@@ -347,8 +347,6 @@ Now, let's talk about all options available in `meta`:
 transform data received from server
 - `getError: error => transformedError`: a function which is called on request error, which allows you to
 transform error received from server
-- `asPromise: boolean`: `true` or `false`, which can be used to promisify request action, so that you could do
-`dispatch(fetchBooks()).then().catch()`, more details can be find in `middleware` chapter
 - `asMutation: boolean`: it can be used to force treating of a request action as mutation when `true` or query when `false`
 - `driver: string`: only if you use multiple drivers, more details in `multiple drivers` chapter
 - `takeLatest: boolean`: when `true`, if a request of a given type is pending and another one is fired, the first one will be
@@ -655,9 +653,6 @@ class Books extends Component {
 }
 ```
 
-Also, you can pass an optional `autoPromisify: true` flag to `handleRequests`, which will just
-promisify all requests - so no need to use `meta.asPromise: true` anymore.
-
 ### Cache middleware
 
 Sometimes you might want your responses to be cached for an amount of time or even forever (until the page is not reloaded at least).
@@ -869,8 +864,6 @@ Below you can see all available options for `handleRequests`:
 - `onError`: see interceptors
 - `onAbort`: see interceptors
 - `cache`: see Cache middleware
-- `promisify`: see Promise middleware
-- `autoPromisify`: see Promise middleware
 - `ssr`: see Server side rendering middleware
 - `isRequestAction: (action: AnyAction) => boolean`: here you can adjust which actions are treated
 as request actions, usually you don't need to worry about it, might be useful for custom drivers
