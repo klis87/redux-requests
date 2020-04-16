@@ -7,8 +7,6 @@ export default {
   onError: null,
   onAbort: null,
   cache: false,
-  promisify: false,
-  autoPromisify: false,
   ssr: null,
   isRequestAction,
   isRequestActionQuery,

@@ -75,7 +75,7 @@ describe('actions', () => {
         type: 'REQUEST',
         request: { url: '/' },
         meta: {
-          asPromise: true,
+          asQuery: true,
         },
       };
 
@@ -84,7 +84,7 @@ describe('actions', () => {
         response: { data: 'data' },
         meta: {
           requestAction,
-          asPromise: true,
+          asQuery: true,
         },
       });
     });
@@ -129,7 +129,7 @@ describe('actions', () => {
         type: 'REQUEST',
         request: { url: '/' },
         meta: {
-          asPromise: true,
+          asQuery: true,
         },
       };
 
@@ -138,7 +138,7 @@ describe('actions', () => {
         error: 'errorData',
         meta: {
           requestAction,
-          asPromise: true,
+          asQuery: true,
         },
       });
     });
@@ -164,7 +164,7 @@ describe('actions', () => {
         type: 'REQUEST',
         request: { url: '/' },
         meta: {
-          asPromise: true,
+          asQuery: true,
         },
       };
 
@@ -172,7 +172,7 @@ describe('actions', () => {
         type: 'REQUEST_ABORT',
         meta: {
           requestAction,
-          asPromise: true,
+          asQuery: true,
         },
       });
     });
