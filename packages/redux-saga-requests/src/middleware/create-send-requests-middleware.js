@@ -56,6 +56,13 @@ const createSendRequestMiddleware = config => {
         };
       }
 
+      if (action.meta && action.meta.onRequest) {
+        action = {
+          ...action,
+          request: action.meta.onRequest(action.request, action, store),
+        };
+      }
+
       if (!action.meta || !action.meta.silent) {
         action = next(action);
       }
@@ -103,6 +110,14 @@ const createSendRequestMiddleware = config => {
 
           if (
             error !== 'REQUEST_ABORTED' &&
+            action.meta &&
+            action.meta.onError
+          ) {
+            action.meta.onError(error, action, store);
+          }
+
+          if (
+            error !== 'REQUEST_ABORTED' &&
             config.onError &&
             (!action.meta || !action.meta.runOnError)
           ) {
@@ -115,6 +130,10 @@ const createSendRequestMiddleware = config => {
           if (error === 'REQUEST_ABORTED') {
             if (config.onAbort && (!action.meta || !action.meta.runOnAbort)) {
               config.onAbort(action, store);
+            }
+
+            if (action.meta && action.meta.onAbort) {
+              action.meta.onAbort(action, store);
             }
 
             const abortAction = createAbortAction(action);
@@ -160,6 +179,10 @@ const createSendRequestMiddleware = config => {
           return response;
         })
         .then(response => {
+          if (action.meta && action.meta.onSuccess) {
+            action.meta.onSuccess(response, action, store);
+          }
+
           if (
             config.onSuccess &&
             (!action.meta || !action.meta.runOnSuccess) &&
