@@ -9,7 +9,6 @@ interface ModifyData {
 }
 
 interface RequestActionMeta {
-  asPromise?: boolean;
   asMutation?: boolean;
   driver?: string;
   takeLatest?: boolean;
@@ -71,8 +70,6 @@ interface HandleRequestConfig {
   onError?: (error: any, action: RequestAction) => any;
   onAbort?: (action: RequestAction) => void;
   cache?: boolean;
-  promisify?: boolean;
-  autoPromisify?: boolean;
   ssr?: null | 'client' | 'server';
   isRequestAction?: (action: AnyAction) => boolean;
   isRequestActionQuery?: (requestAction: RequestAction) => boolean;

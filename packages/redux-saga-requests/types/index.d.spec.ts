@@ -22,7 +22,6 @@ const requestAction: RequestAction = {
   request: { url: '/' },
   meta: {
     driver: 'default',
-    asPromise: true,
     runByWatcher: false,
     abortOn: ['ABORT'],
     takeLatest: false,
