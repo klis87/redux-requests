@@ -123,7 +123,7 @@ const createSendRequestMiddleware = config => {
               store.dispatch(abortAction);
             }
 
-            throw abortAction;
+            throw { action: abortAction, isAborted: true };
           }
 
           const errorAction = createErrorAction(action, error);
@@ -132,7 +132,7 @@ const createSendRequestMiddleware = config => {
             store.dispatch(errorAction);
           }
 
-          throw errorAction;
+          throw { action: errorAction, error };
         })
         .then(response => {
           response =
@@ -178,8 +178,9 @@ const createSendRequestMiddleware = config => {
             store.dispatch(successAction);
           }
 
-          return successAction;
-        });
+          return { action: successAction, ...response };
+        })
+        .catch(error => error);
     }
 
     return next(action);
