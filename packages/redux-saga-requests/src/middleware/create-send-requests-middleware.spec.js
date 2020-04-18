@@ -307,6 +307,31 @@ describe('middleware', () => {
       ]);
     });
 
+    it('doesnt run onRequest when meta runOnRequest is false', async () => {
+      const onRequestMockStore = configureStore([
+        createSendRequestsMiddleware({
+          ...testConfig,
+          onRequest: (request, action, store) => {
+            store.dispatch({ type: 'MAKING_REQUEST' });
+            return { response: { data: `${request.response.data}Updated` } };
+          },
+        }),
+      ]);
+      const requestAction = {
+        type: 'REQUEST',
+        request: { response: { data: 'data' } },
+        meta: { runOnRequest: false },
+      };
+
+      const { dispatch, getActions } = onRequestMockStore({});
+      const successAction = createSuccessAction(requestAction, {
+        data: 'data',
+      });
+      const result = await dispatch(requestAction);
+      expect(result).toEqual({ action: successAction, data: 'data' });
+      expect(getActions()).toEqual([requestAction, successAction]);
+    });
+
     it('supports onSuccess interceptor', async () => {
       const onSuccessMockStore = configureStore([
         createSendRequestsMiddleware({
@@ -332,6 +357,30 @@ describe('middleware', () => {
         { type: 'MAKING_RESPONSE' },
         successAction,
       ]);
+    });
+
+    it('doesnt run onSuccess when meta runOnSuccess if false', async () => {
+      const onSuccessMockStore = configureStore([
+        createSendRequestsMiddleware({
+          ...testConfig,
+          onSuccess: (response, action, store) => {
+            store.dispatch({ type: 'MAKING_RESPONSE' });
+            return Promise.resolve({ data: `${response.data}Updated` });
+          },
+        }),
+      ]);
+      const requestAction = {
+        type: 'REQUEST',
+        request: { response: { data: 'data' } },
+        meta: { runOnSuccess: false },
+      };
+      const { dispatch, getActions } = onSuccessMockStore({});
+      const successAction = createSuccessAction(requestAction, {
+        data: 'data',
+      });
+      const result = await dispatch(requestAction);
+      expect(result).toEqual({ action: successAction, data: 'data' });
+      expect(getActions()).toEqual([requestAction, successAction]);
     });
 
     it('supports onError interceptor', async () => {
@@ -360,6 +409,31 @@ describe('middleware', () => {
         { type: 'MAKING_ERROR' },
         errorAction,
       ]);
+    });
+
+    it('doesnt run onError when meta runOnError is false', async () => {
+      const onErrorMockStore = configureStore([
+        createSendRequestsMiddleware({
+          ...testConfig,
+          onError: (error, action, store) => {
+            store.dispatch({ type: 'MAKING_ERROR' });
+            throw `${error}Updated`;
+          },
+        }),
+      ]);
+      const requestAction = {
+        type: 'REQUEST',
+        request: { error: 'error' },
+        meta: { runOnError: false },
+      };
+      const { dispatch, getActions } = onErrorMockStore({});
+      const errorAction = createErrorAction(requestAction, 'error');
+      const result = dispatch(requestAction);
+      await expect(result).resolves.toEqual({
+        action: errorAction,
+        error: 'error',
+      });
+      expect(getActions()).toEqual([requestAction, errorAction]);
     });
 
     it('allows error recovery inside onError interceptor', async () => {
@@ -418,6 +492,35 @@ describe('middleware', () => {
         requestAction,
         abortRequests(),
         { type: 'MAKING_ABORT' },
+        abortAction,
+      ]);
+    });
+
+    it('doesnt run onAbort when meta runOnAbort is false', async () => {
+      const onErrorMockStore = configureStore([
+        createSendRequestsMiddleware({
+          ...testConfig,
+          onAbort: (action, store) => {
+            store.dispatch({ type: 'MAKING_ABORT' });
+          },
+        }),
+      ]);
+      const requestAction = {
+        type: 'REQUEST',
+        request: { error: 'error' },
+        meta: { runOnAbort: false },
+      };
+      const { dispatch, getActions } = onErrorMockStore({});
+      const abortAction = createAbortAction(requestAction);
+      const result = dispatch(requestAction);
+      dispatch(abortRequests());
+      await expect(result).resolves.toEqual({
+        action: abortAction,
+        isAborted: true,
+      });
+      expect(getActions()).toEqual([
+        requestAction,
+        abortRequests(),
         abortAction,
       ]);
     });
