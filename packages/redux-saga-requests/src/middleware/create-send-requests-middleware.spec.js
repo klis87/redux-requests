@@ -389,7 +389,7 @@ describe('middleware', () => {
           ...testConfig,
           onError: (error, action, store) => {
             store.dispatch({ type: 'MAKING_ERROR' });
-            throw `${error}Updated`;
+            return Promise.reject(`${error}Updated`);
           },
         }),
       ]);
