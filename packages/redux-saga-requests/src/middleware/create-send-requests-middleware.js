@@ -124,7 +124,7 @@ const createSendRequestMiddleware = config => {
             config.onError &&
             (!action.meta || action.meta.runOnError !== false)
           ) {
-            return [config.onError(error, action, store)];
+            return Promise.all([config.onError(error, action, store)]);
           }
 
           throw error;
