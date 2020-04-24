@@ -4,7 +4,7 @@ import {
   createErrorAction,
   createAbortAction,
 } from '../actions';
-import { ABORT_REQUESTS } from '../constants';
+import { ABORT_REQUESTS, RESET_REQUESTS } from '../constants';
 
 const getRequestTypeString = requestType =>
   typeof requestType === 'function' ? requestType.toString() : requestType;
@@ -31,7 +31,10 @@ const createSendRequestMiddleware = config => {
   const pendingRequests = {};
 
   return store => next => action => {
-    if (action.type === ABORT_REQUESTS) {
+    if (
+      action.type === ABORT_REQUESTS ||
+      (action.type === RESET_REQUESTS && action.abortPending)
+    ) {
       const clearAll = !action.requests;
       const keys = !clearAll && getKeys(action.requests);
 
