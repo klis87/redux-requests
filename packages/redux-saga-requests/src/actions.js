@@ -109,9 +109,10 @@ export const clearRequestsCache = (...cacheKeys) => ({
   cacheKeys,
 });
 
-export const resetRequests = (requests = null) => ({
+export const resetRequests = (requests = null, abortPending = true) => ({
   type: RESET_REQUESTS,
   requests,
+  abortPending,
 });
 
 export const abortRequests = (requests = null) => ({
