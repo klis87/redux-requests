@@ -57,12 +57,16 @@ const queryReducer = (state, action, actionType, config, normalizedData) => {
 
   switch (action.type) {
     case success(actionType):
-      return {
-        ...state,
-        data: getDataFromResponseAction(action),
-        pending: state.pending - 1,
-        error: null,
-      };
+      return action.meta &&
+        (action.meta.ssrResponse || action.meta.cacheResponse)
+        ? state
+        : {
+            ...state,
+            data: getDataFromResponseAction(action),
+            pending: state.pending - 1,
+            error: null,
+          };
+
     case error(actionType):
       return {
         ...state,
@@ -76,11 +80,14 @@ const queryReducer = (state, action, actionType, config, normalizedData) => {
         pending: state.pending - 1,
       };
     default:
-      return {
-        ...state,
-        pending: state.pending + 1,
-        error: null,
-      };
+      return action.meta &&
+        (action.meta.ssrResponse || action.meta.cacheResponse)
+        ? state
+        : {
+            ...state,
+            pending: state.pending + 1,
+            error: null,
+          };
   }
 };
 
