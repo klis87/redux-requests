@@ -5,7 +5,7 @@ export default (requestsPromise, config = defaultConfig) => {
   let index = 0;
   const serverSuccessActions = [];
 
-  return store => next => action => {
+  return () => next => action => {
     if (config.isRequestAction(action)) {
       index +=
         action.meta && action.meta.dependentRequestsNumber !== undefined
