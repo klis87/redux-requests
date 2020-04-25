@@ -1,4 +1,4 @@
-import { AnyAction, Reducer, Middleware } from 'redux';
+import { AnyAction, Reducer, Middleware, Store } from 'redux';
 
 interface FilterActions {
   (action: AnyAction): boolean;
@@ -12,7 +12,6 @@ interface RequestActionMeta {
   asMutation?: boolean;
   driver?: string;
   takeLatest?: boolean;
-  abortOn?: FilterActions | string | string[];
   getData?: (data: any) => any;
   getError?: (error: any) => any;
   requestKey?: string;
@@ -34,6 +33,15 @@ interface RequestActionMeta {
   cache?: boolean | number;
   dependentRequestsNumber?: number;
   isDependentRequest?: boolean;
+  silent?: boolean;
+  onRequest?: (request: any, action: RequestAction, store: Store) => void;
+  onSuccess?: (response: any, action: RequestAction, store: Store) => void;
+  onError?: (error: any, action: RequestAction, store: Store) => void;
+  onAbort?: (action: RequestAction, store: Store) => void;
+  runOnRequest?: boolean;
+  runOnSuccess?: boolean;
+  runOnError?: boolean;
+  runOnAbort?: boolean;
   [extraProperty: string]: any;
 }
 
@@ -65,16 +73,15 @@ export interface Driver {
 
 interface HandleRequestConfig {
   driver: Driver | { default: Driver; [driverType: string]: Driver };
-  onRequest?: (request: any, action: RequestAction) => any;
-  onSuccess?: (response: any, action: RequestAction) => any;
-  onError?: (error: any, action: RequestAction) => any;
-  onAbort?: (action: RequestAction) => void;
+  onRequest?: (request: any, action: RequestAction, store: Store) => any;
+  onSuccess?: (response: any, action: RequestAction, store: Store) => any;
+  onError?: (error: any, action: RequestAction, store: Store) => any;
+  onAbort?: (action: RequestAction, store: Store) => void;
   cache?: boolean;
   ssr?: null | 'client' | 'server';
   isRequestAction?: (action: AnyAction) => boolean;
   isRequestActionQuery?: (requestAction: RequestAction) => boolean;
   takeLatest?: boolean | FilterActions;
-  abortOn?: FilterActions | string | string[];
   normalize?: boolean;
   getNormalisationObjectKey?: (obj: any) => boolean;
   shouldObjectBeNormalized?: (obj: any) => boolean;
@@ -91,29 +98,17 @@ export function handleRequests(
   config: HandleRequestConfig,
 ): handleRequestsResponse;
 
-interface SendRequestConfig {
-  dispatchRequestAction?: boolean;
-  silent?: boolean;
-  runOnRequest?: boolean;
-  runOnSuccess?: boolean;
-  runOnError?: boolean;
-  runOnAbort?: boolean;
-}
-
-export const sendRequest: (
-  action: RequestAction,
-  config?: SendRequestConfig,
-) => any;
-
 export const clearRequestsCache: (
   ...actionTypes: string[]
 ) => { type: string; actionTypes: string[] };
 
 export const resetRequests: (
   requests: (string | { requestType: string; requestKey: string })[],
+  abortPending?: boolean,
 ) => {
   type: string;
   requests: (string | { requestType: string; requestKey: string })[];
+  abortPending: boolean;
 };
 
 export interface QueryState<QueryStateData> {
