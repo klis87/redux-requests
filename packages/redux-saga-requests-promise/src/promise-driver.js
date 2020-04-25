@@ -9,8 +9,14 @@ class DummyAbortController {
   abort() {}
 }
 
+const getDefaultAbortController = () =>
+  typeof AbortController === 'undefined'
+    ? DummyAbortController
+    : AbortController;
+
 export const createDriver = ({
-  AbortController = DummyAbortController,
+  AbortController = getDefaultAbortController(),
+  processResponse = response => ({ data: response }),
 } = {}) => requestConfig => {
   /**
    * To implement abort for any JavaScript Promise
@@ -20,8 +26,8 @@ export const createDriver = ({
 
   const responsePromise = new Promise((resolve, reject) => {
     requestConfig.promise
-      .then(data => {
-        resolve({ data });
+      .then(response => {
+        resolve(processResponse(response));
       })
       .catch(reject);
     abortSource.signal.addEventListener('abort', () => {

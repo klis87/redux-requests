@@ -1,6 +1,6 @@
 module.exports = {
   output: {
-    library: 'ReduxSagaRequestsPromiseDriver',
+    library: 'ReduxSagaRequestsPromise',
     libraryTarget: 'umd',
   },
   module: {
@@ -11,14 +11,6 @@ module.exports = {
         loader: 'babel-loader',
       },
     ],
-  },
-  externals: {
-    axios: {
-      commonjs: 'axios',
-      commonjs2: 'axios',
-      amd: 'axios',
-      root: 'axios',
-    },
   },
   devtool: 'source-map',
 };

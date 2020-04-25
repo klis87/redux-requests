@@ -1,14 +1,10 @@
-import Axios from 'axios';
+import axios from 'axios';
 import { FETCH_PHOTO, FETCH_POST } from './constants';
 
 export const fetchPhoto = id => ({
   type: FETCH_PHOTO,
   request: {
-    promise: Axios.get(
-      `https://jsonplaceholder.typicode.com/photos/${id}`,
-    ).then(response => {
-      return response.data;
-    }),
+    promise: axios.get(`https://jsonplaceholder.typicode.com/photos/${id}`),
   },
 });
 
@@ -16,18 +12,12 @@ export const fetchPost = id => ({
   type: FETCH_POST,
   request: [
     {
-      promise: Axios.get(
-        `https://jsonplaceholder.typicode.com/posts/${id}`,
-      ).then(response => {
-        return response.data;
-      }),
+      promise: axios.get(`https://jsonplaceholder.typicode.com/posts/${id}`),
     },
     {
-      promise: Axios.get(
+      promise: axios.get(
         `https://jsonplaceholder.typicode.com/posts/${id}/comments`,
-      ).then(response => {
-        return response.data;
-      }),
+      ),
     },
   ],
   meta: {
