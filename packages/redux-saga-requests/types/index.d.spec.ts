@@ -3,7 +3,6 @@ import {
   error,
   abort,
   Driver,
-  sendRequest,
   clearRequestsCache,
   RequestAction,
   handleRequests,
@@ -22,8 +21,6 @@ const requestAction: RequestAction = {
   request: { url: '/' },
   meta: {
     driver: 'default',
-    runByWatcher: false,
-    abortOn: ['ABORT'],
     takeLatest: false,
     cache: 1,
     cacheKey: 'key',
@@ -57,24 +54,8 @@ handleRequests({
   onError: (error, action) => ({ error }),
   onAbort: action => {},
   takeLatest: true,
-  abortOn: 'TYPE',
   isRequestActionQuery: () => true,
 });
-
-sendRequest(requestAction);
-sendRequest({ type: 'type', payload: { request: {} } });
-sendRequest({ type: 'type', payload: { request: [{}] } });
-sendRequest(
-  { type: 'type', request: [{}, {}] },
-  {
-    dispatchRequestAction: true,
-    silent: false,
-    runOnRequest: false,
-    runOnSuccess: false,
-    runOnError: false,
-    runOnAbort: false,
-  },
-);
 
 clearRequestsCache();
 clearRequestsCache('TYPE');
