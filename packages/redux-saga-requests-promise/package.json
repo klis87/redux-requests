@@ -1,5 +1,5 @@
 {
-  "name": "redux-saga-requests-promise-driver",
+  "name": "redux-saga-requests-promise",
   "version": "0.1.0",
   "description": "Promise driver for Redux-Saga-Requests, Redux-Saga addon to simplify AJAX requests",
   "main": "lib/index.js",
@@ -29,8 +29,8 @@
     "test-types": "tsc types/index.d.spec.ts --noEmit --lib es2015",
     "build:commonjs": "cross-env BABEL_ENV=test babel src --out-dir lib --ignore 'src/**/*.spec.js'",
     "build:es": "cross-env babel src --out-dir es --ignore 'src/**/*.spec.js'",
-    "build:umd": "webpack --mode development -o dist/redux-saga-requests-promise-driver.js",
-    "build:umd:min": "webpack --mode production -o dist/redux-saga-requests-promise-driver.min.js",
+    "build:umd": "webpack --mode development -o dist/redux-saga-requests-promise.js",
+    "build:umd:min": "webpack --mode production -o dist/redux-saga-requests-promise.min.js",
     "build": "npm-run-all clean -p build:commonjs build:es build:umd build:umd:min",
     "build:watch": "nodemon --watch src --ignore src/**/*.spec.js --exec 'yarn run build:es'",
     "prepublish": "yarn run build"

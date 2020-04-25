@@ -20,7 +20,6 @@ module.exports = {
         'react-redux',
         'es',
       ),
-      'redux-saga': path.join(__dirname, '..', 'node_modules', 'redux-saga'),
       'redux-saga-requests': path.join(
         __dirname,
         '..',
@@ -37,20 +36,12 @@ module.exports = {
         'redux-saga-requests-react',
         'es',
       ),
-      'redux-saga-requests-axios': path.join(
+      'redux-saga-requests-promise': path.join(
         __dirname,
         '..',
         '..',
         'packages',
-        'redux-saga-requests-axios',
-        'es',
-      ),
-      'redux-saga-requests-promise-driver': path.join(
-        __dirname,
-        '..',
-        '..',
-        'packages',
-        'redux-saga-requests-promise-driver',
+        'redux-saga-requests-promise',
         'es',
       ),
     },

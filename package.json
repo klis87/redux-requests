@@ -38,6 +38,10 @@
       "maxSize": "6 kB"
     },
     {
+      "path": "./packages/redux-saga-requests-promise/dist/redux-saga-requests-promise.min.js",
+      "maxSize": "1 kB"
+    },
+    {
       "path": "./packages/redux-saga-requests-mock/dist/redux-saga-requests-mock.min.js",
       "maxSize": "4 kB"
     },
