@@ -1,4 +1,4 @@
-# redux-saga-requests-promise
+# @redux-requests/promise
 
 [![npm version](https://badge.fury.io/js/redux-saga-requests-promise.svg)](https://badge.fury.io/js/redux-saga-requests-promise)
 [![Build Status](https://travis-ci.org/klis87/redux-saga-requests.svg?branch=master)](https://travis-ci.org/klis87/redux-saga-requests)
@@ -6,13 +6,13 @@
 [![Known Vulnerabilities](https://snyk.io/test/github/klis87/redux-saga-requests/badge.svg)](https://snyk.io/test/github/klis87/redux-saga-requests)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
-Promise driver to Redux-Saga - addon to simplify handling of AJAX requests.
+Promise driver to Redux - addon to simplify handling of AJAX requests.
 
 ## Installation
 
 To install the package, just run:
 ```
-$ npm install redux-saga-requests-promise
+$ npm install @redux-requests/promise
 ```
 
 ## Usage
@@ -21,7 +21,7 @@ This driver is useful, when you use an API library, which use promises.
 
 For instance, you could do something like that:
 ```js
-import { createDriver } from 'redux-saga-requests-promise';
+import { createDriver } from '@redux-requests/promise';
 
 handleRequests({
   driver: createDriver({
@@ -47,7 +47,10 @@ If you don't, requests abort won't work.
 it is useful if your promises resolve to more things than `data`, then you could for instance use
 `response =>  ({ data: response.data })`
 
-For usage, see [redux-saga-requests docs](https://github.com/klis87/redux-saga-requests).
+For usage, see [redux-saga-requests docs](https://github.com/klis87/redux-requests).
+
+Also note, that for mutations you need to pass `meta.asMutation: true` in your request actions,
+so core library could know whether a request is a query or a mutation.
 
 ## Licence
 

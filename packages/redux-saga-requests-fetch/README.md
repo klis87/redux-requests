@@ -1,4 +1,4 @@
-# redux-saga-requests-fetch
+# @redux-requests/fetch
 
 [![npm version](https://badge.fury.io/js/redux-saga-requests-fetch.svg)](https://badge.fury.io/js/redux-saga-requests-fetch)
 [![Build Status](https://travis-ci.org/klis87/redux-saga-requests.svg?branch=master)](https://travis-ci.org/klis87/redux-saga-requests)
@@ -12,23 +12,19 @@ Fetch API driver to Redux-Saga - addon to simplify handling of AJAX requests.
 
 To install the package, just run:
 ```
-$ yarn add isomorphic-fetch redux-saga-requests-fetch
-```
-or...
-```
-$ npm install isomorphic-fetch redux-saga-requests-fetch
+$ npm install isomorphic-fetch @redux-requests/fetch
 ```
 or you can just use CDN: `https://unpkg.com/redux-saga-requests-fetch`.
 
 ## Usage
 
-For a general usage, see [redux-saga-requests docs](https://github.com/klis87/redux-saga-requests).
+For a general usage, see [redux-requests docs](https://github.com/klis87/redux-requests).
 
 Regarding Fetch API related usage, here you can see a typical setup:
 ```js
 import 'isomorphic-fetch'; // or a different fetch polyfill
-import { handleRequests } from 'redux-saga-requests';
-import { createDriver } from 'redux-saga-requests-fetch';
+import { handleRequests } from '@redux-requests/core';
+import { createDriver } from '@redux-requests/fetch';
 
 handleRequests({
   driver: createDriver(

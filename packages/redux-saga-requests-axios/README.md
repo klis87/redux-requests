@@ -1,4 +1,4 @@
-# redux-saga-requests-axios
+# @redux-requests/axios
 
 [![npm version](https://badge.fury.io/js/redux-saga-requests-axios.svg)](https://badge.fury.io/js/redux-saga-requests-axios)
 [![Build Status](https://travis-ci.org/klis87/redux-saga-requests.svg?branch=master)](https://travis-ci.org/klis87/redux-saga-requests)
@@ -12,15 +12,11 @@ Axios driver to Redux-Saga - addon to simplify handling of AJAX requests.
 
 To install the package, just run:
 ```
-$ yarn add redux-saga-requests-axios
-```
-or...
-```
-$ npm install redux-saga-requests-axios
+$ npm install @redux-requests/axios
 ```
 or you can just use CDN: `https://unpkg.com/redux-saga-requests-axios`.
 
-For usage, see [redux-saga-requests docs](https://github.com/klis87/redux-saga-requests).
+For usage, see [redux-requests docs](https://github.com/klis87/redux-requests).
 
 ## Licence
 
