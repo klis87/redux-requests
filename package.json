@@ -22,31 +22,31 @@
   },
   "bundlesize": [
     {
-      "path": "./packages/redux-saga-requests/dist/redux-saga-requests.min.js",
+      "path": "./packages/redux-requests/dist/redux-requests.min.js",
       "maxSize": "6 kB"
     },
     {
-      "path": "./packages/redux-saga-requests-axios/dist/redux-saga-requests-axios.min.js",
+      "path": "./packages/redux-requests-axios/dist/redux-requests-axios.min.js",
       "maxSize": "1 kB"
     },
     {
-      "path": "./packages/redux-saga-requests-fetch/dist/redux-saga-requests-fetch.min.js",
+      "path": "./packages/redux-requests-fetch/dist/redux-requests-fetch.min.js",
       "maxSize": "2 kB"
     },
     {
-      "path": "./packages/redux-saga-requests-graphql/dist/redux-saga-requests-graphql.min.js",
+      "path": "./packages/redux-requests-graphql/dist/redux-requests-graphql.min.js",
       "maxSize": "6 kB"
     },
     {
-      "path": "./packages/redux-saga-requests-promise/dist/redux-saga-requests-promise.min.js",
+      "path": "./packages/redux-requests-promise/dist/redux-requests-promise.min.js",
       "maxSize": "1 kB"
     },
     {
-      "path": "./packages/redux-saga-requests-mock/dist/redux-saga-requests-mock.min.js",
+      "path": "./packages/redux-requests-mock/dist/redux-requests-mock.min.js",
       "maxSize": "4 kB"
     },
     {
-      "path": "./packages/redux-saga-requests-react/dist/redux-saga-requests-react.min.js",
+      "path": "./packages/redux-requests-react/dist/redux-requests-react.min.js",
       "maxSize": "3 kB"
     }
   ]
