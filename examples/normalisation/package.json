@@ -1,9 +1,9 @@
 {
-  "name": "redux-saga-requests-normalisation-example",
+  "name": "redux-requests-normalisation-example",
   "version": "1.0.0",
-  "description": "redux-saga-requests normalisation example",
+  "description": "redux-requests normalisation example",
   "main": "src/index.js",
-  "repository": "git@github.com:klis87/redux-saga-requests.git",
+  "repository": "git@github.com:klis87/redux-requests.git",
   "author": "Konrad Lisiczynski <klisiczynski@gmail.com>",
   "license": "MIT",
   "scripts": {

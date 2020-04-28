@@ -1,4 +1,4 @@
-# Redux Saga Requests Redux Act integration example
+# Redux Requests Redux Act integration example
 
 In order to launch this example, execute:
 - `yarn install` or `npm install` (or `yarn install` from the parent directory to install all examples at once)

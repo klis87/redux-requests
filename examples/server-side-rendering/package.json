@@ -1,9 +1,9 @@
 {
-  "name": "redux-saga-server-side-rendering-example",
+  "name": "redux-server-side-rendering-example",
   "version": "1.0.0",
-  "description": "redux-saga-requests server side rendering example",
+  "description": "redux-requests server side rendering example",
   "main": "src/index.js",
-  "repository": "git@github.com:klis87/redux-saga-requests.git",
+  "repository": "git@github.com:klis87/redux-requests.git",
   "author": "Konrad Lisiczynski <klisiczynski@gmail.com>",
   "license": "MIT",
   "scripts": {

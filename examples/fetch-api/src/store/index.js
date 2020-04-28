@@ -1,6 +1,6 @@
 import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
-import { handleRequests } from 'redux-saga-requests';
-import { createDriver } from 'redux-saga-requests-fetch';
+import { handleRequests } from '@redux-requests/core';
+import { createDriver } from '@redux-requests/fetch';
 
 export const configureStore = () => {
   const { requestsReducer, requestsMiddleware } = handleRequests({

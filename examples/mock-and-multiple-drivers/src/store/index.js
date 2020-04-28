@@ -1,8 +1,8 @@
 import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
 import axios from 'axios';
-import { handleRequests } from 'redux-saga-requests';
-import { createDriver as createAxiosDriver } from 'redux-saga-requests-axios';
-import { createDriver as createMockDriver } from 'redux-saga-requests-mock';
+import { handleRequests } from '@redux-requests/core';
+import { createDriver as createAxiosDriver } from '@redux-requests/axios';
+import { createDriver as createMockDriver } from '@redux-requests/mock';
 
 import { FETCH_PHOTO } from './constants';
 

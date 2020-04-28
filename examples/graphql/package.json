@@ -1,9 +1,9 @@
 {
-  "name": "redux-saga-requests-graphql-example",
+  "name": "redux-requests-graphql-example",
   "version": "1.0.0",
-  "description": "redux-saga-requests graphql example",
+  "description": "redux-requests graphql example",
   "main": "src/index.js",
-  "repository": "git@github.com:klis87/redux-saga-requests.git",
+  "repository": "git@github.com:klis87/redux-requests.git",
   "author": "Konrad Lisiczynski <klisiczynski@gmail.com>",
   "license": "MIT",
   "scripts": {

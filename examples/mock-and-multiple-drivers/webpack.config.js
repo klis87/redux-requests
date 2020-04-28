@@ -20,37 +20,36 @@ module.exports = {
         'react-redux',
         'es',
       ),
-      'redux-saga': path.join(__dirname, '..', 'node_modules', 'redux-saga'),
-      'redux-saga-requests': path.join(
+      '@redux-requests/core': path.join(
         __dirname,
         '..',
         '..',
         'packages',
-        'redux-saga-requests',
+        'redux-requests',
         'es',
       ),
-      'redux-saga-requests-react': path.join(
+      '@redux-requests/react': path.join(
         __dirname,
         '..',
         '..',
         'packages',
-        'redux-saga-requests-react',
+        'redux-requests-react',
         'es',
       ),
-      'redux-saga-requests-axios': path.join(
+      '@redux-requests/axios': path.join(
         __dirname,
         '..',
         '..',
         'packages',
-        'redux-saga-requests-axios',
+        'redux-requests-axios',
         'es',
       ),
-      'redux-saga-requests-mock': path.join(
+      '@redux-requests/mock': path.join(
         __dirname,
         '..',
         '..',
         'packages',
-        'redux-saga-requests-mock',
+        'redux-requests-mock',
         'es',
       ),
     },

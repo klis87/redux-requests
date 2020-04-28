@@ -1,4 +1,4 @@
-import { gql } from 'redux-saga-requests-graphql';
+import { gql } from '@redux-requests/graphql';
 
 import {
   FETCH_USERS,

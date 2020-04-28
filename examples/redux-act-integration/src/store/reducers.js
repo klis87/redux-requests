@@ -1,4 +1,4 @@
-import { abort } from 'redux-saga-requests';
+import { abort } from '@redux-requests/core';
 import { createReducer } from 'redux-act';
 
 import { fetchPhoto, fetchPosts } from './actions';

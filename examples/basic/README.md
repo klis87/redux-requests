@@ -1,4 +1,4 @@
-# Redux Saga Requests basic example
+# Redux Requests basic example
 
 In order to launch this example, execute:
 - `yarn install` or `npm install` (or `yarn install` from the parent directory to install all examples at once)

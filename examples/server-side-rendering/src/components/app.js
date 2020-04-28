@@ -1,6 +1,6 @@
 import React from 'react';
-import { resetRequests } from 'redux-saga-requests';
-import { Query } from 'redux-saga-requests-react';
+import { resetRequests } from '@redux-requests/core';
+import { Query } from '@redux-requests/react';
 import { useDispatch } from 'react-redux';
 
 import {
@@ -20,9 +20,8 @@ const App = () => {
 
   return (
     <div>
-      <h1>Redux Saga Requests Server side rendering example</h1>
+      <h1>Redux Requests Server side rendering example</h1>
       <hr />
-
       <div>
         <h2>Book</h2>
         <button type="button" onClick={() => dispatch(fetchBook(1))}>
