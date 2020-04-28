@@ -131,15 +131,7 @@ export function getQuerySelector<QueryStateData = any>(props: {
   requestKey?: string;
   multiple?: boolean;
   defaultData?: any;
-}): (
-  state: any,
-  props: {
-    type: string;
-    requestKey?: string;
-    multiple?: boolean;
-    defaultData?: any;
-  },
-) => QueryState<QueryStateData>;
+}): (state: any) => QueryState<QueryStateData>;
 
 export interface MutationState {
   loading: boolean;
@@ -157,4 +149,4 @@ export function getMutation(
 export function getMutationSelector(props: {
   type: string;
   requestKey?: string;
-}): typeof getMutation;
+}): (state: any) => MutationState;
