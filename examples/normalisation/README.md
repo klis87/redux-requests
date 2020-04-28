@@ -1,4 +1,4 @@
-# Redux Saga Requests normalisation example
+# Redux Requests normalisation example
 
 In order to launch this example, execute:
 - `yarn install` or `npm install` (or `yarn install` from the parent directory to install all examples at once)

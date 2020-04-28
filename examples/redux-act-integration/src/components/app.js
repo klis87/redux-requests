@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { resetRequests, abortRequests } from 'redux-saga-requests';
-import { Query, Mutation } from 'redux-saga-requests-react';
+import { resetRequests, abortRequests } from '@redux-requests/core';
+import { Query, Mutation } from '@redux-requests/react';
 
 import {
   fetchPhoto,
@@ -23,7 +23,7 @@ const App = () => {
 
   return (
     <div>
-      <h1>Redux Saga Requests integration with Redux Act example</h1>
+      <h1>Redux Requests integration with Redux Act example</h1>
       <p>
         In order to see aborts in action, you should set network throttling in
         your browser

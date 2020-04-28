@@ -1,7 +1,7 @@
 import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
 import axios from 'axios';
-import { handleRequests } from 'redux-saga-requests';
-import { createDriver } from 'redux-saga-requests-axios';
+import { handleRequests } from '@redux-requests/core';
+import { createDriver } from '@redux-requests/axios';
 
 import { fetchBooks } from './actions';
 

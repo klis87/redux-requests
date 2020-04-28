@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { Query, Mutation } from 'redux-saga-requests-react';
+import { Query, Mutation } from '@redux-requests/react';
 
 import {
   fetchBooks,
@@ -32,7 +32,7 @@ const App = () => {
 
   return (
     <div>
-      <h1>Redux Saga Requests GraphQL example</h1>
+      <h1>Redux Requests GraphQL example</h1>
       <p>
         In order to see aborts in action, you should set network throttling in
         your browser

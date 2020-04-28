@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { resetRequests } from 'redux-saga-requests';
-import { Query } from 'redux-saga-requests-react';
+import { resetRequests } from '@redux-requests/core';
+import { Query } from '@redux-requests/react';
 
 import { fetchPhoto, fetchPost } from '../store/actions';
 import { FETCH_PHOTO, FETCH_POST } from '../store/constants';
@@ -20,7 +20,7 @@ const App = () => {
 
   return (
     <div>
-      <h1>Redux Saga Requests basic example</h1>
+      <h1>Redux Requests basic example</h1>
       <p>
         In order to see aborts in action, you should set network throttling in
         your browser
