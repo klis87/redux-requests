@@ -1,4 +1,4 @@
-# redux-saga-requests-react
+# @redux-requests/react
 
 [![npm version](https://badge.fury.io/js/redux-saga-requests-react.svg)](https://badge.fury.io/js/redux-saga-requests-react)
 [![Build Status](https://travis-ci.org/klis87/redux-saga-requests.svg?branch=master)](https://travis-ci.org/klis87/redux-saga-requests)
@@ -6,17 +6,13 @@
 [![Known Vulnerabilities](https://snyk.io/test/github/klis87/redux-saga-requests/badge.svg)](https://snyk.io/test/github/klis87/redux-saga-requests)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
-React bindings for Redux-Saga-Requests, Redux-Saga addon to simplify AJAX requests
+React bindings for Redux-Requests, Redux addon to simplify AJAX requests
 
 ## Installation
 
 To install the package, just run:
 ```
-$ yarn add redux-saga-requests-react
-```
-or...
-```
-$ npm install redux-saga-requests-react
+$ npm install @redux-requests/react
 ```
 or you can just use CDN: `https://unpkg.com/redux-saga-requests-react`.
 
@@ -24,17 +20,17 @@ For general usage, see [redux-saga-requests docs](https://github.com/klis87/redu
 
 ## Purpose
 
-This library is totally optional, but it reduces boilerplate of using `react-saga-requests`
+This library is totally optional, but it reduces boilerplate of using `redux-requests`
 state inside React components. It provides the following hooks and components:
 
 ### `useQuery`
 
 `useQuery` is a hook which uses `useSelector` from `react-redux` together with `getQuerySelector` from
-`redux-saga-requests`. It accepts the same arguments as `getQuerySelector`. You could
+`redux-requests`. It accepts the same arguments as `getQuerySelector`. You could
 easily use `useSelector` directly, but `useQuery` is slightly less verbose. So, without `useQuery`:
 ```js
 import React from 'react';
-import { getQuerySelector } from 'redux-saga-requests';
+import { getQuerySelector } from '@redux-requests/core';
 import { useSelector } from 'react-redux';
 
 const Books = () => {
@@ -46,7 +42,7 @@ const Books = () => {
 and with `useQuery`:
 ```js
 import React from 'react';
-import { useQuery } from 'redux-saga-requests-react';
+import { useQuery } from '@redux-requests/react';
 
 const Books = () => {
   const books = useQuery({ type: 'FETCH_BOOKS' })
@@ -77,7 +73,7 @@ spinners, `null` by default
 
 Minimalistic example:
 ```js
-import { Query } from 'redux-saga-requests-react';
+import { Query } from '@redux-requests/react';
 
 <Query
   type={REQUEST_TYPE}
@@ -92,7 +88,7 @@ import { Query } from 'redux-saga-requests-react';
 ```
 or with `component` prop:
 ```js
-import { Query } from 'redux-saga-requests-react';
+import { Query } from '@redux-requests/react';
 
 const DataComponent = ({ query, extraLabelProp }) => (
   <div>
@@ -110,7 +106,7 @@ const DataComponent = ({ query, extraLabelProp }) => (
 ```
 or with all props:
 ```js
-import { Query } from 'redux-saga-requests-react';
+import { Query } from '@redux-requests/react';
 
 const LoadingComponent = ({ label }) => (
   <div>
@@ -156,7 +152,7 @@ render.
 For example:
 ```js
 import React from 'react';
-import { useMutation } from 'redux-saga-requests-react';
+import { useMutation } from '@redux-requests/react';
 
 const Books = () => {
   const { loading, error } = useMutation({ type: 'DELETE_BOOK' })
@@ -175,7 +171,7 @@ const Books = () => {
 
 You use it like this:
 ```js
-import { Mutation } from 'redux-saga-requests-react';
+import { Mutation } from '@redux-requests/react';
 
 <Mutation
   type={MUTATION_TYPE}

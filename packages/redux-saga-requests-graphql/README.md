@@ -1,4 +1,4 @@
-# redux-saga-requests-graphql
+# @redux-requests/graphql
 
 [![npm version](https://badge.fury.io/js/redux-saga-requests-graphql.svg)](https://badge.fury.io/js/redux-saga-requests-graphql)
 [![Build Status](https://travis-ci.org/klis87/redux-saga-requests.svg?branch=master)](https://travis-ci.org/klis87/redux-saga-requests)
@@ -6,21 +6,17 @@
 [![Known Vulnerabilities](https://snyk.io/test/github/klis87/redux-saga-requests/badge.svg)](https://snyk.io/test/github/klis87/redux-saga-requests)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
-GraphQL driver to Redux-Saga - addon to simplify handling of AJAX requests.
+GraphQL driver to Redux - addon to simplify handling of AJAX requests.
 
 ## Installation
 
 To install the package, just run:
 ```
-$ yarn add redux-saga-requests-graphql
-```
-or...
-```
-$ npm install redux-saga-requests-graphql
+$ npm install @redux-requests/graphql
 ```
 or you can just use CDN: `https://unpkg.com/redux-saga-requests-graphql`.
 
-For general usage, see [redux-saga-requests docs](https://github.com/klis87/redux-saga-requests).
+For general usage, see [redux-saga-requests docs](https://github.com/klis87/redux-requests).
 
 Regarding GraphQL, let's assume we have the following GraphQL schema:
 ```graphql
@@ -52,8 +48,8 @@ Regarding GraphQL, let's assume we have the following GraphQL schema:
 To use this driver, just import it and pass to `handleRequests`, like you would do
 with other drivers:
 ```js
-import { handleRequests } from 'redux-saga-requests';
-import { createDriver } from 'redux-saga-requests-graphql';
+import { handleRequests } from '@redux-requests/core';
+import { createDriver } from '@redux-requests/graphql';
 
 handleRequests({
   driver: createDriver({ url: 'http://localhost:3000/graphql' }),
@@ -64,7 +60,7 @@ In order to send a query, just do it in a similar fashion to other drivers. The 
 one thing really specific to GraphQL is a way you define your actions. Let's create an action
 to fetch books:
 ```js
-import { gql } from 'redux-saga-requests-graphql';
+import { gql } from '@redux-requests/graphql';
 
 const fetchBooks = () => ({
   type: 'FETCH_BOOKS',
@@ -156,7 +152,7 @@ const deleteBook = id => ({
 ```
 
 Be aware, that all queries are executed as `takeLatest`, and mutations as `takeEvery`,
-see [redux-saga-requests docs](https://github.com/klis87/redux-saga-requests) for more details
+see [redux-requests docs](https://github.com/klis87/redux-requests) for more details
 and how to adjust it if you need it.
 
 Upload files according to [GraphQL multipart request specification](https://github.com/jaydenseric/graphql-multipart-request-spec), which is also used by other
@@ -202,7 +198,7 @@ So, you can do it exactly in the same way like other libraries supporting
 `GraphQL multipart request specification`.
 
 The rest works exactly the same like when using other drivers, see
-[GraphQL example](https://github.com/klis87/redux-saga-requests/tree/master/examples/graphql)
+[GraphQL example](https://github.com/klis87/redux-requests/tree/master/examples/graphql)
 for more info if you need it.
 
 TODO:

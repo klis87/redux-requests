@@ -1,6 +1,6 @@
-# redux-saga-requests
+# redux-requests
 
-[![npm version](https://badge.fury.io/js/redux-saga-requests.svg)](https://badge.fury.io/js/redux-saga-requests)
+[![npm version](https://badge.fury.io/js/%40redux-requests%2Fcore.svg)](https://badge.fury.io/js/%40redux-requests%2Fcore)
 [![gzip size](http://img.badgesize.io/https://unpkg.com/redux-saga-requests/dist/redux-saga-requests.min.js?compression=gzip)](https://unpkg.com/redux-saga-requests)
 [![dependencies](https://david-dm.org/klis87/redux-saga-requests.svg?path=packages/redux-saga-requests)](https://david-dm.org/klis87/redux-saga-requests?path=packages/redux-saga-requests)
 [![dev dependencies](https://david-dm.org/klis87/redux-saga-requests/dev-status.svg?path=packages/redux-saga-requests)](https://david-dm.org/klis87/redux-saga-requests?path=packages/redux-saga-requests&type=dev)
@@ -11,8 +11,8 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
-Redux-Saga addon to simplify handling of AJAX requests. It supports Axios, Fetch API and GraphQL, but different
-integrations could be added, as they are implemented in a plugin fashion.
+Redux addon to simplify handling of AJAX requests. It supports Axios, Fetch API, GraphQL and promise based API libraries,
+but different integrations could be added, as they are implemented in a plugin fashion.
 
 ## Table of content
 
@@ -24,11 +24,11 @@ integrations could be added, as they are implemented in a plugin fashion.
 - [Reducers](#reducers-arrow_up)
 - [Middleware](#middleware-arrow_up)
 - [handleRequests](#handleRequests-arrow_up)
-- [sendRequest](#sendRequest-arrow_up)
 - [Interceptors](#interceptors-arrow_up)
 - [FSA](#fsa-arrow_up)
 - [Usage with Fetch API](#usage-with-fetch-api-arrow_up)
 - [Usage with GraphQL](#usage-with-graphql-arrow_up)
+- [Usage with promise based API libraries](#usage-with-promise-based-api-libraries-arrow_up)
 - [Mocking](#mocking-arrow_up)
 - [Multiple drivers](#multiple-drivers-arrow_up)
 - [Normalisation](#normalisation-arrow_up)
@@ -37,21 +37,33 @@ integrations could be added, as they are implemented in a plugin fashion.
 
 ## Motivation [:arrow_up:](#table-of-content)
 
-With `redux-saga-requests`, assuming you use `axios` you could refactor a code in the following way:
+With `redux-requests`, assuming you use `axios` you could refactor a code in the following way:
 ```diff
   import axios from 'axios';
-- import { takeEvery, put, call } from 'redux-saga/effects';
-+ import { all } from 'redux-saga/effects';
-+ import { handleRequests } from 'redux-saga-requests';
-+ import { createDriver } from 'redux-saga-requests-axios'; // or another driver
+- import thunk from 'redux-thunk';
++ import { handleRequests } from '@redux-requests/core';
++ import { createDriver } from '@redux-requests/axios'; // or another driver
 
   const FETCH_BOOKS = 'FETCH_BOOKS';
 - const FETCH_BOOKS_SUCCESS = 'FETCH_BOOKS_SUCCESS';
 - const FETCH_BOOKS_ERROR = 'FETCH_BOOKS_ERROR';
-
-- const fetchBooks = () => ({ type: FETCH_BOOKS });
+-
+- const fetchBooksRequest = () => ({ type: FETCH_BOOKS });
 - const fetchBooksSuccess = data => ({ type: FETCH_BOOKS_SUCCESS, data });
 - const fetchBooksError = error => ({ type: FETCH_BOOKS_ERROR, error });
+
+- const fetchBooks = () => dispatch => {
+-   dispatch(fetchBooksRequest());
+-
+-   return axios.get('/books').then(response => {
+-     dispatch(fetchBooksSuccess(response.data));
+-     return response;
+-   }).catch(error => {
+-     dispatch(fetchBooksError(error));
+-     throw error;
+-   });
+- }
+
 + const fetchBooks = () => ({
 +   type: FETCH_BOOKS,
 +   request: {
@@ -79,19 +91,8 @@ With `redux-saga-requests`, assuming you use `axios` you could refactor a code i
 -   }
 - };
 
-- const fetchBooksApi = () => axios.get('/books');
--
-- function* fetchBooksSaga() {
--   try {
--     const response = yield call(fetchBooksApi);
--     yield put(fetchBooksSuccess(response.data));
--   } catch (e) {
--     yield put(fetchBooksError(e));
--   }
-- }
--
   const configureStore = () => {
-+   const { requestsReducer, requestsSagas } = handleRequests({
++   const { requestsReducer, requestsMiddleware } = handleRequests({
 +     driver: createDriver(axios),
 +   });
 +
@@ -100,23 +101,17 @@ With `redux-saga-requests`, assuming you use `axios` you could refactor a code i
 +     requests: requestsReducer,
     });
 
-    const sagaMiddleware = createSagaMiddleware();
     const store = createStore(
       reducers,
-      applyMiddleware(sagaMiddleware),
+-     applyMiddleware(thunk),
++     applyMiddleware(...requestsMiddleware),
     );
 
-    function* rootSaga() {
--     yield takeEvery(FETCH_BOOKS, fetchBooksSaga);
-+     yield all(requestsSagas);
-    }
-
-    sagaMiddleware.run(rootSaga);
     return store;
   };
 ```
-With `redux-saga-requests`, you no longer need to define error and success actions to do things like error handling
-or showing loading spinners. You don't need to write requests related repetitive sagas and reducers either.
+With `redux-requests`, you no longer need to define error and success actions to do things like error handling
+or showing loading spinners. You don't need to write requests response related repetitive actions and reducers either.
 You don't even need to worry about writing selectors, as this library provides optimized selectors out of the box.
 With action helper library like `redux-actions`, you don't even need to write constants!
 So basically you end up writing just actions to manage your whole remote state, so no more famous boilerplate in your Redux apps!
@@ -124,55 +119,49 @@ So basically you end up writing just actions to manage your whole remote state, 
 Here you can see the list of features this library provides:
 - you define your AJAX requests as simple actions, like `{ type: FETCH_BOOKS, request: { url: '/books' } }` and `success`,
 `error` (`abort` is also supported, see below) actions will be dispatched automatically for you
-- `success`, `error` and `abort` functions, which add correct and consistent suffixes to your request action types, so you can easily
-react on response actions in your reducers/sagas/middleware
-- `handleRequests` function, which gives you all the pieces needed for this library to work
 - automatic and configurable requests aborts, which increases performance and prevents race condition bugs before they even happen
 - sending multiple requests in one action - `{ type: FETCH_BOOKS_AND_AUTHORS, request: [{ url: '/books' }, { url: '/authors}'] }`
 will send two requests and wrap them in `Promise.all`
 - declarative programming - the idea of this library is to encapsulate all requests logic inside actions, so no more scattered logic
-between actions, reducers, sagas and middlewares
-- support for Axios, Fetch API and GraphQL - additional clients could be added, allowed to use any of them
-within one app, you could even write your own client integration as a `driver` (see [./packages/redux-saga-requests-axios/src/axios-driver.js](https://github.com/klis87/redux-saga-requests/blob/master/packages/redux-saga-requests-axios/src/axios-driver.js)
+between actions, reducers, thunks, sagas and middlewares
+- support for Axios, Fetch API, GraphQL and promise based API libraries - additional clients could be added, allowed to use any of them
+within one app, you could even write your own client integration as a `driver` (see [./packages/redux-requests-axios/src/axios-driver.js](https://github.com/klis87/redux-requests/blob/master/packages/redux-requests-axios/src/axios-driver.js)
 for the example)
 - optimistic updates support, so your views can be updated even before requests are finished, while you still keep consistency in case of errors by reverting optimistic updates
 - cache support with TTL, so that you can avoid making repetitive requests for a data which does not require to be always fetched
 from your server
 - mocking - mock driver, which use can use for test purposes or when you would like to integrate with API not yet implemented (and once API is finished, you could just change driver to Axios or Fetch and magicaly everything will work!)
 - multiple driver support - for example you can use Axios for one part of your requests and Fetch Api for another part
-- compatible with FSA, `redux-act` and `redux-actions` libraries (see [redux-act example](https://github.com/klis87/redux-saga-requests/tree/master/examples/redux-act-integration))
+- compatible with FSA, `redux-act` and `redux-actions` libraries (see [redux-act example](https://github.com/klis87/redux-requests/tree/master/examples/redux-act-integration))
 - simple to use with server side rendering - just pass one extra option to `handleRequests` and your app will be ready for SSR!
-- `onRequest`, `onSuccess`, `onError` and `onAbort` interceptors, you can attach your sagas (or simple functions)
-to them to define a global behaviour for a given event type
-- optional `requestsPromiseMiddleware`, which promisifies requests actions dispatch, so you can wait in your react components to get request response, the same way like you can do this with `redux-thunk`
+- `onRequest`, `onSuccess`, `onError` and `onAbort` interceptors, allowing you to define a global behaviour for a given event type
 - highly optimized selectors to retrieve your remote state
 - automatic (but optional) data normalisation, so you can forget about manual data updates, just like in graphql world but available universally!
-- React bindings in `redux-saga-requests-react` package
+- React bindings in `@redux-requests/react` package
 
 ## Installation [:arrow_up:](#table-of-content)
 
 To install the package, just run:
 ```
-$ npm install redux-saga-requests
+$ npm install @redux-requests/core
 ```
 or you can just use CDN: `https://unpkg.com/redux-saga-requests`.
 
 Also, you need to install a driver:
-- if you use Axios, install `axios` and `redux-saga-requests-axios`:
+- if you use Axios, install `axios` and `@redux-requests/axios`:
 
   ```
-  $ npm install axios redux-saga-requests-axios
+  $ npm install axios @redux-requests/axios
   ```
   or CDN: `https://unpkg.com/redux-saga-requests-axios`.
-- if you use Fetch API, install `isomorphic-fetch` (or a different Fetch polyfill) and `redux-saga-requests-fetch`:
+- if you use Fetch API, install `isomorphic-fetch` (or a different Fetch polyfill) and `@redux-requests/fetch`:
 
   ```
-  $ npm install isomorphic-fetch redux-saga-requests-fetch
+  $ npm install isomorphic-fetch redux-requests/fetch
   ```
   or CDN: `https://unpkg.com/redux-saga-requests-fetch`.
 
-Of course, because this is Redux-Saga addon, you also need to install `redux-saga`.
-Also, it requires to install `reselect`.
+Also, you have to install `reselect`, which probably you use anyway.
 
 ## Usage [:arrow_up:](#table-of-content)
 
@@ -185,7 +174,7 @@ Let's call them request actions from now. If such an action is dispatched, it wi
 to be fired automatically. Then, depending on the outcome, either corresponding success, error, or abort action will
 be dispatched. In the next paragraphs there will be more information about request actions, but for now
 know, that request actions are powered by so called drivers. You set drivers in `handleRequest` function. There are
-officially supported Axios, Fetch API, GraphQL and mock drivers, but it is very easy to write your own driver.
+officially supported Axios, Fetch API, GraphQL, promise and mock drivers, but it is very easy to write your own driver.
 Just pick whatever you prefer. The key to understand is that if you know how to use Fetch API,
 you know how to use Fetch API driver. A config object you would pass to `fetch` function,
 now you attach to `request` key inside a request action. Another information which will
@@ -213,11 +202,6 @@ plus state in requests reducer contains some information which should be treated
 detail, not needed to be understood or used by users of this library. Selectors will be explained in a dedicated chapter,
 for now just know that there are selectors `getQuery`, `getMutation` as well as selector creators `getQuerySelector`
 and `getMutationSelector`.
-
-Also, probably you noticed sagas. Actually you don't need to know or use sagas in your application! You only need to do
-what is shown in `Motivation` part. However, this library is completely compatible with it, actually it uses sagas
-to power some of its functionalities. It might be possible though that one of the next releases will be rewritten to get rid
-of `redux-saga` dependency, it shouldn't change this library API, just know this as a curiosity.
 
 ## Actions [:arrow_up:](#table-of-content)
 
@@ -352,8 +336,6 @@ transform error received from server
 - `takeLatest: boolean`: when `true`, if a request of a given type is pending and another one is fired, the first one will be
 automatically aborted, which can prevent race condition bugs and improve performance, default as `true` for queries and `false`
 for mutations, which is usually what you want
-- `abortOn: string | string[] | action => boolean`: for instance `'LOGOUT'`, `['LOGOUT']` or `action => action.type === 'LOGOUT'`,
-you can use it to automatically abort request
 - `requestKey: string` - by default it is assumed that you only need to store information once for a given request type,
 like its data, error or loading state, so that `fetchBook('2')` would override data for previous book, like with `id` `'1'`, you can
 change it behaviour with this property, like `requestKey: id`
@@ -368,7 +350,57 @@ in `middleware` chapter
 - `optimisticData`: an object which will be normalized on request as an optimistic update
 - `revertedData`: an object which will be normalized on response error so if optimistic update failed
 - `localData`: it can be attached to any action, even not request action, to normalize data without request
+- `silent: boolean`: after setting to `false` no action will be dispatched for given request, so reducers won't be hit,
+useful if you want to make a request and not store it, or in interceptor to avoid duplicated actions in some cases
+- `onRequest`: like `onRequest` interceptor, but used only for this specific action
+- `onSuccess`: like `onSuccess` interceptor, but used only for this specific action
+- `onError`: like `onError` interceptor, but used only for this specific action
+- `onAbort`: like `onAbort` interceptor, but used only for this specific action
+- `runOnRequest: boolean`: passing `true` would prevent running `onRequest` interceptor for this action, useful to avoid infinitive loops in some cases
+- `runOnSuccess`: like above, but for `onSuccess` interceptor
+- `runOnError`: like above, but for `onError` interceptor
+- `runOnAbort`: like above, but for `onAbort` interceptor
 - `mutations`: an object to update queries data, it will be explained below
+
+### Promisified dispatches
+
+By default in Redux `store.dispatch(action)` will just return the dispatched `action` itself.
+However, this library change this behaviour for request actions dispatches by returning promises
+resolving with responses. Because of that, not only you can await requests to be finished, but also
+you can read responses directly from the places you dispatched requests.
+
+For example:
+```js
+store.dispatch(fetchBooks()).then(({ data, error, isAborted, action })) => {
+  // data for success, error for error, isAborted: true for abort
+})
+
+// or in a component
+class Books extends Component {
+  fetch = () => {
+    this.props.fetchBooks().then(({ data, error, isAborted, action })) => {
+      // data for success, error for error, isAborted: true for abort
+    })
+  }
+
+  render() {
+    useQuery
+    // ...
+  }
+}
+```
+
+As you can see, this promise is always resolved, never rejected. Why? To avoid unhandled promise rejection errors.
+Imagine you dispatch a request action somewhere, but in this place you are not interested in result. You just do
+`store.dispatch(fetchBooks())`. Now, even if you handle error in another place, like by reading error from state,
+in case of promise rejection the warning would be still there.
+
+Anyway, promise is resolved on response as:
+- when `success`, as `{ data, action }`
+- when `error`, as `{ error, action }`
+- when `abort`, as `{ isAborted: true, action }`
+
+So `action` is always there in case you need an access to response action.
 
 ### Mutations and data updates
 
@@ -459,13 +491,32 @@ At the very same time you can still use `updateData` to further update data on `
 Sometimes you might need to clear data and errors of your requests, including both queries and mutations.
 You can use `resetRequests` action to do it. For example:
 ```js
-import { resetRequests } from 'redux-saga-requests';
+import { resetRequests } from '@redux-requests/core';
 
 dispatch(resetRequests()); // clear everything
 dispatch(resetRequests([FETCH_BOOKS])); // clear errors and data for FETCH_BOOKS query
 dispatch(resetRequests([DELETE_BOOKS])); // clear errors if any for for DELETE_BOOKS mutation
 dispatch(resetRequests([FETCH_BOOKS, { requestType: FETCH_BOOK, requestKey: '1' }]));
 // clear errors and data for FETCH_BOOKS and FETCH_BOOK with 1 request key
+```
+
+What is important, `resetRequests` apart from reset also aborts all pending requests of the given types.
+You can prevent it by passing 2nd argument `dispatch(resetRequests([FETCH_BOOKS], false))`
+
+Also note that `resetRequests` also clears cache if set.
+
+### abortRequests
+
+Sometimes you might need to abort some pending requests manually.
+You can use `abortRequests` action to do it, which is used the same as `resetRequests`. For example:
+```js
+import { abortRequests } from '@redux-requests/core';
+
+dispatch(abortRequests()); // abort everything
+dispatch(abortRequests([FETCH_BOOKS])); // abort FETCH_BOOKS
+dispatch(abortRequests([DELETE_BOOKS])); // abort DELETE_BOOKS
+dispatch(abortRequests([FETCH_BOOKS, { requestType: FETCH_BOOK, requestKey: '1' }]));
+// abort FETCH_BOOKS and FETCH_BOOK with 1 request key
 ```
 
 ## Selectors [:arrow_up:](#table-of-content)
@@ -481,7 +532,7 @@ Data in reducer is kept normalized, while you need it denormalized in your apps.
 `getQuery` is a selector which returns a state for a given query. It is the selector which requires props.
 Imagine you want to get a state for `FETCH_BOOKS` query which we played with earlier. You can use it like this:
 ```js
-import { getQuery } from 'redux-saga-requests';
+import { getQuery } from '@redux-requests/core';
 
 const booksQuery = getQuery(state, { type: 'FETCH_BOOKS' });
 /* for example {
@@ -520,7 +571,7 @@ you could just `useSelector(getQuerySelector({ type: 'FETCH_BOOKS' }))`.
 
 Almost the same as `getQuery`, it is just used for mutations:
 ```js
-import { getMutation } from 'redux-saga-requests';
+import { getMutation } from '@redux-requests/core';
 
 const deleteBookMutation = getMutation(state, { type: 'DELETE_BOOK' });
 /* for example {
@@ -542,7 +593,7 @@ returned by `handleRequests`. If you need some extra state attached to queries a
 just to do it on selectors level, for instance imagine you want to add a property to books:
 ```js
 import { createSelector } from 'reselect';
-import { getQuerySelector } from 'redux-saga-requests;
+import { getQuerySelector } from '@redux-requests/core;
 
 const bookQuerySelector = createSelector(
   getQuerySelector({ type: 'FETCH_BOOKS', multiple: true }),
@@ -557,7 +608,7 @@ Otherwise you would duplicate books state which is a very bad practice.
 It is totally fine though to react on requests and responses actions in your reducers
 managing a local state, for example:
 ```js
-import { success, error, abort } from 'redux-saga-requests';
+import { success, error, abort } from '@redux-requests/core';
 
 const FETCH_BOOKS = 'FETCH_BOOKS';
 
@@ -583,75 +634,25 @@ request actions for convenience, so in our case they return `FETCH_BOOKS_SUCCESS
 
 ## Middleware [:arrow_up:](#table-of-content)
 
-Some options passed to `handleRequests` will cause it to return an additional key - `requestsMiddleware`.
-Those options are `promisify`, `cache` and `ssr`, all of which can be used independently in any
-combination. All you need to do is to add `requestsMiddleware` to your middleware list, before
-saga middleware. So, assuming you want to use all requests middleware (explained below), you would
-adjust your code from `Motivation` like that:
-```js
-const configureStore = () => {
-  const { requestsReducer, requestsSagas, requestsMiddleware } = handleRequests({
-    driver: createDriver(axios),
-    promisify: true,
-    cache: true,
-    ssr: 'client',
-  });
+Depending on used options, `handleRequests` will return a list of ready to use middleware as `requestsMiddleware`.
+One middleware is `sendRequestsMiddleware`, which is included in all the cases. Its main job
+is to listen to requests actions and execute requests.
 
-  const reducers = combineReducers({
-    requests: requestsReducer,
-  });
+There is also `cacheMiddleware` when `cache: true` option, allowing you to cache responses.
 
-  const sagaMiddleware = createSagaMiddleware();
-  const middleware = [...requestsMiddleware, sagaMiddleware];
-  const store = createStore(
-    reducers,
-    applyMiddleware(middleware),
-  );
+Additionally, `clientSsrMiddleware` and `serverSsrMiddleware` are available with `ssr` option.
 
-  function* rootSaga() {
-    yield takeEvery(FETCH_BOOKS, fetchBooksSaga);
-    yield all(requestsSagas);
-  }
+In any case, you don't need to worry about it, depending on options passed to `handleRequests`,
+all required middleware will be included and in the proper order. You just need to use them, like in `Motivation` paragraph.
 
-  sagaMiddleware.run(rootSaga);
-  return store;
-};
-```
+### Send requests middleware
 
-### Promise middleware
-
-What if you dispatch a request action somewhere and you would like to get a response in the same place?
-Dispatching action by default just returns the dispatched action itself, but you can change this behaviour
-by using promise middleware. All you need to is passing `promisify: true` to `handleRequests`,
-which will include promise middleware in `requestsMiddleware`.
-
-Now, you just need to add `asPromise: true` to request action meta like that:
-```js
-const fetchBooks = () => ({
-  type: FETCH_BOOKS,
-  request: { url: '/books'},
-  meta: {
-    asPromise: true,
-  },
-});
-```
-
-Then you can dispatch the action for example from a component and wait for a response:
-```js
-class Books extends Component {
-  fetch = () => {
-    this.props.fetchBooks().then(successAction => {
-      // handle successful response
-    }).catch(errorOrAbortAction => {
-      // handle error or aborted request
-    })
-  }
-
-  render() {
-    // ...
-  }
-}
-```
+This contains the core logic of the library. It does many things, like:
+- it listens for request actions and executes requests
+- depending on the outcome, it also dispatches `success`, `error` or `abort` action for each request
+- it returns promise with response for each request actions, so you can wait for responses and read it in the place
+you dispatched request actions
+- aborts pending requests for `takeLatest: true` cases and for `resetRequests` and `abortRequests` actions
 
 ### Cache middleware
 
@@ -699,7 +700,7 @@ const fetchBook = id => ({
 
 If you need to clear the cache manually for some reason, you can use `clearRequestsCache` action:
 ```js
-import { clearRequestsCache } from 'redux-saga-requests';
+import { clearRequestsCache } from '@redux-requests/core';
 
 dispatch(clearRequestsCache()) // clear the whole cache
 dispatch(clearRequestsCache(FETCH_BOOKS)) // clear only FETCH_BOOKS cache
@@ -719,36 +720,28 @@ Server side rendering is a very complex topic and there are many ways how to go 
 Many people use the strategy around React components, for instance they attach static methods to components which
 make requests and return promises with responses, then they wrap them in `Promise.all`. I don't recommend this strategy
 when using Redux, because this requires additional code and potentially double rendering on server, but if you really want
-to do it, it is possible thanks to promise middleware.
+to do it, it is possible as dispatched request actions return promise resolved with response.
 
-However, I recommend using another approach. See [server-side-rendering-example](https://github.com/klis87/redux-saga-requests/tree/master/examples/server-side-rendering) with the complete setup, but in a nutshell you can write universal code like you would
+However, I recommend using another approach. See [server-side-rendering-example](https://github.com/klis87/redux-requests/tree/master/examples/server-side-rendering) with the complete setup, but in a nutshell you can write universal code like you would
 normally write it without SSR, with just only minor additions. Here is how:
 
 1. Before we begin, be advised that this strategy requires to dispatch requests on Redux level, at least those which have to be
 fired on application load. So for instance you cannot dispatch them inside `componentDidMount`. The obvious place to dispatch them
-is in your sagas, like `yield put(fetchBooks())`. However, what if your app has multiple routes, and each route has to send
+is in the place you create store, like `store.dispatch(fetchBooks())`. However, what if your app has multiple routes, and each route has to send
 different requests? Well, you need to make Redux aware of current route. I recommend to use a router with first class support for
 Redux, namely [redux-first-router](https://github.com/faceyspacey/redux-first-router). If you use `react-router` though, it is
 fine too, you just need to integrate it with Redux with
-[connected-react-router](https://github.com/supasate/connected-react-router). Then, you can use `take` effect to listen to
-routes changes and/or get current location with `select` effect. This would give you information which route is active to know
-which requests to dispatch.
+[connected-react-router](https://github.com/supasate/connected-react-router).
 2. On the server you need to pass `ssr: 'server'` (`ssr: 'client'` on the client, more in next step)
 option to `handleRequests`, which will include SSR middleware in `requestsMiddleware` and additionally return
 `requestsPromise` which will be resolved once all requests are finished. Here you can see a possible implementation:
     ```js
     import { createStore, applyMiddleware, combineReducers } from 'redux';
-    import createSagaMiddleware from 'redux-saga';
-    import { all, put, call } from 'redux-saga/effects';
     import axios from 'axios';
-    import { handleRequests } from 'redux-saga-requests';
-    import { createDriver } from 'redux-saga-requests-axios';
+    import { handleRequests } from '@redux-requests/core';
+    import { createDriver } from '@redux-requests/axios';
 
     import { fetchBooks } from './actions';
-
-    function* bookSaga() {
-      yield put(fetchBooks());
-    }
 
     export const configureStore = (initialState = undefined) => {
       const ssr = !initialState; // if initialState is not passed, it means we run it on server
@@ -756,7 +749,6 @@ option to `handleRequests`, which will include SSR middleware in `requestsMiddle
       const {
         requestsReducer,
         requestsMiddleware,
-        requestsSagas,
         requestsPromise,
       } = handleRequests({
         driver: createDriver(
@@ -771,20 +763,13 @@ option to `handleRequests`, which will include SSR middleware in `requestsMiddle
         requests: requestsReducer,
       });
 
-      const sagaMiddleware = createSagaMiddleware();
-      const middleware = [...requestsMiddleware, sagaMiddleware];
-
       const store = createStore(
         reducers,
         initialState,
-        applyMiddleware(...middleware),
+        applyMiddleware(...requestsMiddleware),
       );
 
-      function* rootSaga() {
-        yield all([...requestsSagas, call(bookSaga)]);
-      }
-
-      sagaMiddleware.run(rootSaga, requestsSagas);
+      store.dispatch(fetchBooks());
 
       return { store, requestsPromise };
     };
@@ -822,7 +807,6 @@ option to `handleRequests`, which will include SSR middleware in `requestsMiddle
     increased by `1` after each request is initialized. Then, after each response it is decreased by `1`. So, initially after a first
     request it gets positive and after all requests are finished, its value is again set back to `0`. And this is the moment
     which means that all requests are finished and `requestsPromise` is resolved (with all success actions).
-    Additionally a special `redux-saga` `END` action is dispatched to stop all of sagas.
 
     In case of any request error, `requestsPromise` will be rejected with response error action.
 
@@ -852,9 +836,7 @@ As you probably noticed in other chapters, `handleRequests` is a function which 
 and returns object with the following keys:
 - `requestsReducer`: ready to use reducer managing the whole remote state, you need to attach it
 to `requests` key in `combineReducers`
-- `requestsSagas`: list of sagas you have to use like in examples
-- `requestsMiddleware`: list of optional middleware you should put before sagaMiddleware, only applicable
-when option `cache`, `promisify` or `ssr` is used
+- `requestsMiddleware`: list of middleware you should pass to `applyMiddleware`
 - `requestsPromise`: promise which is resolved after all requests are finished, only with `ssr: 'server'` option
 
 Below you can see all available options for `handleRequests`:
@@ -872,51 +854,9 @@ request action is treated as query, if false, as mutation, probably only useful 
 - `takeLatest: boolean || (action: requestAction) => boolean`: if true, pending requests of a given type
 are automatically cancelled if a new request of a given type is fired, by default queries are run as `takeLatest: true`
 and mutations as `takeLatest: false`
-- `abortOn: string | string[] | action => boolean`: for example `[LOGOUT]`, or `action => action.type === LOGOUT`,
-you can use it to automatically abort all requests for a given action
 - `normalize`: by default `false`, see normalisation
 - `getNormalisationObjectKey`: see normalisation
 - `shouldObjectBeNormalized`: see normalisation
-
-## sendRequest [:arrow_up:](#table-of-content)
-
-When you dispatch a request action, under the hood `sendRequest` saga is called.
-Typically you don't need to use, as dispatching Redux action as usual is enough.
-However, `sendRequest` is useful in [Interceptors](#interceptors-arrow_up).
-This is how you can use it:
-```js
-import { takeLatest } from 'redux-saga/effects';
-import { sendRequest } from 'redux-saga-requests';
-
-const FETCH_BOOKS = 'FETCH_BOOKS';
-
-const fetchBooks = () => ({
-  type: FETCH_BOOKS,
-  request: { url: '/books' },
-});
-
-function* booksSaga() {
-  const { response, error } = yield call(sendRequest, fetchBooks());
-}
-```
-Above is actually the same as `yield put(fetchBooks)`, or `yield putResolve(fetchBooks)`
-together with promise middleware, if you want to get response in this place.
-In Redux thunk or React component you would do `dispatch(fetchBooks())`.
-
-Optionally you can pass config to `sendRequest`, like:
-```js
-function* booksSaga() {
-  yield call(sendRequest, fetchBooks(), { dispatchRequestAction: false });
-}
-```
-
-The following options are possible:
-- `dispatchRequestAction`: useful if you use `sendRequest` to react on already dispatched request action not to duplicate it, default as `true`
-- `silent: boolean;`: passing `false` can disable dispatching all Redux actions for this request, default as `false`
-- `runOnRequest: boolean;`: passing `false` can block `onRequest` interceptor, more in the next chapter, default as `true`
-- `runOnSuccess: boolean;`: passing `false` can block `onSuccess` interceptor, default as `true`
-- `runOnError: boolean;`: passing `false` can block `onError` interceptor, default as `true`
-- `runOnAbort: boolean;`: passing `false` can block `onAbort` interceptor, default as `true`
 
 ## Interceptors [:arrow_up:](#table-of-content)
 
@@ -924,24 +864,24 @@ You can add global handlers to `onRequest`, `onSuccess`, `onError` add `onAbort`
 just pass them to `handleRequests`, like so:
 ```js
 import axios from 'axios';
-import { sendRequest, handleRequests } from 'redux-saga-requests';
+import { handleRequests } from '@redux-requests/core';
 
-function* onRequestSaga(request, action) {
+function onRequest(request, action, store) {
   // do sth with you request, like add token to header, or dispatch some action etc.
   return request;
 }
 
-function* onSuccessSaga(response, action) {
+function onSuccess(response, action, store) {
   // do sth with the response, dispatch some action etc
   return response;
 }
 
-function* onErrorSaga(error, action) {
+// TODO:
+function onErrorSaga(error, action, store) {
   // do sth here, like dispatch some action
 
-  // you must return { error } in case you dont want to catch error
-  // or { error: anotherError }
-  // or { response: someRequestResponse } if you want to recover from error
+  // you must throw error in case you dont want to catch error
+  // or return response as { data } if you want to recover from error
 
   if (tokenExpired(error)) {
     // get driver instance, in our case Axios to make a request without Redux
@@ -949,15 +889,13 @@ function* onErrorSaga(error, action) {
 
     try {
       // trying to get a new token, we use axios directly not to touch redux
-      const { data } = yield call(
-        axios.post,
-        '/refreshToken',
-      );
+      const { data } = await axios.post('/refreshToken');
 
       saveNewToken(data.token); // for example to localStorage
 
       // we fire the same request again:
       // - with silent: true not to dispatch duplicated actions
+
       return yield call(sendRequest, action, { silent: true });
 
       /* above is a handy shortcut of doing
@@ -982,16 +920,16 @@ function* onErrorSaga(error, action) {
   return { error };
 }
 
-function* onAbortSaga(action) {
+function onAbort(action, store) {
   // do sth, for example an action dispatch
 }
 
 handleRequests({
   driver: createDriver(axios),
-  onRequest: onRequestSaga,
-  onSuccess: onSuccessSaga,
-  onError: onErrorSaga,
-  onAbort: onAbortSaga,
+  onRequest: onRequest,
+  onSuccess: onSuccess,
+  onError: onError,
+  onAbort: onAbort,
 );
 ```
 
@@ -1038,17 +976,15 @@ const fetchBooks = () => ({
 });
 ```
 Then, success, error and abort actions will also be FSA compliant.
-For details, see [redux-act example](https://github.com/klis87/redux-saga-requests/tree/master/examples/redux-act-integration).
-
-
+For details, see [redux-act example](https://github.com/klis87/redux-requests/tree/master/examples/redux-act-integration).
 
 ## Usage with Fetch API [:arrow_up:](#table-of-content)
 
 All of the above examples show Axios usage, in order to use Fetch API, just pass Fetch driver to `handleRequests`:
 ```js
 import 'isomorphic-fetch'; // or a different fetch polyfill
-import { handleRequests } from 'redux-saga-requests';
-import { createDriver } from 'redux-saga-requests-fetch';
+import { handleRequests } from '@redux-requests/core';
+import { createDriver } from '@redux-requests/fetch';
 
 handleRequests({
   driver: createDriver(
@@ -1095,22 +1031,28 @@ and sets it as `response.data`, so instead of doing `response.json()`, just read
 
 ## Usage with GraphQL [:arrow_up:](#table-of-content)
 
-Just install `redux-saga-requests-graphql` driver. See
-[docs](https://github.com/klis87/redux-saga-requests/tree/master/packages/redux-saga-requests-graphql)
+Just install `@redux-requests/graphql` driver. See
+[docs](https://github.com/klis87/redux-requests/tree/master/packages/redux-requests-graphql)
+for more info.
+
+## Usage with promise based API libraries [:arrow_up:](#table-of-content)
+
+Just install `@redux-requests/promise` driver. See
+[docs](https://github.com/klis87/redux-requests/tree/master/packages/redux-requests-promise)
 for more info.
 
 ## Mocking [:arrow_up:](#table-of-content)
 
 Probably you are sometimes in a situation when you would like to start working on a feature which needs some integration with
-an API. What you can do then? Probably you just wait or start writing some prototype which then you will polish once API is finished. You can do better with `redux-saga-requests-mock`, especially with multi driver support, which you can read about in the
+an API. What you can do then? Probably you just wait or start writing some prototype which then you will polish once API is finished. You can do better with `@redux-requests/mock`, especially with multi driver support, which you can read about in the
 next paragraph. With this driver, you can define expected responses and errors which you would get from server and write your app
 normally. Then, after API is finished, you will just need to replace the driver with a real one, like Axios or Fetch API, without
 any additional refactoring necessary, which could save you a lot of time!
 
 You can use it like this:
 ```js
-import { handleRequests } from 'redux-saga-requests';
-import { createDriver } from 'redux-saga-requests-mock';
+import { handleRequests } from '@redux-requests/core';
+import { createDriver } from '@redux-requests/mock';
 
 const FETCH_PHOTO = 'FETCH_PHOTO';
 
@@ -1154,9 +1096,9 @@ sometimes, you can do it like this:
 ```js
 import axios from 'axios';
 import 'isomorphic-fetch';
-import { handleRequests } from 'redux-saga-requests';
-import { createDriver as createAxiosDriver } from 'redux-saga-requests-axios';
-import { createDriver as createFetchDriver } from 'redux-saga-requests-fetch';
+import { handleRequests } from '@redux-requests/core';
+import { createDriver as createAxiosDriver } from '@redux-requests/axios';
+import { createDriver as createFetchDriver } from '@redux-requests/fetch';
 
 handleRequests({
   driver: {
@@ -1224,7 +1166,7 @@ const fetchBook = id => ({
 ```
 and `getQuery` returns the following data:
 ```js
-import { getQuery } from 'redux-saga-requests';
+import { getQuery } from '@redux-requests/core';
 
 const booksQuery = getQuery(state, { type: 'FETCH_BOOKS' });
 // booksQuery.data is [{ id: '1', title: 'title 1'}, { id: '2', title: 'title 2'}]
@@ -1334,10 +1276,9 @@ const likeBooks = ids => ({
 
 ## React bindings [:arrow_up:](#table-of-content)
 
-Just install `redux-saga-requests-react`. See
-[docs](https://github.com/klis87/redux-saga-requests/tree/master/packages/redux-saga-requests-react)
+Just install `@redux-requests/react`. See
+[docs](https://github.com/klis87/redux-requests/tree/master/packages/redux-requests-react)
 for more info.
-
 
 ## Examples [:arrow_up:](#table-of-content)
 
@@ -1345,15 +1286,16 @@ I highly recommend to try examples how this package could be used in real applic
 and see what actions are being sent with [redux-devtools](https://github.com/zalmoxisus/redux-devtools-extension).
 
 There are following examples currently:
-- [basic](https://github.com/klis87/redux-saga-requests/tree/master/examples/basic)
-- [advanced](https://github.com/klis87/redux-saga-requests/tree/master/examples/advanced)
-- [mutations](https://github.com/klis87/redux-saga-requests/tree/master/examples/mutations)
-- [normalisation](https://github.com/klis87/redux-saga-requests/tree/master/examples/normalisation)
-- [Fetch API](https://github.com/klis87/redux-saga-requests/tree/master/examples/fetch-api)
-- [GraphQL](https://github.com/klis87/redux-saga-requests/tree/master/examples/graphql)
-- [redux-act integration](https://github.com/klis87/redux-saga-requests/tree/master/examples/redux-act-integration)
-- [mock-and-multiple-drivers](https://github.com/klis87/redux-saga-requests/tree/master/examples/mock-and-multiple-drivers)
-- [server-side-rendering](https://github.com/klis87/redux-saga-requests/tree/master/examples/server-side-rendering)
+- [basic](https://github.com/klis87/redux-requests/tree/master/examples/basic)
+- [advanced](https://github.com/klis87/redux-requests/tree/master/examples/advanced)
+- [mutations](https://github.com/klis87/redux-requests/tree/master/examples/mutations)
+- [normalisation](https://github.com/klis87/redux-requests/tree/master/examples/normalisation)
+- [Fetch API](https://github.com/klis87/redux-requests/tree/master/examples/fetch-api)
+- [GraphQL](https://github.com/klis87/redux-requests/tree/master/examples/graphql)
+- [redux-act integration](https://github.com/klis87/redux-requests/tree/master/examples/redux-act-integration)
+- [mock-and-multiple-drivers](https://github.com/klis87/redux-requests/tree/master/examples/mock-and-multiple-drivers)
+- [server-side-rendering](https://github.com/klis87/redux-requests/tree/master/examples/server-side-rendering)
+- [promise driver](https://github.com/klis87/redux-requests/tree/master/examples/promise-driver)
 
 ## Licence [:arrow_up:](#table-of-content)
 
