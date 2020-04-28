@@ -12,7 +12,7 @@ interface RequestActionMeta {
   asMutation?: boolean;
   driver?: string;
   takeLatest?: boolean;
-  getData?: (data: any) => any;
+  getData?: (data: any, currentData: any) => any;
   getError?: (error: any) => any;
   requestKey?: string;
   requestsCapacity?: number;

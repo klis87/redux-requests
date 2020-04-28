@@ -5,6 +5,7 @@ import {
   createAbortAction,
 } from '../actions';
 import { ABORT_REQUESTS, RESET_REQUESTS } from '../constants';
+import { getQuery } from '../selectors';
 
 const getRequestTypeString = requestType =>
   typeof requestType === 'function' ? requestType.toString() : requestType;
@@ -182,7 +183,15 @@ const createSendRequestMiddleware = config => {
             !action.meta.ssrResponse &&
             action.meta.getData
           ) {
-            return { ...response, data: action.meta.getData(response.data) };
+            const query = getQuery(store.getState(), {
+              type: action.type,
+              requestKey: action.meta && action.meta.requestKey,
+            });
+
+            return {
+              ...response,
+              data: action.meta.getData(response.data, query.data),
+            };
           }
 
           return response;
