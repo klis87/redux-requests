@@ -64,15 +64,15 @@ clearRequestsCache('TYPE', 'ANOTHER_TYPE');
 getQuery({}, { type: 'Mutation', requestKey: '1' });
 
 const querySelector = getQuerySelector({ type: 'Query' });
-querySelector({}, { type: 'Query' });
+querySelector({});
 
 const query = getQuery<{ key: string }>({}, { type: 'Query' });
 query.data.key = '1';
 
 const querySelector2 = getQuerySelector<{ key: string }>({ type: 'Query' });
-const query2 = querySelector2({}, { type: 'Query' });
+const query2 = querySelector2({});
 query2.data.key = '1';
 
 getMutation({}, { type: 'Mutation', requestKey: '1' });
 const mutationSelector = getMutationSelector({ type: 'Mutation' });
-mutationSelector({}, { type: 'Mutation' });
+mutationSelector({});
