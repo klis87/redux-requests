@@ -1,0 +1,78 @@
+{
+  "name": "@redux-requests/react",
+  "version": "0.3.0",
+  "description": "React bindings for Redux-Requests, Redux addon to simplify AJAX requests",
+  "main": "lib/index.js",
+  "module": "es/index.js",
+  "jsnext:main": "es/index.js",
+  "unpkg": "dist/redux-requests-react.min.js",
+  "repository": "git@github.com:klis87/redux-requests.git",
+  "author": "Konrad Lisiczynski <klisiczynski@gmail.com>",
+  "license": "MIT",
+  "typings": "types/index.d.ts",
+  "keywords": [
+    "redux",
+    "react",
+    "ajax"
+  ],
+  "homepage": "https://github.com/klis87/redux-requests",
+  "bugs": {
+    "url": "https://github.com/klis87/redux-requests/issues"
+  },
+  "scripts": {
+    "clean": "rimraf es lib dist",
+    "lint": "eslint 'src/**'",
+    "test": "jest src",
+    "test:cover": "jest --coverage src",
+    "test-types": "tsc types/index.d.spec.tsx --noEmit --lib es2015 --jsx react",
+    "build:commonjs": "cross-env BABEL_ENV=test babel src --out-dir lib --ignore 'src/**/*.spec.js'",
+    "build:es": "cross-env babel src --out-dir es --ignore 'src/**/*.spec.js'",
+    "build:umd": "webpack --mode development -o dist/redux-requests-react.js",
+    "build:umd:min": "webpack --mode production -o dist/redux-requests-react.min.js",
+    "build": "npm-run-all clean -p build:commonjs build:es build:umd build:umd:min",
+    "build:watch": "nodemon --watch src --ignore src/**/*.spec.js --exec 'yarn run build:es'",
+    "prepublish": "yarn run build"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-redux": ">=7.1.0",
+    "redux": ">=4.0.0",
+    "@redux-requests/core": ">=0.28.0"
+  },
+  "dependencies": {
+    "prop-types": "^15.5.7",
+    "react-is": "^16.6.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "7.8.4",
+    "@babel/core": "7.8.7",
+    "@babel/plugin-proposal-object-rest-spread": "7.8.3",
+    "@babel/plugin-transform-runtime": "7.8.3",
+    "@babel/preset-env": "7.8.7",
+    "@babel/preset-react": "7.8.3",
+    "@types/react": "16.9.23",
+    "babel-jest": "25.1.0",
+    "babel-loader": "8.0.6",
+    "babel-plugin-transform-react-remove-prop-types": "0.4.24",
+    "cross-env": "7.0.1",
+    "eslint": "6.8.0",
+    "eslint-config-airbnb": "18.0.1",
+    "eslint-plugin-import": "2.20.1",
+    "eslint-plugin-jsx-a11y": "6.2.3",
+    "eslint-plugin-react": "7.18.3",
+    "jest": "25.1.0",
+    "nodemon": "2.0.2",
+    "npm-run-all": "4.1.5",
+    "react": "16.13.0",
+    "react-dom": "16.13.0",
+    "react-redux": "7.2.0",
+    "react-test-renderer": "16.13.0",
+    "redux": "4.0.5",
+    "redux-mock-store": "1.5.4",
+    "@redux-requests/core": "^0.27.0",
+    "rimraf": "3.0.2",
+    "typescript": "3.8.3",
+    "webpack": "4.42.0",
+    "webpack-cli": "3.3.11"
+  }
+}

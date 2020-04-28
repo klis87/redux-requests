@@ -1,1 +1,1 @@
-./packages/redux-saga-requests/README.md
+./packages/redux-requests/README.md
