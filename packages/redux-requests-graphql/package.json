@@ -1,6 +1,6 @@
 {
   "name": "@redux-requests/graphql",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "GraphQL driver for Redux-Requests, Redux addon to simplify AJAX requests",
   "main": "lib/index.js",
   "module": "es/index.js",

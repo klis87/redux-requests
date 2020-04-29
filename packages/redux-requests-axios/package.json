@@ -1,6 +1,6 @@
 {
   "name": "@redux-requests/axios",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Axios driver for Redux-Requests, Redux addon to simplify AJAX requests",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -35,8 +35,8 @@
     "prepublish": "yarn run build"
   },
   "peerDependencies": {
-    "axios": ">=0.16.0",
-    "@redux-requests/core": ">=0.28.0"
+    "@redux-requests/core": ">=0.28.0",
+    "axios": ">=0.16.0"
   },
   "devDependencies": {
     "@babel/cli": "7.8.4",

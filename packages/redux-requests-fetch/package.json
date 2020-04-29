@@ -1,6 +1,6 @@
 {
   "name": "@redux-requests/fetch",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "Fetch API driver for Redux-Requests, Redux addon to simplify AJAX requests",
   "main": "lib/index.js",
   "module": "es/index.js",
