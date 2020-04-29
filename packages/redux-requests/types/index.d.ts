@@ -34,9 +34,9 @@ interface RequestActionMeta {
   dependentRequestsNumber?: number;
   isDependentRequest?: boolean;
   silent?: boolean;
-  onRequest?: (request: any, action: RequestAction, store: Store) => void;
-  onSuccess?: (response: any, action: RequestAction, store: Store) => void;
-  onError?: (error: any, action: RequestAction, store: Store) => void;
+  onRequest?: (request: any, action: RequestAction, store: Store) => any;
+  onSuccess?: (response: any, action: RequestAction, store: Store) => any;
+  onError?: (error: any, action: RequestAction, store: Store) => any;
   onAbort?: (action: RequestAction, store: Store) => void;
   runOnRequest?: boolean;
   runOnSuccess?: boolean;
