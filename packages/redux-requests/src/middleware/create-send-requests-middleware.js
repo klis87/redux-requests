@@ -26,9 +26,202 @@ const getLastActionKey = action =>
   action.type +
   (action.meta && action.meta.requestKey ? action.meta.requestKey : '');
 
+const isActionRehydrated = action =>
+  !!(action.meta && (action.meta.cacheResponse || action.meta.ssrResponse));
+
 // TODO: remove to more functional style, we need object maps and filters
+const abortPendingRequests = (action, pendingRequests) => {
+  const clearAll = !action.requests;
+  const keys = !clearAll && getKeys(action.requests);
+
+  if (!action.requests) {
+    Object.values(pendingRequests).forEach(requests =>
+      requests.forEach(r => r.cancel()),
+    );
+  } else {
+    Object.entries(pendingRequests)
+      .filter(([k]) => keys.includes(k))
+      .forEach(([, requests]) => requests.forEach(r => r.cancel()));
+  }
+};
+
+const isTakeLatest = (action, config) =>
+  action.meta && action.meta.takeLatest !== undefined
+    ? action.meta.takeLatest
+    : typeof config.takeLatest === 'function'
+    ? config.takeLatest(action)
+    : config.takeLatest;
+
+const maybeCallOnRequestInterceptor = (action, config, store) => {
+  if (
+    config.onRequest &&
+    (!action.meta || action.meta.runOnRequest !== false)
+  ) {
+    return {
+      ...action,
+      request: config.onRequest(action.request, action, store),
+    };
+  }
+
+  return action;
+};
+
+const maybeCallOnRequestMeta = (action, store) => {
+  if (action.meta && action.meta.onRequest) {
+    return {
+      ...action,
+      request: action.meta.onRequest(action.request, action, store),
+    };
+  }
+
+  return action;
+};
+
+const maybeDispatchRequestAction = (action, next) => {
+  if (!action.meta || !action.meta.silent) {
+    action = next(action);
+  }
+
+  return action;
+};
+
+const getResponsePromises = (action, config, pendingRequests) => {
+  const actionPayload = getActionPayload(action);
+  const isBatchedRequest = Array.isArray(actionPayload.request);
+
+  if (action.meta && action.meta.cacheResponse) {
+    return [Promise.resolve(action.meta.cacheResponse)];
+  } else if (action.meta && action.meta.ssrResponse) {
+    return [Promise.resolve(action.meta.ssrResponse)];
+  }
+
+  const driver = getDriver(config, action);
+  const lastActionKey = getLastActionKey(action);
+  const takeLatest = isTakeLatest(action, config);
+
+  if (takeLatest && pendingRequests[lastActionKey]) {
+    pendingRequests[lastActionKey].forEach(r => r.cancel());
+  }
+
+  const responsePromises = isBatchedRequest
+    ? actionPayload.request.map(r => driver(r, action))
+    : [driver(actionPayload.request, action)];
+
+  if (responsePromises[0].cancel) {
+    pendingRequests[lastActionKey] = responsePromises;
+  }
+
+  return responsePromises;
+};
+
+const maybeCallGetError = (action, error) => {
+  if (error !== 'REQUEST_ABORTED' && action.meta && action.meta.getError) {
+    throw action.meta.getError(error);
+  }
+
+  throw error;
+};
+
+const maybeCallOnErrorInterceptor = (action, config, store, error) => {
+  if (
+    error !== 'REQUEST_ABORTED' &&
+    config.onError &&
+    (!action.meta || action.meta.runOnError !== false)
+  ) {
+    return Promise.all([config.onError(error, action, store)]);
+  }
+
+  throw error;
+};
+
+const maybeCallOnErrorMeta = (action, store, error) => {
+  if (error !== 'REQUEST_ABORTED' && action.meta && action.meta.onError) {
+    return Promise.all([action.meta.onError(error, action, store)]);
+  }
+
+  throw error;
+};
+
+const maybeCallOnAbortInterceptor = (action, config, store, error) => {
+  if (
+    error === 'REQUEST_ABORTED' &&
+    config.onAbort &&
+    (!action.meta || action.meta.runOnAbort !== false)
+  ) {
+    config.onAbort(action, store);
+  }
+
+  throw error;
+};
+
+const maybeCallOnAbortMeta = (action, store, error) => {
+  if (error === 'REQUEST_ABORTED' && action.meta && action.meta.onAbort) {
+    action.meta.onAbort(action, store);
+  }
+
+  throw error;
+};
+
+const maybeTransformBatchRequestResponse = (action, response) => {
+  const actionPayload = getActionPayload(action);
+  const isBatchedRequest = Array.isArray(actionPayload.request);
+
+  return isBatchedRequest && !isActionRehydrated(action)
+    ? response.reduce(
+        (prev, current) => {
+          prev.data.push(current.data);
+          return prev;
+        },
+        { data: [] },
+      )
+    : response[0];
+};
+
+const maybeCallGetData = (action, store, response) => {
+  if (!isActionRehydrated(action) && action.meta && action.meta.getData) {
+    const query = getQuery(store.getState(), {
+      type: action.type,
+      requestKey: action.meta && action.meta.requestKey,
+    });
+
+    return {
+      ...response,
+      data: action.meta.getData(response.data, query.data),
+    };
+  }
+
+  return response;
+};
+
+const maybeCallOnSuccessInterceptor = (action, config, store, response) => {
+  if (
+    config.onSuccess &&
+    (!action.meta || action.meta.runOnSuccess !== false)
+  ) {
+    const result = config.onSuccess(response, action, store);
+
+    if (!isActionRehydrated(action)) {
+      return result;
+    }
+  }
+
+  return response;
+};
+
+const maybeCallOnSuccessMeta = (action, store, response) => {
+  if (action.meta && action.meta.onSuccess) {
+    const result = action.meta.onSuccess(response, action, store);
+
+    if (!isActionRehydrated(action)) {
+      return result;
+    }
+  }
+
+  return response;
+};
+
 const createSendRequestMiddleware = config => {
-  // TODO: clean not pending promises sometimes
+  // TODO: clear not pending promises sometimes
   const pendingRequests = {};
 
   return store => next => action => {
@@ -36,116 +229,33 @@ const createSendRequestMiddleware = config => {
       action.type === ABORT_REQUESTS ||
       (action.type === RESET_REQUESTS && action.abortPending)
     ) {
-      const clearAll = !action.requests;
-      const keys = !clearAll && getKeys(action.requests);
-
-      if (!action.requests) {
-        Object.values(pendingRequests).forEach(requests =>
-          requests.forEach(r => r.cancel()),
-        );
-      } else {
-        Object.entries(pendingRequests)
-          .filter(([k]) => keys.includes(k))
-          .forEach(([, requests]) => requests.forEach(r => r.cancel()));
-      }
-
+      abortPendingRequests(action, pendingRequests);
       return next(action);
     }
 
     if (config.isRequestAction(action)) {
-      if (
-        config.onRequest &&
-        (!action.meta || action.meta.runOnRequest !== false)
-      ) {
-        action = {
-          ...action,
-          request: config.onRequest(action.request, action, store),
-        };
-      }
+      action = maybeCallOnRequestInterceptor(action, config, store);
+      action = maybeCallOnRequestMeta(action, store);
+      action = maybeDispatchRequestAction(action, next);
 
-      if (action.meta && action.meta.onRequest) {
-        action = {
-          ...action,
-          request: action.meta.onRequest(action.request, action, store),
-        };
-      }
-
-      if (!action.meta || !action.meta.silent) {
-        action = next(action);
-      }
-
-      let responsePromises;
-      const actionPayload = getActionPayload(action);
-      const isBatchedRequest = Array.isArray(actionPayload.request);
-
-      if (action.meta && action.meta.cacheResponse) {
-        responsePromises = [Promise.resolve(action.meta.cacheResponse)];
-      } else if (action.meta && action.meta.ssrResponse) {
-        responsePromises = [Promise.resolve(action.meta.ssrResponse)];
-      } else {
-        const driver = getDriver(config, action);
-        const lastActionKey = getLastActionKey(action);
-        const takeLatest =
-          action.meta && action.meta.takeLatest !== undefined
-            ? action.meta.takeLatest
-            : typeof config.takeLatest === 'function'
-            ? config.takeLatest(action)
-            : config.takeLatest;
-
-        if (takeLatest && pendingRequests[lastActionKey]) {
-          pendingRequests[lastActionKey].forEach(r => r.cancel());
-        }
-
-        responsePromises = isBatchedRequest
-          ? actionPayload.request.map(r => driver(r, action))
-          : [driver(actionPayload.request, action)];
-
-        if (responsePromises[0].cancel) {
-          pendingRequests[lastActionKey] = responsePromises;
-        }
-      }
+      const responsePromises = getResponsePromises(
+        action,
+        config,
+        pendingRequests,
+      );
 
       return Promise.all(responsePromises)
-        .catch(error => {
-          if (
-            error !== 'REQUEST_ABORTED' &&
-            action.meta &&
-            action.meta.getError
-          ) {
-            error = action.meta.getError(error);
-          }
-
-          if (
-            error !== 'REQUEST_ABORTED' &&
-            action.meta &&
-            action.meta.onError
-          ) {
-            action.meta.onError(error, action, store);
-          }
-
-          if (
-            error !== 'REQUEST_ABORTED' &&
-            config.onError &&
-            (!action.meta || action.meta.runOnError !== false)
-          ) {
-            return Promise.all([config.onError(error, action, store)]);
-          }
-
-          throw error;
-        })
+        .catch(error => maybeCallGetError(action, error))
+        .catch(error =>
+          maybeCallOnErrorInterceptor(action, config, store, error),
+        )
+        .catch(error => maybeCallOnErrorMeta(action, store, error))
+        .catch(error =>
+          maybeCallOnAbortInterceptor(action, config, store, error),
+        )
+        .catch(error => maybeCallOnAbortMeta(action, store, error))
         .catch(error => {
           if (error === 'REQUEST_ABORTED') {
-            if (
-              config.onAbort &&
-              (!action.meta || action.meta.runOnAbort !== false)
-            ) {
-              config.onAbort(action, store);
-            }
-
-            if (action.meta && action.meta.onAbort) {
-              action.meta.onAbort(action, store);
-            }
-
             const abortAction = createAbortAction(action);
 
             if (!action.meta || !action.meta.silent) {
@@ -164,54 +274,13 @@ const createSendRequestMiddleware = config => {
           throw { action: errorAction, error };
         })
         .then(response => {
-          response =
-            isBatchedRequest &&
-            (!action.meta ||
-              (!action.meta.cacheResponse && !action.meta.ssrResponse))
-              ? response.reduce(
-                  (prev, current) => {
-                    prev.data.push(current.data);
-                    return prev;
-                  },
-                  { data: [] },
-                )
-              : response[0];
-
-          if (
-            action.meta &&
-            !action.meta.cacheResponse &&
-            !action.meta.ssrResponse &&
-            action.meta.getData
-          ) {
-            const query = getQuery(store.getState(), {
-              type: action.type,
-              requestKey: action.meta && action.meta.requestKey,
-            });
-
-            return {
-              ...response,
-              data: action.meta.getData(response.data, query.data),
-            };
-          }
-
-          return response;
+          response = maybeTransformBatchRequestResponse(action, response);
+          return maybeCallGetData(action, store, response);
         })
-        .then(response => {
-          if (action.meta && action.meta.onSuccess) {
-            action.meta.onSuccess(response, action, store);
-          }
-
-          if (
-            config.onSuccess &&
-            (!action.meta || action.meta.runOnSuccess !== false) &&
-            (!action.meta ||
-              (!action.meta.cacheResponse && !action.meta.ssrResponse))
-          ) {
-            return config.onSuccess(response, action, store);
-          }
-
-          return response;
-        })
+        .then(response =>
+          maybeCallOnSuccessInterceptor(action, config, store, response),
+        )
+        .then(response => maybeCallOnSuccessMeta(action, store, response))
         .then(response => {
           const successAction = createSuccessAction(action, response);
 
