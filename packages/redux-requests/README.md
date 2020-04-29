@@ -876,17 +876,13 @@ function onSuccess(response, action, store) {
   return response;
 }
 
-// TODO:
-function onErrorSaga(error, action, store) {
+async function onError(error, action, store) {
   // do sth here, like dispatch some action
 
   // you must throw error in case you dont want to catch error
   // or return response as { data } if you want to recover from error
 
   if (tokenExpired(error)) {
-    // get driver instance, in our case Axios to make a request without Redux
-    const requestInstance = yield getRequestInstance();
-
     try {
       // trying to get a new token, we use axios directly not to touch redux
       const { data } = await axios.post('/refreshToken');
@@ -895,29 +891,25 @@ function onErrorSaga(error, action, store) {
 
       // we fire the same request again:
       // - with silent: true not to dispatch duplicated actions
+      const newResponse = await store.dispatch({
+        ...action,
+        meta: {
+          ...action.meta,
+          silent: true,
+        },
+      });
 
-      return yield call(sendRequest, action, { silent: true });
-
-      /* above is a handy shortcut of doing
-      const { response, error } = yield call(
-        sendRequest,
-        action,
-        { silent: true },
-      );
-
-      if (response) {
-        return { response };
-      } else {
-        return { error };
-      } */
+      if (newResponse.data) {
+        return { data: newResponse.data };
+      }
     } catch(e) {
       // we didnt manage to get a new token
-      return { error: e }
+      throw error;
     }
   }
 
   // not related token error, we pass it like nothing happened
-  return { error };
+  throw error;
 }
 
 function onAbort(action, store) {
@@ -926,36 +918,12 @@ function onAbort(action, store) {
 
 handleRequests({
   driver: createDriver(axios),
-  onRequest: onRequest,
-  onSuccess: onSuccess,
-  onError: onError,
-  onAbort: onAbort,
+  onRequest,
+  onSuccess,
+  onError,
+  onAbort,
 );
 ```
-
-If you need to use `sendRequest` in an interceptor, be aware of an additional options you
-can pass to it:
-```js
-yield call(sendRequest, action, {
-  silent: true,
-  runOnRequest: false,
-  runOnSuccess: false,
-  runOnError: false,
-  runOnAbort: false,
-});
-```
-Generally, use `silent` if you don't want to dispatch actions for a given request.
-The rest options is to disable given interceptors for a given request. By default `silent` is `false`,
-which simply means that `sendRequests` will dispatch Redux actions. The rest is slightly more dynamic:
-- if a request is sent not from an interceptor, all interceptors will be run
-- if you use `sendRequest` in `onRequest` interceptor, `runOnRequest` is set to `false`
-- if you use `sendRequest` in `onSuccess` interceptor, `runOnSuccess` and `runOnError` are set to `false`
-- if you use `sendRequest` in `onError` interceptor, `runOnError` is set to `false`
-- if you use `sendRequest` in `onAbort` interceptor, `runOnAbort` is set to `false`
-
-Those defaults are set to meet most use cases without the need to worry about disabling proper interceptors manually.
-For example, if you use `sendRequest` in `onRequest` interceptor, you might end up with inifinite loop when `runOnRequest` was true.
-If your use case vary though, you can always overwrite this behaviour by `runOn...` options.
 
 ## FSA [:arrow_up:](#table-of-content)
 
