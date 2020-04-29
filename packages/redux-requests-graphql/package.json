@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "axios": ">=0.16.0",
-    "extract-files": "7.0.0"
+    "extract-files": "8.1.0"
   },
   "devDependencies": {
     "@babel/cli": "7.8.4",
