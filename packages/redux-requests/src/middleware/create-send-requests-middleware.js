@@ -31,10 +31,11 @@ const isActionRehydrated = action =>
 
 // TODO: remove to more functional style, we need object maps and filters
 const abortPendingRequests = (action, pendingRequests) => {
-  const clearAll = !action.requests;
-  const keys = !clearAll && getKeys(action.requests);
+  const payload = getActionPayload(action);
+  const clearAll = !payload.requests;
+  const keys = !clearAll && getKeys(payload.requests);
 
-  if (!action.requests) {
+  if (!payload.requests) {
     Object.values(pendingRequests).forEach(requests =>
       requests.forEach(r => r.cancel()),
     );
@@ -53,13 +54,15 @@ const isTakeLatest = (action, config) =>
     : config.takeLatest;
 
 const maybeCallOnRequestInterceptor = (action, config, store) => {
+  const payload = getActionPayload(action);
+
   if (
     config.onRequest &&
     (!action.meta || action.meta.runOnRequest !== false)
   ) {
     return {
       ...action,
-      request: config.onRequest(action.request, action, store),
+      request: config.onRequest(payload.request, action, store),
     };
   }
 
@@ -67,10 +70,12 @@ const maybeCallOnRequestInterceptor = (action, config, store) => {
 };
 
 const maybeCallOnRequestMeta = (action, store) => {
+  const payload = getActionPayload(action);
+
   if (action.meta && action.meta.onRequest) {
     return {
       ...action,
-      request: action.meta.onRequest(action.request, action, store),
+      request: action.meta.onRequest(payload.request, action, store),
     };
   }
 
@@ -225,9 +230,11 @@ const createSendRequestMiddleware = config => {
   const pendingRequests = {};
 
   return store => next => action => {
+    const payload = getActionPayload(action);
+
     if (
       action.type === ABORT_REQUESTS ||
-      (action.type === RESET_REQUESTS && action.abortPending)
+      (action.type === RESET_REQUESTS && payload.abortPending)
     ) {
       abortPendingRequests(action, pendingRequests);
       return next(action);
