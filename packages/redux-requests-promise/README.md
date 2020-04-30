@@ -11,15 +11,17 @@ Promise driver to Redux - addon to simplify handling of AJAX requests.
 ## Installation
 
 To install the package, just run:
-```
-$ npm install @redux-requests/promise
+
+```bash
+npm install @redux-requests/promise
 ```
 
 ## Usage
 
-This driver is useful, when you use an API library, which use promises.
+This driver is useful when you work directly with promises.
 
 For instance, you could do something like that:
+
 ```js
 import { createDriver } from '@redux-requests/promise';
 
@@ -38,8 +40,8 @@ const fetchPhoto = id => ({
 });
 ```
 
-`AbortController` is optional, by default is will use `AbortController` is available,
-with fallback to `DummyAbortController` which does nothing. If your invironment doesn't
+`AbortController` is optional, by default it will use `AbortController` if available,
+with fallback to `DummyAbortController` which does nothing. If your environment doesn't
 support `AbortController`, you could pass a [polyfill](https://github.com/mo/abortcontroller-polyfill).
 If you don't, requests abort won't work.
 
@@ -47,10 +49,10 @@ If you don't, requests abort won't work.
 it is useful if your promises resolve to more things than `data`, then you could for instance use
 `response =>  ({ data: response.data })`
 
-For usage, see [redux-saga-requests docs](https://github.com/klis87/redux-requests).
+For usage, see [redux-requests docs](https://github.com/klis87/redux-requests).
 
 Also note, that for mutations you need to pass `meta.asMutation: true` in your request actions,
-so core library could know whether a request is a query or a mutation.
+so the core library could know whether a request is a query or a mutation.
 
 ## Licence
 
