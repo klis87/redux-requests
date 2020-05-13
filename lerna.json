@@ -4,7 +4,13 @@
   "useWorkspaces": true,
   "command": {
     "publish": {
-      "ignoreChanges": ["**/node_modules/**"]
+      "ignoreChanges": [
+        "node_modules/**",
+        "packages/*/node_modules/**",
+        "packages/*/dist/**",
+        "packages/*/es/**",
+        "packages/*/lib/**"
+      ]
     }
   }
 }
