@@ -297,7 +297,13 @@ const createSendRequestMiddleware = config => {
 
           return { action: successAction, ...response };
         })
-        .catch(error => error);
+        .catch(error => {
+          if (error && error.action) {
+            return error;
+          }
+
+          throw error;
+        });
     }
 
     return next(action);

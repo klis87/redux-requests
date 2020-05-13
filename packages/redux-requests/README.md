@@ -402,6 +402,10 @@ Anyway, promise is resolved on response as:
 
 So `action` is always there in case you need an access to response action.
 
+Actually there is one case then promise is rejected - a syntax error. Imagine you make an error
+in `getData` or `onSuccess` interceptor. In those cases promise will be rejected with syntax error itself,
+otherwise the error would be swallowed and you wouldn't know where a problem is.
+
 ### Mutations and data updates
 
 Like you probably remember, mutations are requests to cause a side effect, in the contracts to queries which

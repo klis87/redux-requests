@@ -524,5 +524,24 @@ describe('middleware', () => {
         abortAction,
       ]);
     });
+
+    it('dispatches requests and rejects on success but with getData syntax error', async () => {
+      const requestAction = {
+        type: 'REQUEST',
+        request: { response: { data: 'data' } },
+        meta: {
+          getData: data => data.map(v => v), // error
+        },
+      };
+
+      const { dispatch, getActions } = mockStore({
+        requests: { queries: {}, mutations: {} },
+      });
+      const result = dispatch(requestAction);
+      await expect(result).rejects.toThrow(
+        new Error('data.map is not a function'),
+      );
+      expect(getActions()).toEqual([requestAction]);
+    });
   });
 });
