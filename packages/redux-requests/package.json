@@ -1,6 +1,6 @@
 {
   "name": "@redux-requests/core",
-  "version": "0.28.1",
+  "version": "0.28.2",
   "description": "Redux addon to simplify AJAX requests",
   "main": "lib/index.js",
   "module": "es/index.js",
