@@ -1,6 +1,6 @@
 {
   "name": "@redux-requests/promise",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Promise driver for Redux-Requests, Redux addon to simplify AJAX requests",
   "main": "lib/index.js",
   "module": "es/index.js",
