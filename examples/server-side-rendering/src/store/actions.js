@@ -28,6 +28,7 @@ export const fetchBooks = () => ({
     // normalize: true,
     onSuccess: (response, action, store) => {
       store.dispatch(fetchBooksScreeningActors(response.data.map(v => v.id)));
+      return response;
     },
   },
 });
