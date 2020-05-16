@@ -507,7 +507,7 @@ dispatch(resetRequests([FETCH_BOOKS, { requestType: FETCH_BOOK, requestKey: '1' 
 What is important, `resetRequests` apart from reset also aborts all pending requests of the given types.
 You can prevent it by passing 2nd argument `dispatch(resetRequests([FETCH_BOOKS], false))`
 
-Also note that `resetRequests` also clears cache if set.
+Also note that `resetRequests` also set query `pristine` to `true` and clears cache if set.
 
 ### abortRequests
 
@@ -543,6 +543,7 @@ const booksQuery = getQuery(state, { type: 'FETCH_BOOKS' });
   data: [{ id: '1', name: 'Some book title' }],
   loading: false,
   error: null,
+  pristine: false, // true only when there was no request made for a give type
 } */
 ```
 

@@ -79,16 +79,20 @@ const createQuerySelector = (type, requestKey) =>
   createCustomSelector(
     (state, defaultData, multiple) => {
       // in order not to keep queryState.ref reference in selector memoize
-      const { data, pending, error, normalized, usedKeys } = getQueryState(
-        state,
-        type,
-        requestKey,
-      );
+      const {
+        data,
+        pending,
+        error,
+        pristine,
+        normalized,
+        usedKeys,
+      } = getQueryState(state, type, requestKey);
 
       return {
         data,
         pending,
         error,
+        pristine,
         normalized,
         usedKeys,
         multiple,
@@ -100,6 +104,7 @@ const createQuerySelector = (type, requestKey) =>
       data,
       pending,
       error,
+      pristine,
       usedKeys,
       normalized,
       normalizedData,
@@ -115,6 +120,7 @@ const createQuerySelector = (type, requestKey) =>
         : getData(data, multiple, defaultData),
       loading: pending > 0,
       error,
+      pristine,
     }),
   );
 
@@ -122,6 +128,7 @@ const defaultQuery = {
   data: null,
   loading: false,
   error: null,
+  pristine: true,
 };
 
 const defaultQueryMultiple = {

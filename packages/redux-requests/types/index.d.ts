@@ -114,6 +114,7 @@ export interface QueryState<QueryStateData> {
   data: QueryStateData;
   error: any;
   loading: boolean;
+  pristine: boolean;
 }
 
 export function getQuery<QueryStateData = any>(

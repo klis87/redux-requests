@@ -9,6 +9,7 @@ describe('selectors', () => {
             pending: 1,
             error: null,
             data: 'data',
+            pristine: false,
             normalized: false,
             ref: {},
           },
@@ -16,6 +17,7 @@ describe('selectors', () => {
             pending: 0,
             error: null,
             data: ['@@1', '@@2'],
+            pristine: false,
             normalized: true,
             usedKeys: { '': ['id', 'x'] },
             ref: {},
@@ -24,6 +26,7 @@ describe('selectors', () => {
             pending: 0,
             error: null,
             data: '@@3',
+            pristine: false,
             normalized: true,
             usedKeys: {
               '': ['id', 'nested'],
@@ -36,6 +39,7 @@ describe('selectors', () => {
             pending: 1,
             error: null,
             data: 'data2',
+            pristine: false,
             normalized: false,
             ref: {},
           },
@@ -43,6 +47,7 @@ describe('selectors', () => {
             pending: 1,
             error: null,
             data: 'data3',
+            pristine: false,
             normalized: false,
             ref: {},
           },
@@ -68,6 +73,7 @@ describe('selectors', () => {
         data: null,
         loading: false,
         error: null,
+        pristine: true,
       });
     });
 
@@ -81,6 +87,7 @@ describe('selectors', () => {
         data: [],
         loading: false,
         error: null,
+        pristine: true,
       });
     });
 
@@ -94,6 +101,7 @@ describe('selectors', () => {
         data: {},
         loading: false,
         error: null,
+        pristine: true,
       });
     });
 
@@ -108,6 +116,7 @@ describe('selectors', () => {
         data: 'data',
         loading: true,
         error: null,
+        pristine: false,
       });
     });
 
@@ -116,6 +125,7 @@ describe('selectors', () => {
         data: 'data2',
         loading: true,
         error: null,
+        pristine: false,
       });
     });
 
@@ -149,6 +159,7 @@ describe('selectors', () => {
         ],
         loading: false,
         error: null,
+        pristine: false,
       });
     });
 
@@ -191,6 +202,7 @@ describe('selectors', () => {
         ],
         loading: false,
         error: null,
+        pristine: false,
       });
       expect(query2).toEqual({
         data: [
@@ -199,6 +211,7 @@ describe('selectors', () => {
         ],
         loading: false,
         error: null,
+        pristine: false,
       });
     });
 
@@ -244,6 +257,7 @@ describe('selectors', () => {
         ],
         loading: false,
         error: null,
+        pristine: false,
       });
       expect(query2).toBe(query);
     });

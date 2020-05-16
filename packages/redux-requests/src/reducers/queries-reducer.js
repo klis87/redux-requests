@@ -16,6 +16,7 @@ const getInitialQuery = normalized => ({
   data: null,
   pending: 0,
   error: null,
+  pristine: true,
   ref: {},
   normalized,
   usedKeys: normalized ? {} : null,
@@ -87,6 +88,7 @@ const queryReducer = (state, action, actionType, config, normalizedData) => {
             ...state,
             pending: state.pending + 1,
             error: null,
+            pristine: false,
           };
   }
 };

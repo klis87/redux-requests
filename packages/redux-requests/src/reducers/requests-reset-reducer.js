@@ -14,6 +14,7 @@ const resetQuery = query => ({
   ...query,
   data: null,
   error: null,
+  pristine: true,
   usedKeys: query.normalized ? {} : null,
 });
 
