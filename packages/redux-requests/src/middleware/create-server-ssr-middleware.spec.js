@@ -21,19 +21,29 @@ describe('middleware', () => {
     const successAction = createSuccessAction(requestAction, 'data');
     const errorAction = createErrorAction(requestAction, 'error');
 
-    it('dispatches END and rejects promise on error response', async () => {
+    it('rejects promise on error response', async () => {
       const requestsPromise = defer();
       const mockStore = configureStore([
         createServerSsrMiddleware(requestsPromise),
       ]);
       const store = mockStore({});
-      const result = store.dispatch(errorAction);
-      expect(result).toBe(errorAction);
-      expect(store.getActions()).toEqual([errorAction]);
-      await expect(requestsPromise).rejects.toBe(errorAction);
+      store.dispatch(requestAction);
+      store.dispatch(requestAction);
+      store.dispatch(successAction);
+      store.dispatch(errorAction);
+      expect(store.getActions()).toEqual([
+        requestAction,
+        requestAction,
+        successAction,
+        errorAction,
+      ]);
+      await expect(requestsPromise).rejects.toEqual({
+        successActions: [successAction],
+        errorActions: [errorAction],
+      });
     });
 
-    it('dispatches END and resolves promise on finished successful requests', async () => {
+    it('resolves promise on finished successful requests', async () => {
       const requestsPromise = defer();
       const mockStore = configureStore([
         createServerSsrMiddleware(requestsPromise),
@@ -98,6 +108,138 @@ describe('middleware', () => {
         secondResponseAction,
         thirdResponseAction,
       ]);
+    });
+
+    it('supports dependent actions when first one fails', async () => {
+      const requestsPromise = defer();
+      const mockStore = configureStore([
+        createServerSsrMiddleware(requestsPromise),
+      ]);
+      const store = mockStore({});
+      const firstRequestAction = {
+        type: 'REQUEST',
+        request: { url: '/' },
+        meta: { dependentRequestsNumber: 2 },
+      };
+      // const secondRequestAction = {
+      //   type: 'REQUEST2',
+      //   request: { url: '/' },
+      //   meta: { isDependentRequest: true },
+      // };
+      // const thirdRequestAction = {
+      //   type: 'REQUEST3',
+      //   request: { url: '/' },
+      //   meta: { isDependentRequest: true },
+      // };
+      const firsErrorAction = createErrorAction(firstRequestAction);
+      // const secondResponseAction = createSuccessAction(secondRequestAction);
+      // const thirdResponseAction = createSuccessAction(thirdRequestAction);
+      store.dispatch(firstRequestAction);
+      store.dispatch(firsErrorAction);
+      // store.dispatch(secondRequestAction);
+      // store.dispatch(thirdRequestAction);
+      // store.dispatch(secondResponseAction);
+      // store.dispatch(thirdResponseAction);
+      expect(store.getActions()).toEqual([
+        firstRequestAction,
+        firsErrorAction,
+        // secondRequestAction,
+        // thirdRequestAction,
+        // secondResponseAction,
+        // thirdResponseAction,
+      ]);
+      await expect(requestsPromise).rejects.toEqual({
+        successActions: [],
+        errorActions: [firsErrorAction],
+      });
+    });
+
+    it('supports dependent actions when 3rd action failes', async () => {
+      const requestsPromise = defer();
+      const mockStore = configureStore([
+        createServerSsrMiddleware(requestsPromise),
+      ]);
+      const store = mockStore({});
+      const firstRequestAction = {
+        type: 'REQUEST',
+        request: { url: '/' },
+        meta: { dependentRequestsNumber: 2 },
+      };
+      const secondRequestAction = {
+        type: 'REQUEST2',
+        request: { url: '/' },
+        meta: { isDependentRequest: true },
+      };
+      const thirdRequestAction = {
+        type: 'REQUEST3',
+        request: { url: '/' },
+        meta: { isDependentRequest: true },
+      };
+      const firsResponseAction = createSuccessAction(firstRequestAction);
+      const secondResponseAction = createSuccessAction(secondRequestAction);
+      const thirdErrorAction = createErrorAction(thirdRequestAction);
+      store.dispatch(firstRequestAction);
+      store.dispatch(firsResponseAction);
+      store.dispatch(secondRequestAction);
+      store.dispatch(thirdRequestAction);
+      store.dispatch(secondResponseAction);
+      store.dispatch(thirdErrorAction);
+      expect(store.getActions()).toEqual([
+        firstRequestAction,
+        firsResponseAction,
+        secondRequestAction,
+        thirdRequestAction,
+        secondResponseAction,
+        thirdErrorAction,
+      ]);
+      await expect(requestsPromise).rejects.toEqual({
+        successActions: [firsResponseAction, secondResponseAction],
+        errorActions: [thirdErrorAction],
+      });
+    });
+
+    it('supports dependent actions 1 => 2 => 3 when 2nd fails', async () => {
+      const requestsPromise = defer();
+      const mockStore = configureStore([
+        createServerSsrMiddleware(requestsPromise),
+      ]);
+      const store = mockStore({});
+      const firstRequestAction = {
+        type: 'REQUEST',
+        request: { url: '/' },
+        meta: { dependentRequestsNumber: 1 },
+      };
+      const secondRequestAction = {
+        type: 'REQUEST2',
+        request: { url: '/' },
+        meta: { isDependentRequest: true, dependentRequestsNumber: 1 },
+      };
+      // const thirdRequestAction = {
+      //   type: 'REQUEST3',
+      //   request: { url: '/' },
+      //   meta: { isDependentRequest: true },
+      // };
+      const firsResponseAction = createSuccessAction(firstRequestAction);
+      const secondErrorAction = createErrorAction(secondRequestAction);
+      // const thirdResponseAction = createSuccessAction(thirdRequestAction);
+      store.dispatch(firstRequestAction);
+      store.dispatch(firsResponseAction);
+      store.dispatch(secondRequestAction);
+      // store.dispatch(thirdRequestAction);
+      store.dispatch(secondErrorAction);
+      // store.dispatch(thirdResponseAction);
+      expect(store.getActions()).toEqual([
+        firstRequestAction,
+        firsResponseAction,
+        secondRequestAction,
+        // thirdRequestAction,
+        secondErrorAction,
+        // thirdResponseAction,
+      ]);
+      await expect(requestsPromise).rejects.toEqual({
+        successActions: [firsResponseAction],
+        errorActions: [secondErrorAction],
+      });
     });
   });
 });

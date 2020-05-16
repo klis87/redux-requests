@@ -3,7 +3,8 @@ import { isResponseAction, isSuccessAction } from '../actions';
 
 export default (requestsPromise, config = defaultConfig) => {
   let index = 0;
-  const serverSuccessActions = [];
+  const successActions = [];
+  const errorActions = [];
 
   return () => next => action => {
     if (config.isRequestAction(action)) {
@@ -12,17 +13,29 @@ export default (requestsPromise, config = defaultConfig) => {
           ? action.meta.dependentRequestsNumber + 1
           : 1;
     } else if (isResponseAction(action)) {
-      if (!isSuccessAction(action)) {
-        requestsPromise.reject(action);
-        return next(action);
-      }
+      action = next(action);
 
-      serverSuccessActions.push(action);
-      index -= action.meta.isDependentRequest ? 2 : 1;
+      if (!isSuccessAction(action)) {
+        errorActions.push(action);
+        index -=
+          action.meta.dependentRequestsNumber !== undefined
+            ? action.meta.dependentRequestsNumber + 1
+            : 1;
+        index -= action.meta.isDependentRequest ? 1 : 0;
+      } else {
+        successActions.push(action);
+        index -= action.meta.isDependentRequest ? 2 : 1;
+      }
 
       if (index === 0) {
-        requestsPromise.resolve(serverSuccessActions);
+        if (errorActions.length > 0) {
+          requestsPromise.reject({ successActions, errorActions });
+        } else {
+          requestsPromise.resolve(successActions);
+        }
       }
+
+      return action;
     }
 
     return next(action);

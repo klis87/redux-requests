@@ -18,6 +18,16 @@ export default (config = defaultConfig) => store => next => action => {
     requestKey: action.meta && action.meta.requestKey,
   });
 
+  if (query.error) {
+    return next({
+      ...action,
+      meta: {
+        ...action.meta,
+        ssrError: query.error,
+      },
+    });
+  }
+
   return next({
     ...action,
     meta: {

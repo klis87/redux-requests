@@ -803,6 +803,7 @@ option to `handleRequests`, which will include SSR middleware in `requestsMiddle
       .catch(e => {
         console.log('error', e);
         res.status(400).send('something went wrong');
+        // you can also render React too, like for 404 error
       });
     ```
     As you can see, compared to what you would normally do in SSR for redux app, you only need to
@@ -813,7 +814,7 @@ option to `handleRequests`, which will include SSR middleware in `requestsMiddle
     request it gets positive and after all requests are finished, its value is again set back to `0`. And this is the moment
     which means that all requests are finished and `requestsPromise` is resolved (with all success actions).
 
-    In case of any request error, `requestsPromise` will be rejected with response error action.
+    In case of any request error, `requestsPromise` will be rejected with object `{ errorActions: [], successActions: [] }`.
 
     There is also more complex case. Imagine you have a request `x`, after which you would like to dispatch
     another `y`. You cannot do it immediately because `y` requires some information from `x` response.

@@ -27,7 +27,12 @@ const getLastActionKey = action =>
   (action.meta && action.meta.requestKey ? action.meta.requestKey : '');
 
 const isActionRehydrated = action =>
-  !!(action.meta && (action.meta.cacheResponse || action.meta.ssrResponse));
+  !!(
+    action.meta &&
+    (action.meta.cacheResponse ||
+      action.meta.ssrResponse ||
+      action.meta.ssrError)
+  );
 
 // TODO: remove to more functional style, we need object maps and filters
 const abortPendingRequests = (action, pendingRequests) => {
@@ -98,6 +103,8 @@ const getResponsePromises = (action, config, pendingRequests) => {
     return [Promise.resolve(action.meta.cacheResponse)];
   } else if (action.meta && action.meta.ssrResponse) {
     return [Promise.resolve(action.meta.ssrResponse)];
+  } else if (action.meta && action.meta.ssrError) {
+    return [Promise.reject(action.meta.ssrError)];
   }
 
   const driver = getDriver(config, action);
@@ -120,7 +127,12 @@ const getResponsePromises = (action, config, pendingRequests) => {
 };
 
 const maybeCallGetError = (action, error) => {
-  if (error !== 'REQUEST_ABORTED' && action.meta && action.meta.getError) {
+  if (
+    error !== 'REQUEST_ABORTED' &&
+    !isActionRehydrated(action) &&
+    action.meta &&
+    action.meta.getError
+  ) {
     throw action.meta.getError(error);
   }
 

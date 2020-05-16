@@ -1,16 +1,8 @@
 import defaultConfig from '../default-config';
-import {
-  getRequestActionFromResponse,
-  isResponseAction,
-  isSuccessAction,
-} from '../actions';
+import { getRequestActionFromResponse, isResponseAction } from '../actions';
 
 export default (state = [], action, config = defaultConfig) => {
-  if (
-    config.ssr === 'server' &&
-    isResponseAction(action) &&
-    isSuccessAction(action)
-  ) {
+  if (config.ssr === 'server' && isResponseAction(action)) {
     return [...state, getRequestActionFromResponse(action).type];
   }
 
@@ -18,7 +10,7 @@ export default (state = [], action, config = defaultConfig) => {
     config.ssr === 'client' &&
     config.isRequestAction(action) &&
     action.meta &&
-    action.meta.ssrResponse
+    (action.meta.ssrResponse || action.meta.ssrError)
   ) {
     const indexToRemove = state.findIndex(v => v === action.type);
 
