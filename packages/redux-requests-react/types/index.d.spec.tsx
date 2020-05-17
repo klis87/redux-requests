@@ -20,6 +20,7 @@ function BasicQuery() {
         data: 'x',
         error: null,
         loading: true,
+        pristine: false,
       })}
       type="TYPE"
     >
