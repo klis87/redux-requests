@@ -1,13 +1,13 @@
 # redux-requests
 
 [![npm version](https://badge.fury.io/js/%40redux-requests%2Fcore.svg)](https://badge.fury.io/js/%40redux-requests%2Fcore)
-[![gzip size](http://img.badgesize.io/https://unpkg.com/redux-saga-requests/dist/redux-saga-requests.min.js?compression=gzip)](https://unpkg.com/redux-saga-requests)
-[![dependencies](https://david-dm.org/klis87/redux-saga-requests.svg?path=packages/redux-saga-requests)](https://david-dm.org/klis87/redux-saga-requests?path=packages/redux-saga-requests)
-[![dev dependencies](https://david-dm.org/klis87/redux-saga-requests/dev-status.svg?path=packages/redux-saga-requests)](https://david-dm.org/klis87/redux-saga-requests?path=packages/redux-saga-requests&type=dev)
-[![peer dependencies](https://david-dm.org/klis87/redux-saga-requests/peer-status.svg?path=packages/redux-saga-requests)](https://david-dm.org/klis87/redux-saga-requests?path=packages/redux-saga-requests&type=peer)
-[![Build Status](https://travis-ci.org/klis87/redux-saga-requests.svg?branch=master)](https://travis-ci.org/klis87/redux-saga-requests)
-[![Coverage Status](https://coveralls.io/repos/github/klis87/redux-saga-requests/badge.svg?branch=master)](https://coveralls.io/github/klis87/redux-saga-requests?branch=master)
-[![Known Vulnerabilities](https://snyk.io/test/github/klis87/redux-saga-requests/badge.svg)](https://snyk.io/test/github/klis87/redux-saga-requests)
+[![gzip size](http://img.badgesize.io/https://unpkg.com/@redux-requests/core/dist/redux-requests.min.js?compression=gzip)](https://unpkg.com/@redux-requests/core)
+[![dependencies](https://david-dm.org/klis87/redux-requests.svg?path=packages/redux-requests)](https://david-dm.org/klis87/redux-requests?path=packages/redux-requests)
+[![dev dependencies](https://david-dm.org/klis87/redux-requests/dev-status.svg?path=packages/redux-requests)](https://david-dm.org/klis87/redux-requests?path=packages/redux-requests&type=dev)
+[![peer dependencies](https://david-dm.org/klis87/redux-requests/peer-status.svg?path=packages/redux-requests)](https://david-dm.org/klis87/redux-requests?path=packages/redux-requests&type=peer)
+<!-- [![Build Status](https://travis-ci.org/klis87/redux-saga-requests.svg?branch=master)](https://travis-ci.org/klis87/redux-saga-requests) -->
+<!-- [![Coverage Status](https://coveralls.io/repos/github/klis87/redux-requests/badge.svg?branch=master)](https://coveralls.io/github/klis87/redux-requests?branch=master) -->
+[![Known Vulnerabilities](https://snyk.io/test/github/klis87/redux-requests/badge.svg)](https://snyk.io/test/github/klis87/redux-requests)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
@@ -145,7 +145,7 @@ To install the package, just run:
 ```
 $ npm install @redux-requests/core
 ```
-or you can just use CDN: `https://unpkg.com/redux-saga-requests`.
+or you can just use CDN: `https://unpkg.com/@redux-requests/core`.
 
 Also, you need to install a driver:
 - if you use Axios, install `axios` and `@redux-requests/axios`:
@@ -153,13 +153,13 @@ Also, you need to install a driver:
   ```
   $ npm install axios @redux-requests/axios
   ```
-  or CDN: `https://unpkg.com/redux-saga-requests-axios`.
+  or CDN: `https://unpkg.com/@redux-requests/axios`.
 - if you use Fetch API, install `isomorphic-fetch` (or a different Fetch polyfill) and `@redux-requests/fetch`:
 
   ```
   $ npm install isomorphic-fetch redux-requests/fetch
   ```
-  or CDN: `https://unpkg.com/redux-saga-requests-fetch`.
+  or CDN: `https://unpkg.com/@redux-requests/fetch`.
 
 Also, you have to install `reselect`, which probably you use anyway.
 
