@@ -6,7 +6,6 @@
     }
   },
   "plugins": [
-    ["@babel/plugin-proposal-object-rest-spread", { "loose": true }],
     [
       "@babel/plugin-transform-runtime",
       {
