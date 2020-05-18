@@ -5,8 +5,8 @@
 [![dependencies](https://david-dm.org/klis87/redux-requests.svg?path=packages/redux-requests)](https://david-dm.org/klis87/redux-requests?path=packages/redux-requests)
 [![dev dependencies](https://david-dm.org/klis87/redux-requests/dev-status.svg?path=packages/redux-requests)](https://david-dm.org/klis87/redux-requests?path=packages/redux-requests&type=dev)
 [![peer dependencies](https://david-dm.org/klis87/redux-requests/peer-status.svg?path=packages/redux-requests)](https://david-dm.org/klis87/redux-requests?path=packages/redux-requests&type=peer)
-<!-- [![Build Status](https://travis-ci.org/klis87/redux-saga-requests.svg?branch=master)](https://travis-ci.org/klis87/redux-saga-requests) -->
-<!-- [![Coverage Status](https://coveralls.io/repos/github/klis87/redux-requests/badge.svg?branch=master)](https://coveralls.io/github/klis87/redux-requests?branch=master) -->
+[![Build Status](https://travis-ci.org/klis87/redux-requests.svg?branch=master)](https://travis-ci.org/klis87/redux-requests)
+[![Coverage Status](https://coveralls.io/repos/github/klis87/redux-requests/badge.svg?branch=master)](https://coveralls.io/github/klis87/redux-requests?branch=master)
 [![Known Vulnerabilities](https://snyk.io/test/github/klis87/redux-requests/badge.svg)](https://snyk.io/test/github/klis87/redux-requests)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
