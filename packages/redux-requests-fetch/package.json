@@ -26,8 +26,8 @@
     "test": "jest src",
     "test:cover": "jest --coverage src",
     "test-types": "tsc types/index.d.spec.ts --noEmit --lib es2015",
-    "build:commonjs": "cross-env BABEL_ENV=test babel src --out-dir lib --ignore 'src/**/*.spec.js'",
-    "build:es": "cross-env babel src --out-dir es --ignore 'src/**/*.spec.js'",
+    "build:commonjs": "cross-env BABEL_ENV=cjs babel src --out-dir lib --ignore 'src/**/*.spec.js'",
+    "build:es": "babel src --out-dir es --ignore 'src/**/*.spec.js'",
     "build:umd": "webpack --mode development -o dist/redux-requests-fetch.js",
     "build:umd:min": "webpack --mode production -o dist/redux-requests-fetch.min.js",
     "build": "npm-run-all clean -p build:commonjs build:es build:umd build:umd:min",
@@ -35,7 +35,6 @@
     "prepublish": "yarn run build"
   },
   "dependencies": {
-    "@babel/runtime": "^7.2.0",
     "axios": ">=0.16.0"
   },
   "peerDependencies": {
@@ -44,7 +43,6 @@
   "devDependencies": {
     "@babel/cli": "7.8.4",
     "@babel/core": "7.9.6",
-    "@babel/plugin-transform-runtime": "7.9.6",
     "@babel/preset-env": "7.9.6",
     "babel-jest": "25.1.0",
     "babel-loader": "8.1.0",

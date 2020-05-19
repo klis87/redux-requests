@@ -26,7 +26,7 @@
     "test": "jest src",
     "test:cover": "jest --coverage src",
     "test-types": "tsc types/index.d.spec.ts --noEmit --lib es2015",
-    "build:commonjs": "cross-env BABEL_ENV=test babel src --out-dir lib --ignore 'src/**/*.spec.js'",
+    "build:commonjs": "cross-env BABEL_ENV=cjs babel src --out-dir lib --ignore 'src/**/*.spec.js'",
     "build:es": "cross-env babel src --out-dir es --ignore 'src/**/*.spec.js'",
     "build:umd": "webpack --mode development -o dist/redux-requests-axios.js",
     "build:umd:min": "webpack --mode production -o dist/redux-requests-axios.min.js",

@@ -4,21 +4,20 @@
     "@babel/preset-react"
   ],
   "env": {
-    "test": {
+    "cjs": {
       "presets": [
         ["@babel/preset-env", { "loose": true }],
+        "@babel/preset-react"
+      ]
+    },
+    "test": {
+      "presets": [
+        ["@babel/preset-env", { "loose": true, "targets": {"node": "current"} } ],
         "@babel/preset-react"
       ]
     }
   },
   "plugins": [
-    [
-      "@babel/plugin-transform-runtime",
-      {
-        "corejs": false,
-        "helpers": true,
-        "regenerator": true
-      }
-    ],
-    ["transform-react-remove-prop-types", { "mode": "wrap"} ]]
+    ["transform-react-remove-prop-types", { "mode": "wrap"} ]
+  ]
 }
