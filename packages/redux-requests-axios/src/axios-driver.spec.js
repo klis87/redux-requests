@@ -16,7 +16,7 @@ describe('axiosDriver', () => {
     const axiosDriver = createDriver(axiosInstance);
     axios.CancelToken.source.mockReturnValue(tokenSource);
 
-    const responsePromise = axiosDriver({ url: '/' }, { token: 'token' });
+    const responsePromise = axiosDriver({ url: '/' });
 
     await expect(responsePromise).resolves.toEqual({ data: 'data' });
     expect(axiosInstance).toHaveBeenLastCalledWith({
