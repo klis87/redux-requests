@@ -19,48 +19,42 @@ or you can just use CDN: `https://unpkg.com/@redux-requests/mock`.
 ## Usage
 
 Probably you are sometimes in a situation when you would like to start working on a feature which needs some integration with
-an API. What you can do then? Probably you just wait or start writing some prototype which then you will polish once API is finished. You can do better with `@redux-requests/mock`, especially with multi driver support, which you can read about in the
-next paragraph. With this driver, you can define expected responses and errors which you would get from server and write your app
+an API. What you can do then? Probably you just wait or start writing some prototype which then you will polish once API is finished. You can do better with `@redux-requests/mock`, especially with multi driver support.
+With this driver, you can define expected responses and errors which you would get from server and write your app
 normally. Then, after API is finished, you will just need to replace the driver with a real one, like Axios or Fetch API, without
 any additional refactoring necessary, which could save you a lot of time!
 
 You can use it like this:
 ```js
-import { createRequestInstance, watchRequests } from '@redux-requests/core';
+import { handleRequests } from '@redux-requests/core';
 import { createDriver } from '@redux-requests/mock';
 
 const FETCH_PHOTO = 'FETCH_PHOTO';
+const FETCH_PHOTO_ERROR = 'FETCH_PHOTO_ERROR';
 
 const fetchPhoto = id => ({
   type: FETCH_PHOTO,
-  request: { url: `/photos/${id}` },
+  request: {
+    response: {
+      data: {
+        id,
+        title: 'accusamus beatae ad facilis cum similique qui sunt',
+      },
+    },
+  },
+});
+
+const fetchPhotoError = id => ({
+  type: FETCH_PHOTO_ERROR,
+  request: {
+    error: { status: 404 },
+  },
 });
 
 handleRequests({
-  driver: createDriver(
-    {
-      [FETCH_PHOTO]: requestConfig => {
-        // mock normal response for id 1 and 404 error fot the rest
-        const id = requestConfig.url.split('/')[2];
-
-        if (id === '1') {
-          return {
-            data: {
-              albumId: 1,
-              id: 1,
-              title: 'accusamus beatae ad facilis cum similique qui sunt',
-            },
-          };
-        }
-
-        throw { status: 404 };
-      },
-    },
-    {
-      timeout: 1000, // optional, in ms, defining how much time mock request would take, useful for testing spinners
-      getDataFromResponse: response => response.data // optional, if you mock Axios or Fetch API, you dont need to worry about it
-    },
-  ),
+  driver: createDriver({
+    timeout: 1000, // optional, in ms, defining how much time mock request would take, useful for testing spinners
+  }),
 });
 ```
 

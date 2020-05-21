@@ -66,7 +66,9 @@ export const isRequestAction = action => {
       Array.isArray(actionPayload.request) ||
       actionPayload.request.url ||
       actionPayload.request.query ||
-      actionPayload.request.promise
+      actionPayload.request.promise ||
+      actionPayload.request.response ||
+      actionPayload.request.error
     ) &&
     !actionPayload.response &&
     !(actionPayload instanceof Error)

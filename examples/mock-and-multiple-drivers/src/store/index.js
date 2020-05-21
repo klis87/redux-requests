@@ -14,28 +14,7 @@ export const configureStore = () => {
           baseURL: 'https://jsonplaceholder.typicode.com',
         }),
       ),
-      mock: createMockDriver(
-        {
-          [FETCH_PHOTO]: requestConfig => {
-            const id = requestConfig.url.split('/')[2];
-
-            if (id === '1') {
-              return {
-                data: {
-                  albumId: 1,
-                  id: 1,
-                  title: 'accusamus beatae ad facilis cum similique qui sunt',
-                  url: 'https://via.placeholder.com/600/92c952',
-                  thumbnailUrl: 'https://via.placeholder.com/150/92c952',
-                },
-              };
-            }
-
-            throw { status: 404 };
-          },
-        },
-        { timeout: 1000 },
-      ),
+      mock: createMockDriver({ timeout: 1000 }),
     },
   });
   const reducers = combineReducers({

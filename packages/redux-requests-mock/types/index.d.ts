@@ -4,7 +4,4 @@ interface MockDriverConfig {
   timeout?: number;
 }
 
-export const createDriver: (
-  mockInstance: any,
-  mockDriverConfig?: MockDriverConfig,
-) => Driver;
+export const createDriver: (mockDriverConfig?: MockDriverConfig) => Driver;
