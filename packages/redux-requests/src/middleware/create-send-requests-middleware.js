@@ -65,9 +65,19 @@ const maybeCallOnRequestInterceptor = (action, config, store) => {
     config.onRequest &&
     (!action.meta || action.meta.runOnRequest !== false)
   ) {
+    if (action.request) {
+      return {
+        ...action,
+        request: config.onRequest(payload.request, action, store),
+      };
+    }
+
     return {
       ...action,
-      request: config.onRequest(payload.request, action, store),
+      payload: {
+        ...action.payload,
+        request: config.onRequest(payload.request, action, store),
+      },
     };
   }
 
@@ -78,9 +88,19 @@ const maybeCallOnRequestMeta = (action, store) => {
   const payload = getActionPayload(action);
 
   if (action.meta && action.meta.onRequest) {
+    if (action.request) {
+      return {
+        ...action,
+        request: action.meta.onRequest(payload.request, action, store),
+      };
+    }
+
     return {
       ...action,
-      request: action.meta.onRequest(payload.request, action, store),
+      payload: {
+        ...action.payload,
+        request: action.meta.onRequest(payload.request, action, store),
+      },
     };
   }
 
