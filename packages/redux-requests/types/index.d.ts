@@ -31,6 +31,7 @@ interface RequestActionMeta {
   revertedData?: any;
   localData?: any;
   cache?: boolean | number;
+  cacheKey?: string;
   dependentRequestsNumber?: number;
   isDependentRequest?: boolean;
   silent?: boolean;

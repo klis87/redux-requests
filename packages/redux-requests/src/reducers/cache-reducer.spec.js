@@ -6,9 +6,9 @@ import cacheReducer from './cache-reducer';
 describe('reducers', () => {
   describe('cacheReducer', () => {
     const defaultState = {
-      QUERY: null,
-      QUERY2: null,
-      QUERY3: null,
+      QUERY: { timeout: null, cacheKey: undefined },
+      QUERY2: { timeout: null, cacheKey: undefined },
+      QUERY3: { timeout: null, cacheKey: undefined },
     };
 
     it('clears the whole cache for clearRequestsCache action', () => {
@@ -20,7 +20,7 @@ describe('reducers', () => {
         expect(
           cacheReducer(defaultState, clearRequestsCache('QUERY', 'QUERY2')),
         ).toEqual({
-          QUERY3: null,
+          QUERY3: { timeout: null, cacheKey: undefined },
         }),
       );
     });
@@ -68,7 +68,10 @@ describe('reducers', () => {
             { data: 'data' },
           ),
         ),
-      ).toEqual({ ...defaultState, QUERY4: null });
+      ).toEqual({
+        ...defaultState,
+        QUERY4: { timeout: null, cacheKey: undefined },
+      });
     });
 
     it('populates cache with timeout for response action with server data', () => {
@@ -82,7 +85,10 @@ describe('reducers', () => {
               { data: 'data' },
             ),
           ),
-        ).toEqual({ ...defaultState, QUERY4: Date.now() + 1000 });
+        ).toEqual({
+          ...defaultState,
+          QUERY4: { timeout: Date.now() + 1000, cacheKey: undefined },
+        });
       } finally {
         clear();
       }

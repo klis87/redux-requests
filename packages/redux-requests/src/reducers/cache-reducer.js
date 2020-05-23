@@ -4,7 +4,7 @@ import { isSuccessAction, getRequestActionFromResponse } from '../actions';
 const getNewCacheTimeout = cache =>
   cache === true ? null : cache * 1000 + Date.now();
 
-const getCacheKey = action => action.type + (action.meta.requestKey || '');
+const getKey = action => action.type + (action.meta.requestKey || '');
 
 export default (state, action) => {
   if (action.type === CLEAR_REQUESTS_CACHE) {
@@ -30,7 +30,10 @@ export default (state, action) => {
 
     return {
       ...state,
-      [getCacheKey(requestAction)]: getNewCacheTimeout(action.meta.cache),
+      [getKey(requestAction)]: {
+        timeout: getNewCacheTimeout(action.meta.cache),
+        cacheKey: action.meta.cacheKey,
+      },
     };
   }
 

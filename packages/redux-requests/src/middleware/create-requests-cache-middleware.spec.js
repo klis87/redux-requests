@@ -30,7 +30,7 @@ describe('middleware', () => {
       const store = mockStore({
         requests: {
           queries: { REQUEST: { ref: {}, data: 'data' } },
-          cache: { REQUEST: null },
+          cache: { REQUEST: { timeout: null, cacheKey: undefined } },
         },
       });
       const action = {
@@ -55,7 +55,7 @@ describe('middleware', () => {
         const store = mockStore({
           requests: {
             queries: { REQUEST: { ref: {}, data: 'data' } },
-            cache: { REQUEST: Date.now() },
+            cache: { REQUEST: { cacheKey: undefined, timeout: Date.now() } },
           },
         });
         const action = {
@@ -83,7 +83,7 @@ describe('middleware', () => {
         const store = mockStore({
           requests: {
             queries: { REQUEST: { ref: {}, data: 'data' } },
-            cache: { REQUEST: Date.now() },
+            cache: { REQUEST: { cacheKey: undefined, timeout: Date.now() } },
           },
         });
         const action = {

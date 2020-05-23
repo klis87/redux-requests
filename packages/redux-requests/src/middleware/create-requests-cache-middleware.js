@@ -1,9 +1,11 @@
 import defaultConfig from '../default-config';
 import { getQuery } from '../selectors';
 
-const isCacheValid = cache => cache === null || Date.now() <= cache;
+const isCacheValid = (cache, action) =>
+  cache.cacheKey === action.meta.cacheKey &&
+  (cache.timeout === null || Date.now() <= cache.timeout);
 
-const getCacheKey = action => action.type + (action.meta.requestKey || '');
+const getKey = action => action.type + (action.meta.requestKey || '');
 
 export default (config = defaultConfig) => store => next => action => {
   if (
@@ -12,11 +14,11 @@ export default (config = defaultConfig) => store => next => action => {
     action.meta.cache &&
     !action.meta.ssrResponse
   ) {
-    const cacheKey = getCacheKey(action);
+    const key = getKey(action);
     const state = store.getState();
-    const cacheValue = state.requests.cache[cacheKey];
+    const cacheValue = state.requests.cache[key];
 
-    if (cacheValue !== undefined && isCacheValid(cacheValue)) {
+    if (cacheValue !== undefined && isCacheValid(cacheValue, action)) {
       const query = getQuery(state, {
         type: action.type,
         requestKey: action.meta && action.meta.requestKey,
