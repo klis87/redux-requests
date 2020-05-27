@@ -1,4 +1,4 @@
-# redux-requests
+# ![Redux-Requests](https://github.com/klis87/redux-requests/blob/dev/images/logo.png)
 
 [![npm version](https://badge.fury.io/js/%40redux-requests%2Fcore.svg)](https://badge.fury.io/js/%40redux-requests%2Fcore)
 [![gzip size](http://img.badgesize.io/https://unpkg.com/@redux-requests/core/dist/redux-requests.min.js?compression=gzip)](https://unpkg.com/@redux-requests/core)
