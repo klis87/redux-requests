@@ -14,6 +14,8 @@
 Redux addon to simplify handling of AJAX requests. It supports Axios, Fetch API, GraphQL and promise based API libraries,
 but different integrations could be added, as they are implemented in a plugin fashion.
 
+![Redux-Requests showcase](https://github.com/klis87/redux-requests/blob/dev/images/showcase.gif)
+
 ## Table of content
 
 - [Motivation](#motivation-arrow_up)
@@ -1228,6 +1230,7 @@ There are following examples currently:
 - [mock-and-multiple-drivers](https://github.com/klis87/redux-requests/tree/master/examples/mock-and-multiple-drivers)
 - [server-side-rendering](https://github.com/klis87/redux-requests/tree/master/examples/server-side-rendering)
 - [promise driver](https://github.com/klis87/redux-requests/tree/master/examples/promise-driver)
+- [showcase](https://github.com/klis87/redux-requests/tree/master/examples/showcase)
 
 ## Licence [:arrow_up:](#table-of-content)
 
