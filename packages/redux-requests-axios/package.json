@@ -1,6 +1,6 @@
 {
   "name": "@redux-requests/axios",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "Axios driver for Redux-Requests, Redux addon to simplify AJAX requests",
   "main": "lib/index.js",
   "module": "es/index.js",
