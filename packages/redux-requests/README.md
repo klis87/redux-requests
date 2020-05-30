@@ -682,7 +682,21 @@ What will happen now, is that after a succesfull book fetch (to be specific afte
 any `FETCH_BOOKS` actions for `10` seconds won't trigger any AJAX calls and the following `FETCH_BOOKS_SUCCESS` will contain
 cached previous server response. You could also use `cache: true` to cache forever.
 
-Another use case is that you might want to keep a separate cache for the same request action based on a cache key. For example:
+Sometimes you would like to invalidate your cache based on a key, so if a key is changed, then you would bypass the cache
+and network would be hit. You can use `meta.cacheKey` for that:
+```js
+const fetchBooks = language => ({
+  type: FETCH_BOOKS,
+  request: { url: '/books', params: { language } },
+  meta: {
+    cache: 10, // in seconds, or true to cache forever
+    cacheKey: language, // if language changes, cache won't ne hit and request will be made
+  },
+});
+```
+
+Another use case is that you might want to keep a separate cache for the same request action based on a key.
+Then, like for usual not cached queries, you could use `meta.RequestKey`. For example:
 ```js
 const fetchBook = id => ({
   type: FETCH_BOOK,
@@ -704,6 +718,9 @@ const fetchBook = id => ({
 - GET /books/1 - make request, cache /books/1, invalidate /books/2 cache
 */
 ```
+
+You can also use `cacheKey` and `requestKey` at the same time, then different `cacheKey`
+will be able to invalidate cache for each `requestKey` individually.
 
 If you need to clear the cache manually for some reason, you can use `clearRequestsCache` action:
 ```js
