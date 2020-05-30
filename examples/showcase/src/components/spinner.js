@@ -3,7 +3,7 @@ import { CircularProgress } from '@material-ui/core';
 
 const Spinner = () => (
   <div style={{ textAlign: 'center' }}>
-    <CircularProgress />
+    <CircularProgress disableShrink />
   </div>
 );
 

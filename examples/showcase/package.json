@@ -16,6 +16,7 @@
     "@material-ui/lab": "4.0.0-alpha.53",
     "axios": "0.19.2",
     "express": "4.17.1",
+    "prism-react-renderer": "1.1.1",
     "react": "16.13.0",
     "react-beautiful-dnd": "13.0.0",
     "react-dom": "16.13.0",

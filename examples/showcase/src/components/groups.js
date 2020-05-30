@@ -20,6 +20,39 @@ import {
 import { FETCH_GROUPS } from '../store/constants';
 import { followUser, unfollowUser } from '../store/actions';
 import Spinner from './spinner';
+import CodeTooltip from './code-tooltip';
+
+const code = `const fetchGroups = () => ({
+  type: FETCH_GROUPS,
+  request: {
+    url: '/groups',
+  },
+  meta: {
+    normalize: true,
+  },
+});
+
+const followUser = id => ({
+  type: FOLLOW_USER,
+  request: {
+    url: \`/groups/\${id}/follow\`,
+    method: 'post',
+  },
+  meta: {
+    normalize: true,
+  },
+});
+
+const unfollowUser = id => ({
+  type: UNFOLLOW_USER,
+  request: {
+    url: \`/groups/\${id}/unfollow\`,
+    method: 'post',
+  },
+  meta: {
+    normalize: true,
+  },
+});`;
 
 const Posts = () => {
   const dispatch = useDispatch();
@@ -29,11 +62,25 @@ const Posts = () => {
       <AppBar position="static" color="primary">
         <Toolbar style={{ minHeigh: 'auto' }} variant="dense">
           <Typography color="inherit" variant="h6" style={{ marginRight: 32 }}>
-            Groups
+            Groups and automatic normalisation
           </Typography>
+          <div style={{ marginLeft: 'auto' }}>
+            <CodeTooltip code={code} />
+          </div>
         </Toolbar>
       </AppBar>
       <Paper style={{ padding: 32 }}>
+        <Typography paragraph>
+          Notice that many people are in several groups. Try to follow/unfollow
+          them and see them synchronized across multiple groups.
+        </Typography>
+        <Typography paragraph>
+          This is handled without any manual updates instructions by automatic
+          normalisation. Forget about updating data which is stored in multiple
+          places, just make sure your server responds with updated nodes and the
+          job will be done, all nodes will be synchronized no matter in how many
+          places and how deeply stored.
+        </Typography>
         <Query type={FETCH_GROUPS} loadingComponent={Spinner}>
           {({ data }) => (
             <Grid container spacing={4}>

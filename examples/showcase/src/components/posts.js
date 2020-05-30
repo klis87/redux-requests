@@ -18,6 +18,132 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { FETCH_POSTS, LIKE_POST, UNLIKE_POST } from '../store/constants';
 import { reorderPosts, likePost, unlikePost } from '../store/actions';
 import Spinner from './spinner';
+import CodeTooltip from './code-tooltip';
+
+const code0 = `const fetchPosts = () => ({
+  type: FETCH_POSTS,
+  request: {
+    url: '/posts',
+  },
+});
+
+const likePost = id => ({
+  type: LIKE_POST,
+  request: {
+    url: \`/posts/\${id}/like\`,
+    method: 'post',
+  },
+  meta: {
+    requestKey: id,
+    mutations: {
+      [FETCH_POSTS]: {
+        updateDataOptimistic: data =>
+          data.map(v => (v.id === id ? { ...v, likes: v.likes + 1 } : v)),
+        revertData: data =>
+          data.map(v => (v.id === id ? { ...v, likes: v.likes - 1 } : v)),
+      },
+    },
+  },
+});
+
+const unlikePost = id => ({
+  type: UNLIKE_POST,
+  request: {
+    url: \`/posts/\${id}/unlike\`,
+    method: 'post',
+  },
+  meta: {
+    requestKey: id,
+    mutations: {
+      [FETCH_POSTS]: {
+        updateDataOptimistic: data =>
+          data.map(v => (v.id === id ? { ...v, likes: v.likes - 1 } : v)),
+        revertData: data =>
+          data.map(v => (v.id === id ? { ...v, likes: v.likes + 1 } : v)),
+      },
+    },
+  },
+});
+
+const reorderPosts = (newIds, currentIds) => ({
+  type: REORDER_POSTS,
+  request: {
+    url: '/posts/reorder',
+    method: 'post',
+    data: {
+      ids: newIds,
+    },
+  },
+  meta: {
+    mutations: {
+      [FETCH_POSTS]: {
+        updateDataOptimistic: data =>
+          newIds.map(id => data.find(v => v.id === id)),
+        revertData: data =>
+          currentIds.map(id => data.find(v => v.id === id)),
+      },
+    },
+  },
+});`;
+
+const code1 = `const fetchPosts = () => ({
+  type: FETCH_POSTS,
+  request: {
+    url: '/posts',
+  },
+});
+
+const likePost = id => ({
+  type: LIKE_POST,
+  request: {
+    url: \`/posts/\${id}/like\`,
+    method: 'post',
+  },
+  meta: {
+    requestKey: id,
+    mutations: {
+      [FETCH_POSTS]: {
+        updateData: data =>
+          data.map(v => (v.id === id ? { ...v, likes: v.likes + 1 } : v)),
+      },
+    },
+  },
+});
+
+const unlikePost = id => ({
+  type: UNLIKE_POST,
+  request: {
+    url: \`/posts/\${id}/unlike\`,
+    method: 'post',
+  },
+  meta: {
+    requestKey: id,
+    mutations: {
+      [FETCH_POSTS]: {
+        updateData: data =>
+          data.map(v => (v.id === id ? { ...v, likes: v.likes - 1 } : v)),
+      },
+    },
+  },
+});
+
+const reorderPosts = newIds => ({
+  type: REORDER_POSTS,
+  request: {
+    url: '/posts/reorder',
+    method: 'post',
+    data: {
+      ids: newIds,
+    },
+  },
+  meta: {
+    mutations: {
+      [FETCH_POSTS]: {
+        updateData: (data, mutationData) => mutationData,
+      },
+    },
+  },
+});`;
 
 const Posts = () => {
   const dispatch = useDispatch();
@@ -39,9 +165,27 @@ const Posts = () => {
             }
             label="Optimistic updates"
           />
+          <div style={{ marginLeft: 'auto' }}>
+            <CodeTooltip code={optimistic ? code0 : code1} />
+          </div>
         </Toolbar>
       </AppBar>
       <Paper style={{ padding: 32 }}>
+        <Typography paragraph>
+          Optimistic updates allow to update data before even requests are
+          finished, so UI feels much faster.
+        </Typography>
+        <Typography paragraph>
+          Try to drag icons on the right of items to change sorting, click{' '}
+          <b>LIKE</b> and <b>UNLIKE</b> buttons and notice data updates while
+          requests are still pending.
+        </Typography>
+        <Typography paragraph>
+          Turn off <b>OPTIMISTIC UPDATES</b> and do the same, notice data is not
+          updated immediately anymore. See also sorting animation problem, which
+          in theory could be solved without optimistic updates too, but then you
+          would need to keep copy of data state, which would be error-prone.
+        </Typography>
         <Query type={FETCH_POSTS} loadingComponent={Spinner}>
           {({ data }) => (
             <DragDropContext

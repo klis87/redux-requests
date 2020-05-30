@@ -16,6 +16,88 @@ import { Pagination, Rating } from '@material-ui/lab';
 import { fetchBooks, setBookRating } from '../store/actions';
 import { FETCH_BOOKS } from '../store/constants';
 import Spinner from './spinner';
+import CodeTooltip from './code-tooltip';
+
+const code0 = `const fetchBooks = (page = 1) => ({
+  type: FETCH_BOOKS,
+  request: {
+    url: '/books',
+    params: {
+      page,
+    },
+  },
+});
+
+const setBookRating = (id, rating) => ({
+  type: SET_BOOK_RATING,
+  request: {
+    url: \`/books/\${id}/rating/\${rating}\`,
+    method: 'post',
+  },
+  meta: {
+    mutations: {
+      [FETCH_BOOKS]: (data, mutationData) =>
+        data.map(v => (v.id === mutationData.id ? mutationData : v)),
+    },
+  },
+});`;
+
+const code1 = `const fetchBooks = (page = 1) => ({
+  type: FETCH_BOOKS,
+  request: {
+    url: '/books',
+    params: {
+      page,
+    },
+  },
+  meta: {
+    cache: 10,
+    cacheKey: String(page),
+  },
+});
+
+const setBookRating = (id, rating) => ({
+  type: SET_BOOK_RATING,
+  request: {
+    url: \`/books/\${id}/rating/\${rating}\`,
+    method: 'post',
+  },
+  meta: {
+    mutations: {
+      [FETCH_BOOKS]: (data, mutationData) =>
+        data.map(v => (v.id === mutationData.id ? mutationData : v)),
+    },
+  },
+});`;
+
+const code2 = `const fetchBooks = (page = 1) => ({
+  type: FETCH_BOOKS,
+  request: {
+    url: '/books',
+    params: {
+      page,
+    },
+  },
+  meta: {
+    cache: 10,
+    requestKey: String(page),
+    requestsCapacity: 3,
+  },
+});
+
+const setBookRating = (id, rating, page) => ({
+  type: SET_BOOK_RATING,
+  request: {
+    url: \`/books/\${id}/rating/\${rating}\`,
+    method: 'post',
+  },
+  meta: {
+    mutations: {
+      [FETCH_BOOKS + String(page)]: (data, mutationData) =>
+        data.map(v => (v.id === mutationData.id ? mutationData : v)),
+    },
+  },
+});`;
 
 const Books = () => {
   const dispatch = useDispatch();
@@ -44,9 +126,24 @@ const Books = () => {
               <Tab label="Cache last 3 pages" />
             </Tabs>
           </div>
+          <CodeTooltip code={mode === 0 ? code0 : mode === 1 ? code1 : code2} />
         </Toolbar>
       </AppBar>
       <Paper style={{ padding: 32 }}>
+        <Typography paragraph>
+          Try to change pages quickly, notice in devtools that previous pending
+          requests are automatically aborted.
+        </Typography>
+        <Typography paragraph>
+          Check <b>CACHE SINGLE PAGE</b> tab, try to click the selected page
+          after data is already fetched, for 10 seconds no request will be made,
+          as the last page is cached.
+        </Typography>
+        <Typography paragraph>
+          Check <b>CACHE LAST 3 PAGES</b> tab, try to play and for instance
+          select 2, 3, 4, 2, 3, 4... For 10 seconds for last 3 pages no request
+          will be made, as last 3 pages are cached.
+        </Typography>
         <Pagination
           count={9}
           page={page}

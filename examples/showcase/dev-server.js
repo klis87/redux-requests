@@ -86,7 +86,6 @@ app.get('/groups', async (req, res) => {
 
 app.post('/groups/:id/follow', async (req, res) => {
   const { id } = req.params;
-  await sleep();
   groups = groups.map(group => ({
     ...group,
     people: group.people.map(v => (v.id === id ? { ...v, followed: true } : v)),
@@ -101,7 +100,6 @@ app.post('/groups/:id/follow', async (req, res) => {
 
 app.post('/groups/:id/unfollow', async (req, res) => {
   const { id } = req.params;
-  await sleep();
   groups = groups.map(group => ({
     ...group,
     people: group.people.map(v =>
