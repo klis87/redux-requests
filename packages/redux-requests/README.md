@@ -1,4 +1,4 @@
-# ![Redux-Requests](https://github.com/klis87/redux-requests/blob/dev/images/logo.png)
+# ![Redux-Requests](https://github.com/klis87/redux-requests/blob/master/images/logo.png)
 
 [![npm version](https://badge.fury.io/js/%40redux-requests%2Fcore.svg)](https://badge.fury.io/js/%40redux-requests%2Fcore)
 [![gzip size](http://img.badgesize.io/https://unpkg.com/@redux-requests/core/dist/redux-requests.min.js?compression=gzip)](https://unpkg.com/@redux-requests/core)
@@ -14,7 +14,7 @@
 Redux addon to simplify handling of AJAX requests. It supports Axios, Fetch API, GraphQL and promise based API libraries,
 but different integrations could be added, as they are implemented in a plugin fashion.
 
-![Redux-Requests showcase](https://github.com/klis87/redux-requests/blob/dev/images/showcase.gif)
+![Redux-Requests showcase](https://github.com/klis87/redux-requests/blob/master/images/showcase.gif)
 
 ## Table of content
 
