@@ -36,6 +36,7 @@ but different integrations could be added, as they are implemented in a plugin f
 - [Normalisation](#normalisation-arrow_up)
 - [React bindings](#react-bindings-arrow_up)
 - [Examples](#examples-arrow_up)
+- [Companion libraries](#examples-arrow_up)
 
 ## Motivation [:arrow_up:](#table-of-content)
 
@@ -1248,6 +1249,12 @@ There are following examples currently:
 - [server-side-rendering](https://github.com/klis87/redux-requests/tree/master/examples/server-side-rendering)
 - [promise driver](https://github.com/klis87/redux-requests/tree/master/examples/promise-driver)
 - [showcase](https://github.com/klis87/redux-requests/tree/master/examples/showcase)
+
+## Companion libraries [:arrow_up:](#table-of-content)
+
+- [redux-smart-actions](https://github.com/klis87/redux-smart-actions) - Redux addon to create actions and thunks with minimum boilerplate, you can use it to create requests actions faster and in a less verbose way, without constants,
+useful especially to create thunks without constants, so you have access to Redux state in request actions without
+any need to pass them with action arguments
 
 ## Licence [:arrow_up:](#table-of-content)
 
