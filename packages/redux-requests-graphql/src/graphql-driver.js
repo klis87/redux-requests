@@ -38,13 +38,21 @@ export const createDriver = ({ url }) => {
       method: 'post',
       data,
       headers: requestConfig.headers,
-    }).then(response => {
-      if (response.data.errors) {
-        throw response;
-      } else {
-        return response.data;
-      }
-    });
+    })
+      .then(response => {
+        if (response.data.errors) {
+          throw response;
+        } else {
+          return response.data;
+        }
+      })
+      .catch(error => {
+        if (axios.isCancel(error)) {
+          throw 'REQUEST_ABORTED';
+        }
+
+        throw error;
+      });
 
     responsePromise.cancel = () => abortSource.cancel();
     return responsePromise;
