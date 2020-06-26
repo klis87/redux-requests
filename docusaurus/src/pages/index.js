@@ -6,6 +6,8 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import styles from './styles.module.css';
 
+import Test from '../../docs/introduction/motivation.md';
+
 const features = [
   // {
   //   title: <>Easy to Use</>,
@@ -72,14 +74,15 @@ function Home() {
                 'button button--outline button--secondary button--lg',
                 styles.getStarted,
               )}
-              to={useBaseUrl('docs/getting-started/motivation')}
+              to={useBaseUrl('docs/introduction/motivation')}
             >
               Get Started
             </Link>
           </div>
         </div>
       </header>
-      <main>
+      <main style={{ padding: 16 }}>
+        <Test />
         {features && features.length && (
           <section className={styles.features}>
             <div className="container">

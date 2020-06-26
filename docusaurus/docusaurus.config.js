@@ -1,33 +1,33 @@
 /* eslint-disable global-require */
 /* eslint-disable import/no-extraneous-dependencies */
 module.exports = {
-  title: 'redux-saga-requests',
+  title: 'redux-requests',
   tagline: 'Redux requests made simpler',
-  url: 'https://strdr4605.github.io/redux-saga-requests',
-  baseUrl: '/redux-saga-requests/',
+  url: 'https://github.com/klis87/redux-requests',
+  baseUrl: '/',
   favicon: 'img/favicon.ico',
-  organizationName: 'strdr4605', // Usually your GitHub org/user name.
-  projectName: 'redux-saga-requests', // Usually your repo name.
+  organizationName: 'klis87', // Usually your GitHub org/user name.
+  projectName: 'redux-requests', // Usually your repo name.
   themeConfig: {
     prism: {
       theme: require('prism-react-renderer/themes/nightOwl'),
     },
     navbar: {
       hideOnScroll: true,
-      title: 'redux-saga-requests',
+      title: 'redux-requests',
       // logo: {
       //   alt: 'redux-saga-requests Logo',
       //   src: 'img/logo.svg',
       // },
       links: [
         {
-          to: 'docs/getting-started/motivation',
+          to: 'docs/introduction/installation',
           activeBasePath: 'docs',
           label: 'Docs',
           position: 'left',
         },
         {
-          href: 'https://github.com/klis87/redux-saga-requests',
+          href: 'https://github.com/klis87/redux-requests',
           label: 'GitHub',
           position: 'right',
         },
@@ -36,7 +36,7 @@ module.exports = {
     footer: {
       style: 'dark',
       links: [],
-      copyright: `Copyright © ${new Date().getFullYear()} redux-saga-requests. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} redux-requests. Built with Docusaurus.`,
     },
   },
   presets: [
@@ -46,7 +46,7 @@ module.exports = {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl:
-            'https://github.com/klis87/redux-saga-requests/edit/master/docusaurus/',
+            'https://github.com/klis87/redux-requests/edit/master/docusaurus/',
           showLastUpdateAuthor: true,
           showLastUpdateTime: true,
         },
