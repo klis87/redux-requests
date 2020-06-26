@@ -1,9 +1,22 @@
 module.exports = {
   docs: {
-    'Getting started': [
-      'getting-started/motivation',
-      'getting-started/installation',
-      'getting-started/usage',
+    Introduction: [
+      'introduction/motivation',
+      'introduction/installation',
+      'introduction/basic-usage',
+    ],
+    Tutorial: [
+      'tutorial/1-request-aborts',
+      'tutorial/2-batch-requests',
+      'tutorial/3-request-keys',
+      'tutorial/4-reacting-to-request-actions',
+      'tutorial/5-resetting-requests',
+      'tutorial/6-interceptors',
+      'tutorial/7-local-updates',
+      'tutorial/8-optimistic-updates',
+      'tutorial/9-caching',
+      'tutorial/10-automatic-normalisation',
+      'tutorial/part1',
     ],
     'Guide (remove before release)': ['doc1', 'doc2', 'doc3', 'mdx'],
   },

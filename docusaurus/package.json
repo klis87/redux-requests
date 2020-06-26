@@ -3,8 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "docusaurus start",
+    "dev": "docusaurus start",
     "build": "docusaurus build",
+    "start": "NODE_ENV=production node server.js",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy"
   },
@@ -12,6 +13,8 @@
     "@docusaurus/core": "^2.0.0-alpha.48",
     "@docusaurus/preset-classic": "^2.0.0-alpha.48",
     "classnames": "^2.2.6",
+    "compression": "1.7.4",
+    "express": "4.17.1",
     "react": "^16.8.4",
     "react-dom": "^16.8.4"
   },
