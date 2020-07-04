@@ -18,6 +18,14 @@ module.exports = {
       'tutorial/10-automatic-normalisation',
       'tutorial/part1',
     ],
+    Drivers: [
+      'drivers/using-drivers',
+      'drivers/axios-driver',
+      'drivers/fetch-driver',
+      'drivers/graphql-driver',
+      'drivers/promise-driver',
+      'drivers/mock-driver',
+    ],
     'Guide (remove before release)': ['doc1', 'doc2', 'doc3', 'mdx'],
   },
 };

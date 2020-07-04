@@ -28,7 +28,7 @@ Also, you need to install a driver. There are following drivers available:
 You need to have at least one, but it is also possible to use multiple in the single
 app. It is also possible to write a custom driver.
 
-### Axios
+### Axios driver
 
 Choose it, if you like using `axios` library. To install it, run:
 ```bash
@@ -41,7 +41,7 @@ or CDN: `https://unpkg.com/@redux-requests/axios`
 $ npm install axios
 ```
 
-### Fetch
+### Fetch driver
 
 Choose it, if you prefer to use the standard Fetch API to communicate with your servers:
 ```bash
@@ -55,7 +55,7 @@ for instance `isomorphic-fetch`:
 $ npm install isomorphic-fetch
 ```
 
-### GraphQL
+### GraphQL driver
 
 Use it, if you need to connect to a GraphQL server. In theory it is of course possible to
 use `axios` or `fetch` driver for this, but `graphql` driver makes this simpler and supports
@@ -65,7 +65,7 @@ $ npm install @redux-requests/graphql
 ```
 or CDN: `https://unpkg.com/@redux-requests/graphql`.
 
-### Promise
+### Promise driver
 
 Sometimes you already have a library which is responsible for API communication.
 Usually those are promised based. For this scenario, pick `promise` driver:
@@ -74,7 +74,7 @@ $ npm install @redux-requests/promise
 ```
 or CDN: `https://unpkg.com/@redux-requests/promise`.
 
-### Mock
+### Mock driver
 
 In a perfect world, you would always already have an API to integrate with during frontend
 development. However, quite often reality proves otherwise and you would like to
