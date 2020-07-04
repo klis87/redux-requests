@@ -16,7 +16,6 @@ module.exports = {
       'tutorial/8-optimistic-updates',
       'tutorial/9-caching',
       'tutorial/10-automatic-normalisation',
-      'tutorial/part1',
     ],
     Drivers: [
       'drivers/using-drivers',
@@ -26,6 +25,6 @@ module.exports = {
       'drivers/promise-driver',
       'drivers/mock-driver',
     ],
-    'Guide (remove before release)': ['doc1', 'doc2', 'doc3', 'mdx'],
+    Guides: ['guides/actions'],
   },
 };
