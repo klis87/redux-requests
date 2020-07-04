@@ -15,7 +15,7 @@ To install the package, just run:
 ```bash
 npm install @redux-requests/promise
 ```
-```
+
 or you can just use CDN: `https://unpkg.com/@redux-requests/promise`.
 
 ## Usage

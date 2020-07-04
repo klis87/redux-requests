@@ -44,8 +44,8 @@ const fetchPhoto = id => ({
   },
 });
 
-const fetchPhotoError = id => ({
-  type: FETCH_PHOTO_ERROR,
+const fetchPhotoWithError = id => ({
+  type: FETCH_PHOTO_WITH_ERROR,
   request: {
     error: { status: 404 },
   },
