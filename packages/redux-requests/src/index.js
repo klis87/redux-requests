@@ -5,6 +5,9 @@ export {
   clearRequestsCache,
   resetRequests,
   abortRequests,
+  isRequestActionQuery,
+  isRequestAction,
+  isResponseAction,
 } from './actions';
 export { default as handleRequests } from './handle-requests';
 export {
