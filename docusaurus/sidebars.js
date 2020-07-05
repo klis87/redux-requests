@@ -29,6 +29,8 @@ module.exports = {
       'guides/actions',
       'guides/selectors',
       'guides/server-side-rendering',
+      'guides/usage-with-redux-saga',
+      'guides/usage-with-react',
     ],
   },
 };
