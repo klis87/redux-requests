@@ -109,6 +109,8 @@ a suffix (`_SUCCESS`, `_ERROR` or `_ABORT`).
 Also notice `meta` in any response action, you can find there `requestAction` object,
 which is just a related request action which resulted in the response action. Also all `meta`
 keys are copied to response actions for convenience, that's why there is `mutations` key there.
+You can use this mechanism also to pass anything to `meta`, then it will be available in
+response actions too in case you need it.
 
 Additionally, of course success actions have `response` key and error actions have `error` key.
 
