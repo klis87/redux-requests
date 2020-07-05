@@ -152,3 +152,9 @@ export function getMutationSelector(props: {
   type: string;
   requestKey?: string;
 }): (state: any) => MutationState;
+
+export const isRequestAction = (action: AnyAction) => boolean;
+
+export const isRequestActionQuery = (requestAction: RequestAction) => boolean;
+
+export const isResponseAction = (action: AnyAction) => boolean;
