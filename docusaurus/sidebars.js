@@ -25,6 +25,10 @@ module.exports = {
       'drivers/promise-driver',
       'drivers/mock-driver',
     ],
-    Guides: ['guides/actions'],
+    Guides: [
+      'guides/actions',
+      'guides/selectors',
+      'guides/server-side-rendering',
+    ],
   },
 };
