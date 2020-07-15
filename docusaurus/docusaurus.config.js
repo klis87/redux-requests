@@ -18,7 +18,7 @@ module.exports = {
       title: 'redux-requests',
       logo: {
         alt: 'redux-saga-requests Logo',
-        src: 'img/logo.svg',
+        src: 'img/logo-small.png',
       },
       links: [
         {
