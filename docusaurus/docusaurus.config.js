@@ -2,7 +2,8 @@
 /* eslint-disable import/no-extraneous-dependencies */
 module.exports = {
   title: 'redux-requests',
-  tagline: 'Redux requests made simpler',
+  tagline:
+    'Declarative AJAX requests and automatic network state management for Redux',
   url: 'https://github.com/klis87/redux-requests',
   baseUrl: '/',
   favicon: 'img/favicon.ico',
@@ -15,13 +16,13 @@ module.exports = {
     navbar: {
       hideOnScroll: true,
       title: 'redux-requests',
-      // logo: {
-      //   alt: 'redux-saga-requests Logo',
-      //   src: 'img/logo.svg',
-      // },
+      logo: {
+        alt: 'redux-saga-requests Logo',
+        src: 'img/logo.svg',
+      },
       links: [
         {
-          to: 'docs/introduction/installation',
+          to: 'docs/introduction/motivation',
           activeBasePath: 'docs',
           label: 'Docs',
           position: 'left',
