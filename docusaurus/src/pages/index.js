@@ -188,6 +188,7 @@ function Home() {
   const context = useDocusaurusContext();
   const { siteConfig = {} } = context;
   const showcaseUrl = useBaseUrl('img/showcase.gif');
+  const logoUrl = useBaseUrl('img/logo-small.png');
 
   return (
     <Layout
@@ -196,7 +197,23 @@ function Home() {
     >
       <header className={classnames('hero hero--primary', styles.heroBanner)}>
         <div className="container">
-          <h1 className="hero__title">{siteConfig.title}</h1>
+          <div style={{ marginBottom: 16 }}>
+            <img
+              src={logoUrl}
+              alt="logo"
+              style={{ width: 100, verticalAlign: 'middle' }}
+            />
+            <h1
+              className="hero__title"
+              style={{
+                display: 'inline-block',
+                verticalAlign: 'middle',
+                margin: 0,
+              }}
+            >
+              {siteConfig.title}
+            </h1>
+          </div>
           <p className="hero__subtitle">{siteConfig.tagline}</p>
           <div className={styles.buttons}>
             <Link
