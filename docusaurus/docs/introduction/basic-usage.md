@@ -180,4 +180,14 @@ state stored in `requestsReducer`, which is never a good thing.
 
 ## What's next?
 
-TODO: tutorial, guides, api, examples
+To get more familiar with the usage of this library, it is very important to go through
+[tutorial](../tutorial/1-request-aborts) first which will help understand API of this library and its assumptions.
+
+Then, you could check out how to [use drivers](../drivers/using-drivers) and pick
+a driver of your choice or write your own if needed.
+
+It is also advised to read [actions](../guides/actions) and [selectors](../guides/selectors)
+guides.
+
+Then, you could see [examples](examples), read other guides or scan the whole [API](../api-reference/request-action)
+to see all the available options.
