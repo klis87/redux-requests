@@ -8,7 +8,7 @@ title: Motivation
 Even in 21th century, making AJAX requests and management of remote state is surprisingly hard!
 It looks easy at the beginning, but the more experienced you become, the more aware you are
 about problems you didn't consider before. Race conditions, requests aborts, caching, optimistic updates,
-error handling, showing spinners for loading state per operations, server side rendering...
+error handling, showing spinners for loading state per request, server side rendering...
 This list could go on... You could solve all of those problems on the app level yourself,
 but think about code amount to achieve it, or potential bugs you could have when having to
 worry about so many things, especially with tight deadlines. Should we really worry about
@@ -22,6 +22,7 @@ With `redux-requests`, assuming you use `axios` you could refactor a code in the
 - import thunk from 'redux-thunk';
 + import { handleRequests } from '@redux-requests/core';
 + import { createDriver } from '@redux-requests/axios'; // or another driver
+
 
   const FETCH_BOOKS = 'FETCH_BOOKS';
 - const FETCH_BOOKS_SUCCESS = 'FETCH_BOOKS_SUCCESS';

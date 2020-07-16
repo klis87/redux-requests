@@ -4,6 +4,7 @@ module.exports = {
       'introduction/motivation',
       'introduction/installation',
       'introduction/basic-usage',
+      'introduction/examples',
     ],
     Tutorial: [
       'tutorial/1-request-aborts',
