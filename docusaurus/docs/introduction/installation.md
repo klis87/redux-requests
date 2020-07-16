@@ -34,7 +34,7 @@ Choose it, if you like using `axios` library. To install it, run:
 ```bash
 $ npm install @redux-requests/axios
 ```
-or CDN: `https://unpkg.com/@redux-requests/axios`
+or CDN: `https://unpkg.com/@redux-requests/axios`.
 
 `axios` itself is not included in the driver, so you will need to install it separately:
 ```bash
