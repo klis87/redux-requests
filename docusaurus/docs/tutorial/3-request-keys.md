@@ -2,6 +2,8 @@
 title:  3. Request keys
 ---
 
+## Sending requests with `requestKey`
+
 Let's bring back **batch requests** action from the previous part of the tutorial:
 ```js
 const fetchBook = ids => ({
@@ -109,7 +111,7 @@ So, all you need to do is add the matching `requestKey` to query type.
 ## Mutations with `requestKey`
 
 Interestingly, not only queries can have `requestKey`. It can be useful to use it
-for mutations too, which could be useful if you wanted to show multiple loading spinners
+for mutations too, for example if you wanted to show multiple loading spinners
 or errors at the same time:
 ```js
 const updateBook = (id, title) => ({

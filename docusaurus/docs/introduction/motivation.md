@@ -5,7 +5,7 @@ title: Motivation
 
 ## Genesis
 
-Even in 21th century, making AJAX requests and management of remote state is surprisingly hard!
+Even in 21st century, making AJAX requests and management of remote state is surprisingly hard!
 It looks easy at the beginning, but the more experienced you become, the more aware you are
 about problems you didn't consider before. Race conditions, requests aborts, caching, optimistic updates,
 error handling, showing spinners for loading state per request, server side rendering...

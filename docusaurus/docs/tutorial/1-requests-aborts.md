@@ -5,8 +5,8 @@ title:  1. Requests aborts
 
 ## Basic setup
 
-Before we begin, make sure you read `basic-usage` chapter. Now, let's start with
-basic setup:
+Before we begin, make sure you read [basic usage chapter](../introduction/basic-usage). Now, let's start with
+a basic setup:
 ```js
 import axios from 'axios';
 import { handleRequests } from '@redux-requests/core';
@@ -113,7 +113,7 @@ Or... if you had a mutation which you would like to have aborted, you would add
 `meta.takeLatest: true`.
 
 As mentioned above, you can configure it globally by using `takeLatest` option
-in `handleRequest`. As mentioned earlier, default implementation uses aborts only for
+in `handleRequest`. Default implementation uses aborts only for
 queries and it looks like that:
 ```js
 import { isRequestActionQuery } from '@redux-requests/core';

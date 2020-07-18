@@ -23,4 +23,4 @@ As you can see, it looks similar to normal mutations. One difference is that the
 is no `request` key - after all we didn't want to make any request. Another difference is
 that the update function is not attached directly to the query type (in our case `FETCH_BOOK_DETAIL`),
 but inside the object as `updateData`. This is because we need to pass also `local: true`
-to the mutation to mark is as a local one.
+to the mutation to mark it as a local one.

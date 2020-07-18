@@ -2,6 +2,8 @@
 title:  9. Caching
 ---
 
+## `cache`
+
 Sometimes you might want your responses to be cached for an amount of time or even forever (until the page is not reloaded at least).
 Or, putting it another way, you would like to send a given request no more often than once for an amount of time. You can easily
 achieve it with an optional cache middleware. To activate it, just pass `cache: true` to `handleRequests`:
@@ -61,11 +63,9 @@ const fetchBook = id => ({
 /* then, you will achieve the following behaviour:
 - GET /books/1 - make request, cache /books/1
 - GET /books/1 - cache hit
-- GET /books/2 - make request, /books/2
+- GET /books/2 - make request, cache /books/2
 - GET /books/2 - cache hit
 - GET /books/1 - cache hit
-- GET /books/3 - make request, cache /books/3, invalidate /books/1 cache
-- GET /books/1 - make request, cache /books/1, invalidate /books/2 cache
 */
 ```
 
@@ -87,7 +87,7 @@ const fetchBook = (id, language) => ({
 /* then, you will achieve the following behaviour:
 - GET /books/1?language=en - make request, cache /books/1
 - GET /books/1?language=en - cache hit
-- GET /books/2?language=de - make request, /books/2
+- GET /books/2?language=de - make request, cache /books/2
 - GET /books/2?language=en - make request, cache /books/2 again due to changed language
 - GET /books/2?language=en - cache hit
 */
@@ -95,8 +95,8 @@ const fetchBook = (id, language) => ({
 
 There is an interesting `requestKey` and `cacheKey` relation. Passing the same
 `requestKey` and `cacheKey` is the same like passing only `requestKey`, because
-request are stored separately for each `requestKey`, so cache invalidation with
-`cacheKey` could never be possible.
+requests are stored separately for each `requestKey`, so cache invalidation with
+the same `cacheKey` could never happen.
 
 ## Cache with `requestCapacity`
 
@@ -116,7 +116,7 @@ const fetchBook = id => ({
 /* then, you will achieve the following behaviour:
 - GET /books/1 - make request, cache /books/1
 - GET /books/1 - cache hit
-- GET /books/2 - make request, /books/2
+- GET /books/2 - make request, cache /books/2
 - GET /books/2 - cache hit
 - GET /books/1 - cache hit
 - GET /books/3 - make request, cache /books/3, invalidate /books/1 cache

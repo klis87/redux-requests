@@ -25,7 +25,7 @@ promises, so you can use `putResolve` instead:
 import { putResolve } from 'redux-saga/effects';
 
 function* fetchBookSaga() {
-  const { data, error, isAborted, action } = yield put(fetchBooks());
+  const { data, error, isAborted, action } = yield putResolve(fetchBooks());
 }
 ```
 

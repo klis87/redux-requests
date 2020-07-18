@@ -2,6 +2,13 @@
 title:  2. Batch requests
 ---
 
+## What are batch requests?
+
+**Batch requests** is about sending multiple requests by dispatching a single request
+action (with array of request configs).
+
+## Use cases for batch requests
+
 Let's write a request action to fetch a book detail:
 ```js
 const FETCH_BOOK = 'FETCH_BOOK';
@@ -77,7 +84,3 @@ store.dispatch(fetchBook(['1', '2', '3', '4', '5']));
 
 There is an alternative strategy to **batch requests** which will be covered
 in the next part.
-
-
-## `meta.getData`
-

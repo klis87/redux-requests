@@ -10,7 +10,7 @@ title:  Fetch driver
 
 First, install the driver:
 ```bash
-$ npm install  @redux-requests/fetch
+$ npm install @redux-requests/fetch
 ```
 or you can just use CDN: `https://unpkg.com/@redux-requests/fetch`.
 
@@ -54,7 +54,7 @@ fetch('/users', {
 ```
 should be translated to this request action:
 ```js
-const fetchUsers = () => ({
+const fetchUsers = data => ({
   type: 'FETCH_USERS',
   request: {
     url: '/users/',

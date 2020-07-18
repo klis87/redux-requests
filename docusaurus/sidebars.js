@@ -7,7 +7,7 @@ module.exports = {
       'introduction/examples',
     ],
     Tutorial: [
-      'tutorial/1-request-aborts',
+      'tutorial/1-requests-aborts',
       'tutorial/2-batch-requests',
       'tutorial/3-request-keys',
       'tutorial/4-reacting-to-request-actions',

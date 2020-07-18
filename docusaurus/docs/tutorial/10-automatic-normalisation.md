@@ -85,16 +85,17 @@ objects.
 ## Required conditions
 
 In order to make automatic normalisation work, the following conditions must be meet:
-1) you must have a standardized way to identify your objects, usually this is just `id` key
-2) ids must be unique across the whole app, if not, you will need to append something to them,
+
+1. you must have a standardized way to identify your objects, usually this is just `id` key
+2. ids must be unique across the whole app, not only across object types, if not, you will need to append something to them,
 the same has to be done in GraphQL world, usually adding `_typename`
-3) objects with the same ids should have consistent structure, if an object like book in one
+3. objects with the same ids should have consistent structure, if an object like book in one
 query has `title` key, it should be `title` in others, not `name` out of a sudden
 
 Two functions which can be passed to `handleRequest` can help to meet those requirements,
 `shouldObjectBeNormalized` and `getNormalisationObjectKey`.
 
-`shouldObjectBeNormalized` can help you with 1) point, if for instance you identify
+`shouldObjectBeNormalized` can help you with 1st point, if for instance you identify
 objects differently, for instance by `_id` key, then you can pass
 `shouldObjectBeNormalized: obj => obj._id !== undefined` to `handleRequest`.
 
