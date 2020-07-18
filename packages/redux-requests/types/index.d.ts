@@ -84,7 +84,7 @@ interface HandleRequestConfig {
   isRequestActionQuery?: (requestAction: RequestAction) => boolean;
   takeLatest?: boolean | FilterActions;
   normalize?: boolean;
-  getNormalisationObjectKey?: (obj: any) => boolean;
+  getNormalisationObjectKey?: (obj: any) => string;
   shouldObjectBeNormalized?: (obj: any) => boolean;
 }
 
