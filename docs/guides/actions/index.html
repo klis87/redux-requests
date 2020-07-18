@@ -8,7 +8,7 @@
 
 <title data-react-helmet="true">Actions | redux-requests</title>
 
-<meta data-react-helmet="true" http-equiv="x-ua-compatible" content="ie=edge"><meta data-react-helmet="true" property="og:title" content="redux-requests"><meta data-react-helmet="true" name="twitter:card" content="summary"><meta data-react-helmet="true" name="description" content="As you probably noticed, this library is all about writing Redux actions. You need to do some"><meta data-react-helmet="true" property="og:description" content="As you probably noticed, this library is all about writing Redux actions. You need to do some"><meta data-react-helmet="true" property="og:url" content="http://redux-requests.klisiczynski.com/docs/guides/actions">
+<meta data-react-helmet="true" http-equiv="x-ua-compatible" content="ie=edge"><meta data-react-helmet="true" property="og:title" content="redux-requests"><meta data-react-helmet="true" name="twitter:card" content="summary"><meta data-react-helmet="true" name="description" content="Actions guide for redux-requests - declarative AJAX requests and automatic network state management for Redux"><meta data-react-helmet="true" property="og:description" content="Actions guide for redux-requests - declarative AJAX requests and automatic network state management for Redux"><meta data-react-helmet="true" property="og:url" content="http://redux-requests.klisiczynski.com/docs/guides/actions">
 
 <link data-react-helmet="true" rel="shortcut icon" href="/img/favicon.ico">
 
@@ -18,7 +18,7 @@
 
 <link rel="preload" href="/styles.e3afe6bd.js" as="script">
 
-<link rel="preload" href="/runtime~main.3b25b496.js" as="script">
+<link rel="preload" href="/runtime~main.3f7d8d1b.js" as="script">
 
 <link rel="preload" href="/main.71e6a981.js" as="script">
 
@@ -30,7 +30,7 @@
 
 <link rel="preload" href="/17896441.599a7668.js" as="script">
 
-<link rel="preload" href="/9feb18d4.6ee88cfe.js" as="script">
+<link rel="preload" href="/9feb18d4.ad6c208d.js" as="script">
 
 </head>
 <body>
@@ -79,12 +79,12 @@ like <code>getMutation</code> and forget about constants even when writing thunk
 care where you dispatch request actions from. This is totally up to you! You can
 dispatch them in sagas, in a middleware, in observables, in React components, from
 thunks or even inside routes when using Redux routers like <a href="https://github.com/faceyspacey/redux-first-router">redux-first-router</a>. Basically, in any place you could dispatch a Redux action,
-you can dispatch request actions, after all request action is also just Redux action!</p></div></article><div class="margin-vert--xl"><div class="row"><div class="col"><a href="https://github.com/klis87/redux-requests/edit/master/docusaurus/docs/guides/actions.md" target="_blank" rel="noreferrer noopener"><svg fill="currentColor" height="1.2em" width="1.2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 40 40" style="margin-right:0.3em;vertical-align:sub"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col text--right"><em><small>Last updated on <time datetime="2020-07-18T13:11:12.000Z" class="docLastUpdatedAt_1sqk">7/18/2020</time> by <strong>klis87</strong></small></em></div></div></div><div class="margin-vert--lg"><nav class="pagination-nav"><div class="pagination-nav__item"><a class="pagination-nav__link" href="/docs/drivers/mock-driver"><h5 class="pagination-nav__link--sublabel">Previous</h5><h4 class="pagination-nav__link--label">« Mock driver</h4></a></div><div class="pagination-nav__item pagination-nav__item--next"><a class="pagination-nav__link" href="/docs/guides/selectors"><h5 class="pagination-nav__link--sublabel">Next</h5><h4 class="pagination-nav__link--label">Selectors »</h4></a></div></nav></div></div></div><div class="col col--3"><div class="tableOfContents_TbNY"><ul class="contents contents__left-border"><li><a href="#request-actions" class="contents__link">Request actions</a></li><li><a href="#response-actions" class="contents__link">Response actions</a></li><li><a href="#promisified-dispatches" class="contents__link">Promisified dispatches</a></li><li><a href="#fsa-actions" class="contents__link">FSA actions</a></li><li><a href="#action-creator-libraries" class="contents__link">Action creator libraries</a></li><li><a href="#thunks" class="contents__link">Thunks</a></li><li><a href="#where-to-dispatch-request-actions" class="contents__link">Where to dispatch request actions</a></li></ul></div></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container"><div class="text--center"><div>Copyright © 2020 redux-requests. Built with Docusaurus.</div></div></div></footer>
+you can dispatch request actions, after all request action is also just Redux action!</p></div></article><div class="margin-vert--xl"><div class="row"><div class="col"><a href="https://github.com/klis87/redux-requests/edit/master/docusaurus/docs/guides/actions.md" target="_blank" rel="noreferrer noopener"><svg fill="currentColor" height="1.2em" width="1.2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 40 40" style="margin-right:0.3em;vertical-align:sub"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col text--right"><em><small>Last updated on <time datetime="2020-07-18T23:52:40.000Z" class="docLastUpdatedAt_1sqk">7/19/2020</time> by <strong>klis87</strong></small></em></div></div></div><div class="margin-vert--lg"><nav class="pagination-nav"><div class="pagination-nav__item"><a class="pagination-nav__link" href="/docs/drivers/mock-driver"><h5 class="pagination-nav__link--sublabel">Previous</h5><h4 class="pagination-nav__link--label">« Mock driver</h4></a></div><div class="pagination-nav__item pagination-nav__item--next"><a class="pagination-nav__link" href="/docs/guides/selectors"><h5 class="pagination-nav__link--sublabel">Next</h5><h4 class="pagination-nav__link--label">Selectors »</h4></a></div></nav></div></div></div><div class="col col--3"><div class="tableOfContents_TbNY"><ul class="contents contents__left-border"><li><a href="#request-actions" class="contents__link">Request actions</a></li><li><a href="#response-actions" class="contents__link">Response actions</a></li><li><a href="#promisified-dispatches" class="contents__link">Promisified dispatches</a></li><li><a href="#fsa-actions" class="contents__link">FSA actions</a></li><li><a href="#action-creator-libraries" class="contents__link">Action creator libraries</a></li><li><a href="#thunks" class="contents__link">Thunks</a></li><li><a href="#where-to-dispatch-request-actions" class="contents__link">Where to dispatch request actions</a></li></ul></div></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container"><div class="text--center"><div>Copyright © 2020 redux-requests. Built with Docusaurus.</div></div></div></footer>
 </div>
 
 <script src="/styles.e3afe6bd.js"></script>
 
-<script src="/runtime~main.3b25b496.js"></script>
+<script src="/runtime~main.3f7d8d1b.js"></script>
 
 <script src="/main.71e6a981.js"></script>
 
@@ -96,7 +96,7 @@ you can dispatch request actions, after all request action is also just Redux ac
 
 <script src="/17896441.599a7668.js"></script>
 
-<script src="/9feb18d4.6ee88cfe.js"></script>
+<script src="/9feb18d4.ad6c208d.js"></script>
 
 
 </body>
