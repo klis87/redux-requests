@@ -12,7 +12,7 @@ import styles from './styles.module.css';
 const features = [
   {
     title: <>Just actions</>,
-    imageUrl: 'img/undraw_docusaurus_mountain.svg',
+    imageUrl: 'img/undraw_letter.svg',
     description: (
       <>
         Just dispatch actions and enjoy automatic AJAX requests and network
@@ -22,7 +22,7 @@ const features = [
   },
   {
     title: <>First class aborts support</>,
-    imageUrl: 'img/undraw_docusaurus_tree.svg',
+    imageUrl: 'img/undraw_cancel.svg',
     description: (
       <>
         Automatic and configurable requests aborts, which increases performance
@@ -32,7 +32,7 @@ const features = [
   },
   {
     title: <>Drivers driven</>,
-    imageUrl: 'img/undraw_docusaurus_tree.svg',
+    imageUrl: 'img/undraw_by_my_car.svg',
     description: (
       <>
         Compatible with anything for server communication. Axios, Fetch API,
@@ -43,12 +43,12 @@ const features = [
   },
   {
     title: <>Batch requests</>,
-    imageUrl: 'img/undraw_docusaurus_react.svg',
+    imageUrl: 'img/undraw_portfolio.svg',
     description: <>Define multiple requests in single action</>,
   },
   {
     title: <>Optimistic updates</>,
-    imageUrl: 'img/undraw_docusaurus_react.svg',
+    imageUrl: 'img/undraw_to_the_stars.svg',
     description: (
       <>
         Update remote data before receiving server response to improve perceived
@@ -58,7 +58,7 @@ const features = [
   },
   {
     title: <>Cache</>,
-    imageUrl: 'img/undraw_docusaurus_react.svg',
+    imageUrl: 'img/undraw_memory_storage.svg',
     description: (
       <>
         Cache server response forever or for a defined time period to decrease
@@ -68,7 +68,7 @@ const features = [
   },
   {
     title: <>Data normalisation</>,
-    imageUrl: 'img/undraw_docusaurus_react.svg',
+    imageUrl: 'img/undraw_data_processing.svg',
     description: (
       <>
         Use automatic data normalisation in GraphQL Apollo fashion, but for
@@ -78,7 +78,7 @@ const features = [
   },
   {
     title: <>Server side rendering</>,
-    imageUrl: 'img/undraw_docusaurus_react.svg',
+    imageUrl: 'img/undraw_server.svg',
     description: (
       <>
         Configure SSR totally on Redux level and write truly universal code
@@ -88,7 +88,7 @@ const features = [
   },
   {
     title: <>React bindings</>,
-    imageUrl: 'img/undraw_docusaurus_react.svg',
+    imageUrl: 'img/undraw_react.svg',
     description: (
       <>Use react bindings to decrease code amount with React even more</>
     ),
