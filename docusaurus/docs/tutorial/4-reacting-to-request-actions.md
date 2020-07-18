@@ -1,5 +1,6 @@
 ---
 title:  4. Reacting to request actions
+description: 4th part of the tutorial for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 Despite the fact this library advocates using mostly actions and built-in selectors,

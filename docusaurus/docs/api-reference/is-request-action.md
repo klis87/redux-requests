@@ -1,5 +1,6 @@
 ---
 title:  isRequestAction
+description: isRequestAction API reference for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 `isRequestAction` is a small helper function which checks whether a Redux action

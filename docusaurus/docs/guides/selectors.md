@@ -1,5 +1,6 @@
 ---
 title:  Selectors
+description: Selectors guide for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 While it is possible to get a remote state from `requestsReducer` on your own, it is recommented to use below selectors.

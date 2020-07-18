@@ -1,5 +1,6 @@
 ---
 title:  getQuerySelector
+description: getQuerySelector API reference for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 It is almost the same as `getQuery`, the difference is that `getQuery` is the selector,

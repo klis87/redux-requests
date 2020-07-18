@@ -1,5 +1,6 @@
 ---
 title: Installation
+description: Installation guide for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 ## Installing the core

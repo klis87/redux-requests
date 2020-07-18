@@ -1,5 +1,6 @@
 ---
 title:  5. Resetting requests
+description: 5th part of the tutorial for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 Sometimes you might need to clear data and errors of your requests, including both queries and mutations.

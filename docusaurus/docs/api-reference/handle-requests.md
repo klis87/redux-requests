@@ -1,5 +1,6 @@
 ---
 title:  handleRequests
+description: handleRequests API reference for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 As you probably noticed in other chapters, `handleRequests` is a function which gets some options

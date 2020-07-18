@@ -1,5 +1,6 @@
 ---
 title:  resetRequests
+description: resetRequests API reference for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 `resetRequests` is a built-in action to reset requests state.

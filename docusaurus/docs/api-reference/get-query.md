@@ -1,5 +1,6 @@
 ---
 title:  getQuery
+description: getQuery API reference for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 `getQuery` is a selector which returns a state for a given query. It is the selector which requires props.

@@ -1,5 +1,6 @@
 ---
 title:  3. Request keys
+description: 3rd part of the tutorial for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 ## Sending requests with `requestKey`

@@ -1,5 +1,6 @@
 ---
 title:  6. Interceptors
+description: 6th part of the tutorial for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 ## Interceptors introduction

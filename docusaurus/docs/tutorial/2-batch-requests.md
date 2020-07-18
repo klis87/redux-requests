@@ -1,5 +1,6 @@
 ---
 title:  2. Batch requests
+description: 2nd part of the tutorial for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 ## What are batch requests?

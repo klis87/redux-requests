@@ -1,5 +1,6 @@
 ---
 title:  Actions
+description: Actions guide for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 As you probably noticed, this library is all about writing Redux actions. You need to do some
