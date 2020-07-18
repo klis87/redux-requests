@@ -1,5 +1,6 @@
 ---
 title:  1. Requests aborts
+description: 1st part of the tutorial for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 

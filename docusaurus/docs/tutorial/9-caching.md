@@ -1,5 +1,6 @@
 ---
 title:  9. Caching
+description: 9th part of the tutorial for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 ## `cache`

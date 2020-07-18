@@ -1,5 +1,6 @@
 ---
 title: Examples
+description: Examples for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 There are following examples currently:

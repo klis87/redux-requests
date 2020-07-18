@@ -1,5 +1,6 @@
 ---
 title:  getMutation
+description: getMutation API reference for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 Almost the same as `getQuery`, it is just used for mutations:

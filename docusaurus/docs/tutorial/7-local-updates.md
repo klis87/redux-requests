@@ -1,5 +1,6 @@
 ---
 title:  7. Local updates
+description: 7th part of the tutorial for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 What if you need to update a query data locally, without making any request? You

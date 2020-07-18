@@ -1,6 +1,7 @@
 ---
 id: motivation
 title: Motivation
+description: Motivation guide for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 ## Genesis

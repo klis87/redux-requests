@@ -1,5 +1,6 @@
 ---
 title:  10. Automatic normalisation
+description: 10th part of the tutorial for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 ## What is normalisation?

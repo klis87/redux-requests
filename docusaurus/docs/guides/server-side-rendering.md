@@ -1,5 +1,6 @@
 ---
 title:  Server side rendering
+description: SSR guide for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 ## What is server side rendering?

@@ -1,5 +1,6 @@
 ---
 title:  isRequestActionQuery
+description: isRequestActionQuery API reference for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 `isRequestActionQuery` is a small helper function which checks whether a request action

@@ -1,5 +1,6 @@
 ---
 title:  abortRequests
+description: abortRequests API reference for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 `abortRequests` is a built-in action which sometimes you might need to abort some pending requests manually,

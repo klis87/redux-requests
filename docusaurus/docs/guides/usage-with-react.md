@@ -1,5 +1,6 @@
 ---
 title:  Usage with React
+description: React guide for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 ## Introduction

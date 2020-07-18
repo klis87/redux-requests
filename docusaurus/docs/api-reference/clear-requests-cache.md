@@ -1,5 +1,6 @@
 ---
 title:  clearRequestsCache
+description: clearRequestsCache API reference for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 `clearRequestsCache` is a built-in action, which you might need to clear the cache manually for some reason,

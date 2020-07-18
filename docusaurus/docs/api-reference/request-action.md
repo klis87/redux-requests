@@ -1,5 +1,6 @@
 ---
 title:  RequestAction
+description: RequestAction API reference for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 `RequestAction` is a type which defines the structure of request actions. Like

@@ -1,5 +1,6 @@
 ---
 title:  error
+description: error API reference for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 This is a small helper which adds a proper suffix to request action types, it can

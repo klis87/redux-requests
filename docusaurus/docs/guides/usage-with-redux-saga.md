@@ -1,5 +1,6 @@
 ---
 title:  Usage with redux-saga
+description: Redux-saga guide for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 ## How to use it with `redux-saga`?

@@ -1,5 +1,6 @@
 ---
 title:  8. Optimistic updates
+description: 8th part of the tutorial for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
 Sometimes you don't want to wait for a mutation response to update your data. This
