@@ -11,9 +11,14 @@ If you know `axios`, you already know how to use it as the driver.
 
 First, install the driver:
 ```bash
-$ npm install  @redux-requests/axios
+$ npm install @redux-requests/axios
 ```
 or you can just use CDN: `https://unpkg.com/@redux-requests/axios`.
+
+You also need to install `axios`:
+```bash
+$ npm install axios
+```
 
 ## Usage
 

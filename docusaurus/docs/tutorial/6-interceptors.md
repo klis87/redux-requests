@@ -2,6 +2,8 @@
 title:  6. Interceptors
 ---
 
+## Interceptors introduction
+
 What if you need to make a side effect for a given request, or maybe a response success
 or an error? What if you need to add a token to all or most of requests? This is
 where **interceptors** come into play.
@@ -11,7 +13,7 @@ There are four types of **interceptors**: `onRequest`, `onSuccess`, `onError` an
 request action inside `meta` or you can pass them to `handleRequests` to intercept
 all requests.
 
-Now, let's analyze all **interceptors** first.
+Now, let's analyze all **interceptors**.
 
 ## `onRequest`
 
@@ -105,7 +107,7 @@ const onError = (error, requestAction, store) => {
 }
 ```
 A very important things here is that you need to `throw` error (passed or another)
-or return a rejected promise with am error. Forgetting about it will probably
+or return a rejected promise with an error. Forgetting about it will probably
 create some bugs, because if you don't rethrow, it will be treated that error is fixed.
 
 This is because it is possible to recover from error. Imagine you received an error
@@ -176,7 +178,7 @@ const onAbort = (requestAction, store) => {
 
 Let's go back to `onError` example with token refresh. We pointed that above example
 was a little simplified. Before we improve it, here is the list of additional `meta`
-options related to interceptos:
+options related to interceptors:
 - `silent: boolean`: after setting to `false` no action will be dispatched for a given request, so reducers won't be hit,
 useful if you want to make a request and not store it, or in an interceptor to avoid duplicated actions in some cases
 - `runOnRequest: boolean`: passing `false` would prevent running `onRequest` interceptor for this action, useful to avoid infinitive loops in some cases
@@ -266,3 +268,9 @@ handleRequests({
   onAbort,
 );
 ```
+
+## Interceptors and batch requests
+
+You need to be careful when writing `onRequest` interceptors with **batch requests**.
+For those `request` argument will be an array of configs (like in batch request action), so
+you must remember to handle those cases too when needed.

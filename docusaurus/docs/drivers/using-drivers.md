@@ -16,7 +16,7 @@ will be covered later in this chapter.
 
 ## How to use drivers
 
-You must use at least one driver. You can choose one of provided driver by this library
+You must use at least one driver. You can choose one of provided drivers by this library
 or write your own. Let's assume we pick `fetch` driver. Install it:
 ```bash
 $ npm install @redux-requests/fetch
@@ -135,7 +135,7 @@ const axiosDriver = requestConfig => {
 ```
 
 This looks a little more complicated, but it is not, let's analyze above code steps
-by steps. First of call, to support abort we decorated returned promise with `cancel`
+by steps. First of all, to support abort we decorated returned promise with `cancel`
 method, which will be called by the library when a request should be aborted. Native
 promises cannot be aborted/cancelled, but by adding this we make it possible. This technique
 is quite similar for example to `Bluebird` promises. Moreover, notice `catch` logic.
