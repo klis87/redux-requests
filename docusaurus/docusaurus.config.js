@@ -4,8 +4,8 @@ module.exports = {
   title: 'redux-requests',
   tagline:
     'Declarative AJAX requests and automatic network state management for Redux',
-  url: 'https://github.com/klis87/redux-requests',
-  baseUrl: '/',
+  url: 'https://klis87.github.io',
+  baseUrl: '/redux-requests/',
   favicon: 'img/favicon.ico',
   organizationName: 'klis87', // Usually your GitHub org/user name.
   projectName: 'redux-requests', // Usually your repo name.

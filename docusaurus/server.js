@@ -12,7 +12,7 @@ const app = express();
 //   }),
 // );
 app.use(
-  '/redux-saga-requests',
+  '/redux-requests',
   compression(),
   express.static(
     'build',

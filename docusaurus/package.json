@@ -7,7 +7,7 @@
     "build": "docusaurus build",
     "start": "NODE_ENV=production node server.js",
     "swizzle": "docusaurus swizzle",
-    "deploy": "docusaurus deploy"
+    "deploy": "GIT_USER=klis87 USE_SSH=true docusaurus deploy"
   },
   "dependencies": {
     "@docusaurus/core": "^2.0.0-alpha.48",
