@@ -99,16 +99,26 @@ export function handleRequests(
 ): handleRequestsResponse;
 
 export const clearRequestsCache: (
-  ...actionTypes: string[]
-) => { type: string; actionTypes: string[] };
+  requests?: (string | { requestType: string; requestKey: string })[],
+) => {
+  type: string;
+  requests: (string | { requestType: string; requestKey: string })[];
+};
 
 export const resetRequests: (
-  requests: (string | { requestType: string; requestKey: string })[],
+  requests?: (string | { requestType: string; requestKey: string })[],
   abortPending?: boolean,
 ) => {
   type: string;
   requests: (string | { requestType: string; requestKey: string })[];
   abortPending: boolean;
+};
+
+export const abortRequests: (
+  requests?: (string | { requestType: string; requestKey: string })[],
+) => {
+  type: string;
+  requests: (string | { requestType: string; requestKey: string })[];
 };
 
 export interface QueryState<QueryStateData> {
@@ -153,8 +163,8 @@ export function getMutationSelector(props: {
   requestKey?: string;
 }): (state: any) => MutationState;
 
-export const isRequestAction = (action: AnyAction) => boolean;
+export const isRequestAction: (action: AnyAction) => boolean;
 
-export const isRequestActionQuery = (requestAction: RequestAction) => boolean;
+export const isRequestActionQuery: (requestAction: RequestAction) => boolean;
 
-export const isResponseAction = (action: AnyAction) => boolean;
+export const isResponseAction: (action: AnyAction) => boolean;

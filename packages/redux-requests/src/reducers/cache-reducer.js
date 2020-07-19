@@ -4,17 +4,27 @@ import { isSuccessAction, getRequestActionFromResponse } from '../actions';
 const getNewCacheTimeout = cache =>
   cache === true ? null : cache * 1000 + Date.now();
 
-const getKey = action => action.type + (action.meta.requestKey || '');
+const getRequestKey = action => action.type + (action.meta.requestKey || '');
+
+const getRequestTypeString = requestType =>
+  typeof requestType === 'function' ? requestType.toString() : requestType;
+
+const getRequestKeys = requests =>
+  requests.map(v =>
+    typeof v === 'object'
+      ? getRequestTypeString(v.requestType) + v.requestKey
+      : getRequestTypeString(v),
+  );
 
 export default (state, action) => {
   if (action.type === CLEAR_REQUESTS_CACHE) {
-    if (action.cacheKeys.length === 0) {
+    if (!action.requests) {
       return {};
     }
 
     state = { ...state };
-    action.cacheKeys.forEach(cacheKey => {
-      delete state[cacheKey];
+    getRequestKeys(action.requests).forEach(requestKey => {
+      delete state[requestKey];
     });
 
     return state;
@@ -30,7 +40,7 @@ export default (state, action) => {
 
     return {
       ...state,
-      [getKey(requestAction)]: {
+      [getRequestKey(requestAction)]: {
         timeout: getNewCacheTimeout(action.meta.cache),
         cacheKey: action.meta.cacheKey,
       },
