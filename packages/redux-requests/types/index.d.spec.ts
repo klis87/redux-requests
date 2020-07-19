@@ -4,12 +4,17 @@ import {
   abort,
   Driver,
   clearRequestsCache,
+  resetRequests,
+  abortRequests,
   RequestAction,
   handleRequests,
   getQuery,
   getQuerySelector,
   getMutation,
   getMutationSelector,
+  isRequestAction,
+  isRequestActionQuery,
+  isResponseAction,
 } from './index';
 
 success('type');
@@ -58,8 +63,16 @@ handleRequests({
 });
 
 clearRequestsCache();
-clearRequestsCache('TYPE');
-clearRequestsCache('TYPE', 'ANOTHER_TYPE');
+clearRequestsCache(['TYPE']);
+clearRequestsCache(['TYPE', { requestType: 'ANOTHER_TYPE', requestKey: '1' }]);
+
+abortRequests();
+abortRequests(['TYPE']);
+abortRequests(['TYPE', { requestType: 'ANOTHER_TYPE', requestKey: '1' }]);
+
+resetRequests();
+resetRequests(['TYPE']);
+resetRequests(['TYPE', { requestType: 'ANOTHER_TYPE', requestKey: '1' }]);
 
 getQuery({}, { type: 'Mutation', requestKey: '1' });
 
@@ -76,3 +89,7 @@ query2.data.key = '1';
 getMutation({}, { type: 'Mutation', requestKey: '1' });
 const mutationSelector = getMutationSelector({ type: 'Mutation' });
 mutationSelector({});
+
+isRequestAction({ type: 'ACTION' }) === true;
+isRequestActionQuery({ type: 'ACTION', request: { url: '/' } }) === true;
+isResponseAction({ type: 'ACTION', request: { url: '/' } }) === true;

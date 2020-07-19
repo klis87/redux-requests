@@ -18,7 +18,13 @@ describe('reducers', () => {
     it('clears specific cache keys for clearRequestsCache', () => {
       expect(
         expect(
-          cacheReducer(defaultState, clearRequestsCache('QUERY', 'QUERY2')),
+          cacheReducer(
+            defaultState,
+            clearRequestsCache([
+              'QUERY',
+              { requestType: 'QUERY', requestKey: '2' },
+            ]),
+          ),
         ).toEqual({
           QUERY3: { timeout: null, cacheKey: undefined },
         }),
