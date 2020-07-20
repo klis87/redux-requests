@@ -68,6 +68,8 @@ when data is updated - it will still show during initial fetch, but ill not for 
 - `loadingComponent` custom React component, which will be rndered when request is pending, useful for showing
 - `loadingComponentProps`: extra props which will be passed to `loadingComponent`
 spinners, `null` by default
+- `showLoaderDuringRefetch: boolean`: `true` by default, whether `loadingComponent` will be shown on data refetch
+or not, if `false` you won't see spinner even when data is being loaded if you already have some data from a previous requests
 
 Minimalistic example:
 ```js
