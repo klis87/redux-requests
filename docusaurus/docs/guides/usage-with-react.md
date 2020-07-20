@@ -26,7 +26,7 @@ $ npm install react-redux
 ### `useQuery`
 
 `useQuery` is a hook which uses `useSelector` from `react-redux` together with `getQuerySelector` from
-`redux-requests`. It accepts the same arguments as `getQuerySelector`. You could
+`redux-requests/core`. It accepts the same arguments as `getQuerySelector`. You could
 easily use `useSelector` directly, but `useQuery` is slightly less verbose. So, without `useQuery`:
 ```js
 import React from 'react';
@@ -53,13 +53,20 @@ const Books = () => {
 ### `Query`
 
 `Query` simplifies rendering queries data, loading spinners and server errors. It automatically connects to Redux store by using `useQuery` under the hood. It has the following props:
-- `type: string`: refer to `getQuery` form the core library
-- `selector`: if you alredy have a query selector, pass it here instead of `type`
+- `type: string`: type of query action, refer to `getQuery` from the core library
+- `requestKey: string`: pass it if you used `requestKey` in query action, refer to `getQuery` from the core library
+- `multiple: boolean`: refer to `getQuery` from the core library
+- `defaultData`: refer to `getQuery` from the core library
+- `selector`: if you already have a query selector, pass it here instead of `type`
+- `children` - render function receiving object with data, loading flag and error property
+- `component` - alternative prop to children, you can pass your custom component here, which will receive data,  loading and error props, plus any additional props passed to `Query`
 - `isDataEmpty: query => boolean`: function which defines when `data` is empty, by default data as empty array and falsy value like `null`, `undefined` is considered as empty
 when data is updated - it will still show during initial fetch, but ill not for subsequent requests
 - `noDataMessage`: `string` or any React node, like `<div>message</div>`, which will be rendered when `data` is empty
-- `errorComonent`: custom React component, which will be rendered on error, receives `error` prop, `null` by default
+- `errorComponent`: custom React component, which will be rendered on error, receives `error` prop, `null` by default
+- `errorComponentProps`: extra props which will be passed to `errorComponent`
 - `loadingComponent` custom React component, which will be rndered when request is pending, useful for showing
+- `loadingComponentProps`: extra props which will be passed to `loadingComponent`
 spinners, `null` by default
 
 Minimalistic example:
@@ -136,7 +143,7 @@ const ErrorComponent = ({ error, label }) => (
 ### `useMutation`
 
 `useMutation` is a hook which uses `useSelector` from `react-redux` together with `getMutationSelector` from
-`redux-requests`. It accepts the same arguments as `getMutation`. Like in case of `useQuery`, you could
+`redux-requests`. It accepts the same arguments as `getMutationSelector`. Like in case of `useQuery`, you could
 render
 
 For example:
@@ -153,9 +160,9 @@ const Books = () => {
 ### `Mutation`
 
 `Mutation` converts `useMutation` into component with render prop. It has the following props:
-- `type: string`: refer to useMutation
+- `type: string`: type of mutation action, refer to `getMutation` from the core library
+- `requestKey: string`: pass it if you used `requestKey` in mutation action, refer to `getMutation` from the core library
 - `selector`: if you already have a mutation selector, pass it here instead of type
-- `requestKey`: string: refer to useMutation
 - `children` - render function receiving object with loading flag and error property
 - `component` - alternative prop to children, you can pass your custom component here, which will receive loading and error props, plus any additional props passed to Mutation
 
