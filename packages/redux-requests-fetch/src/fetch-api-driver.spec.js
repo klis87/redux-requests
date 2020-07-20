@@ -102,7 +102,7 @@ describe('fetchApiDriver', () => {
   it('calls fetchInstance with proper object', async () => {
     const requestInstance = jest.fn().mockResolvedValue({
       ok: true,
-      json: () => {},
+      json: jest.fn().mockResolvedValue('data'),
     });
     const driver = createDriver(requestInstance, {
       AbortController: DummyAbortController,
@@ -114,7 +114,7 @@ describe('fetchApiDriver', () => {
   it('calls fetchInstance without signal with default AbortController', async () => {
     const requestInstance = jest.fn().mockResolvedValue({
       ok: true,
-      json: () => {},
+      json: jest.fn().mockResolvedValue('data'),
     });
     const driver = createDriver(requestInstance);
     await driver({ url: '/' });
@@ -133,7 +133,7 @@ describe('fetchApiDriver', () => {
 
     const requestInstance = jest.fn().mockResolvedValue({
       ok: true,
-      json: () => {},
+      json: jest.fn().mockResolvedValue('data'),
     });
     const driver = createDriver(requestInstance, {
       AbortController: LocalDummyAbortController,
@@ -147,7 +147,7 @@ describe('fetchApiDriver', () => {
   it('uses baseURL for relative urls', async () => {
     const requestInstance = jest.fn().mockResolvedValue({
       ok: true,
-      json: () => {},
+      json: jest.fn().mockResolvedValue('data'),
     });
     const driver = createDriver(requestInstance, {
       baseURL: 'http://domain.com',
@@ -162,7 +162,7 @@ describe('fetchApiDriver', () => {
   it('doesnt use baseURL for absolute urls', async () => {
     const requestInstance = jest.fn().mockResolvedValue({
       ok: true,
-      json: () => {},
+      json: jest.fn().mockResolvedValue('data'),
     });
     const driver = createDriver(requestInstance, {
       baseURL: 'http://domain.com',

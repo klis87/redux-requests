@@ -199,18 +199,24 @@ const maybeCallOnAbortMeta = (action, store, error) => {
   throw error;
 };
 
+const getInitialBatchObject = responseKeys =>
+  responseKeys.reduce((prev, key) => {
+    prev[key] = [];
+    return prev;
+  }, {});
+
 const maybeTransformBatchRequestResponse = (action, response) => {
   const actionPayload = getActionPayload(action);
   const isBatchedRequest = Array.isArray(actionPayload.request);
+  const responseKeys = Object.keys(response[0]);
 
   return isBatchedRequest && !isActionRehydrated(action)
-    ? response.reduce(
-        (prev, current) => {
-          prev.data.push(current.data);
-          return prev;
-        },
-        { data: [] },
-      )
+    ? response.reduce((prev, current) => {
+        responseKeys.forEach(key => {
+          prev[key].push(current[key]);
+        });
+        return prev;
+      }, getInitialBatchObject(responseKeys))
     : response[0];
 };
 

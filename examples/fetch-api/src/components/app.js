@@ -1,5 +1,5 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { resetRequests } from '@redux-requests/core';
 import { Query } from '@redux-requests/react';
 
@@ -16,7 +16,6 @@ const RequestError = () => (
 );
 
 const App = () => {
-  const abortCounter = useSelector(state => state.abortCounter);
   const dispatch = useDispatch();
 
   return (
@@ -26,10 +25,6 @@ const App = () => {
         In order to see aborts in action, you should set network throttling in
         your browser
       </p>
-      <hr />
-      <div>
-        <span>Abort counter: {abortCounter}</span>
-      </div>
       <hr />
       <div>
         <h2>Photo</h2>
