@@ -124,7 +124,7 @@ you can read responses directly from the places you dispatched requests.
 
 For example:
 ```js
-store.dispatch(fetchBooks()).then(({ data, error, isAborted, action })) => {
+store.dispatch(fetchBooks()).then(({ data, error, isAborted, action }) => {
   // data for success, error for error, isAborted: true for abort
 })
 ```
