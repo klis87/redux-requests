@@ -1,7 +1,7 @@
 {
   "name": "@redux-requests/fetch",
   "version": "0.11.1",
-  "description": "Fetch API driver for Redux-Requests, Redux addon to simplify AJAX requests",
+  "description": "Fetch API driver for redux-requests, declarative AJAX requests and automatic network state management for Redux",
   "main": "lib/index.js",
   "module": "es/index.js",
   "jsnext:main": "es/index.js",
@@ -16,7 +16,7 @@
     "fetch",
     "ajax"
   ],
-  "homepage": "https://github.com/klis87/redux-requests",
+  "homepage": "https://redux-requests.klisiczynski.com",
   "bugs": {
     "url": "https://github.com/klis87/redux-requests/issues"
   },
