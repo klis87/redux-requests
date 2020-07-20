@@ -8,7 +8,7 @@ describe('axiosDriver', () => {
   it('returns cancellable promise with correct response', async () => {
     const axiosInstance = jest
       .fn()
-      .mockResolvedValue({ data: 'data', status: 200 });
+      .mockResolvedValue({ data: 'data', status: 200, headers: {} });
     const tokenSource = {
       token: 'token',
       cancel: jest.fn(),
@@ -18,7 +18,11 @@ describe('axiosDriver', () => {
 
     const responsePromise = axiosDriver({ url: '/' });
 
-    await expect(responsePromise).resolves.toEqual({ data: 'data' });
+    await expect(responsePromise).resolves.toEqual({
+      data: 'data',
+      status: 200,
+      headers: {},
+    });
     expect(axiosInstance).toHaveBeenLastCalledWith({
       url: '/',
       cancelToken: 'token',

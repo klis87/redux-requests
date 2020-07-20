@@ -7,7 +7,11 @@ export const createDriver = axiosInstance => requestConfig => {
     cancelToken: abortSource.token,
     ...requestConfig,
   })
-    .then(response => ({ data: response.data }))
+    .then(response => ({
+      data: response.data,
+      status: response.status,
+      headers: response.headers,
+    }))
     .catch(error => {
       if (axios.isCancel(error)) {
         throw 'REQUEST_ABORTED';
