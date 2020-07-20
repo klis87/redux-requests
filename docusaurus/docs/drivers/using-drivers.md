@@ -106,7 +106,30 @@ which get's `requestConfig` (it will be passed from `action.request`) and return
 called `axios` with it. `axios(requestConfig)` already returns a promise which will
 be rejected for error, so we are good here. The only thing we did is adding
 `.then(response => ({ data: response.data }))` to resolve promises only with `data` -
-the library except promises to be resolved with object with `data`.
+the library expects promises to be resolved with object with at least `data`.
+
+## Supporting more than just data
+
+As written above, for success response promise has to be resolved with an object
+with at least `data` key, but you can add anything else:
+```js
+import axios from 'axios';
+
+const axiosDriver = requestConfig => {
+  return axios(requestConfig).then(response => ({
+    data: response.data,
+    headers: response.headers,
+    status: response.status,
+  }));
+};
+```
+
+Now `headers` and `status` will be available in `onSuccess` interceptor and in
+promise which is returned by request action dispatch (next to `data`). However,
+note that still only `data` will be stored in reducer, so if you need to access a header
+for instance from Redux state, you can store it in your own reducer or you could merge
+a header with `data` inside `onSuccess` interceptor.
+
 
 ## Supporting aborts in custom drivers
 
@@ -121,7 +144,11 @@ const axiosDriver = requestConfig => {
     cancelToken: abortSource.token,
     ...requestConfig,
   })
-    .then(response => ({ data: response.data }))
+    .then(response => ({
+      data: response.data,
+      headers: response.headers,
+      status: response.status,
+    }))
     .catch(error => {
       if (axios.isCancel(error)) {
         throw 'REQUEST_ABORTED';
@@ -164,7 +191,11 @@ const createAxiosDriver = axiosInstance => requestConfig => {
     cancelToken: abortSource.token,
     ...requestConfig,
   })
-    .then(response => ({ data: response.data }))
+    .then(response => ({
+      data: response.data,
+      headers: response.headers,
+      status: response.status,
+    }))
     .catch(error => {
       if (axios.isCancel(error)) {
         throw 'REQUEST_ABORTED';

@@ -75,3 +75,7 @@ by default. Available response types are: `'arraybuffer'`, `'blob'`, `'formData'
 (if you don't want a response stream to be read for the given response).
 
 Moreover, as you probably deducted from `responseType` option in config, this driver reads response streams automatically for you (depending on `responseType` you choose) and sets it as `response.data`, so instead of doing `response.json()`, just read `response.data`.
+
+## Extra response attributes
+
+`fetch` driver supports `headers` and `status` attributes inside response (next to `data`).
