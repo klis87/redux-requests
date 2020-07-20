@@ -167,9 +167,9 @@ Also, you need to install a driver:
 
 Also, you have to install `reselect`, which probably you use anyway.
 
-## Usage
+## Usage [:arrow_up:](#table-of-content)
 
-For usage, see (documentation)[https://redux-requests.klisiczynski.com/docs/introduction/motivation]
+For usage, see [documentation](https://redux-requests.klisiczynski.com/docs/introduction/motivation)
 
 ## Examples [:arrow_up:](#table-of-content)
 
