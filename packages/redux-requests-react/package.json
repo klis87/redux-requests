@@ -49,7 +49,7 @@
     "@babel/preset-env": "7.9.6",
     "@babel/preset-react": "7.9.4",
     "@redux-requests/core": "^0.31.0",
-    "@types/react": "16.9.23",
+    "@types/react": "16.9.43",
     "babel-jest": "25.1.0",
     "babel-loader": "8.1.0",
     "babel-plugin-transform-react-remove-prop-types": "0.4.24",
