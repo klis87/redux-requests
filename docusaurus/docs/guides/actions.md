@@ -135,7 +135,9 @@ Imagine you dispatch a request action somewhere, but in this place you are not i
 in case of promise rejection the warning would be still there.
 
 Anyway, promise is resolved on response as:
-- when `success`, as `{ data, action }`
+- when `success`, as `{ data, action, ...extraDriverProps }`, `extraDriverProps` are other optional keys
+next to `data` inside success response, for example `axios` and `fetch` drivers support `headers` and `status`,
+so promise would be resolved to `{ data, action, headers, status }`
 - when `error`, as `{ error, action }`
 - when `abort`, as `{ isAborted: true, action }`
 

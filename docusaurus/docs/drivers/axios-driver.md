@@ -57,3 +57,7 @@ const deleteUser = id => ({
 ```
 The point is, you can use the same request config like you do with pure Axios. That's
 all there is to it. For any options just refer to [axios docs](https://github.com/axios/axios).
+
+## Extra response attributes
+
+`axios` driver supports `headers` and `status` attributes inside response (next to `data`).
