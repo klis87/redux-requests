@@ -8,7 +8,7 @@
 
 <title data-react-helmet="true">5. Resetting requests | redux-requests</title>
 
-<meta data-react-helmet="true" http-equiv="x-ua-compatible" content="ie=edge"><meta data-react-helmet="true" property="og:title" content="redux-requests"><meta data-react-helmet="true" name="twitter:card" content="summary"><meta data-react-helmet="true" name="description" content="5th part of the tutorial for redux-requests - declarative AJAX requests and automatic network state management for Redux"><meta data-react-helmet="true" property="og:description" content="5th part of the tutorial for redux-requests - declarative AJAX requests and automatic network state management for Redux"><meta data-react-helmet="true" property="og:url" content="http://redux-requests.klisiczynski.com/docs/tutorial/5-resetting-requests">
+<meta data-react-helmet="true" http-equiv="x-ua-compatible" content="ie=edge"><meta data-react-helmet="true" property="og:title" content="redux-requests"><meta data-react-helmet="true" name="twitter:card" content="summary"><meta data-react-helmet="true" name="description" content="5th part of the tutorial for redux-requests - declarative AJAX requests and automatic network state management for Redux"><meta data-react-helmet="true" property="og:description" content="5th part of the tutorial for redux-requests - declarative AJAX requests and automatic network state management for Redux"><meta data-react-helmet="true" property="og:url" content="https://redux-requests.klisiczynski.com/docs/tutorial/5-resetting-requests">
 
 <link data-react-helmet="true" rel="shortcut icon" href="/img/favicon.ico">
 
@@ -18,9 +18,9 @@
 
 <link rel="preload" href="/styles.e3afe6bd.js" as="script">
 
-<link rel="preload" href="/runtime~main.44482f00.js" as="script">
+<link rel="preload" href="/runtime~main.6e396d07.js" as="script">
 
-<link rel="preload" href="/main.71e6a981.js" as="script">
+<link rel="preload" href="/main.1623852e.js" as="script">
 
 <link rel="preload" href="/1.647e9388.js" as="script">
 
@@ -30,7 +30,7 @@
 
 <link rel="preload" href="/17896441.599a7668.js" as="script">
 
-<link rel="preload" href="/7eafd509.4a5b6d27.js" as="script">
+<link rel="preload" href="/7eafd509.57ad2abd.js" as="script">
 
 </head>
 <body>
@@ -43,14 +43,14 @@ You can use <code>resetRequests</code> action to do it. For example:</p><div cla
 </span></div><div class="token-line" style="color:#d6deeb"><span class="token plain"></span><span class="token comment" style="color:rgb(99, 119, 119);font-style:italic">// clear errors if any for for DELETE_BOOKS mutation</span><span class="token plain"></span></div><div class="token-line" style="color:#d6deeb"><span class="token plain"></span><span class="token function" style="color:rgb(130, 170, 255)">dispatch</span><span class="token punctuation" style="color:rgb(199, 146, 234)">(</span><span class="token function" style="color:rgb(130, 170, 255)">resetRequests</span><span class="token punctuation" style="color:rgb(199, 146, 234)">(</span><span class="token punctuation" style="color:rgb(199, 146, 234)">[</span><span class="token constant" style="color:rgb(130, 170, 255)">DELETE_BOOKS</span><span class="token punctuation" style="color:rgb(199, 146, 234)">]</span><span class="token punctuation" style="color:rgb(199, 146, 234)">)</span><span class="token punctuation" style="color:rgb(199, 146, 234)">)</span><span class="token punctuation" style="color:rgb(199, 146, 234)">;</span><span class="token plain"></span></div><div class="token-line" style="color:#d6deeb"><span class="token plain" style="display:inline-block">
 </span></div><div class="token-line" style="color:#d6deeb"><span class="token plain"></span><span class="token comment" style="color:rgb(99, 119, 119);font-style:italic">// clear errors and data for FETCH_BOOKS and FETCH_BOOK with 1 request key</span><span class="token plain"></span></div><div class="token-line" style="color:#d6deeb"><span class="token plain"></span><span class="token function" style="color:rgb(130, 170, 255)">dispatch</span><span class="token punctuation" style="color:rgb(199, 146, 234)">(</span><span class="token function" style="color:rgb(130, 170, 255)">resetRequests</span><span class="token punctuation" style="color:rgb(199, 146, 234)">(</span><span class="token punctuation" style="color:rgb(199, 146, 234)">[</span><span class="token constant" style="color:rgb(130, 170, 255)">FETCH_BOOKS</span><span class="token punctuation" style="color:rgb(199, 146, 234)">,</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(199, 146, 234)">{</span><span class="token plain"> requestType</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"> </span><span class="token constant" style="color:rgb(130, 170, 255)">FETCH_BOOK</span><span class="token punctuation" style="color:rgb(199, 146, 234)">,</span><span class="token plain"> requestKey</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"> </span><span class="token string" style="color:rgb(173, 219, 103)">&#x27;1&#x27;</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(199, 146, 234)">}</span><span class="token punctuation" style="color:rgb(199, 146, 234)">]</span><span class="token punctuation" style="color:rgb(199, 146, 234)">)</span><span class="token punctuation" style="color:rgb(199, 146, 234)">)</span><span class="token punctuation" style="color:rgb(199, 146, 234)">;</span></div></code></pre></div><p>What is important, <code>resetRequests</code> apart from reset also aborts all pending requests of the given types.
 You can prevent it by passing 2nd argument <code>dispatch(resetRequests([FETCH_BOOKS], false))</code>.</p><p>Also note that <code>resetRequests</code> also set query <code>pristine</code> to true and clears cache if set
-(more about caching in another tutorial).</p></div></article><div class="margin-vert--xl"><div class="row"><div class="col"><a href="https://github.com/klis87/redux-requests/edit/master/docusaurus/docs/tutorial/5-resetting-requests.md" target="_blank" rel="noreferrer noopener"><svg fill="currentColor" height="1.2em" width="1.2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 40 40" style="margin-right:0.3em;vertical-align:sub"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col text--right"><em><small>Last updated on <time datetime="2020-07-18T23:52:40.000Z" class="docLastUpdatedAt_1sqk">7/19/2020</time> by <strong>klis87</strong></small></em></div></div></div><div class="margin-vert--lg"><nav class="pagination-nav"><div class="pagination-nav__item"><a class="pagination-nav__link" href="/docs/tutorial/4-reacting-to-request-actions"><h5 class="pagination-nav__link--sublabel">Previous</h5><h4 class="pagination-nav__link--label">« 4. Reacting to request actions</h4></a></div><div class="pagination-nav__item pagination-nav__item--next"><a class="pagination-nav__link" href="/docs/tutorial/6-interceptors"><h5 class="pagination-nav__link--sublabel">Next</h5><h4 class="pagination-nav__link--label">6. Interceptors »</h4></a></div></nav></div></div></div><div class="col col--3"><div class="tableOfContents_TbNY"></div></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container"><div class="text--center"><div>Copyright © 2020 redux-requests. Built with Docusaurus.</div></div></div></footer>
+(more about caching in another tutorial).</p></div></article><div class="margin-vert--xl"><div class="row"><div class="col"><a href="https://github.com/klis87/redux-requests/edit/master/docusaurus/docs/tutorial/5-resetting-requests.md" target="_blank" rel="noreferrer noopener"><svg fill="currentColor" height="1.2em" width="1.2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 40 40" style="margin-right:0.3em;vertical-align:sub"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col text--right"><em><small>Last updated on <time datetime="2020-07-20T13:55:22.000Z" class="docLastUpdatedAt_1sqk">7/20/2020</time> by <strong>klis87</strong></small></em></div></div></div><div class="margin-vert--lg"><nav class="pagination-nav"><div class="pagination-nav__item"><a class="pagination-nav__link" href="/docs/tutorial/4-reacting-to-request-actions"><h5 class="pagination-nav__link--sublabel">Previous</h5><h4 class="pagination-nav__link--label">« 4. Reacting to request actions</h4></a></div><div class="pagination-nav__item pagination-nav__item--next"><a class="pagination-nav__link" href="/docs/tutorial/6-interceptors"><h5 class="pagination-nav__link--sublabel">Next</h5><h4 class="pagination-nav__link--label">6. Interceptors »</h4></a></div></nav></div></div></div><div class="col col--3"><div class="tableOfContents_TbNY"></div></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container"><div class="text--center"><div>Copyright © 2020 redux-requests. Built with Docusaurus.</div></div></div></footer>
 </div>
 
 <script src="/styles.e3afe6bd.js"></script>
 
-<script src="/runtime~main.44482f00.js"></script>
+<script src="/runtime~main.6e396d07.js"></script>
 
-<script src="/main.71e6a981.js"></script>
+<script src="/main.1623852e.js"></script>
 
 <script src="/1.647e9388.js"></script>
 
@@ -60,7 +60,7 @@ You can prevent it by passing 2nd argument <code>dispatch(resetRequests([FETCH_B
 
 <script src="/17896441.599a7668.js"></script>
 
-<script src="/7eafd509.4a5b6d27.js"></script>
+<script src="/7eafd509.57ad2abd.js"></script>
 
 
 </body>
