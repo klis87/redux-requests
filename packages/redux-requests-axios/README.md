@@ -6,7 +6,7 @@
 [![Known Vulnerabilities](https://snyk.io/test/github/klis87/redux-requests/badge.svg)](https://snyk.io/test/github/klis87/redux-requests)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
-Axios driver to Redux-Saga - addon to simplify handling of AJAX requests.
+Axios driver for redux-requests, declarative AJAX requests and automatic network state management for Redux
 
 ## Installation
 
@@ -16,7 +16,9 @@ $ npm install @redux-requests/axios
 ```
 or you can just use CDN: `https://unpkg.com/@redux-requests/axios`.
 
-For usage, see [redux-requests docs](https://github.com/klis87/redux-requests).
+## Usage
+
+For usage, see [redux-requests docs](https://redux-requests.klisiczynski.com).
 
 ## Licence
 

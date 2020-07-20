@@ -6,7 +6,7 @@
 [![Known Vulnerabilities](https://snyk.io/test/github/klis87/redux-requests/badge.svg)](https://snyk.io/test/github/klis87/redux-requests)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
-Mock driver to Redux - addon to simplify handling of AJAX requests.
+Mock driver for redux-requests, declarative AJAX requests and automatic network state management for Redux
 
 ## Installation
 
@@ -18,45 +18,7 @@ or you can just use CDN: `https://unpkg.com/@redux-requests/mock`.
 
 ## Usage
 
-Probably you are sometimes in a situation when you would like to start working on a feature which needs some integration with
-an API. What you can do then? Probably you just wait or start writing some prototype which then you will polish once API is finished. You can do better with `@redux-requests/mock`, especially with multi driver support.
-With this driver, you can define expected responses and errors which you would get from server and write your app
-normally. Then, after API is finished, you will just need to replace the driver with a real one, like Axios or Fetch API, without
-any additional refactoring necessary, which could save you a lot of time!
-
-You can use it like this:
-```js
-import { handleRequests } from '@redux-requests/core';
-import { createDriver } from '@redux-requests/mock';
-
-const FETCH_PHOTO = 'FETCH_PHOTO';
-const FETCH_PHOTO_ERROR = 'FETCH_PHOTO_ERROR';
-
-const fetchPhoto = id => ({
-  type: FETCH_PHOTO,
-  request: {
-    response: {
-      data: {
-        id,
-        title: 'accusamus beatae ad facilis cum similique qui sunt',
-      },
-    },
-  },
-});
-
-const fetchPhotoWithError = id => ({
-  type: FETCH_PHOTO_WITH_ERROR,
-  request: {
-    error: { status: 404 },
-  },
-});
-
-handleRequests({
-  driver: createDriver({
-    timeout: 1000, // optional, in ms, defining how much time mock request would take, useful for testing spinners
-  }),
-});
-```
+For usage, see [redux-requests docs](https://redux-requests.klisiczynski.com).
 
 ## Licence
 

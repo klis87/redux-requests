@@ -6,7 +6,7 @@
 [![Known Vulnerabilities](https://snyk.io/test/github/klis87/redux-requests/badge.svg)](https://snyk.io/test/github/klis87/redux-requests)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
-Fetch API driver to Redux-Saga - addon to simplify handling of AJAX requests.
+Fetch API driver for redux-requests, declarative AJAX requests and automatic network state management for Redux
 
 ## Installation
 
@@ -18,55 +18,7 @@ or you can just use CDN: `https://unpkg.com/@redux-requests/fetch`.
 
 ## Usage
 
-For a general usage, see [redux-requests docs](https://github.com/klis87/redux-requests).
-
-Regarding Fetch API related usage, here you can see a typical setup:
-```js
-import 'isomorphic-fetch'; // or a different fetch polyfill
-import { handleRequests } from '@redux-requests/core';
-import { createDriver } from '@redux-requests/fetch';
-
-handleRequests({
-  driver: createDriver(
-    window.fetch,
-    {
-      baseURL: 'https://my-domain.com' // optional - it works like axios baseURL, prepending all relative urls
-      AbortController: window.AbortController, // optional, if your browser supports AbortController or you use a polyfill like https://github.com/mo/abortcontroller-polyfill
-    }
-  ),
-});
-```
-And in order to create Fetch API requests, below:
-```js
-fetch('/users', {
-  method: 'POST',
-  body: JSON.stringify(data),
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-```
-should be translated to this:
-```js
-const fetchUsers = () => ({
-  type: 'FETCH_USERS',
-  request: {
-    url: '/users/',
-    method: 'POST',
-    body: JSON.stringify(data),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }
-});
-```
-The point is, you can use the same request config like you do with pure Fetch API, but you need to pass `url` in the
-config itself. Also, one additional parameter you could provide in the config is `responseType`, which is set as `json`
-as the default. Available response types are: `'arraybuffer'`, `'blob'`, `'formData'`, `'json'`, `'text'`, or `null`
-(if you don't want a response stream to be read for the given response).
-
-Also, this driver reads response streams automatically for you (depending on `responseType` you choose)
-and sets it as `response.data`, so instead of doing `response.json()`, just read `response.data`.
+For usage, see [redux-requests docs](https://redux-requests.klisiczynski.com).
 
 ## Licence
 
