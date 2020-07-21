@@ -11,9 +11,9 @@
   },
   "dependencies": {
     "@babel/polyfill": "7.10.4",
-    "@redux-requests/core": "0.31.0",
-    "@redux-requests/graphql": "0.4.3",
-    "@redux-requests/react": "0.4.8",
+    "@redux-requests/core": "1.0.0",
+    "@redux-requests/graphql": "1.0.0",
+    "@redux-requests/react": "1.0.0",
     "apollo-server-express": "2.11.0",
     "express": "4.17.1",
     "graphql": "14.6.0",

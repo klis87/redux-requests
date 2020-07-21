@@ -11,9 +11,9 @@
   },
   "dependencies": {
     "@babel/polyfill": "7.10.4",
-    "@redux-requests/axios": "0.10.0",
-    "@redux-requests/core": "0.31.0",
-    "@redux-requests/react": "0.4.8",
+    "@redux-requests/axios": "1.0.0",
+    "@redux-requests/core": "1.0.0",
+    "@redux-requests/react": "1.0.0",
     "axios": "0.19.2",
     "react": "16.13.1",
     "react-dom": "16.13.1",
