@@ -3,43 +3,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const nodeExternals = require('webpack-node-externals');
 
-const resolve = {
-  alias: {
-    react: path.join(__dirname, '..', 'node_modules', 'react'),
-    'react-redux': path.join(
-      __dirname,
-      '..',
-      'node_modules',
-      'react-redux',
-      'es',
-    ),
-    '@redux-requests/core': path.join(
-      __dirname,
-      '..',
-      '..',
-      'packages',
-      'redux-requests',
-      'es',
-    ),
-    '@redux-requests/react': path.join(
-      __dirname,
-      '..',
-      '..',
-      'packages',
-      'redux-requests-react',
-      'es',
-    ),
-    '@redux-requests/axios': path.join(
-      __dirname,
-      '..',
-      '..',
-      'packages',
-      'redux-requests-axios',
-      'es',
-    ),
-  },
-};
-
 module.exports = [
   {
     name: 'client',
@@ -50,7 +13,6 @@ module.exports = [
       path: path.join(__dirname, 'dist'),
       publicPath: '/',
     },
-    resolve,
     module: {
       rules: [
         {
@@ -81,7 +43,6 @@ module.exports = [
       publicPath: '/static/',
       libraryTarget: 'commonjs2',
     },
-    resolve,
     module: {
       rules: [
         {

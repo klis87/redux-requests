@@ -10,42 +10,6 @@ module.exports = {
     path: path.join(__dirname, 'dist'),
     publicPath: '/',
   },
-  resolve: {
-    alias: {
-      react: path.join(__dirname, '..', 'node_modules', 'react'),
-      'react-redux': path.join(
-        __dirname,
-        '..',
-        'node_modules',
-        'react-redux',
-        'es',
-      ),
-      '@redux-requests/core': path.join(
-        __dirname,
-        '..',
-        '..',
-        'packages',
-        'redux-requests',
-        'es',
-      ),
-      '@redux-requests/react': path.join(
-        __dirname,
-        '..',
-        '..',
-        'packages',
-        'redux-requests-react',
-        'es',
-      ),
-      '@redux-requests/promise': path.join(
-        __dirname,
-        '..',
-        '..',
-        'packages',
-        'redux-requests-promise',
-        'es',
-      ),
-    },
-  },
   module: {
     rules: [
       {
