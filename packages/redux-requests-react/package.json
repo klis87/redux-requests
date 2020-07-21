@@ -34,7 +34,7 @@
     "prepublish": "yarn run build"
   },
   "peerDependencies": {
-    "@redux-requests/core": ">=0.28.0",
+    "@redux-requests/core": ">=1.0.0",
     "react": ">=16.8.0",
     "react-redux": ">=7.1.0",
     "redux": ">=4.0.0"
