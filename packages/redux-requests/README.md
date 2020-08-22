@@ -1,7 +1,7 @@
 # ![Redux-Requests](https://raw.githubusercontent.com/klis87/redux-requests/master/images/logo.png)
 
 [![npm version](https://badge.fury.io/js/%40redux-requests%2Fcore.svg)](https://badge.fury.io/js/%40redux-requests%2Fcore)
-[![gzip size](http://img.badgesize.io/https://unpkg.com/@redux-requests/core/dist/redux-requests.min.js?compression=gzip)](https://unpkg.com/@redux-requests/core)
+[![gzip size](https://img.badgesize.io/https://unpkg.com/@redux-requests/core/dist/redux-requests.min.js?compression=gzip)](https://unpkg.com/@redux-requests/core)
 [![dependencies](https://david-dm.org/klis87/redux-requests.svg?path=packages/redux-requests)](https://david-dm.org/klis87/redux-requests?path=packages/redux-requests)
 [![dev dependencies](https://david-dm.org/klis87/redux-requests/dev-status.svg?path=packages/redux-requests)](https://david-dm.org/klis87/redux-requests?path=packages/redux-requests&type=dev)
 [![peer dependencies](https://david-dm.org/klis87/redux-requests/peer-status.svg?path=packages/redux-requests)](https://david-dm.org/klis87/redux-requests?path=packages/redux-requests&type=peer)
@@ -27,6 +27,7 @@ Declarative AJAX requests and automatic network state management for Redux
 ## Motivation [:arrow_up:](#table-of-content)
 
 With `redux-requests`, assuming you use `axios` you could refactor a code in the following way:
+
 ```diff
   import axios from 'axios';
 - import thunk from 'redux-thunk';
@@ -146,23 +147,29 @@ Use react bindings to decrease code amount with React even more
 ## Installation [:arrow_up:](#table-of-content)
 
 To install the package, just run:
+
 ```
 $ npm install @redux-requests/core
 ```
+
 or you can just use CDN: `https://unpkg.com/@redux-requests/core`.
 
 Also, you need to install a driver:
+
 - if you use Axios, install `axios` and `@redux-requests/axios`:
 
   ```
   $ npm install axios @redux-requests/axios
   ```
+
   or CDN: `https://unpkg.com/@redux-requests/axios`.
+
 - if you use Fetch API, install `isomorphic-fetch` (or a different Fetch polyfill) and `@redux-requests/fetch`:
 
   ```
   $ npm install isomorphic-fetch redux-requests/fetch
   ```
+
   or CDN: `https://unpkg.com/@redux-requests/fetch`.
 
 Also, you have to install `reselect`, which probably you use anyway.
@@ -177,6 +184,7 @@ I highly recommend to try examples how this package could be used in real applic
 and see what actions are being sent with [redux-devtools](https://github.com/zalmoxisus/redux-devtools-extension).
 
 There are following examples currently:
+
 - [basic](https://github.com/klis87/redux-requests/tree/master/examples/basic)
 - [advanced](https://github.com/klis87/redux-requests/tree/master/examples/advanced)
 - [mutations](https://github.com/klis87/redux-requests/tree/master/examples/mutations)
@@ -192,8 +200,8 @@ There are following examples currently:
 ## Companion libraries [:arrow_up:](#table-of-content)
 
 - [redux-smart-actions](https://github.com/klis87/redux-smart-actions) - Redux addon to create actions and thunks with minimum boilerplate, you can use it to create requests actions faster and in a less verbose way, without constants,
-useful especially to create thunks without constants, so you have access to Redux state in request actions without
-any need to pass them with action arguments
+  useful especially to create thunks without constants, so you have access to Redux state in request actions without
+  any need to pass them with action arguments
 
 ## Licence [:arrow_up:](#table-of-content)
 
