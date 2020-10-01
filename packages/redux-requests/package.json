@@ -1,6 +1,6 @@
 {
   "name": "@redux-requests/core",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Declarative AJAX requests and automatic network state management for Redux",
   "main": "lib/index.js",
   "module": "es/index.js",
