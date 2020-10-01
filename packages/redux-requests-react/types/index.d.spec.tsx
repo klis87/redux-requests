@@ -1,5 +1,22 @@
 import * as React from 'react';
+import { RequestAction } from '@redux-requests/core';
+
 import { Query, Mutation, useQuery, useMutation } from './index';
+
+const fetchBooks: () => RequestAction<
+  { raw: boolean },
+  { parsed: boolean }
+> = () => {
+  return {
+    type: 'FETCH_BOOKS',
+    request: {
+      url: '/books',
+    },
+    meta: {
+      getData: data => ({ parsed: data.raw }),
+    },
+  };
+};
 
 const query = useQuery<string>({ type: 'Query' });
 const query2 = useQuery({
@@ -7,6 +24,8 @@ const query2 = useQuery({
   multiple: true,
   defaultData: {},
 });
+const query3 = useQuery({ type: fetchBooks });
+
 const mutation = useMutation({ type: 'Mutation' });
 const mutation2 = useMutation({
   type: 'Mutation',
@@ -27,6 +46,10 @@ function BasicQuery() {
       {({ data }) => data}
     </Query>
   );
+}
+
+function BasicQuery2() {
+  return <Query type={fetchBooks}>{({ data }) => data}</Query>;
 }
 
 function Spinner({ extra }) {

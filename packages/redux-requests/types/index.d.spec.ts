@@ -93,3 +93,21 @@ mutationSelector({});
 isRequestAction({ type: 'ACTION' }) === true;
 isRequestActionQuery({ type: 'ACTION', request: { url: '/' } }) === true;
 isResponseAction({ type: 'ACTION', request: { url: '/' } }) === true;
+
+const fetchBooks: () => RequestAction<
+  { raw: boolean },
+  { parsed: boolean }
+> = () => {
+  return {
+    type: 'FETCH_BOOKS',
+    request: {
+      url: '/books',
+    },
+    meta: {
+      getData: data => ({ parsed: data.raw }),
+    },
+  };
+};
+
+const booksQuery = getQuery({}, { type: fetchBooks });
+const { data } = booksQuery;

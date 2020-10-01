@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { QueryState, MutationState } from '@redux-requests/core';
+import { QueryState, MutationState, RequestAction } from '@redux-requests/core';
 
 interface LoadingProps {
   [loadingProp: string]: any;
@@ -11,7 +11,7 @@ interface ErrorProps {
 }
 
 interface QueryProps<QueryStateData> {
-  type?: string;
+  type?: string | ((...params: any[]) => RequestAction<any, QueryStateData>);
   requestKey?: string;
   multiple?: boolean;
   defaultData?: any;
@@ -36,7 +36,7 @@ export class Query<QueryStateData = any> extends React.Component<
 > {}
 
 interface MutationProps {
-  type?: string;
+  type?: string | ((...params: any[]) => RequestAction);
   requestKey?: string;
   selector?: (state: any) => MutationState;
   children?: (mutation: MutationState) => React.ReactNode;
@@ -50,13 +50,13 @@ interface MutationProps {
 export class Mutation extends React.Component<MutationProps> {}
 
 export function useQuery<QueryStateData = any>(props: {
-  type: string;
+  type: string | ((...params: any[]) => RequestAction<any, QueryStateData>);
   requestKey?: string;
   multiple?: boolean;
   defaultData?: any;
 }): QueryState<QueryStateData>;
 
 export function useMutation(props: {
-  type: string;
+  type: string | ((...params: any[]) => RequestAction);
   requestKey?: string;
 }): MutationState;

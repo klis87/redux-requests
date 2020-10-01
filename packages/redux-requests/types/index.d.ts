@@ -8,11 +8,11 @@ interface ModifyData {
   (data: any, mutationData: any): any;
 }
 
-interface RequestActionMeta {
+interface RequestActionMeta<Data, TransformedData> {
   asMutation?: boolean;
   driver?: string;
   takeLatest?: boolean;
-  getData?: (data: any, currentData: any) => any;
+  getData?: (data: Data, currentData: TransformedData) => TransformedData;
   getError?: (error: any) => any;
   requestKey?: string;
   requestsCapacity?: number;
@@ -46,18 +46,18 @@ interface RequestActionMeta {
   [extraProperty: string]: any;
 }
 
-export type RequestAction =
+export type RequestAction<Data = any, TransformedData = Data> =
   | {
       type: string;
       request: any | any[];
-      meta?: RequestActionMeta;
+      meta?: RequestActionMeta<Data, TransformedData>;
     }
   | {
       type: string;
       payload: {
         request: any | any[];
       };
-      meta?: RequestActionMeta;
+      meta?: RequestActionMeta<Data, TransformedData>;
     };
 
 type ActionTypeModifier = (actionType: string) => string;
@@ -131,7 +131,7 @@ export interface QueryState<QueryStateData> {
 export function getQuery<QueryStateData = any>(
   state: any,
   props: {
-    type: string;
+    type: string | ((...params: any[]) => RequestAction<any, QueryStateData>);
     requestKey?: string;
     multiple?: boolean;
     defaultData?: any;
@@ -139,7 +139,7 @@ export function getQuery<QueryStateData = any>(
 ): QueryState<QueryStateData>;
 
 export function getQuerySelector<QueryStateData = any>(props: {
-  type: string;
+  type: string | ((...params: any[]) => RequestAction<any, QueryStateData>);
   requestKey?: string;
   multiple?: boolean;
   defaultData?: any;
@@ -153,13 +153,13 @@ export interface MutationState {
 export function getMutation(
   state: any,
   props: {
-    type: string;
+    type: string | ((...params: any[]) => RequestAction);
     requestKey?: string;
   },
 ): MutationState;
 
 export function getMutationSelector(props: {
-  type: string;
+  type: string | ((...params: any[]) => RequestAction);
   requestKey?: string;
 }): (state: any) => MutationState;
 
