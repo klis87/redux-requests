@@ -48,12 +48,12 @@ interface RequestActionMeta<Data, TransformedData> {
 
 export type RequestAction<Data = any, TransformedData = Data> =
   | {
-      type: string;
+      type?: string;
       request: any | any[];
       meta?: RequestActionMeta<Data, TransformedData>;
     }
   | {
-      type: string;
+      type?: string;
       payload: {
         request: any | any[];
       };
