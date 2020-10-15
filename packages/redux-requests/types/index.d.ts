@@ -60,6 +60,10 @@ export type RequestAction<Data = any, TransformedData = Data> =
       meta?: RequestActionMeta<Data, TransformedData>;
     };
 
+type ResponseData<
+  Request extends (...args: any[]) => RequestAction
+> = ReturnType<ReturnType<Request>['meta']['getData']>;
+
 type ActionTypeModifier = (actionType: string) => string;
 
 export const success: ActionTypeModifier;

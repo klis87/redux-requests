@@ -7,6 +7,7 @@ import {
   resetRequests,
   abortRequests,
   RequestAction,
+  ResponseData,
   handleRequests,
   getQuery,
   getQuerySelector,
@@ -111,3 +112,5 @@ const fetchBooks: () => RequestAction<
 
 const booksQuery = getQuery({}, { type: fetchBooks });
 const { data } = booksQuery;
+
+type BooksData = ResponseData<typeof fetchBooks>;
