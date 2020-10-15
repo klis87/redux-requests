@@ -245,8 +245,9 @@ function Home() {
         )}
         <div className="container">
           <p>
-            With <i>redux-requests</i>, assuming you use <i>axios</i> you could
-            refactor a code in the following way:
+            With <i>redux-requests</i>, assuming you use <i>axios</i> (you could
+            use it with anything else too!) you could refactor a code in the
+            following way:
           </p>
           <Highlight
             {...defaultProps}

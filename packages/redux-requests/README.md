@@ -26,7 +26,7 @@ Declarative AJAX requests and automatic network state management for Redux
 
 ## Motivation [:arrow_up:](#table-of-content)
 
-With `redux-requests`, assuming you use `axios` you could refactor a code in the following way:
+With `redux-requests`, assuming you use `axios` (you could use it with anything else too!) you could refactor a code in the following way:
 
 ```diff
   import axios from 'axios';
