@@ -60,6 +60,20 @@ export type RequestAction<Data = any, TransformedData = Data> =
       meta?: RequestActionMeta<Data, TransformedData>;
     };
 
+export type LocalMutationAction = {
+  type?: string;
+  meta: {
+    mutations?: {
+      [actionType: string]: {
+        updateData: ModifyData;
+        local: true;
+      };
+    };
+    localData?: any;
+    [extraProperty: string]: any;
+  };
+};
+
 type ResponseData<
   Request extends (...args: any[]) => RequestAction
 > = ReturnType<ReturnType<Request>['meta']['getData']>;

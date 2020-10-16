@@ -7,6 +7,7 @@ import {
   resetRequests,
   abortRequests,
   RequestAction,
+  LocalMutationAction,
   ResponseData,
   handleRequests,
   getQuery,
@@ -114,3 +115,16 @@ const booksQuery = getQuery({}, { type: fetchBooks });
 const { data } = booksQuery;
 
 type BooksData = ResponseData<typeof fetchBooks>;
+
+const localMutation: () => LocalMutationAction = () => ({
+  type: 'LOCAL_MUTATION',
+  meta: {
+    localData: { id: '1', title: 'title' },
+    mutations: {
+      FETCH_BOOKS: {
+        updateData: (data: BooksData) => ({ parsed: data.parsed }),
+        local: true,
+      },
+    },
+  },
+});
