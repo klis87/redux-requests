@@ -1,7 +1,13 @@
 import * as React from 'react';
 import { RequestAction } from '@redux-requests/core';
 
-import { Query, Mutation, useQuery, useMutation } from './index';
+import {
+  Query,
+  Mutation,
+  useQuery,
+  useMutation,
+  useDispatchRequest,
+} from './index';
 
 const fetchBooks: () => RequestAction<
   { raw: boolean },
@@ -14,6 +20,17 @@ const fetchBooks: () => RequestAction<
     },
     meta: {
       getData: data => ({ parsed: data.raw }),
+    },
+  };
+};
+
+const fetchBook: (
+  id: string,
+) => RequestAction<{ id: string; title: string }> = () => {
+  return {
+    type: 'FETCH_BOOK',
+    request: {
+      url: '/book',
     },
   };
 };
@@ -139,3 +156,20 @@ function MutationWithSelector() {
     </Mutation>
   );
 }
+
+const QueryDispatcher = () => {
+  const dispatch = useDispatchRequest();
+
+  return (
+    <button
+      onClick={async () => {
+        const response = await dispatch(fetchBooks());
+        response.data.parsed;
+        const response2 = await dispatch(fetchBook('1'));
+        response2.data.title;
+      }}
+    >
+      Make a query
+    </button>
+  );
+};

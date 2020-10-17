@@ -60,3 +60,14 @@ export function useMutation(props: {
   type: string | ((...params: any[]) => RequestAction);
   requestKey?: string;
 }): MutationState;
+
+declare function dispatchRequest<QueryStateData = any>(
+  requestAction: RequestAction<any, QueryStateData>,
+): Promise<{
+  data?: QueryStateData;
+  error?: null;
+  isAborted?: true;
+  action: any;
+}>;
+
+export function useDispatchRequest(): typeof dispatchRequest;
