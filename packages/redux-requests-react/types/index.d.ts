@@ -1,5 +1,10 @@
 import * as React from 'react';
-import { QueryState, MutationState, RequestAction } from '@redux-requests/core';
+import {
+  QueryState,
+  MutationState,
+  RequestAction,
+  dispatchRequest,
+} from '@redux-requests/core';
 
 interface LoadingProps {
   [loadingProp: string]: any;
@@ -60,14 +65,5 @@ export function useMutation(props: {
   type: string | ((...params: any[]) => RequestAction);
   requestKey?: string;
 }): MutationState;
-
-declare function dispatchRequest<QueryStateData = any>(
-  requestAction: RequestAction<any, QueryStateData>,
-): Promise<{
-  data?: QueryStateData;
-  error?: null;
-  isAborted?: true;
-  action: any;
-}>;
 
 export function useDispatchRequest(): typeof dispatchRequest;

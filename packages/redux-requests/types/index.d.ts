@@ -1,11 +1,24 @@
 import { AnyAction, Reducer, Middleware, Store } from 'redux';
 
+export function dispatchRequest<QueryStateData = any>(
+  requestAction: RequestAction<any, QueryStateData>,
+): Promise<{
+  data?: QueryStateData;
+  error?: null;
+  isAborted?: true;
+  action: any;
+}>;
+
 interface FilterActions {
   (action: AnyAction): boolean;
 }
 
 interface ModifyData {
   (data: any, mutationData: any): any;
+}
+
+interface RequestsStore extends Store {
+  dispatchRequest: typeof dispatchRequest;
 }
 
 interface RequestActionMeta<Data, TransformedData> {
@@ -35,10 +48,18 @@ interface RequestActionMeta<Data, TransformedData> {
   dependentRequestsNumber?: number;
   isDependentRequest?: boolean;
   silent?: boolean;
-  onRequest?: (request: any, action: RequestAction, store: Store) => any;
-  onSuccess?: (response: any, action: RequestAction, store: Store) => any;
-  onError?: (error: any, action: RequestAction, store: Store) => any;
-  onAbort?: (action: RequestAction, store: Store) => void;
+  onRequest?: (
+    request: any,
+    action: RequestAction,
+    store: RequestsStore,
+  ) => any;
+  onSuccess?: (
+    response: any,
+    action: RequestAction,
+    store: RequestsStore,
+  ) => any;
+  onError?: (error: any, action: RequestAction, store: RequestsStore) => any;
+  onAbort?: (action: RequestAction, store: RequestsStore) => void;
   runOnRequest?: boolean;
   runOnSuccess?: boolean;
   runOnError?: boolean;
@@ -92,10 +113,18 @@ export interface Driver {
 
 interface HandleRequestConfig {
   driver: Driver | { default: Driver; [driverType: string]: Driver };
-  onRequest?: (request: any, action: RequestAction, store: Store) => any;
-  onSuccess?: (response: any, action: RequestAction, store: Store) => any;
-  onError?: (error: any, action: RequestAction, store: Store) => any;
-  onAbort?: (action: RequestAction, store: Store) => void;
+  onRequest?: (
+    request: any,
+    action: RequestAction,
+    store: RequestsStore,
+  ) => any;
+  onSuccess?: (
+    response: any,
+    action: RequestAction,
+    store: RequestsStore,
+  ) => any;
+  onError?: (error: any, action: RequestAction, store: RequestsStore) => any;
+  onAbort?: (action: RequestAction, store: RequestsStore) => void;
   cache?: boolean;
   ssr?: null | 'client' | 'server';
   isRequestAction?: (action: AnyAction) => boolean;

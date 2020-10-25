@@ -46,6 +46,17 @@ const requestAction: RequestAction = {
   },
 };
 
+const fetchBook: (
+  id: string,
+) => RequestAction<{ id: string; title: string }> = () => {
+  return {
+    type: 'FETCH_BOOK',
+    request: {
+      url: '/book',
+    },
+  };
+};
+
 let dummyDriver: Driver;
 dummyDriver({}, requestAction)
   .then(v => v)
@@ -57,7 +68,10 @@ handleRequests({ driver: dummyDriver });
 handleRequests({
   driver: { default: dummyDriver, anotherDriver: dummyDriver },
   onRequest: (request, action) => request,
-  onSuccess: (response, action) => response,
+  onSuccess: async (response, action, store) => {
+    const r = await store.dispatchRequest(fetchBook('1'));
+    return response;
+  },
   onError: (error, action) => ({ error }),
   onAbort: action => {},
   takeLatest: true,

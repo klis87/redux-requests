@@ -269,6 +269,10 @@ const createSendRequestMiddleware = config => {
 
   return store => next => action => {
     const payload = getActionPayload(action);
+    const requestStore = {
+      ...store,
+      dispatchRequest: store.dispatch,
+    };
 
     if (
       action.type === ABORT_REQUESTS ||
@@ -279,8 +283,8 @@ const createSendRequestMiddleware = config => {
     }
 
     if (config.isRequestAction(action)) {
-      action = maybeCallOnRequestInterceptor(action, config, store);
-      action = maybeCallOnRequestMeta(action, store);
+      action = maybeCallOnRequestInterceptor(action, config, requestStore);
+      action = maybeCallOnRequestMeta(action, requestStore);
       action = maybeDispatchRequestAction(action, next);
 
       const responsePromises = getResponsePromises(
@@ -292,13 +296,13 @@ const createSendRequestMiddleware = config => {
       return Promise.all(responsePromises)
         .catch(error => maybeCallGetError(action, error))
         .catch(error =>
-          maybeCallOnErrorInterceptor(action, config, store, error),
+          maybeCallOnErrorInterceptor(action, config, requestStore, error),
         )
-        .catch(error => maybeCallOnErrorMeta(action, store, error))
+        .catch(error => maybeCallOnErrorMeta(action, requestStore, error))
         .catch(error =>
-          maybeCallOnAbortInterceptor(action, config, store, error),
+          maybeCallOnAbortInterceptor(action, config, requestStore, error),
         )
-        .catch(error => maybeCallOnAbortMeta(action, store, error))
+        .catch(error => maybeCallOnAbortMeta(action, requestStore, error))
         .catch(error => {
           if (error === 'REQUEST_ABORTED') {
             const abortAction = createAbortAction(action);
@@ -323,9 +327,11 @@ const createSendRequestMiddleware = config => {
           return maybeCallGetData(action, store, response);
         })
         .then(response =>
-          maybeCallOnSuccessInterceptor(action, config, store, response),
+          maybeCallOnSuccessInterceptor(action, config, requestStore, response),
         )
-        .then(response => maybeCallOnSuccessMeta(action, store, response))
+        .then(response =>
+          maybeCallOnSuccessMeta(action, requestStore, response),
+        )
         .then(response => {
           const successAction = createSuccessAction(action, response);
 
