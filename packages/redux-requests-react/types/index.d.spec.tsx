@@ -24,16 +24,14 @@ const fetchBooks: () => RequestAction<
   };
 };
 
-const fetchBook: (
-  id: string,
-) => RequestAction<{ id: string; title: string }> = () => {
+function fetchBook(id: string): RequestAction<{ id: string; title: string }> {
   return {
     type: 'FETCH_BOOK',
     request: {
       url: '/book',
     },
   };
-};
+}
 
 const query = useQuery<string>({ type: 'Query' });
 const query2 = useQuery({
@@ -42,6 +40,7 @@ const query2 = useQuery({
   defaultData: {},
 });
 const query3 = useQuery({ type: fetchBooks });
+const query4 = useQuery({ type: 'FETCH_BOOKS', action: fetchBooks });
 
 const mutation = useMutation({ type: 'Mutation' });
 const mutation2 = useMutation({

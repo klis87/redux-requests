@@ -179,6 +179,7 @@ export function getQuery<QueryStateData = any>(
   state: any,
   props: {
     type: string | ((...params: any[]) => RequestAction<any, QueryStateData>);
+    action?: (...params: any[]) => RequestAction<any, QueryStateData>;
     requestKey?: string;
     multiple?: boolean;
     defaultData?: any;
@@ -187,6 +188,7 @@ export function getQuery<QueryStateData = any>(
 
 export function getQuerySelector<QueryStateData = any>(props: {
   type: string | ((...params: any[]) => RequestAction<any, QueryStateData>);
+  action?: (...params: any[]) => RequestAction<any, QueryStateData>;
   requestKey?: string;
   multiple?: boolean;
   defaultData?: any;
