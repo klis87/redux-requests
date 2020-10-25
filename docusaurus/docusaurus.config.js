@@ -39,6 +39,16 @@ module.exports = {
       links: [],
       copyright: `Copyright © ${new Date().getFullYear()} redux-requests. Built with Docusaurus.`,
     },
+    algolia: {
+      apiKey: '661b4fb5395737a02a98e8cfbe70735e',
+      indexName: 'redux-requests',
+
+      // // Optional: see doc section bellow
+      // contextualSearch: true,
+
+      // Optional: Algolia search parameters
+      // searchParameters: {},
+    },
   },
   presets: [
     [
