@@ -18,7 +18,7 @@ import {
   isRequestAction,
   isRequestActionQuery,
   isResponseAction,
-  createRequestStore,
+  createRequestsStore,
 } from './index';
 
 success('type');
@@ -80,7 +80,7 @@ handleRequests({
   isRequestActionQuery: () => true,
 });
 
-const requestsStore = createRequestStore(createStore(combineReducers({})));
+const requestsStore = createRequestsStore(createStore(combineReducers({})));
 const response = requestsStore.dispatchRequest(fetchBook('1'));
 
 clearRequestsCache();

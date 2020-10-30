@@ -21,7 +21,7 @@ interface RequestsStore extends Store {
   dispatchRequest: typeof dispatchRequest;
 }
 
-export const createRequestStore: (store: Store) => RequestsStore;
+export const createRequestsStore: (store: Store) => RequestsStore;
 
 interface RequestActionMeta<Data, TransformedData> {
   asMutation?: boolean;

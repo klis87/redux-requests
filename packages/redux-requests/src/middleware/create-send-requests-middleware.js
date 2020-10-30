@@ -6,7 +6,7 @@ import {
 } from '../actions';
 import { ABORT_REQUESTS, RESET_REQUESTS } from '../constants';
 import { getQuery } from '../selectors';
-import createRequestStore from './create-request-store';
+import createRequestsStore from './create-requests-store';
 
 const getRequestTypeString = requestType =>
   typeof requestType === 'function' ? requestType.toString() : requestType;
@@ -270,7 +270,7 @@ const createSendRequestMiddleware = config => {
 
   return store => next => action => {
     const payload = getActionPayload(action);
-    const requestStore = createRequestStore(store);
+    const requestsStore = createRequestsStore(store);
 
     if (
       action.type === ABORT_REQUESTS ||
@@ -281,8 +281,8 @@ const createSendRequestMiddleware = config => {
     }
 
     if (config.isRequestAction(action)) {
-      action = maybeCallOnRequestInterceptor(action, config, requestStore);
-      action = maybeCallOnRequestMeta(action, requestStore);
+      action = maybeCallOnRequestInterceptor(action, config, requestsStore);
+      action = maybeCallOnRequestMeta(action, requestsStore);
       action = maybeDispatchRequestAction(action, next);
 
       const responsePromises = getResponsePromises(
@@ -294,13 +294,13 @@ const createSendRequestMiddleware = config => {
       return Promise.all(responsePromises)
         .catch(error => maybeCallGetError(action, error))
         .catch(error =>
-          maybeCallOnErrorInterceptor(action, config, requestStore, error),
+          maybeCallOnErrorInterceptor(action, config, requestsStore, error),
         )
-        .catch(error => maybeCallOnErrorMeta(action, requestStore, error))
+        .catch(error => maybeCallOnErrorMeta(action, requestsStore, error))
         .catch(error =>
-          maybeCallOnAbortInterceptor(action, config, requestStore, error),
+          maybeCallOnAbortInterceptor(action, config, requestsStore, error),
         )
-        .catch(error => maybeCallOnAbortMeta(action, requestStore, error))
+        .catch(error => maybeCallOnAbortMeta(action, requestsStore, error))
         .catch(error => {
           if (error === 'REQUEST_ABORTED') {
             const abortAction = createAbortAction(action);
@@ -325,10 +325,15 @@ const createSendRequestMiddleware = config => {
           return maybeCallGetData(action, store, response);
         })
         .then(response =>
-          maybeCallOnSuccessInterceptor(action, config, requestStore, response),
+          maybeCallOnSuccessInterceptor(
+            action,
+            config,
+            requestsStore,
+            response,
+          ),
         )
         .then(response =>
-          maybeCallOnSuccessMeta(action, requestStore, response),
+          maybeCallOnSuccessMeta(action, requestsStore, response),
         )
         .then(response => {
           const successAction = createSuccessAction(action, response);
