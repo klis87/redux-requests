@@ -16,3 +16,4 @@ export {
   getQuerySelector,
   getMutationSelector,
 } from './selectors';
+export { createRequestStore } from './middleware';

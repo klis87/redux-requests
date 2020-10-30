@@ -1,3 +1,4 @@
+import { createStore, combineReducers } from 'redux';
 import {
   success,
   error,
@@ -17,6 +18,7 @@ import {
   isRequestAction,
   isRequestActionQuery,
   isResponseAction,
+  createRequestStore,
 } from './index';
 
 success('type');
@@ -78,6 +80,9 @@ handleRequests({
   isRequestActionQuery: () => true,
 });
 
+const requestsStore = createRequestStore(createStore(combineReducers({})));
+const response = requestsStore.dispatchRequest(fetchBook('1'));
+
 clearRequestsCache();
 clearRequestsCache(['TYPE']);
 clearRequestsCache(['TYPE', { requestType: 'ANOTHER_TYPE', requestKey: '1' }]);
@@ -126,7 +131,9 @@ const fetchBooks: () => RequestAction<
 };
 
 const booksQuery = getQuery({}, { type: fetchBooks });
-const { data } = booksQuery;
+
+const booksSelector = getQuerySelector({ type: fetchBooks });
+booksSelector({}).data.parsed;
 
 type BooksData = ResponseData<typeof fetchBooks>;
 

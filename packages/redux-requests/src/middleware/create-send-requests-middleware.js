@@ -6,6 +6,7 @@ import {
 } from '../actions';
 import { ABORT_REQUESTS, RESET_REQUESTS } from '../constants';
 import { getQuery } from '../selectors';
+import createRequestStore from './create-request-store';
 
 const getRequestTypeString = requestType =>
   typeof requestType === 'function' ? requestType.toString() : requestType;
@@ -269,10 +270,7 @@ const createSendRequestMiddleware = config => {
 
   return store => next => action => {
     const payload = getActionPayload(action);
-    const requestStore = {
-      ...store,
-      dispatchRequest: store.dispatch,
-    };
+    const requestStore = createRequestStore(store);
 
     if (
       action.type === ABORT_REQUESTS ||
