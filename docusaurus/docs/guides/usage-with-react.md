@@ -1,5 +1,5 @@
 ---
-title:  Usage with React
+title: Usage with React
 description: React guide for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
@@ -12,9 +12,11 @@ some React helpers which will be described below.
 ## Installation
 
 To install the package, just run:
+
 ```bash
 $ npm install @redux-requests/react
 ```
+
 or you can just use CDN: `https://unpkg.com/@redux-requests/react`.
 
 ```bas
@@ -28,24 +30,26 @@ $ npm install react-redux
 `useQuery` is a hook which uses `useSelector` from `react-redux` together with `getQuerySelector` from
 `redux-requests/core`. It accepts the same arguments as `getQuerySelector`. You could
 easily use `useSelector` directly, but `useQuery` is slightly less verbose. So, without `useQuery`:
+
 ```js
 import React from 'react';
 import { getQuerySelector } from '@redux-requests/core';
 import { useSelector } from 'react-redux';
 
 const Books = () => {
-  const books = useSelector(getQuerySelector({ type: 'FETCH_BOOKS' }))
+  const books = useSelector(getQuerySelector({ type: 'FETCH_BOOKS' }));
   // ...
 };
 ```
 
 and with `useQuery`:
+
 ```js
 import React from 'react';
 import { useQuery } from '@redux-requests/react';
 
 const Books = () => {
-  const books = useQuery({ type: 'FETCH_BOOKS' })
+  const books = useQuery({ type: 'FETCH_BOOKS' });
   // ...
 };
 ```
@@ -53,25 +57,28 @@ const Books = () => {
 ### `Query`
 
 `Query` simplifies rendering queries data, loading spinners and server errors. It automatically connects to Redux store by using `useQuery` under the hood. It has the following props:
+
 - `type: string`: type of query action, refer to `getQuery` from the core library
 - `requestKey: string`: pass it if you used `requestKey` in query action, refer to `getQuery` from the core library
 - `multiple: boolean`: refer to `getQuery` from the core library
 - `defaultData`: refer to `getQuery` from the core library
 - `selector`: if you already have a query selector, pass it here instead of `type`
 - `children` - render function receiving object with data, loading flag and error property
-- `component` - alternative prop to children, you can pass your custom component here, which will receive data,  loading and error props, plus any additional props passed to `Query`
+- `component` - alternative prop to children, you can pass your custom component here, which will receive data, loading and error props, plus any additional props passed to `Query`
 - `isDataEmpty: query => boolean`: function which defines when `data` is empty, by default data as empty array and falsy value like `null`, `undefined` is considered as empty
-when data is updated - it will still show during initial fetch, but ill not for subsequent requests
+  when data is updated - it will still show during initial fetch, but ill not for subsequent requests
 - `noDataMessage`: `string` or any React node, like `<div>message</div>`, which will be rendered when `data` is empty
 - `errorComponent`: custom React component, which will be rendered on error, receives `error` prop, `null` by default
 - `errorComponentProps`: extra props which will be passed to `errorComponent`
 - `loadingComponent` custom React component, which will be rndered when request is pending, useful for showing
 - `loadingComponentProps`: extra props which will be passed to `loadingComponent`
-spinners, `null` by default
+  spinners, `null` by default
 - `showLoaderDuringRefetch: boolean`: `true` by default, whether `loadingComponent` will be shown on data refetch
-or not, if `false` you won't see spinner even when data is being loaded if you already have some data from a previous requests
+  or not, if `false` you won't see spinner even when data is being loaded if you already have some data from a previous requests
+- `action`: useful only when you use Typescript, see details [here](/docs/guides/usage-with-typescript#automatic-data-inference)
 
 Minimalistic example:
+
 ```js
 import { Query } from '@redux-requests/react';
 
@@ -79,14 +86,12 @@ import { Query } from '@redux-requests/react';
   type={REQUEST_TYPE}
   // or selector={myQuerySelector}
 >
-  {({ data }) => (
-    <div>
-      {data}
-    </div>
-  )}
-</Query>
+  {({ data }) => <div>{data}</div>}
+</Query>;
 ```
+
 or with `component` prop:
+
 ```js
 import { Query } from '@redux-requests/react';
 
@@ -102,9 +107,11 @@ const DataComponent = ({ query, extraLabelProp }) => (
   // or selector={myQuerySelector}
   component={DataComponent}
   extraLabelProp="label"
-/>
+/>;
 ```
+
 or with all props:
+
 ```js
 import { Query } from '@redux-requests/react';
 
@@ -126,7 +133,8 @@ const ErrorComponent = ({ error, label }) => (
   type={REQUEST_TYPE}
   // or selector={myQuerySelector}
   isDataEmpty={query =>
-    Array.isArray(query.data) ? query.data.length === 0 : !query.data}
+    Array.isArray(query.data) ? query.data.length === 0 : !query.data
+  }
   showLoaderDuringRefetch={false}
   noDataMessage="There is no data"
   errorComponent={ErrorComponent}
@@ -134,12 +142,8 @@ const ErrorComponent = ({ error, label }) => (
   loadingComponent={LoadingComponent}
   loadingComponentProps={{ label: 'Loading label' }}
 >
-  {({ data }) => (
-    <div>
-      {data}
-    </div>
-  )}
-</Query>
+  {({ data }) => <div>{data}</div>}
+</Query>;
 ```
 
 ### `useMutation`
@@ -149,12 +153,13 @@ const ErrorComponent = ({ error, label }) => (
 render
 
 For example:
+
 ```js
 import React from 'react';
 import { useMutation } from '@redux-requests/react';
 
 const Books = () => {
-  const { loading, error } = useMutation({ type: 'DELETE_BOOK' })
+  const { loading, error } = useMutation({ type: 'DELETE_BOOK' });
   // ...
 };
 ```
@@ -162,6 +167,7 @@ const Books = () => {
 ### `Mutation`
 
 `Mutation` converts `useMutation` into component with render prop. It has the following props:
+
 - `type: string`: type of mutation action, refer to `getMutation` from the core library
 - `requestKey: string`: pass it if you used `requestKey` in mutation action, refer to `getMutation` from the core library
 - `selector`: if you already have a mutation selector, pass it here instead of type
@@ -169,6 +175,7 @@ const Books = () => {
 - `component` - alternative prop to children, you can pass your custom component here, which will receive loading and error props, plus any additional props passed to Mutation
 
 You use it like this:
+
 ```js
 import { Mutation } from '@redux-requests/react';
 
@@ -183,9 +190,33 @@ import { Mutation } from '@redux-requests/react';
 
     return (
       <button onClick={dispatchSomeMutation} disabled={loading}>
-        Send mutation {loading && '...' }
+        Send mutation {loading && '...'}
       </button>
     );
   }}
-</Mutation>
+</Mutation>;
 ```
+
+### `useDispatchRequest`
+
+Alias for `useDispatch` from `react-redux`, it works the same but it improve Typescript experience:
+
+```jsx
+import { useDispatchRequest } from '@redux-requests/react';
+
+const BookFetcher = () => {
+  const dispatchRequest = useDispatchRequest();
+
+  return (
+    <button
+      onClick={async () => {
+        const { data, error } = await dispatch(fetchBook('1'));
+      }}
+    >
+      Fetch book
+    </button>
+  );
+};
+```
+
+See [this guide](/docs/guides/usage-with-typescript#usage-with-react) for more information.

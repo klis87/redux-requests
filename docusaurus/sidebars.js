@@ -50,6 +50,9 @@ module.exports = {
       'api-reference/is-request-action-query',
       'api-reference/is-request-action',
       'api-reference/is-response-action',
+      'api-reference/local-mutation-action',
+      'api-reference/response-data',
+      'api-reference/create-requests-store',
     ],
   },
 };
