@@ -32,6 +32,7 @@ module.exports = {
       'guides/server-side-rendering',
       'guides/usage-with-redux-saga',
       'guides/usage-with-react',
+      'guides/usage-with-typescript',
     ],
     'API reference': [
       'api-reference/request-action',
