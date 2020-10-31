@@ -144,6 +144,11 @@ between client and server
 
 Use react bindings to decrease code amount with React even more
 
+### Typescript friendly
+
+It has many utilities to make Typescript experience even greater, for example all data generics are inferred in selectors
+and dispatch results automatically.
+
 ## Installation [:arrow_up:](#table-of-content)
 
 To install the package, just run:
