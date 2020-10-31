@@ -253,6 +253,44 @@ type BookData = ResponseData<typeof fetchBook>;
 // the same as type BookData = { id: string; name: string }
 ```
 
+## `LocalMutationAction`
+
+If you use a local mutation, you could also use `LocalMutationAction` interface:
+
+```ts
+import { LocalMutationAction } from '@redux-requests/core';
+
+function updateBookName(id: string, newName: string): LocalMutationAction {
+  return {
+    type: 'UPDATE_BOOK_NAME',
+    meta: {
+      mutations: {
+        FETCH_BOOK: {
+          updateData: data =>
+            data && data.id === id ? { ...data, name: newName } : data,
+          local: true,
+        },
+      },
+    },
+  };
+}
+```
+
+...or if `fetchBook` is normalized, you could just:
+
+```ts
+import { LocalMutationAction } from '@redux-requests/core';
+
+function updateBookName(id: string, newName: string): LocalMutationAction {
+  return {
+    type: 'UPDATE_BOOK_NAME',
+    meta: {
+      localData: { id, name: newName },
+    },
+  };
+}
+```
+
 ## Usage with React
 
 If you use React, `useQuery` and `Query` also have `action` prop, and also you could pass a request action as `type` if
