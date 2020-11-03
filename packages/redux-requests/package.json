@@ -61,7 +61,7 @@
     "reselect": "4.0.0",
     "rimraf": "3.0.2",
     "typescript": "3.9.7",
-    "webpack": "4.43.0",
+    "webpack": "5.4.0",
     "webpack-cli": "3.3.12"
   },
   "dependencies": {
