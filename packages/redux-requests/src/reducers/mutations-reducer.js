@@ -7,8 +7,7 @@ import {
 export default (state, action) => {
   if (!isResponseAction(action)) {
     const mutationType =
-      action.type +
-      (action.meta && action.meta.requestKey ? action.meta.requestKey : '');
+      action.type + (action.meta?.requestKey ? action.meta.requestKey : '');
 
     return {
       ...state,
@@ -23,7 +22,7 @@ export default (state, action) => {
   const requestAction = getRequestActionFromResponse(action);
   const mutationType =
     requestAction.type +
-    (action.meta && action.meta.requestKey ? action.meta.requestKey : '');
+    (action.meta?.requestKey ? action.meta.requestKey : '');
 
   if (isErrorAction(action)) {
     return {

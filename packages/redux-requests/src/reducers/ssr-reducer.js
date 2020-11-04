@@ -9,8 +9,7 @@ export default (state = [], action, config = defaultConfig) => {
   if (
     config.ssr === 'client' &&
     config.isRequestAction(action) &&
-    action.meta &&
-    (action.meta.ssrResponse || action.meta.ssrError)
+    (action.meta?.ssrResponse || action.meta?.ssrError)
   ) {
     const indexToRemove = state.findIndex(v => v === action.type);
 

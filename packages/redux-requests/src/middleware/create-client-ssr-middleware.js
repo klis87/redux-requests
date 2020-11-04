@@ -15,7 +15,7 @@ export default (config = defaultConfig) => store => next => action => {
 
   const query = getQuery(state, {
     type: action.type,
-    requestKey: action.meta && action.meta.requestKey,
+    requestKey: action.meta?.requestKey,
   });
 
   if (query.error) {
