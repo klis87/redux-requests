@@ -60,8 +60,7 @@ export const isRequestAction = action => {
   const actionPayload = getActionPayload(action);
 
   return (
-    !!actionPayload &&
-    !!actionPayload.request &&
+    !!actionPayload?.request &&
     !!(
       Array.isArray(actionPayload.request) ||
       actionPayload.request.url ||
@@ -75,8 +74,7 @@ export const isRequestAction = action => {
   );
 };
 
-export const isResponseAction = action =>
-  !!(action.meta && action.meta.requestAction);
+export const isResponseAction = action => !!action.meta?.requestAction;
 
 export const getRequestActionFromResponse = action => action.meta.requestAction;
 
@@ -97,7 +95,7 @@ const isRequestQuery = request =>
 export const isRequestActionQuery = action => {
   const { request } = getActionPayload(action);
 
-  if (action.meta && action.meta.asMutation !== undefined) {
+  if (action.meta?.asMutation !== undefined) {
     return !action.meta.asMutation;
   }
 

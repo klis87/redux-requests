@@ -9,7 +9,7 @@ export default (requestsPromise, config = defaultConfig) => {
   return () => next => action => {
     if (config.isRequestAction(action)) {
       index +=
-        action.meta && action.meta.dependentRequestsNumber !== undefined
+        action.meta?.dependentRequestsNumber !== undefined
           ? action.meta.dependentRequestsNumber + 1
           : 1;
     } else if (isResponseAction(action)) {

@@ -19,20 +19,18 @@ const getKeys = requests =>
   );
 
 const getDriver = (config, action) =>
-  action.meta && action.meta.driver
+  action.meta?.driver
     ? config.driver[action.meta.driver]
     : config.driver.default || config.driver;
 
 const getLastActionKey = action =>
-  action.type +
-  (action.meta && action.meta.requestKey ? action.meta.requestKey : '');
+  action.type + (action.meta?.requestKey ? action.meta.requestKey : '');
 
 const isActionRehydrated = action =>
   !!(
-    action.meta &&
-    (action.meta.cacheResponse ||
-      action.meta.ssrResponse ||
-      action.meta.ssrError)
+    action.meta?.cacheResponse ||
+    action.meta?.ssrResponse ||
+    action.meta?.ssrError
   );
 
 // TODO: remove to more functional style, we need object maps and filters
@@ -53,7 +51,7 @@ const abortPendingRequests = (action, pendingRequests) => {
 };
 
 const isTakeLatest = (action, config) =>
-  action.meta && action.meta.takeLatest !== undefined
+  action.meta?.takeLatest !== undefined
     ? action.meta.takeLatest
     : typeof config.takeLatest === 'function'
     ? config.takeLatest(action)
@@ -88,7 +86,7 @@ const maybeCallOnRequestInterceptor = (action, config, store) => {
 const maybeCallOnRequestMeta = (action, store) => {
   const payload = getActionPayload(action);
 
-  if (action.meta && action.meta.onRequest) {
+  if (action.meta?.onRequest) {
     if (action.request) {
       return {
         ...action,
@@ -120,11 +118,11 @@ const getResponsePromises = (action, config, pendingRequests) => {
   const actionPayload = getActionPayload(action);
   const isBatchedRequest = Array.isArray(actionPayload.request);
 
-  if (action.meta && action.meta.cacheResponse) {
+  if (action.meta?.cacheResponse) {
     return [Promise.resolve(action.meta.cacheResponse)];
-  } else if (action.meta && action.meta.ssrResponse) {
+  } else if (action.meta?.ssrResponse) {
     return [Promise.resolve(action.meta.ssrResponse)];
-  } else if (action.meta && action.meta.ssrError) {
+  } else if (action.meta?.ssrError) {
     return [Promise.reject(action.meta.ssrError)];
   }
 
@@ -151,8 +149,7 @@ const maybeCallGetError = (action, error) => {
   if (
     error !== 'REQUEST_ABORTED' &&
     !isActionRehydrated(action) &&
-    action.meta &&
-    action.meta.getError
+    action.meta?.getError
   ) {
     throw action.meta.getError(error);
   }
@@ -173,7 +170,7 @@ const maybeCallOnErrorInterceptor = (action, config, store, error) => {
 };
 
 const maybeCallOnErrorMeta = (action, store, error) => {
-  if (error !== 'REQUEST_ABORTED' && action.meta && action.meta.onError) {
+  if (error !== 'REQUEST_ABORTED' && action.meta?.onError) {
     return Promise.all([action.meta.onError(error, action, store)]);
   }
 
@@ -193,7 +190,7 @@ const maybeCallOnAbortInterceptor = (action, config, store, error) => {
 };
 
 const maybeCallOnAbortMeta = (action, store, error) => {
-  if (error === 'REQUEST_ABORTED' && action.meta && action.meta.onAbort) {
+  if (error === 'REQUEST_ABORTED' && action.meta?.onAbort) {
     action.meta.onAbort(action, store);
   }
 
@@ -222,10 +219,10 @@ const maybeTransformBatchRequestResponse = (action, response) => {
 };
 
 const maybeCallGetData = (action, store, response) => {
-  if (!isActionRehydrated(action) && action.meta && action.meta.getData) {
+  if (!isActionRehydrated(action) && action.meta?.getData) {
     const query = getQuery(store.getState(), {
       type: action.type,
-      requestKey: action.meta && action.meta.requestKey,
+      requestKey: action.meta?.requestKey,
     });
 
     return {
@@ -253,7 +250,7 @@ const maybeCallOnSuccessInterceptor = (action, config, store, response) => {
 };
 
 const maybeCallOnSuccessMeta = (action, store, response) => {
-  if (action.meta && action.meta.onSuccess) {
+  if (action.meta?.onSuccess) {
     const result = action.meta.onSuccess(response, action, store);
 
     if (!isActionRehydrated(action)) {

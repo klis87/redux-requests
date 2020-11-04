@@ -26,7 +26,7 @@ const getDataFromResponseAction = action =>
   action.payload ? action.payload.data : action.response.data;
 
 const shouldBeNormalized = (action, config) =>
-  action.meta && action.meta.normalize !== undefined
+  action.meta?.normalize !== undefined
     ? action.meta.normalize
     : config.normalize;
 
@@ -35,11 +35,7 @@ const queryReducer = (state, action, actionType, config, normalizedData) => {
     state = getInitialQuery(shouldBeNormalized(action, config));
   }
 
-  if (
-    action.meta &&
-    action.meta.mutations &&
-    action.meta.mutations[actionType]
-  ) {
+  if (action.meta?.mutations?.[actionType]) {
     const mutationConfig = action.meta.mutations[actionType];
     const data = updateData(
       state.normalized
@@ -58,8 +54,7 @@ const queryReducer = (state, action, actionType, config, normalizedData) => {
 
   switch (action.type) {
     case success(actionType):
-      return action.meta &&
-        (action.meta.ssrResponse || action.meta.cacheResponse)
+      return action.meta?.ssrResponse || action.meta?.cacheResponse
         ? state
         : {
             ...state,
@@ -69,7 +64,7 @@ const queryReducer = (state, action, actionType, config, normalizedData) => {
           };
 
     case error(actionType):
-      return action.meta && action.meta.ssrError
+      return action.meta?.ssrError
         ? state
         : {
             ...state,
@@ -83,10 +78,9 @@ const queryReducer = (state, action, actionType, config, normalizedData) => {
         pending: state.pending - 1,
       };
     default:
-      return action.meta &&
-        (action.meta.ssrResponse ||
-          action.meta.ssrError ||
-          action.meta.cacheResponse)
+      return action.meta?.ssrResponse ||
+        action.meta?.ssrError ||
+        action.meta?.cacheResponse
         ? state
         : {
             ...state,
@@ -113,11 +107,7 @@ const maybeGetQueryActionType = (action, config) => {
 };
 
 const updateNormalizedData = (normalizedData, action, config) => {
-  if (
-    config.isRequestAction(action) &&
-    action.meta &&
-    action.meta.optimisticData
-  ) {
+  if (config.isRequestAction(action) && action.meta?.optimisticData) {
     const [, newNormalizedData] = normalize(action.meta.optimisticData, config);
     return mergeData(normalizedData, newNormalizedData);
   }
@@ -144,7 +134,7 @@ const updateNormalizedData = (normalizedData, action, config) => {
     return mergeData(normalizedData, newNormalizedData);
   }
 
-  if (action.meta && action.meta.localData) {
+  if (action.meta?.localData) {
     const [, newNormalizedData] = normalize(action.meta.localData, config);
     return mergeData(normalizedData, newNormalizedData);
   }
@@ -159,7 +149,7 @@ export default (state, action, config = defaultConfig) => {
     config,
   );
 
-  if (action.meta && action.meta.mutations) {
+  if (action.meta?.mutations) {
     return {
       queries: {
         ...state.queries,
@@ -198,7 +188,7 @@ export default (state, action, config = defaultConfig) => {
 
   if (queryActionType) {
     const queryType =
-      action.meta && typeof action.meta.requestKey !== 'undefined'
+      action.meta?.requestKey !== undefined
         ? queryActionType + action.meta.requestKey
         : queryActionType;
     const updatedQuery = queryReducer(
