@@ -121,7 +121,7 @@ describe('fetchApiDriver', () => {
     expect(requestInstance).toBeCalledWith('/', { signal: undefined });
   });
 
-  it('returns promise with cancel function which aborts request', async () => {
+  it('returns promise with cancel function which aborts request', () => {
     const abort = jest.fn();
 
     class LocalDummyAbortController {

@@ -3,10 +3,13 @@ module.exports = {
     library: 'ReduxRequestsReact',
     libraryTarget: 'umd',
   },
+  resolve: {
+    extensions: ['.js', '.jsx'],
+  },
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.jsx?$/,
         exclude: /node_modules/,
         loader: 'babel-loader',
       },
