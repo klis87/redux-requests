@@ -7,6 +7,7 @@ import {
   createAbortAction,
   abortRequests,
 } from '../actions';
+
 import { createSendRequestsMiddleware } from '.';
 
 const dummyDriver = requestConfig => {

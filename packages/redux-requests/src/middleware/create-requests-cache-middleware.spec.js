@@ -2,6 +2,7 @@ import configureStore from 'redux-mock-store';
 import { advanceBy, advanceTo, clear } from 'jest-date-mock';
 
 import { createSuccessAction } from '../actions';
+
 import { createRequestsCacheMiddleware } from '.';
 
 describe('middleware', () => {

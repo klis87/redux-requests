@@ -8,9 +8,10 @@ import {
   isErrorAction,
   isSuccessAction,
 } from '../actions';
-import updateData from './update-data';
-import { normalize, mergeData } from '../normalizers';
 import { getQuery } from '../selectors';
+import { normalize, mergeData } from '../normalizers';
+
+import updateData from './update-data';
 
 const getInitialQuery = normalized => ({
   data: null,

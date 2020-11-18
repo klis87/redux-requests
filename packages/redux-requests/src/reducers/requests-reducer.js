@@ -1,5 +1,6 @@
 import defaultConfig from '../default-config';
 import { isResponseAction, getRequestActionFromResponse } from '../actions';
+
 import queriesReducer from './queries-reducer';
 import mutationsReducer from './mutations-reducer';
 import requestKeysReducer from './requests-keys-reducer';

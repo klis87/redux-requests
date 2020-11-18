@@ -4,6 +4,7 @@ import {
   createErrorAction,
   createAbortAction,
 } from '../actions';
+
 import queriesReducer from './queries-reducer';
 
 describe('reducers', () => {

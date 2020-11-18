@@ -1,6 +1,7 @@
 import { advanceTo, clear } from 'jest-date-mock';
 
 import { clearRequestsCache, createSuccessAction } from '../actions';
+
 import cacheReducer from './cache-reducer';
 
 describe('reducers', () => {

@@ -1,6 +1,7 @@
 import configureStore from 'redux-mock-store';
 
 import { createSuccessAction, createErrorAction } from '../actions';
+
 import { createServerSsrMiddleware } from '.';
 
 const defer = () => {

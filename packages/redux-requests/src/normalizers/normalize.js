@@ -1,5 +1,6 @@
-import { mergeData } from './merge-data';
 import defaultConfig from '../default-config';
+
+import { mergeData } from './merge-data';
 
 const stipFromDeps = (data, config, root = true) => {
   if (Array.isArray(data)) {
