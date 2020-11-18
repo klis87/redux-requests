@@ -53,6 +53,7 @@ export const createAbortAction = action => ({
 export const getActionPayload = action =>
   action.payload === undefined ? action : action.payload;
 
+// eslint-disable-next-line import/no-unused-modules
 export const getResponseFromSuccessAction = action =>
   action.payload ? action.payload : action.response;
 

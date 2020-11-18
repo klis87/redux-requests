@@ -1,5 +1,6 @@
-import defaultConfig from '../default-config';
 import { createSuccessAction } from '../actions';
+import defaultConfig from '../default-config';
+
 import ssrReducer from './ssr-reducer';
 
 describe('reducers', () => {

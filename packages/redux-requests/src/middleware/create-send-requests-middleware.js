@@ -6,6 +6,7 @@ import {
 } from '../actions';
 import { ABORT_REQUESTS, RESET_REQUESTS } from '../constants';
 import { getQuery } from '../selectors';
+
 import createRequestsStore from './create-requests-store';
 
 const getRequestTypeString = requestType =>

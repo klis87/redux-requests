@@ -1,4 +1,5 @@
 import defaultConfig from '../default-config';
+
 import { normalize } from './normalize';
 import { mergeData } from './merge-data';
 

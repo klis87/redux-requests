@@ -6,7 +6,7 @@
     "prettier",
     "prettier/react"
   ],
-  "plugins": ["react"],
+  "plugins": ["import", "react"],
   "parserOptions": {
     "ecmaVersion": 2021,
     "sourceType": "module",
@@ -62,8 +62,23 @@
     "no-sequences": 2,
     "no-console": 1,
 
-    "react/prop-types": 0,
+    "import/no-self-import": 2,
+    "import/first": 2,
+    "import/newline-after-import": 2,
+    "import/no-named-default": 2,
+    "import/dynamic-import-chunkname": 2,
+    "import/no-unused-modules": [
+      2,
+      {
+        "missingExports": false,
+        "unusedExports": true,
+        "ignoreExports": ["**/*/index.js"]
+      }
+    ],
+    "import/no-extraneous-dependencies": 2,
+    "import/order": [2, { "newlines-between": "always" }],
 
+    "react/prop-types": 0,
     "react/button-has-type": 2,
     "react/no-access-state-in-setstate": 2,
     "react/no-array-index-key": 2,
@@ -77,6 +92,6 @@
     "react/jsx-no-script-url": 2,
     "react/jsx-no-useless-fragment": 2,
     "react/jsx-pascal-case": 2,
-    "react/jsx-filename-extension": 1
+    "react/jsx-filename-extension": 2
   }
 }

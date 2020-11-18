@@ -1,4 +1,5 @@
 import { resetRequests } from '../actions';
+
 import requestsResetReducer from './requests-reset-reducer';
 
 describe('reducers', () => {
