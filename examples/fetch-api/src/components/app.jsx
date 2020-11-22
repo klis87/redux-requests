@@ -1,10 +1,11 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { resetRequests, abortRequests } from '@redux-requests/core';
+import { useDispatch } from 'react-redux';
+import { resetRequests } from '@redux-requests/core';
 import { Query } from '@redux-requests/react';
 
 import { fetchPhoto, fetchPost } from '../store/actions';
 import { FETCH_PHOTO, FETCH_POST } from '../store/constants';
+
 import Spinner from './spinner';
 import Photo from './photo';
 import Post from './post';
@@ -16,42 +17,24 @@ const RequestError = () => (
 );
 
 const App = () => {
-  const abortCounter = useSelector(state => state.abortCounter);
-  const requestCounter = useSelector(state => state.requestCounter);
-  const responseCounter = useSelector(state => state.responseCounter);
-  const errorCounter = useSelector(state => state.errorCounter);
   const dispatch = useDispatch();
 
   return (
     <div>
-      <h1>Redux Requests advanced example</h1>
+      <h1>Redux Requests fetch api example</h1>
       <p>
         In order to see aborts in action, you should set network throttling in
         your browser
       </p>
       <hr />
       <div>
-        <div>Request counter: {requestCounter}</div>
-        <div>Response counter: {responseCounter}</div>
-        <div>Error counter: {errorCounter}</div>
-        <div>Abort counter: {abortCounter}</div>
-      </div>
-      <hr />
-      <div>
         <h2>Photo</h2>
-        <button
-          type="button"
-          style={buttonStyle}
-          onClick={() => dispatch(abortRequests([FETCH_PHOTO]))}
-        >
-          Abort
-        </button>
         <button
           type="button"
           style={buttonStyle}
           onClick={() => dispatch(resetRequests([FETCH_PHOTO]))}
         >
-          Reset
+          Clear
         </button>
         <button
           type="button"
@@ -65,8 +48,7 @@ const App = () => {
           style={buttonStyle}
           onClick={() => dispatch(fetchPhoto(10001))}
         >
-          Fetch non-existent photo, with id 1 as fallback (with onError
-          interceptor)
+          Fetch non-existent photo
         </button>
         <Query
           type={FETCH_PHOTO}
@@ -83,16 +65,9 @@ const App = () => {
         <button
           type="button"
           style={buttonStyle}
-          onClick={() => dispatch(abortRequests([FETCH_POST]))}
-        >
-          Abort
-        </button>
-        <button
-          type="button"
-          style={buttonStyle}
           onClick={() => dispatch(resetRequests([FETCH_POST]))}
         >
-          Reset
+          Clear
         </button>
         <button
           type="button"

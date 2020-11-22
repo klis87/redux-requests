@@ -5,6 +5,7 @@ import { Query } from '@redux-requests/react';
 
 import { fetchPhoto, fetchPost } from '../store/actions';
 import { FETCH_PHOTO, FETCH_POST } from '../store/constants';
+
 import Spinner from './spinner';
 import Photo from './photo';
 import Post from './post';
@@ -20,7 +21,7 @@ const App = () => {
 
   return (
     <div>
-      <h1>Redux Requests basic example</h1>
+      <h1>Redux Requests mock and multiple drivers example</h1>
       <p>
         In order to see aborts in action, you should set network throttling in
         your browser

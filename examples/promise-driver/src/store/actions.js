@@ -1,4 +1,5 @@
 import axios from 'axios';
+
 import { FETCH_PHOTO, FETCH_POST } from './constants';
 
 export const fetchPhoto = id => ({

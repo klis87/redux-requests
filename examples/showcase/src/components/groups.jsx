@@ -17,8 +17,9 @@ import {
   ListItemSecondaryAction,
 } from '@material-ui/core';
 
-import { FETCH_GROUPS } from '../store/constants';
 import { followUser, unfollowUser } from '../store/actions';
+import { FETCH_GROUPS } from '../store/constants';
+
 import Spinner from './spinner';
 import CodeTooltip from './code-tooltip';
 

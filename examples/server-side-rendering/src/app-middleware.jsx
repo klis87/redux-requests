@@ -62,7 +62,8 @@ router.get('/api/books/:id', async (req, res) => {
   const { id } = req.params;
 
   if (!id || !books.find(v => v.id === id)) {
-    return res.sendStatus(404).send();
+    res.sendStatus(404).send();
+    return;
   }
 
   await sleep();
@@ -73,7 +74,8 @@ router.get('/api/bookScreeningActors', async (req, res) => {
   const { bookIds } = req.query;
 
   if (!bookIds || !Array.isArray(bookIds)) {
-    return res.sendStatus(400).send();
+    res.sendStatus(400).send();
+    return;
   }
 
   await sleep();

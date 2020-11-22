@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { clearRequestsCache } from '@redux-requests/core';
-import { Query, Mutation } from '@redux-requests/react';
+import { Query } from '@redux-requests/react';
 import { useDispatch } from 'react-redux';
 import {
   Paper,
@@ -15,6 +15,7 @@ import { Pagination, Rating } from '@material-ui/lab';
 
 import { fetchBooks, setBookRating } from '../store/actions';
 import { FETCH_BOOKS } from '../store/constants';
+
 import Spinner from './spinner';
 import CodeTooltip from './code-tooltip';
 

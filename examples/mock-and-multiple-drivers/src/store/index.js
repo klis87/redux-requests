@@ -4,8 +4,6 @@ import { handleRequests } from '@redux-requests/core';
 import { createDriver as createAxiosDriver } from '@redux-requests/axios';
 import { createDriver as createMockDriver } from '@redux-requests/mock';
 
-import { FETCH_PHOTO } from './constants';
-
 export const configureStore = () => {
   const { requestsReducer, requestsMiddleware } = handleRequests({
     driver: {

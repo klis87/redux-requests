@@ -3,18 +3,15 @@ import { useDispatch } from 'react-redux';
 import { Query, Mutation } from '@redux-requests/react';
 
 import {
-  fetchUsers,
   fetchBooks,
   fetchBook,
   deleteBook,
   likeBook,
   unlikeBook,
-  changeBookName,
   uploadFile,
   uploadFiles,
 } from '../store/actions';
 import {
-  FETCH_USERS,
   LIKE_BOOK,
   UNLIKE_BOOK,
   FETCH_BOOK,
@@ -22,6 +19,7 @@ import {
   UPLOAD_FILE,
   UPLOAD_FILES,
 } from '../store/constants';
+
 import Spinner from './spinner';
 
 const buttonStyle = { marginRight: 10 };
@@ -35,42 +33,11 @@ const App = () => {
 
   return (
     <div>
-      <h1>Redux Requests normalisation example</h1>
+      <h1>Redux Requests GraphQL example</h1>
       <p>
         In order to see aborts in action, you should set network throttling in
         your browser
       </p>
-      <hr />
-      <div>
-        <h2>Users</h2>
-        <button
-          type="button"
-          style={buttonStyle}
-          onClick={() => dispatch(fetchUsers())}
-        >
-          Fetch users
-        </button>
-        <Query
-          type={FETCH_USERS}
-          errorComponent={RequestError}
-          loadingComponent={Spinner}
-          noDataMessage={<p>There is no entity currently.</p>}
-        >
-          {({ data }) =>
-            data.users.map(user => {
-              return (
-                <div key={user.id}>
-                  <h1>{user.name}</h1>
-                  <div>
-                    {user.favouriteBook.author}{' '}
-                    {user.favouriteBook.liked.toString()}
-                  </div>
-                </div>
-              );
-            })
-          }
-        </Query>
-      </div>
       <hr />
       <div>
         <h2>Books</h2>
@@ -93,14 +60,6 @@ const App = () => {
                 <div key={book.id}>
                   <h1>{book.title}</h1>
                   <div>{book.author}</div>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      dispatch(changeBookName(book.id, 'updated name'))
-                    }
-                  >
-                    Change book name
-                  </button>
                   <button
                     type="button"
                     onClick={() => dispatch(deleteBook(book))}
@@ -154,7 +113,6 @@ const App = () => {
             <div>
               <h1>{data.book.title}</h1>
               <div>{data.book.author}</div>
-              <div>{data.book.liked ? 'liked' : 'unliked'}</div>
             </div>
           )}
         </Query>
