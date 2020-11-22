@@ -9,6 +9,7 @@ import {
   FETCH_BOOKS_SCREENING_ACTORS,
 } from '../store/constants';
 import { fetchBook, fetchBooks } from '../store/actions';
+
 import Spinner from './spinner';
 
 const RequestError = () => (

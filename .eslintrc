@@ -79,9 +79,9 @@
     "import/order": [2, { "newlines-between": "always" }],
 
     "react/prop-types": 0,
+    "react/no-array-index-key": 0,
     "react/button-has-type": 2,
     "react/no-access-state-in-setstate": 2,
-    "react/no-array-index-key": 2,
     "react/no-redundant-should-component-update": 2,
     "react/no-unsafe": 2,
     "react/no-unused-state": 2,

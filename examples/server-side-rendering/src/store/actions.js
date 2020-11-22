@@ -4,7 +4,7 @@ import {
   FETCH_BOOKS_SCREENING_ACTORS,
 } from './constants';
 
-export const fetchBooksScreeningActors = bookIds => ({
+const fetchBooksScreeningActors = bookIds => ({
   type: FETCH_BOOKS_SCREENING_ACTORS,
   request: {
     url: '/api/bookScreeningActors',
@@ -24,8 +24,6 @@ export const fetchBooks = () => ({
   },
   meta: {
     dependentRequestsNumber: 1,
-    // cache: 5,
-    // normalize: true,
     onSuccess: (response, action, store) => {
       store.dispatch(fetchBooksScreeningActors(response.data.map(v => v.id)));
       return response;
@@ -40,7 +38,6 @@ export const fetchBook = id => ({
   },
   meta: {
     cache: true,
-    // normalize: true,
     requestKey: id,
     requestsCapacity: 3,
   },

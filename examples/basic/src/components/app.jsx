@@ -5,6 +5,7 @@ import { Query } from '@redux-requests/react';
 
 import { fetchPhoto, fetchPost } from '../store/actions';
 import { FETCH_PHOTO, FETCH_POST } from '../store/constants';
+
 import Spinner from './spinner';
 import Photo from './photo';
 import Post from './post';

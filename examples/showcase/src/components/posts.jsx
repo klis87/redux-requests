@@ -17,6 +17,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 import { FETCH_POSTS, LIKE_POST, UNLIKE_POST } from '../store/constants';
 import { reorderPosts, likePost, unlikePost } from '../store/actions';
+
 import Spinner from './spinner';
 import CodeTooltip from './code-tooltip';
 
@@ -206,11 +207,11 @@ const Posts = () => {
                   <div {...provided.droppableProps} ref={provided.innerRef}>
                     {data.map((post, i) => (
                       <Draggable key={post.id} draggableId={post.id} index={i}>
-                        {provided => (
+                        {providedNested => (
                           <div
-                            style={provided.draggableProps.style}
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
+                            style={providedNested.draggableProps.style}
+                            ref={providedNested.innerRef}
+                            {...providedNested.draggableProps}
                           >
                             <Paper style={{ padding: 16, marginBottom: 16 }}>
                               <div>
@@ -277,7 +278,7 @@ const Posts = () => {
                                   )}
                                 </Mutation>
                                 <span
-                                  {...provided.dragHandleProps}
+                                  {...providedNested.dragHandleProps}
                                   style={{ float: 'right' }}
                                 >
                                   <DragIndicator fontSize="large" />
