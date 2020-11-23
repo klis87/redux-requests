@@ -13,10 +13,13 @@ module.exports = [
       path: path.join(__dirname, 'dist'),
       publicPath: '/',
     },
+    resolve: {
+      extensions: ['.js', '.jsx'],
+    },
     module: {
       rules: [
         {
-          test: /\.js$/,
+          test: /\.jsx?$/,
           exclude: /node_modules/,
           loader: 'babel-loader',
         },
@@ -42,6 +45,9 @@ module.exports = [
       path: path.join(__dirname, 'dist'),
       publicPath: '/static/',
       libraryTarget: 'commonjs2',
+    },
+    resolve: {
+      extensions: ['.js', '.jsx'],
     },
     module: {
       rules: [
