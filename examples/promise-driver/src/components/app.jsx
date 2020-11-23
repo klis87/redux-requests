@@ -21,7 +21,7 @@ const App = () => {
 
   return (
     <div>
-      <h1>Redux Requests basic example</h1>
+      <h1>Redux Requests promise example</h1>
       <p>
         In order to see aborts in action, you should set network throttling in
         your browser
