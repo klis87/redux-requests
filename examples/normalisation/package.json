@@ -14,7 +14,7 @@
     "@redux-requests/core": "1.0.0",
     "@redux-requests/graphql": "1.0.0",
     "@redux-requests/react": "1.0.0",
-    "apollo-server-express": "2.11.0",
+    "apollo-server-express": "2.14.2",
     "express": "4.17.1",
     "graphql": "14.6.0",
     "react": "16.13.1",
