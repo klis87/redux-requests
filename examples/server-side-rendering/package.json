@@ -31,7 +31,7 @@
     "express-handlebars": "5.2.0",
     "html-webpack-harddisk-plugin": "1.0.2",
     "html-webpack-plugin": "4.5.0",
-    "webpack": "5.8.0",
+    "webpack": "5.9.0",
     "webpack-dev-middleware": "4.0.2",
     "webpack-hot-middleware": "2.25.0",
     "webpack-hot-server-middleware": "0.6.1",
