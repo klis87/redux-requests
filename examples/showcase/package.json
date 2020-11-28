@@ -10,31 +10,35 @@
     "start": "node dev-server"
   },
   "dependencies": {
-    "@babel/polyfill": "7.10.4",
-    "@material-ui/core": "4.9.14",
+    "@babel/polyfill": "7.12.1",
+    "@material-ui/core": "4.11.1",
     "@material-ui/icons": "4.9.1",
-    "@material-ui/lab": "4.0.0-alpha.53",
+    "@material-ui/lab": "4.0.0-alpha.56",
     "@redux-requests/axios": "1.0.0",
-    "@redux-requests/core": "1.0.0",
-    "@redux-requests/react": "1.0.0",
-    "axios": "0.19.2",
+    "@redux-requests/core": "1.2.0",
+    "@redux-requests/react": "1.2.0",
+    "axios": "0.21.0",
     "express": "4.17.1",
     "prism-react-renderer": "1.1.1",
-    "react": "16.13.1",
+    "react": "17.0.1",
     "react-beautiful-dnd": "13.0.0",
-    "react-dom": "16.13.1",
-    "react-redux": "7.2.0",
+    "react-dom": "17.0.1",
+    "react-redux": "7.2.2",
     "redux": "4.0.5",
     "reselect": "4.0.0"
   },
   "devDependencies": {
-    "@babel/core": "7.10.5",
-    "@babel/preset-env": "7.10.4",
-    "@babel/preset-react": "7.10.4",
-    "babel-loader": "8.1.0",
+    "@babel/core": "7.12.9",
+    "@babel/preset-env": "7.12.7",
+    "@babel/preset-react": "7.12.7",
+    "@babel/runtime": "^7.12.5",
+    "babel-loader": "8.2.1",
     "babel-plugin-transform-imports": "2.0.0",
-    "html-webpack-plugin": "3.2.0",
-    "webpack": "4.43.0",
-    "webpack-dev-middleware": "3.7.2"
+    "html-webpack-plugin": "4.5.0",
+    "webpack": "5.6.0",
+    "webpack-dev-middleware": "4.0.2"
+  },
+  "resolutions": {
+    "@babel/runtime": "^7.12.5"
   }
 }

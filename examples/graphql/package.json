@@ -10,26 +10,26 @@
     "start": "node dev-server"
   },
   "dependencies": {
-    "@babel/polyfill": "7.10.4",
-    "@redux-requests/core": "1.0.0",
+    "@babel/polyfill": "7.12.1",
+    "@redux-requests/core": "1.2.0",
     "@redux-requests/graphql": "1.0.0",
-    "@redux-requests/react": "1.0.0",
+    "@redux-requests/react": "1.2.0",
     "apollo-server-express": "2.11.0",
     "express": "4.17.1",
     "graphql": "14.6.0",
-    "react": "16.13.1",
-    "react-dom": "16.13.1",
-    "react-redux": "7.2.0",
+    "react": "17.0.1",
+    "react-dom": "17.0.1",
+    "react-redux": "7.2.2",
     "redux": "4.0.5",
     "reselect": "4.0.0"
   },
   "devDependencies": {
-    "@babel/core": "7.10.5",
-    "@babel/preset-env": "7.10.4",
-    "@babel/preset-react": "7.10.4",
-    "babel-loader": "8.1.0",
-    "html-webpack-plugin": "3.2.0",
-    "webpack": "4.43.0",
-    "webpack-dev-middleware": "3.7.2"
+    "@babel/core": "7.12.9",
+    "@babel/preset-env": "7.12.7",
+    "@babel/preset-react": "7.12.7",
+    "babel-loader": "8.2.1",
+    "html-webpack-plugin": "4.5.0",
+    "webpack": "5.6.0",
+    "webpack-dev-middleware": "4.0.2"
   }
 }
