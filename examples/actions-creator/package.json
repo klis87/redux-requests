@@ -1,7 +1,7 @@
 {
-  "name": "redux-requests-redux-act-integration-example",
+  "name": "redux-requests-actions-creator-example",
   "version": "1.0.0",
-  "description": "redux requests integration with redux act example",
+  "description": "redux requests with actions creator example",
   "main": "src/index.js",
   "repository": "git@github.com:klis87/redux-requests.git",
   "author": "Konrad Lisiczynski <klisiczynski@gmail.com>",
@@ -19,7 +19,7 @@
     "react-dom": "17.0.1",
     "react-redux": "7.2.2",
     "redux": "4.0.5",
-    "redux-act": "1.7.7",
+    "redux-smart-actions": "1.0.0",
     "reselect": "4.0.0"
   },
   "devDependencies": {

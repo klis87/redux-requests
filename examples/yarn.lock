@@ -4783,10 +4783,10 @@ reduce-flatten@^2.0.0:
   resolved "https://registry.yarnpkg.com/reduce-flatten/-/reduce-flatten-2.0.0.tgz#734fd84e65f375d7ca4465c69798c25c9d10ae27"
   integrity sha512-EJ4UNY/U1t2P/2k6oqotuX2Cc3T6nxJwsM0N0asT7dhrtH1ltUxDn4NalSYmPE2rCkVpcf/X6R0wDwcFpzhd4w==
 
-redux-act@1.7.7:
-  version "1.7.7"
-  resolved "https://registry.yarnpkg.com/redux-act/-/redux-act-1.7.7.tgz#0ee8140ade95921b6ebbf70be3fc61c8d6c8a4b1"
-  integrity sha512-UKa6QJkrgrQauFtEuGjnZaBa6dKwXjeu/qchY8ifbA+i/UdEEtOZ/lfowaXkgfllr9c/5EAmmlvk0C9J2wSTnw==
+redux-smart-actions@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/redux-smart-actions/-/redux-smart-actions-1.0.0.tgz#d6d22eae20081f7afc8a2320ddd3fe4cf62a87c4"
+  integrity sha512-s7Kdxvm952YYfBtLibWaF7/6ftotXLqyyZ+2/pXMvJHvStxhMFUMdwhHUgDUcjfgqWKoWmZezce/DazElr6+sQ==
 
 redux@4.0.5, redux@^4.0.4:
   version "4.0.5"

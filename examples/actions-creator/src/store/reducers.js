@@ -1,5 +1,5 @@
 import { abort } from '@redux-requests/core';
-import { createReducer } from 'redux-act';
+import { createReducer } from 'redux-smart-actions';
 
 import { fetchPhoto, fetchPosts } from './actions';
 
