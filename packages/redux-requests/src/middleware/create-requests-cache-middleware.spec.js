@@ -32,6 +32,8 @@ describe('middleware', () => {
         requests: {
           queries: { REQUEST: { ref: {}, data: 'data' } },
           cache: { REQUEST: { timeout: null, cacheKey: undefined } },
+          downloadProgress: {},
+          uploadProgress: {},
         },
       });
       const action = {
@@ -57,6 +59,8 @@ describe('middleware', () => {
           requests: {
             queries: { REQUEST: { ref: {}, data: 'data' } },
             cache: { REQUEST: { cacheKey: undefined, timeout: Date.now() } },
+            downloadProgress: {},
+            uploadProgress: {},
           },
         });
         const action = {

@@ -1,10 +1,31 @@
 import axios from 'axios';
 
-export const createDriver = axiosInstance => requestConfig => {
+const calculateProgress = progressEvent =>
+  parseInt((progressEvent.loaded / progressEvent.total) * 100);
+
+export const createDriver = axiosInstance => (
+  requestConfig,
+  requestAction,
+  driverActions,
+) => {
   const abortSource = axios.CancelToken.source();
 
   const responsePromise = axiosInstance({
     cancelToken: abortSource.token,
+    onDownloadProgress:
+      driverActions.setDownloadProgress &&
+      (progressEvent => {
+        if (progressEvent.lengthComputable) {
+          driverActions.setDownloadProgress(calculateProgress(progressEvent));
+        }
+      }),
+    onUploadProgress:
+      driverActions.setUploadProgress &&
+      (progressEvent => {
+        if (progressEvent.lengthComputable) {
+          driverActions.setUploadProgress(calculateProgress(progressEvent));
+        }
+      }),
     ...requestConfig,
   })
     .then(response => ({

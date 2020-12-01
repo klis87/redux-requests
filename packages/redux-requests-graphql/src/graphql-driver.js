@@ -1,12 +1,15 @@
 import axios from 'axios';
 import { extractFiles } from 'extract-files';
 
+const calculateProgress = progressEvent =>
+  parseInt((progressEvent.loaded / progressEvent.total) * 100);
+
 export const createDriver = ({ url }) => {
   const axiosInstance = axios.create({
     baseURL: url,
   });
 
-  return requestConfig => {
+  return (requestConfig, requestAction, driverActions) => {
     const abortSource = axios.CancelToken.source();
     const { clone, files } = extractFiles({
       query: requestConfig.query,
@@ -38,6 +41,20 @@ export const createDriver = ({ url }) => {
       method: 'post',
       data,
       headers: requestConfig.headers,
+      onDownloadProgress:
+        driverActions.setDownloadProgress &&
+        (progressEvent => {
+          if (progressEvent.lengthComputable) {
+            driverActions.setDownloadProgress(calculateProgress(progressEvent));
+          }
+        }),
+      onUploadProgress:
+        driverActions.setUploadProgress &&
+        (progressEvent => {
+          if (progressEvent.lengthComputable) {
+            driverActions.setUploadProgress(calculateProgress(progressEvent));
+          }
+        }),
     })
       .then(response => {
         if (response.data.errors) {

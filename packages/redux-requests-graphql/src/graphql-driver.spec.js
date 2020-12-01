@@ -26,7 +26,7 @@ describe('graphqlDriver', () => {
       }
     `;
     await expect(
-      driver({ query, headers: { header: 'header' } }, { token: 'token' }),
+      driver({ query, headers: { header: 'header' } }, undefined, {}),
     ).resolves.toEqual('data');
     await expect(axiosInstanceMock).toBeCalledWith({
       cancelToken: 'token',
@@ -55,7 +55,8 @@ describe('graphqlDriver', () => {
             }
           `,
         },
-        { token: 'token' },
+        undefined,
+        {},
       ),
     ).rejects.toEqual({
       data: { errors: 'errors' },
@@ -75,7 +76,8 @@ describe('graphqlDriver', () => {
             }
           `,
         },
-        { token: 'token' },
+        undefined,
+        {},
       ),
     ).rejects.toBe('error');
   });
@@ -110,7 +112,8 @@ describe('graphqlDriver', () => {
         query,
         variables: { file, x: 1 },
       },
-      { token: 'token' },
+      undefined,
+      {},
     );
     await expect(axiosInstanceMock).toBeCalledWith({
       cancelToken: 'token',

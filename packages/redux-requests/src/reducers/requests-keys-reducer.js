@@ -70,7 +70,14 @@ export default (state, action, config = defaultConfig) => {
       }
     }
 
-    return { queries, mutations, cache, requestsKeys };
+    return {
+      queries,
+      mutations,
+      cache,
+      requestsKeys,
+      downloadProgress: state.downloadProgress,
+      uploadProgress: state.uploadProgress,
+    };
   }
 
   return state;

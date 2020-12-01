@@ -56,6 +56,8 @@ function BasicQuery() {
         error: null,
         loading: true,
         pristine: false,
+        downloadProgress: null,
+        uploadProgress: null,
       })}
       type="TYPE"
     >
@@ -94,7 +96,9 @@ function QueryWithComponents() {
       type="QUERY"
       component={Component}
       loadingComponent={Spinner}
-      loadingComponentProps={{ extra: 'extra' }}
+      loadingComponentProps={{
+        extra: 'extra',
+      }}
       errorComponent={Error}
       errorComponentProps={{ extra: 'extra' }}
       noDataMessage={<span>No data</span>}
@@ -144,6 +148,8 @@ function MutationWithSelector() {
       selector={state => ({
         error: null,
         loading: false,
+        downloadProgress: null,
+        uploadProgress: null,
       })}
     >
       {({ loading, error }) => (

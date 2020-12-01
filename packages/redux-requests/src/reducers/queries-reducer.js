@@ -42,7 +42,12 @@ const queryReducer = (state, action, actionType, config, normalizedData) => {
       state.normalized
         ? getQuery(
             {
-              requests: { normalizedData, queries: { [actionType]: state } },
+              requests: {
+                normalizedData,
+                queries: { [actionType]: state },
+                downloadProgress: {},
+                uploadProgress: {},
+              },
             },
             { type: actionType },
           ).data

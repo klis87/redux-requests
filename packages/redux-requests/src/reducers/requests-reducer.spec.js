@@ -11,6 +11,8 @@ describe('reducers', () => {
         normalizedData: {},
         cache: {},
         requestsKeys: {},
+        downloadProgress: {},
+        uploadProgress: {},
         ssr: null,
       });
     });
@@ -24,6 +26,8 @@ describe('reducers', () => {
             normalizedData: {},
             cache: {},
             requestsKeys: {},
+            downloadProgress: {},
+            uploadProgress: {},
             ssr: null,
           },
           { type: 'NOT_REQUEST' },
@@ -34,6 +38,8 @@ describe('reducers', () => {
         normalizedData: {},
         cache: {},
         requestsKeys: {},
+        downloadProgress: {},
+        uploadProgress: {},
         ssr: null,
       });
     });
@@ -50,6 +56,8 @@ describe('reducers', () => {
           normalizedData: {},
           cache: {},
           requestsKeys: {},
+          downloadProgress: {},
+          uploadProgress: {},
           ssr: null,
         },
         firstRequest,

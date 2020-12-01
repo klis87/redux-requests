@@ -3,6 +3,8 @@ import { createSelector } from 'reselect';
 const defaultMutation = {
   loading: false,
   error: null,
+  downloadProgress: null,
+  uploadProgress: null,
 };
 
 const getMutationState = (state, type, requestKey = '') =>
@@ -13,9 +15,13 @@ const mutationSelectors = new WeakMap();
 const createMutationSelector = (type, requestKey) =>
   createSelector(
     state => getMutationState(state, type, requestKey),
-    mutationState => ({
+    state => state.requests.downloadProgress[type + (requestKey || '')] ?? null,
+    state => state.requests.uploadProgress[type + (requestKey || '')] ?? null,
+    (mutationState, downloadProgress, uploadProgress) => ({
       loading: mutationState.pending > 0,
       error: mutationState.error,
+      downloadProgress,
+      uploadProgress,
     }),
   );
 

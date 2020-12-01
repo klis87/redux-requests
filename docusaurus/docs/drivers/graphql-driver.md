@@ -1,5 +1,5 @@
 ---
-title:  GraphQL driver
+title: GraphQL driver
 description: GraphQL guide for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
@@ -14,14 +14,17 @@ to facilitate files uploads.
 ## Installation
 
 To install the package, just run:
+
 ```bash
 $ npm install @redux-requests/graphql
 ```
+
 or you can just use CDN: `https://unpkg.com/@redux-requests/graphql`.
 
 ## Usage
 
 Let's assume we have the following GraphQL schema:
+
 ```graphql
 type Book {
   id: ID!
@@ -50,6 +53,7 @@ type Mutation {
 
 To use this driver, just import it and pass to `handleRequests`, like you would do
 with other drivers:
+
 ```js
 import { handleRequests } from '@redux-requests/core';
 import { createDriver } from '@redux-requests/graphql';
@@ -62,6 +66,7 @@ handleRequests({
 In order to send a query, just do it in a similar fashion to other drivers. The only
 one thing really specific to GraphQL is a way you define your actions. Let's create an action
 to fetch books:
+
 ```js
 import { gql } from '@redux-requests/graphql';
 
@@ -84,6 +89,7 @@ const fetchBooks = () => ({
   },
 });
 ```
+
 As you see, there is nothing fancy here, you just write GraphQL. Notice we wrap it in
 `gql` tag. Currently it only trims queries, but in the future it could do other stuff,
 so it is recommended to wrap all your queries in `gql`, especially that it will hint
@@ -93,6 +99,7 @@ pass `headers`, which could be useful for authentication for instance.
 ## Passing variables
 
 Now, let's fetch a specific book, which requires using variables:
+
 ```js
 const fetchBook = id => ({
   type: 'FETCH_BOOK',
@@ -116,6 +123,7 @@ const fetchBook = id => ({
 
 Notice `Book` properties repeated across those two queries. As you probably know,
 the answer for this problem is GraphQL fragment, which you can create like this:
+
 ```js
 const bookFragment = gql`
   fragment BookFragment on Book {
@@ -145,6 +153,7 @@ const fetchBook = id => ({
 ## Mutations
 
 Mutations are done like queries, just use GraphQL language:
+
 ```js
 const deleteBook = id => ({
   type: 'DELETE_BOOK',
@@ -167,6 +176,7 @@ Upload files according to [GraphQL multipart request specification](https://gith
 GraphQL clients and servers, like Apollo, is also supported.
 
 So, to upload a single file:
+
 ```js
 const uploadFile = file => ({
   type: 'UPLOAD_FILE',
@@ -184,7 +194,9 @@ const uploadFile = file => ({
   },
 });
 ```
+
 ... or, to upload multiple files:
+
 ```js
 const uploadFiles = files => ({
   type: 'UPLOAD_FILES',
@@ -202,5 +214,12 @@ const uploadFiles = files => ({
   },
 });
 ```
+
 So, you can do it exactly in the same way like other libraries supporting
 `GraphQL multipart request specification`.
+
+## Progress event support
+
+`graphql` driver supports [ProgressEvent](https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent). All you
+need to do is to add `meta.measureDownloadProgress` or `meta.measureUploadProgress` to a request action and
+you could access `downloadProgress` or `uploadProgress` values from selectors like `getQuery` or `getMutation`.

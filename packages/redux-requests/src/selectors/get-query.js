@@ -6,7 +6,10 @@ const isQueryEqual = (currentVal, previousVal) => {
   if (
     currentVal.data !== previousVal.data ||
     currentVal.pending !== previousVal.pending ||
-    currentVal.error !== previousVal.error
+    currentVal.error !== previousVal.error ||
+    currentVal.pristine !== previousVal.pristine ||
+    currentVal.downloadProgress !== previousVal.downloadProgress ||
+    currentVal.uploadProgress !== previousVal.uploadProgress
   ) {
     return false;
   }
@@ -98,6 +101,10 @@ const createQuerySelector = (type, requestKey) =>
         multiple,
         defaultData,
         normalizedData: state.requests.normalizedData,
+        downloadProgress:
+          state.requests.downloadProgress[type + (requestKey || '')] ?? null,
+        uploadProgress:
+          state.requests.uploadProgress[type + (requestKey || '')] ?? null,
       };
     },
     ({
@@ -110,6 +117,8 @@ const createQuerySelector = (type, requestKey) =>
       normalizedData,
       defaultData,
       multiple,
+      downloadProgress,
+      uploadProgress,
     }) => ({
       data: normalized
         ? denormalize(
@@ -121,6 +130,8 @@ const createQuerySelector = (type, requestKey) =>
       loading: pending > 0,
       error,
       pristine,
+      downloadProgress,
+      uploadProgress,
     }),
   );
 
@@ -129,6 +140,8 @@ const defaultQuery = {
   loading: false,
   error: null,
   pristine: true,
+  downloadProgress: null,
+  uploadProgress: null,
 };
 
 const defaultQueryMultiple = {

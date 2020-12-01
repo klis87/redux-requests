@@ -23,6 +23,8 @@ describe('middleware', () => {
               ref: {},
             },
           },
+          downloadProgress: {},
+          uploadProgress: {},
           ssr: ['REQUEST'],
         },
       });
@@ -46,6 +48,8 @@ describe('middleware', () => {
               ref: {},
             },
           },
+          downloadProgress: {},
+          uploadProgress: {},
           ssr: ['REQUEST'],
         },
       });
@@ -65,6 +69,8 @@ describe('middleware', () => {
               ref: {},
             },
           },
+          downloadProgress: {},
+          uploadProgress: {},
           ssr: ['REQUEST'],
         },
       });

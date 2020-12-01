@@ -1,5 +1,5 @@
 ---
-title:  RequestAction
+title: RequestAction
 description: RequestAction API reference for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
@@ -11,6 +11,7 @@ property and might have `meta` property.
 
 This is mandatory key in any request action. What you put here depends on a driver you use.
 For example, when using `axios`, it could look like that:
+
 ```js
 const fetchBooks = () => ({
   type: 'FETCH_BOOKS',
@@ -21,13 +22,11 @@ const fetchBooks = () => ({
 ```
 
 It is also possible to provide array of configs to make **batch requests**:
+
 ```js
 const fetchBooksAndAuthors = () => ({
   type: 'FETCH_BOOKS_AND_AUTHORS',
-  request: [
-    { url: '/books' },
-    { url: '/authors' },
-  ],
+  request: [{ url: '/books' }, { url: '/authors' }],
 });
 ```
 
@@ -36,6 +35,7 @@ const fetchBooksAndAuthors = () => ({
 While `request` key is driver dependent and mandatory, `meta` is optional and its
 options don't depend on used driver. As an example, let's add a `meta` property
 to `FETCH_BOOKS` action:
+
 ```js
 const fetchBooks = () => ({
   type: 'FETCH_BOOKS',
@@ -47,8 +47,8 @@ const fetchBooks = () => ({
   },
 });
 ```
-which would turn on automatic normalisation for `FETCH_BOOKS` query.
 
+which would turn on automatic normalisation for `FETCH_BOOKS` query.
 
 Below you can see the list of all possible `meta` options:
 
@@ -69,7 +69,6 @@ It can be used to force treating of a request action as mutation when `true` or 
 Useful if a driver you use doesn't have a config which could determine whether it is query or mutation.
 Also could be handy if your want to treat a mutation (for example `POST` request) as a query for instance
 to store its data.
-
 
 ### `driver: string`
 
@@ -180,10 +179,23 @@ See [interceptors tutorial](../tutorial/6-interceptors).
 Passing `true` would prevent running `onAbort` interceptor for this action.
 See [interceptors tutorial](../tutorial/6-interceptors).
 
+### `measureDownloadProgress: boolean`
+
+Passing `true` will expose download progress calculation in selectors like `getQuery` and `getMutation`, calculated by native
+[ProgressEvent](https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent). Useful for file downloads and big JSON payloads.
+Available only for `axios` and `graphql` drivers... and for custom drivers which support it.
+
+### `measureUploadProgress: boolean`
+
+Passing `true` will expose upload progress calculation in selectors like `getQuery` and `getMutation`, calculated by native
+[ProgressEvent](https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent). Useful for file uploads and big JSON payloads.
+Available only for `axios` and `graphql` drivers... and for custom drivers which support it.
+
 ### `mutations`
 
 An object to instruct a mutation how to update queries data. Its keys are just
 query types and values are update functions, for example for `DELETE_BOOK` mutation we could have:
+
 ```js
 mutations: {
   FETCH_BOOKS: data => data.filter(book => book.id !== '1'),
@@ -191,6 +203,7 @@ mutations: {
 ```
 
 It is possible to update multiple queries with one mutation:
+
 ```js
 mutations: {
   FETCH_BOOK: data => data.id === '1' ? null : data,
@@ -200,6 +213,7 @@ mutations: {
 
 Update function also has 2nd argument `mutationData` which is just `data` from mutation
 response. It could be useful for update mutations like `UPDATE_BOOK`:
+
 ```js
 mutations: {
   FETCH_BOOK: (data, mutationData) => data.id === '1' ? mutationData : data,
@@ -207,6 +221,7 @@ mutations: {
 ```
 
 Actually there is an alias for passing update functions:
+
 ```js
 mutations: {
   FETCH_BOOK: {

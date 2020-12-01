@@ -1,5 +1,5 @@
 ---
-title:  Using drivers
+title: Using drivers
 description: Using drivers guide for redux-requests - declarative AJAX requests and automatic network state management for Redux
 ---
 
@@ -19,23 +19,23 @@ will be covered later in this chapter.
 
 You must use at least one driver. You can choose one of provided drivers by this library
 or write your own. Let's assume we pick `fetch` driver. Install it:
+
 ```bash
 $ npm install @redux-requests/fetch
 ```
+
 and pass it to `handleRequests`:
+
 ```js
 import 'isomorphic-fetch';
 import { handleRequests } from '@redux-requests/core';
-import { createDriver  } from '@redux-requests/fetch';
+import { createDriver } from '@redux-requests/fetch';
 
 handleRequests({
-  driver: createDriver(
-    window.fetch,
-    {
-      baseURL: 'https://my-domain.com',
-      AbortController: window.AbortController,
-    },
-  ),
+  driver: createDriver(window.fetch, {
+    baseURL: 'https://my-domain.com',
+    AbortController: window.AbortController,
+  }),
 });
 ```
 
@@ -46,6 +46,7 @@ And that's it, `fetch` driver is ready to use and the library will understand
 
 You can use multiple drivers at the same time if you need it. For example, if you want to use Axios by default, but also Fetch API
 sometimes, you can do it like this:
+
 ```js
 import axios from 'axios';
 import 'isomorphic-fetch';
@@ -56,19 +57,17 @@ import { createDriver as createFetchDriver } from '@redux-requests/fetch';
 handleRequests({
   driver: {
     default: createAxiosDriver(axios),
-    fetch: createFetchDriver(
-      window.fetch,
-      {
-        baseURL: 'https://my-domain.com',
-        AbortController: window.AbortController,
-      },
-    ),
+    fetch: createFetchDriver(window.fetch, {
+      baseURL: 'https://my-domain.com',
+      AbortController: window.AbortController,
+    }),
   },
 });
 ```
 
 As you can see, the default driver is Axios, so how to mark a request to be run by Fetch driver?
 Just pass the key you assigned Fetch driver to (`fetch` in our case) in `action.meta.driver`, for instance:
+
 ```js
 const fetchUsers = () => ({
   type: 'FETCH_USERS',
@@ -93,6 +92,7 @@ sends an AJAX request and returns a promise, which will be resolved for success 
 
 So, let's write `axios` driver. In order to understand what will happen next, it is recommended
 to get familiar with `axios` library, especially how to abort requests. Anyway, let's start some coding:
+
 ```js
 import axios from 'axios';
 
@@ -112,6 +112,7 @@ the library expects promises to be resolved with object with at least `data`.
 
 As written above, for success response promise has to be resolved with an object
 with at least `data` key, but you can add anything else:
+
 ```js
 import axios from 'axios';
 
@@ -130,10 +131,10 @@ note that still only `data` will be stored in reducer, so if you need to access 
 for instance from Redux state, you can store it in your own reducer or you could merge
 a header with `data` inside `onSuccess` interceptor.
 
-
 ## Supporting aborts in custom drivers
 
 We are not done yet though, our driver does not support aborts yet, let's fix that:
+
 ```js
 import axios from 'axios';
 
@@ -181,6 +182,7 @@ So resist the temptation and stick just to promises when writing drivers!
 
 Most of the time you would probably want your driver to be configurable. For instance,
 we might want to allow to pass a custom `axios` instance to `axios` driver. So let's refactor what we have:
+
 ```js
 import axios from 'axios';
 
@@ -210,6 +212,7 @@ const createAxiosDriver = axiosInstance => requestConfig => {
 ```
 
 Now we could create driver with a configured axios, like:
+
 ```js
 import axios from 'axios';
 
@@ -223,3 +226,61 @@ const axiosDriver = createAxiosDriver(
 So basically we refactored `axiosDriver` into `createAxiosDriver` - function which
 returns `axiosDriver`. This technique is of course not mandatory but it might be handy
 to make your drivers more flexible.
+
+## Supporting download and upload progress
+
+Optionally drivers could support download and upload progress. Because `axios` makes it easy with the help of
+[ProgressEvent](https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent), let's see how we could implement it:
+
+```js
+import axios from 'axios';
+
+const calculateProgress = progressEvent =>
+  parseInt((progressEvent.loaded / progressEvent.total) * 100);
+
+const createAxiosDriver = axiosInstance => (
+  requestConfig,
+  requestAction,
+  driverActions,
+) => {
+  const abortSource = axios.CancelToken.source();
+
+  const responsePromise = axiosInstance({
+    cancelToken: abortSource.token,
+    onDownloadProgress:
+      driverActions.setDownloadProgress &&
+      (progressEvent => {
+        if (progressEvent.lengthComputable) {
+          driverActions.setDownloadProgress(calculateProgress(progressEvent));
+        }
+      }),
+    onUploadProgress:
+      driverActions.setUploadProgress &&
+      (progressEvent => {
+        if (progressEvent.lengthComputable) {
+          driverActions.setUploadProgress(calculateProgress(progressEvent));
+        }
+      }),
+    ...requestConfig,
+  })
+    .then(response => ({
+      data: response.data,
+      headers: response.headers,
+      status: response.status,
+    }))
+    .catch(error => {
+      if (axios.isCancel(error)) {
+        throw 'REQUEST_ABORTED';
+      }
+
+      throw error;
+    });
+
+  responsePromise.cancel = () => abortSource.cancel();
+  return responsePromise;
+};
+```
+
+As you can see, you could utilise `driverActions` helpers which are passed to any driver. We use them in
+`axios` `onDownloadProgress` and `onUploadProgress` callbacks. After adding this, you could add `meta.measureDownloadProgress`
+or `meta.measureUploadProgress` to a request action and you could access `downloadProgress` or `uploadProgress` values from selectors like `getQuery` or `getMutation`.

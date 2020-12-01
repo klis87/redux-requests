@@ -60,7 +60,7 @@ const fetchBook: (
 };
 
 let dummyDriver: Driver;
-dummyDriver({}, requestAction)
+dummyDriver({}, requestAction, {})
   .then(v => v)
   .catch(e => {
     throw e;

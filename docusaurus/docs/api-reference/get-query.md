@@ -15,6 +15,8 @@ const booksQuery = getQuery(state, { type: 'FETCH_BOOKS' });
   loading: false,
   error: null,
   pristine: false, // true only when there was no request made for a give type
+  downloadProgress: null, // only when requestAction.meta.measureDownloadProgress is true
+  uploadProgress: null, // only when requestAction.meta.measureUploadProgress is true
 } */
 ```
 

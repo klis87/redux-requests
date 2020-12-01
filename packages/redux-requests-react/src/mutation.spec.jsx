@@ -18,6 +18,8 @@ describe('Mutation', () => {
             mutations: {
               [MUTATION_TYPE]: { pending: 1, error: 'error', ref: {} },
             },
+            downloadProgress: {},
+            uploadProgress: {},
           },
         })}
       >
@@ -42,6 +44,8 @@ describe('Mutation', () => {
             mutations: {
               [MUTATION_TYPE]: { pending: 1, error: 'error', ref: {} },
             },
+            downloadProgress: {},
+            uploadProgress: {},
           },
         })}
       >
@@ -64,6 +68,8 @@ describe('Mutation', () => {
         store={mockStore({
           requests: {
             mutations: {},
+            downloadProgress: {},
+            uploadProgress: {},
           },
         })}
       >
@@ -88,6 +94,8 @@ describe('Mutation', () => {
             mutations: {
               [`${MUTATION_TYPE}x`]: { pending: 1, error: 'error', ref: {} },
             },
+            downloadProgress: {},
+            uploadProgress: {},
           },
         })}
       >
@@ -113,6 +121,8 @@ describe('Mutation', () => {
             mutations: {
               [MUTATION_TYPE]: { x: { pending: 1, error: 'error', ref: {} } },
             },
+            downloadProgress: {},
+            uploadProgress: {},
           },
         })}
       >
@@ -144,6 +154,8 @@ describe('Mutation', () => {
             mutations: {
               [MUTATION_TYPE]: { pending: 1, error: 'error', ref: {} },
             },
+            downloadProgress: {},
+            uploadProgress: {},
           },
         })}
       >

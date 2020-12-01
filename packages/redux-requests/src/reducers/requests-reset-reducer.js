@@ -29,7 +29,7 @@ export default (state, action) => {
     return state;
   }
 
-  let { queries, mutations, cache } = state;
+  let { queries, mutations, cache, downloadProgress, uploadProgress } = state;
   const clearAll = !action.requests;
   const keys = !clearAll && getKeys(action.requests);
 
@@ -63,5 +63,29 @@ export default (state, action) => {
         return prev;
       }, {});
 
-  return { queries, mutations, cache };
+  downloadProgress = clearAll
+    ? {}
+    : Object.entries(downloadProgress).reduce((prev, [k, v]) => {
+        if (keys.includes(k)) {
+          return prev;
+        }
+
+        prev[k] = v;
+
+        return prev;
+      }, {});
+
+  uploadProgress = clearAll
+    ? {}
+    : Object.entries(uploadProgress).reduce((prev, [k, v]) => {
+        if (keys.includes(k)) {
+          return prev;
+        }
+
+        prev[k] = v;
+
+        return prev;
+      }, {});
+
+  return { queries, mutations, cache, downloadProgress, uploadProgress };
 };

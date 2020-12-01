@@ -70,7 +70,9 @@ const Books = () => {
 - `noDataMessage`: `string` or any React node, like `<div>message</div>`, which will be rendered when `data` is empty
 - `errorComponent`: custom React component, which will be rendered on error, receives `error` prop, `null` by default
 - `errorComponentProps`: extra props which will be passed to `errorComponent`
-- `loadingComponent` custom React component, which will be rndered when request is pending, useful for showing
+- `loadingComponent` custom React component, which will be rndered when request is pending, useful for showing spinners,
+  receives `downloadProgress` and `uploadProgress` props, useful when `requestAction.meta.measureDownloadProgress` or
+  `requestAction.meta.measureUploadProgress` is `true`
 - `loadingComponentProps`: extra props which will be passed to `loadingComponent`
   spinners, `null` by default
 - `showLoaderDuringRefetch: boolean`: `true` by default, whether `loadingComponent` will be shown on data refetch

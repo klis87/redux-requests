@@ -60,13 +60,22 @@ describe('selectors', () => {
           '@@4': { id: 4, list: ['@@5'] },
           '@@5': { id: 5 },
         },
+        downloadProgress: {},
+        uploadProgress: {},
       },
     };
 
     it('returns fallback query state if not found', () => {
       expect(
         getQuery(
-          { requests: { queries: {}, mutations: {} } },
+          {
+            requests: {
+              queries: {},
+              mutations: {},
+              downloadProgress: {},
+              uploadProgress: {},
+            },
+          },
           { type: 'QUERY' },
         ),
       ).toEqual({
@@ -74,13 +83,22 @@ describe('selectors', () => {
         loading: false,
         error: null,
         pristine: true,
+        downloadProgress: null,
+        uploadProgress: null,
       });
     });
 
     it('replaces data as null with [] when multiple true', () => {
       expect(
         getQuery(
-          { requests: { queries: {}, mutations: {} } },
+          {
+            requests: {
+              queries: {},
+              mutations: {},
+              downloadProgress: {},
+              uploadProgress: {},
+            },
+          },
           { type: 'QUERY', multiple: true },
         ),
       ).toEqual({
@@ -88,13 +106,22 @@ describe('selectors', () => {
         loading: false,
         error: null,
         pristine: true,
+        downloadProgress: null,
+        uploadProgress: null,
       });
     });
 
     it('replaces data as custom object with {} when defaultData defined', () => {
       expect(
         getQuery(
-          { requests: { queries: {}, mutations: {} } },
+          {
+            requests: {
+              queries: {},
+              mutations: {},
+              downloadProgress: {},
+              uploadProgress: {},
+            },
+          },
           { type: 'QUERY', defaultData: {} },
         ),
       ).toEqual({
@@ -102,6 +129,8 @@ describe('selectors', () => {
         loading: false,
         error: null,
         pristine: true,
+        downloadProgress: null,
+        uploadProgress: null,
       });
     });
 
@@ -117,6 +146,8 @@ describe('selectors', () => {
         loading: true,
         error: null,
         pristine: false,
+        downloadProgress: null,
+        uploadProgress: null,
       });
     });
 
@@ -126,6 +157,8 @@ describe('selectors', () => {
         loading: true,
         error: null,
         pristine: false,
+        downloadProgress: null,
+        uploadProgress: null,
       });
     });
 
@@ -160,6 +193,8 @@ describe('selectors', () => {
         loading: false,
         error: null,
         pristine: false,
+        downloadProgress: null,
+        uploadProgress: null,
       });
     });
 
@@ -203,6 +238,8 @@ describe('selectors', () => {
         loading: false,
         error: null,
         pristine: false,
+        downloadProgress: null,
+        uploadProgress: null,
       });
       expect(query2).toEqual({
         data: [
@@ -212,6 +249,8 @@ describe('selectors', () => {
         loading: false,
         error: null,
         pristine: false,
+        downloadProgress: null,
+        uploadProgress: null,
       });
     });
 
@@ -258,6 +297,8 @@ describe('selectors', () => {
         loading: false,
         error: null,
         pristine: false,
+        downloadProgress: null,
+        uploadProgress: null,
       });
       expect(query2).toBe(query);
     });

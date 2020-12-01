@@ -33,6 +33,8 @@ describe('Query', () => {
             queries: {
               [QUERY_TYPE]: { data: 'data', error: null, pending: 0, ref: {} },
             },
+            downloadProgress: {},
+            uploadProgress: {},
           },
         })}
       >
@@ -48,6 +50,8 @@ describe('Query', () => {
         store={mockStore({
           requests: {
             queries: {},
+            downloadProgress: {},
+            uploadProgress: {},
           },
         })}
       >
@@ -65,6 +69,8 @@ describe('Query', () => {
             queries: {
               [QUERY_TYPE]: { data: null, error: null, pending: 0, ref: {} },
             },
+            downloadProgress: {},
+            uploadProgress: {},
           },
         })}
       >
@@ -83,6 +89,8 @@ describe('Query', () => {
             queries: {
               [QUERY_TYPE]: { data: [], error: null, pending: 0, ref: {} },
             },
+            downloadProgress: {},
+            uploadProgress: {},
           },
         })}
       >
@@ -108,6 +116,8 @@ describe('Query', () => {
             queries: {
               [QUERY_TYPE]: { data: 'empty', error: null, pending: 0, ref: {} },
             },
+            downloadProgress: {},
+            uploadProgress: {},
           },
         })}
       >
@@ -131,6 +141,8 @@ describe('Query', () => {
             queries: {
               [QUERY_TYPE]: { data: null, error: null, pending: 0, ref: {} },
             },
+            downloadProgress: {},
+            uploadProgress: {},
           },
         })}
       >
@@ -150,6 +162,8 @@ describe('Query', () => {
             queries: {
               [QUERY_TYPE]: { data: null, error: null, pending: 0, ref: {} },
             },
+            downloadProgress: {},
+            uploadProgress: {},
           },
         })}
       >
@@ -169,6 +183,8 @@ describe('Query', () => {
             queries: {
               [QUERY_TYPE]: { data: null, error: null, pending: 0, ref: {} },
             },
+            downloadProgress: {},
+            uploadProgress: {},
           },
         })}
       >
@@ -189,6 +205,8 @@ describe('Query', () => {
             queries: {
               [QUERY_TYPE]: { data: 'data', error: null, pending: 1, ref: {} },
             },
+            downloadProgress: {},
+            uploadProgress: {},
           },
         })}
       >
@@ -209,6 +227,8 @@ describe('Query', () => {
             queries: {
               [QUERY_TYPE]: { data: 'data', error: null, pending: 1, ref: {} },
             },
+            downloadProgress: {},
+            uploadProgress: {},
           },
         })}
       >
@@ -244,6 +264,8 @@ describe('Query', () => {
                     ref: {},
                   },
                 },
+                downloadProgress: {},
+                uploadProgress: {},
               },
             })}
           >
@@ -267,6 +289,8 @@ describe('Query', () => {
             queries: {
               [QUERY_TYPE]: { data: 'data', error: null, pending: 1, ref: {} },
             },
+            downloadProgress: {},
+            uploadProgress: {},
           },
         })}
       >
@@ -292,6 +316,8 @@ describe('Query', () => {
                 ref: {},
               },
             },
+            downloadProgress: {},
+            uploadProgress: {},
           },
         })}
       >
@@ -321,6 +347,8 @@ describe('Query', () => {
                 ref: {},
               },
             },
+            downloadProgress: {},
+            uploadProgress: {},
           },
         })}
       >
@@ -356,6 +384,8 @@ describe('Query', () => {
                     ref: {},
                   },
                 },
+                downloadProgress: {},
+                uploadProgress: {},
               },
             })}
           >
@@ -385,6 +415,8 @@ describe('Query', () => {
             queries: {
               [QUERY_TYPE]: { data: 'data', error: null, pending: 0, ref: {} },
             },
+            downloadProgress: {},
+            uploadProgress: {},
           },
         })}
       >

@@ -3,6 +3,8 @@ import {
   createSuccessAction,
   createErrorAction,
   createAbortAction,
+  setDownloadProgress,
+  setUploadProgress,
 } from '../actions';
 import { ABORT_REQUESTS, RESET_REQUESTS } from '../constants';
 import { getQuery } from '../selectors';
@@ -115,7 +117,33 @@ const maybeDispatchRequestAction = (action, next) => {
   return action;
 };
 
-const getResponsePromises = (action, config, pendingRequests) => {
+const getDriverActions = (action, store) => {
+  const driverActions = {};
+
+  if (action.meta?.measureDownloadProgress) {
+    driverActions.setDownloadProgress = progress =>
+      store.dispatch(
+        setDownloadProgress(
+          action.type + (action.meta?.requestKey || ''),
+          progress,
+        ),
+      );
+  }
+
+  if (action.meta?.measureUploadProgress) {
+    driverActions.setUploadProgress = progress =>
+      store.dispatch(
+        setUploadProgress(
+          action.type + (action.meta?.requestKey || ''),
+          progress,
+        ),
+      );
+  }
+
+  return driverActions;
+};
+
+const getResponsePromises = (action, config, pendingRequests, store) => {
   const actionPayload = getActionPayload(action);
   const isBatchedRequest = Array.isArray(actionPayload.request);
 
@@ -127,6 +155,7 @@ const getResponsePromises = (action, config, pendingRequests) => {
     return [Promise.reject(action.meta.ssrError)];
   }
 
+  const driverActions = isBatchedRequest ? {} : getDriverActions(action, store);
   const driver = getDriver(config, action);
   const lastActionKey = getLastActionKey(action);
   const takeLatest = isTakeLatest(action, config);
@@ -136,8 +165,8 @@ const getResponsePromises = (action, config, pendingRequests) => {
   }
 
   const responsePromises = isBatchedRequest
-    ? actionPayload.request.map(r => driver(r, action))
-    : [driver(actionPayload.request, action)];
+    ? actionPayload.request.map(r => driver(r, action, driverActions))
+    : [driver(actionPayload.request, action, driverActions)];
 
   if (responsePromises[0].cancel) {
     pendingRequests[lastActionKey] = responsePromises;
@@ -287,6 +316,7 @@ const createSendRequestMiddleware = config => {
         action,
         config,
         pendingRequests,
+        store,
       );
 
       return Promise.all(responsePromises)

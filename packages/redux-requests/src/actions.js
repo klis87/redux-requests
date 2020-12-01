@@ -5,6 +5,8 @@ import {
   CLEAR_REQUESTS_CACHE,
   RESET_REQUESTS,
   ABORT_REQUESTS,
+  SET_DOWNLOAD_PROGRESS,
+  SET_UPLOAD_PROGRESS,
 } from './constants';
 
 const getActionWithSuffix = suffix => actionType => actionType + suffix;
@@ -119,4 +121,16 @@ export const resetRequests = (requests = null, abortPending = true) => ({
 export const abortRequests = (requests = null) => ({
   type: ABORT_REQUESTS,
   requests,
+});
+
+export const setDownloadProgress = (requestType, progress) => ({
+  type: SET_DOWNLOAD_PROGRESS,
+  requestType,
+  progress,
+});
+
+export const setUploadProgress = (requestType, progress) => ({
+  type: SET_UPLOAD_PROGRESS,
+  requestType,
+  progress,
 });

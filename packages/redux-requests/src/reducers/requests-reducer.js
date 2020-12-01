@@ -5,6 +5,7 @@ import queriesReducer from './queries-reducer';
 import mutationsReducer from './mutations-reducer';
 import requestKeysReducer from './requests-keys-reducer';
 import cacheReducer from './cache-reducer';
+import progressReducer from './progress-reducer';
 import requestsResetReducer from './requests-reset-reducer';
 import ssrReducer from './ssr-reducer';
 
@@ -13,6 +14,8 @@ const defaultState = {
   mutations: {},
   normalizedData: {},
   cache: {},
+  downloadProgress: {},
+  uploadProgress: {},
   requestsKeys: {},
 };
 
@@ -41,6 +44,14 @@ export default (config = defaultConfig) => (state = defaultState, action) => {
             queries,
             mutations,
             cache: cacheReducer(state.cache, action),
+            ...progressReducer(
+              {
+                downloadProgress: state.downloadProgress,
+                uploadProgress: state.uploadProgress,
+              },
+              action,
+              config,
+            ),
           },
           action,
         ),

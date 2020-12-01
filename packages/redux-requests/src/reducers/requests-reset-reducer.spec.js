@@ -35,6 +35,8 @@ describe('reducers', () => {
               MUTATION: { error: 'error', pending: 1 },
             },
             cache: { QUERY2: {} },
+            downloadProgress: {},
+            uploadProgress: {},
           },
           resetRequests(),
         ),
@@ -61,6 +63,8 @@ describe('reducers', () => {
           MUTATION: { error: null, pending: 1 },
         },
         cache: {},
+        downloadProgress: {},
+        uploadProgress: {},
       });
     });
 
@@ -99,6 +103,8 @@ describe('reducers', () => {
               MUTATION2: { error: 'error', pending: 1 },
               MUTATION3: { error: 'error', pending: 1 },
             },
+            downloadProgress: {},
+            uploadProgress: {},
             cache: { QUERY: {}, QUERY2: {}, QUERY3: {} },
           },
           resetRequests([
@@ -140,6 +146,8 @@ describe('reducers', () => {
           MUTATION3: { error: 'error', pending: 1 },
         },
         cache: { QUERY3: {} },
+        downloadProgress: {},
+        uploadProgress: {},
       });
     });
 
@@ -162,6 +170,8 @@ describe('reducers', () => {
             },
             mutations: {},
             cache: {},
+            downloadProgress: {},
+            uploadProgress: {},
           },
           resetRequests([queryAction]),
         ),
@@ -178,6 +188,8 @@ describe('reducers', () => {
         },
         mutations: {},
         cache: {},
+        downloadProgress: {},
+        uploadProgress: {},
       });
     });
   });

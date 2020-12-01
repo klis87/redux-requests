@@ -7,11 +7,13 @@ import {
 } from '@redux-requests/core';
 
 interface LoadingProps {
+  downloadProgress?: number | null;
+  uploadProgress?: number | null;
   [loadingProp: string]: any;
 }
 
 interface ErrorProps {
-  error: any;
+  error?: any;
   [errorProp: string]: any;
 }
 
@@ -33,7 +35,7 @@ interface QueryProps<QueryStateData> {
   errorComponent?: React.ComponentType<ErrorProps>;
   errorComponentProps?: { [errorProp: string]: any };
   loadingComponent?: React.ComponentType<LoadingProps>;
-  loadingComponentProps?: LoadingProps;
+  loadingComponentProps?: { [loadingProp: string]: any };
   [extraProperty: string]: any;
 }
 

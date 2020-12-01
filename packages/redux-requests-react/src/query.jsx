@@ -30,7 +30,11 @@ const Query = ({
 
   if (query.loading && (showLoaderDuringRefetch || dataEmpty)) {
     return LoadingComponent ? (
-      <LoadingComponent {...loadingComponentProps} />
+      <LoadingComponent
+        downloadProgress={query.downloadProgress}
+        uploadProgress={query.uploadProgress}
+        {...loadingComponentProps}
+      />
     ) : null;
   }
 

@@ -66,6 +66,8 @@ interface RequestActionMeta<Data, TransformedData> {
   runOnSuccess?: boolean;
   runOnError?: boolean;
   runOnAbort?: boolean;
+  measureDownloadProgress?: boolean;
+  measureUploadProgress?: boolean;
   [extraProperty: string]: any;
 }
 
@@ -109,8 +111,17 @@ export const error: ActionTypeModifier;
 
 export const abort: ActionTypeModifier;
 
+interface DriverActions {
+  setDownloadProgress?: (downloadProgress: number) => void;
+  setUploadProgress?: (uploadProgress: number) => void;
+}
+
 export interface Driver {
-  (requestConfig: any, requestAction: RequestAction): Promise<any>;
+  (
+    requestConfig: any,
+    requestAction: RequestAction,
+    driverActions: DriverActions,
+  ): Promise<any>;
 }
 
 interface HandleRequestConfig {
@@ -175,6 +186,8 @@ export interface QueryState<QueryStateData> {
   error: any;
   loading: boolean;
   pristine: boolean;
+  uploadProgress: number | null;
+  downloadProgress: number | null;
 }
 
 export function getQuery<QueryStateData = any>(
@@ -199,6 +212,8 @@ export function getQuerySelector<QueryStateData = any>(props: {
 export interface MutationState {
   loading: boolean;
   error: any;
+  uploadProgress: number | null;
+  downloadProgress: number | null;
 }
 
 export function getMutation(
