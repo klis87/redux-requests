@@ -1,13 +1,15 @@
 import { AnyAction, Reducer, Middleware, Store } from 'redux';
 
-export function dispatchRequest<QueryStateData = any>(
-  requestAction: RequestAction<any, QueryStateData>,
-): Promise<{
-  data?: QueryStateData;
-  error?: null;
-  isAborted?: true;
-  action: any;
-}>;
+export interface DispatchRequest {
+  <QueryStateData = any>(
+    requestAction: RequestAction<any, QueryStateData>,
+  ): Promise<{
+    data?: QueryStateData;
+    error?: null;
+    isAborted?: true;
+    action: any;
+  }>;
+}
 
 interface FilterActions {
   (action: AnyAction): boolean;
@@ -18,7 +20,7 @@ interface ModifyData {
 }
 
 interface RequestsStore extends Store {
-  dispatchRequest: typeof dispatchRequest;
+  dispatchRequest: DispatchRequest;
 }
 
 export const createRequestsStore: (store: Store) => RequestsStore;

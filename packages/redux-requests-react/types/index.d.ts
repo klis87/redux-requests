@@ -3,7 +3,7 @@ import {
   QueryState,
   MutationState,
   RequestAction,
-  dispatchRequest,
+  DispatchRequest,
 } from '@redux-requests/core';
 
 interface LoadingProps {
@@ -57,17 +57,43 @@ interface MutationProps {
 
 export class Mutation extends React.Component<MutationProps> {}
 
-export function useQuery<QueryStateData = any>(props: {
-  type: string | ((...params: any[]) => RequestAction<any, QueryStateData>);
-  action?: (...params: any[]) => RequestAction<any, QueryStateData>;
+interface RequestCreator<QueryStateData = any> {
+  (...args: any[]): RequestAction<any, QueryStateData>;
+}
+
+type GetQueryStateData<T extends RequestCreator> = T extends RequestCreator<
+  infer QueryStateData
+>
+  ? QueryStateData
+  : never;
+
+export function useQuery<
+  Data = undefined,
+  QueryCreator extends RequestCreator = any
+>(props: {
+  type: string | QueryCreator;
+  action?: QueryCreator;
   requestKey?: string;
   multiple?: boolean;
   defaultData?: any;
-}): QueryState<QueryStateData>;
+  dispatch?: boolean;
+  variables?: Parameters<QueryCreator>;
+}): QueryState<
+  Data extends undefined ? GetQueryStateData<QueryCreator> : Data
+> & {
+  load: () => Promise<{
+    data?: QueryState<
+      Data extends undefined ? GetQueryStateData<QueryCreator> : Data
+    >;
+    error?: null;
+    isAborted?: true;
+    action: any;
+  }>;
+};
 
 export function useMutation(props: {
   type: string | ((...params: any[]) => RequestAction);
   requestKey?: string;
 }): MutationState;
 
-export function useDispatchRequest(): typeof dispatchRequest;
+export function useDispatchRequest(): DispatchRequest;

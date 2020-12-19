@@ -9,20 +9,24 @@ import {
   useDispatchRequest,
 } from './index';
 
-const fetchBooks: () => RequestAction<
-  { raw: boolean },
-  { parsed: boolean }
-> = () => {
+function fetchBooks(
+  x: number,
+  y: string,
+  z: { a: boolean },
+): RequestAction<{ raw: boolean }, { parsed: boolean }> {
   return {
     type: 'FETCH_BOOKS',
     request: {
       url: '/books',
+      x,
+      y,
+      a: z.a,
     },
     meta: {
       getData: data => ({ parsed: data.raw }),
     },
   };
-};
+}
 
 function fetchBook(id: string): RequestAction<{ id: string; title: string }> {
   return {
@@ -34,12 +38,23 @@ function fetchBook(id: string): RequestAction<{ id: string; title: string }> {
 }
 
 const query = useQuery<string>({ type: 'Query' });
-const query2 = useQuery({
+const query2 = useQuery<number>({
   type: 'Query',
   multiple: true,
   defaultData: {},
+  variables: [{ x: 1, y: 2 }],
 });
-const query3 = useQuery({ type: fetchBooks });
+query2.data;
+
+const query3 = useQuery({
+  type: fetchBooks,
+  action: fetchBooks,
+  dispatch: true,
+  variables: [1, '1', { a: true }],
+});
+query3.data;
+const x = query3.load();
+
 const query4 = useQuery({ type: 'FETCH_BOOKS', action: fetchBooks });
 
 const mutation = useMutation({ type: 'Mutation' });
@@ -168,7 +183,7 @@ const QueryDispatcher = () => {
   return (
     <button
       onClick={async () => {
-        const response = await dispatch(fetchBooks());
+        const response = await dispatch(fetchBooks(1, '1', { a: false }));
         response.data.parsed;
         const response2 = await dispatch(fetchBook('1'));
         response2.data.title;
