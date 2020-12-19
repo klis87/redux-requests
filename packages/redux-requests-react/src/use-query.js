@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { getQuerySelector } from '@redux-requests/core';
 
@@ -29,10 +29,15 @@ const useQuery = ({
     }
   }, [dispatch, dispatchQuery]);
 
-  return {
-    ...useSelector(getQuerySelector(selectorProps)),
-    load: dispatchQuery,
-  };
+  const query = useSelector(getQuerySelector(selectorProps));
+
+  return useMemo(
+    () => ({
+      ...query,
+      load: dispatchQuery,
+    }),
+    [query, dispatchQuery],
+  );
 };
 
 export default useQuery;

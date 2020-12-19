@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { getMutationSelector } from '@redux-requests/core';
 
@@ -15,10 +15,15 @@ const useMutation = ({ variables = emptyVariables, ...selectorProps }) => {
     );
   }, [selectorProps.action, selectorProps.type, ...variables]);
 
-  return {
-    ...useSelector(getMutationSelector(selectorProps)),
-    mutate: dispatchMutation,
-  };
+  const mutation = useSelector(getMutationSelector(selectorProps));
+
+  return useMemo(
+    () => ({
+      ...mutation,
+      mutate: dispatchMutation,
+    }),
+    [mutation, dispatchMutation],
+  );
 };
 
 export default useMutation;
