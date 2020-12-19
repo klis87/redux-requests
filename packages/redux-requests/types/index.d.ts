@@ -5,7 +5,7 @@ export interface DispatchRequest {
     requestAction: RequestAction<any, QueryStateData>,
   ): Promise<{
     data?: QueryStateData;
-    error?: null;
+    error?: any;
     isAborted?: true;
     action: any;
   }>;

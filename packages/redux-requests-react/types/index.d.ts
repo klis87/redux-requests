@@ -85,7 +85,7 @@ export function useQuery<
     data?: QueryState<
       Data extends undefined ? GetQueryStateData<QueryCreator> : Data
     >;
-    error?: null;
+    error?: any;
     isAborted?: true;
     action: any;
   }>;
@@ -104,7 +104,7 @@ export function useMutation<
     data?: QueryState<
       Data extends undefined ? GetQueryStateData<MutationCreator> : Data
     >;
-    error?: null;
+    error?: any;
     isAborted?: true;
     action: any;
   }>;
