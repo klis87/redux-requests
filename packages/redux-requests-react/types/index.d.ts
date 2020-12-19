@@ -1,9 +1,11 @@
 import * as React from 'react';
+import { Reducer, Middleware } from 'redux';
 import {
   QueryState,
   MutationState,
   RequestAction,
   DispatchRequest,
+  HandleRequestConfig,
 } from '@redux-requests/core';
 
 interface LoadingProps {
@@ -111,3 +113,12 @@ export function useMutation<
 };
 
 export function useDispatchRequest(): DispatchRequest;
+
+interface RequestsProviderProps {
+  children: React.ReactNode;
+  requestsConfig: HandleRequestConfig;
+  extraReducers?: Reducer[];
+  getMiddleware?: (extraMiddleware: Middleware[]) => Middleware[];
+}
+
+export class RequestsProvider extends React.Component<RequestsProviderProps> {}

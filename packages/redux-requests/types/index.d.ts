@@ -126,7 +126,7 @@ export interface Driver {
   ): Promise<any>;
 }
 
-interface HandleRequestConfig {
+export interface HandleRequestConfig {
   driver: Driver | { default: Driver; [driverType: string]: Driver };
   onRequest?: (
     request: any,
