@@ -91,9 +91,23 @@ export function useQuery<
   }>;
 };
 
-export function useMutation(props: {
-  type: string | ((...params: any[]) => RequestAction);
+export function useMutation<
+  Data = undefined,
+  MutationCreator extends RequestCreator = any
+>(props: {
+  type: string | MutationCreator;
+  action?: MutationCreator;
   requestKey?: string;
-}): MutationState;
+  variables?: Parameters<MutationCreator>;
+}): MutationState & {
+  mutate: () => Promise<{
+    data?: QueryState<
+      Data extends undefined ? GetQueryStateData<MutationCreator> : Data
+    >;
+    error?: null;
+    isAborted?: true;
+    action: any;
+  }>;
+};
 
 export function useDispatchRequest(): DispatchRequest;

@@ -37,6 +37,17 @@ function fetchBook(id: string): RequestAction<{ id: string; title: string }> {
   };
 }
 
+function updateBook(id: string): RequestAction<{ id: string; title: string }> {
+  return {
+    type: 'FETCH_BOOK',
+    request: {
+      url: '/book',
+      method: 'post',
+      data: { id },
+    },
+  };
+}
+
 const query = useQuery<string>({ type: 'Query' });
 const query2 = useQuery<number>({
   type: 'Query',
@@ -57,11 +68,17 @@ const x = query3.load();
 
 const query4 = useQuery({ type: 'FETCH_BOOKS', action: fetchBooks });
 
-const mutation = useMutation({ type: 'Mutation' });
+const mutation = useMutation<string>({ type: 'Mutation' });
+const r = mutation.mutate();
 const mutation2 = useMutation({
   type: 'Mutation',
   requestKey: 'key',
 });
+const mutation3 = useMutation({
+  type: updateBook,
+  variables: ['1'],
+});
+const r2 = mutation3.mutate();
 
 function BasicQuery() {
   return (
