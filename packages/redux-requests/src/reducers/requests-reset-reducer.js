@@ -23,6 +23,11 @@ const resetMutation = mutation => ({
   error: null,
 });
 
+// TODO: probably move a cache module
+const isCacheValid = (cache, action) =>
+  cache.cacheKey === action.meta.cacheKey &&
+  (cache.timeout === null || Date.now() <= cache.timeout);
+
 // TODO: this should be rewritten to more functional style, we need things like filter/map object helpers
 export default (state, action) => {
   if (action.type !== RESET_REQUESTS) {
@@ -34,7 +39,14 @@ export default (state, action) => {
   const keys = !clearAll && getKeys(action.requests);
 
   queries = Object.entries(queries).reduce((prev, [k, v]) => {
-    if (clearAll || keys.includes(k)) {
+    const cacheValue = cache[k];
+
+    if (
+      (clearAll || keys.includes(k)) &&
+      (action.resetCached ||
+        cacheValue === undefined ||
+        !isCacheValid(cacheValue, action))
+    ) {
       prev[k] = resetQuery(v);
     } else {
       prev[k] = v;
@@ -51,7 +63,9 @@ export default (state, action) => {
     return prev;
   }, {});
 
-  cache = clearAll
+  cache = !action.resetCached
+    ? cache
+    : clearAll
     ? {}
     : Object.entries(cache).reduce((prev, [k, v]) => {
         if (keys.includes(k)) {

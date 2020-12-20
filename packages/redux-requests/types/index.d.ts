@@ -170,10 +170,12 @@ export const clearRequestsCache: (
 export const resetRequests: (
   requests?: (string | { requestType: string; requestKey: string })[],
   abortPending?: boolean,
+  resetCached?: boolean,
 ) => {
   type: string;
   requests: (string | { requestType: string; requestKey: string })[];
   abortPending: boolean;
+  resetCached: boolean;
 };
 
 export const abortRequests: (
