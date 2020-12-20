@@ -127,6 +127,7 @@ const createQuerySelector = (type, requestKey) =>
             usedKeys,
           )
         : getData(data, multiple, defaultData),
+      pending,
       loading: pending > 0,
       error,
       pristine,
@@ -137,6 +138,7 @@ const createQuerySelector = (type, requestKey) =>
 
 const defaultQuery = {
   data: null,
+  pending: 0,
   loading: false,
   error: null,
   pristine: true,

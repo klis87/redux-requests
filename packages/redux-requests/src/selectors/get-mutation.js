@@ -2,6 +2,7 @@ import { createSelector } from 'reselect';
 
 const defaultMutation = {
   loading: false,
+  pending: 0,
   error: null,
   downloadProgress: null,
   uploadProgress: null,
@@ -18,6 +19,7 @@ const createMutationSelector = (type, requestKey) =>
     state => state.requests.downloadProgress[type + (requestKey || '')] ?? null,
     state => state.requests.uploadProgress[type + (requestKey || '')] ?? null,
     (mutationState, downloadProgress, uploadProgress) => ({
+      pending: mutationState.pending,
       loading: mutationState.pending > 0,
       error: mutationState.error,
       downloadProgress,

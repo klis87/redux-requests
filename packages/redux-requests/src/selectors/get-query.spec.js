@@ -80,6 +80,7 @@ describe('selectors', () => {
         ),
       ).toEqual({
         data: null,
+        pending: 0,
         loading: false,
         error: null,
         pristine: true,
@@ -103,6 +104,7 @@ describe('selectors', () => {
         ),
       ).toEqual({
         data: [],
+        pending: 0,
         loading: false,
         error: null,
         pristine: true,
@@ -127,6 +129,7 @@ describe('selectors', () => {
       ).toEqual({
         data: {},
         loading: false,
+        pending: 0,
         error: null,
         pristine: true,
         downloadProgress: null,
@@ -143,6 +146,7 @@ describe('selectors', () => {
     it('returns transformed query state if found', () => {
       expect(getQuery(state, { type: 'QUERY' })).toEqual({
         data: 'data',
+        pending: 1,
         loading: true,
         error: null,
         pristine: false,
@@ -154,6 +158,7 @@ describe('selectors', () => {
     it('works with query requestKey', () => {
       expect(getQuery(state, { type: 'QUERY', requestKey: '11' })).toEqual({
         data: 'data2',
+        pending: 1,
         loading: true,
         error: null,
         pristine: false,
@@ -190,6 +195,7 @@ describe('selectors', () => {
           { id: 1, x: 1 },
           { id: 2, x: 2 },
         ],
+        pending: 0,
         loading: false,
         error: null,
         pristine: false,
@@ -235,6 +241,7 @@ describe('selectors', () => {
           { id: 1, x: 1 },
           { id: 2, x: 2 },
         ],
+        pending: 0,
         loading: false,
         error: null,
         pristine: false,
@@ -246,6 +253,7 @@ describe('selectors', () => {
           { id: 1, x: 1 },
           { id: 2, x: 3 },
         ],
+        pending: 0,
         loading: false,
         error: null,
         pristine: false,
@@ -294,6 +302,7 @@ describe('selectors', () => {
           { id: 1, x: 1 },
           { id: 2, x: 2 },
         ],
+        pending: 0,
         loading: false,
         error: null,
         pristine: false,

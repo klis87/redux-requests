@@ -188,6 +188,7 @@ export const abortRequests: (
 export interface QueryState<QueryStateData> {
   data: QueryStateData;
   error: any;
+  pending: number;
   loading: boolean;
   pristine: boolean;
   uploadProgress: number | null;
@@ -214,6 +215,7 @@ export function getQuerySelector<QueryStateData = any>(props: {
 }): (state: any) => QueryState<QueryStateData>;
 
 export interface MutationState {
+  pending: number;
   loading: boolean;
   error: any;
   uploadProgress: number | null;
