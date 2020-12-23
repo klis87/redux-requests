@@ -1,6 +1,6 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { getMutationSelector } from '@redux-requests/core';
+import { getMutationSelector, resetRequests } from '@redux-requests/core';
 
 import useDispatchRequest from './use-dispatch-request';
 
@@ -16,6 +16,22 @@ const useMutation = ({ variables = emptyVariables, ...selectorProps }) => {
   }, [selectorProps.action, selectorProps.type, ...variables]);
 
   const mutation = useSelector(getMutationSelector(selectorProps));
+
+  useEffect(() => {
+    return () => {
+      dispatchRequest(
+        resetRequests(
+          [
+            {
+              requestType: selectorProps.type,
+              requestKey: selectorProps.requestKey,
+            },
+          ],
+          false,
+        ),
+      );
+    };
+  }, [selectorProps.type, selectorProps.requestKey]);
 
   return useMemo(
     () => ({

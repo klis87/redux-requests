@@ -17,7 +17,7 @@ const getRequestTypeString = requestType =>
 const getKeys = requests =>
   requests.map(v =>
     typeof v === 'object'
-      ? getRequestTypeString(v.requestType) + v.requestKey
+      ? getRequestTypeString(v.requestType) + (v.requestKey || '')
       : getRequestTypeString(v),
   );
 

@@ -6,7 +6,7 @@ const getRequestTypeString = requestType =>
 const getKeys = requests =>
   requests.map(v =>
     typeof v === 'object'
-      ? getRequestTypeString(v.requestType) + v.requestKey
+      ? getRequestTypeString(v.requestType) + (v.requestKey || '')
       : getRequestTypeString(v),
   );
 
@@ -25,7 +25,7 @@ const resetMutation = mutation => ({
 
 // TODO: probably move a cache module
 const isCacheValid = (cache, action) =>
-  cache.cacheKey === action.meta.cacheKey &&
+  cache.cacheKey === action.meta?.cacheKey &&
   (cache.timeout === null || Date.now() <= cache.timeout);
 
 // TODO: this should be rewritten to more functional style, we need things like filter/map object helpers
@@ -45,7 +45,7 @@ export default (state, action) => {
       (clearAll || keys.includes(k)) &&
       (action.resetCached ||
         cacheValue === undefined ||
-        !isCacheValid(cacheValue, action))
+        (cacheValue && !isCacheValid(cacheValue, action)))
     ) {
       prev[k] = resetQuery(v);
     } else {

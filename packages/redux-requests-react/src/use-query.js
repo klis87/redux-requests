@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { getQuerySelector } from '@redux-requests/core';
+import { getQuerySelector, resetRequests } from '@redux-requests/core';
 
 import useDispatchRequest from './use-dispatch-request';
 
@@ -30,6 +30,23 @@ const useQuery = ({
   }, [dispatch, dispatchQuery]);
 
   const query = useSelector(getQuerySelector(selectorProps));
+
+  useEffect(() => {
+    return () => {
+      dispatchRequest(
+        resetRequests(
+          [
+            {
+              requestType: selectorProps.type,
+              requestKey: selectorProps.requestKey,
+            },
+          ],
+          true,
+          false,
+        ),
+      );
+    };
+  }, [selectorProps.type, selectorProps.requestKey]);
 
   return useMemo(
     () => ({
