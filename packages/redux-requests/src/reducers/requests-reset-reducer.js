@@ -63,19 +63,24 @@ export default (state, action) => {
     return prev;
   }, {});
 
-  cache = !action.resetCached
-    ? cache
-    : clearAll
-    ? {}
-    : Object.entries(cache).reduce((prev, [k, v]) => {
-        if (keys.includes(k)) {
+  cache =
+    clearAll && action.resetCached
+      ? {}
+      : Object.entries(cache).reduce((prev, [k, v]) => {
+          const cacheValue = cache[k];
+
+          if (
+            (clearAll || keys.includes(k)) &&
+            (action.resetCached ||
+              cacheValue === undefined ||
+              (cacheValue && !isCacheValid(cacheValue, action)))
+          ) {
+            return prev;
+          }
+          prev[k] = v;
+
           return prev;
-        }
-
-        prev[k] = v;
-
-        return prev;
-      }, {});
+        }, {});
 
   downloadProgress = clearAll
     ? {}
