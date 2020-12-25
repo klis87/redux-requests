@@ -8,6 +8,7 @@ import cacheReducer from './cache-reducer';
 import progressReducer from './progress-reducer';
 import requestsResetReducer from './requests-reset-reducer';
 import ssrReducer from './ssr-reducer';
+import watchersReducer from './watchers-reducer';
 
 const defaultState = {
   queries: {},
@@ -17,6 +18,7 @@ const defaultState = {
   downloadProgress: {},
   uploadProgress: {},
   requestsKeys: {},
+  watchers: {},
 };
 
 export default (config = defaultConfig) => (state = defaultState, action) => {
@@ -62,5 +64,6 @@ export default (config = defaultConfig) => (state = defaultState, action) => {
     ),
     normalizedData,
     ssr: config.ssr ? ssrReducer(state.ssr, action, config) : null,
+    watchers: watchersReducer(state.watchers, action, config),
   };
 };

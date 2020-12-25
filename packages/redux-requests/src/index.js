@@ -8,6 +8,8 @@ export {
   isRequestActionQuery,
   isRequestAction,
   isResponseAction,
+  addWatcher,
+  removeWatcher,
 } from './actions';
 export { default as handleRequests } from './handle-requests';
 export {

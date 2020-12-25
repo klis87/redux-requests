@@ -7,6 +7,8 @@ import {
   ABORT_REQUESTS,
   SET_DOWNLOAD_PROGRESS,
   SET_UPLOAD_PROGRESS,
+  ADD_WATCHER,
+  REMOVE_WATCHER,
 } from './constants';
 
 const getActionWithSuffix = suffix => actionType => actionType + suffix;
@@ -138,4 +140,14 @@ export const setUploadProgress = (requestType, progress) => ({
   type: SET_UPLOAD_PROGRESS,
   requestType,
   progress,
+});
+
+export const addWatcher = requestType => ({
+  type: ADD_WATCHER,
+  requestType,
+});
+
+export const removeWatcher = requestType => ({
+  type: REMOVE_WATCHER,
+  requestType,
 });

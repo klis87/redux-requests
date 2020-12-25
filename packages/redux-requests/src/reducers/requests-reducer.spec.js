@@ -14,6 +14,7 @@ describe('reducers', () => {
         downloadProgress: {},
         uploadProgress: {},
         ssr: null,
+        watchers: {},
       });
     });
 
