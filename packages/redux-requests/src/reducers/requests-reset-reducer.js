@@ -23,6 +23,18 @@ const resetMutation = mutation => ({
   error: null,
 });
 
+const mapObject = (obj, callback) =>
+  Object.entries(obj).reduce((prev, [k, v]) => {
+    const newValue = callback(k, v);
+
+    if (newValue === undefined) {
+      return prev;
+    }
+
+    prev[k] = newValue;
+    return prev;
+  }, {});
+
 // TODO: probably move a cache module
 const isCacheValid = (cache, action) =>
   cache.cacheKey === action.meta?.cacheKey &&
@@ -38,7 +50,7 @@ export default (state, action) => {
   const clearAll = !action.requests;
   const keys = !clearAll && getKeys(action.requests);
 
-  queries = Object.entries(queries).reduce((prev, [k, v]) => {
+  queries = mapObject(queries, (k, v) => {
     const cacheValue = cache[k];
 
     if (
@@ -47,26 +59,20 @@ export default (state, action) => {
         cacheValue === undefined ||
         (cacheValue && !isCacheValid(cacheValue, action)))
     ) {
-      prev[k] = resetQuery(v);
-    } else {
-      prev[k] = v;
+      return resetQuery(v);
     }
-    return prev;
-  }, {});
 
-  mutations = Object.entries(mutations).reduce((prev, [k, v]) => {
-    if (clearAll || keys.includes(k)) {
-      prev[k] = resetMutation(v);
-    } else {
-      prev[k] = v;
-    }
-    return prev;
-  }, {});
+    return v;
+  });
+
+  mutations = mapObject(mutations, (k, v) =>
+    clearAll || keys.includes(k) ? resetMutation(v) : v,
+  );
 
   cache =
     clearAll && action.resetCached
       ? {}
-      : Object.entries(cache).reduce((prev, [k, v]) => {
+      : mapObject(cache, (k, v) => {
           const cacheValue = cache[k];
 
           if (
@@ -75,36 +81,23 @@ export default (state, action) => {
               cacheValue === undefined ||
               (cacheValue && !isCacheValid(cacheValue, action)))
           ) {
-            return prev;
+            return undefined;
           }
-          prev[k] = v;
 
-          return prev;
-        }, {});
+          return v;
+        });
 
   downloadProgress = clearAll
     ? {}
-    : Object.entries(downloadProgress).reduce((prev, [k, v]) => {
-        if (keys.includes(k)) {
-          return prev;
-        }
-
-        prev[k] = v;
-
-        return prev;
-      }, {});
+    : mapObject(downloadProgress, (k, v) =>
+        clearAll || keys.includes(k) ? resetMutation(v) : v,
+      );
 
   uploadProgress = clearAll
     ? {}
-    : Object.entries(uploadProgress).reduce((prev, [k, v]) => {
-        if (keys.includes(k)) {
-          return prev;
-        }
-
-        prev[k] = v;
-
-        return prev;
-      }, {});
+    : mapObject(uploadProgress, (k, v) =>
+        clearAll || keys.includes(k) ? resetMutation(v) : v,
+      );
 
   return { queries, mutations, cache, downloadProgress, uploadProgress };
 };
