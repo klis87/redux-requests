@@ -78,11 +78,16 @@ const queryReducer = (state, action, actionType, config, normalizedData) => {
             pending: state.pending - 1,
             error: action.payload ? action.payload : action.error,
           };
-    case abort(actionType):
+    case abort(actionType): {
+      if (state.pending === 1 && state.data === null && state.error === null) {
+        return undefined;
+      }
+
       return {
         ...state,
         pending: state.pending - 1,
       };
+    }
     default:
       return action.meta?.ssrResponse ||
         action.meta?.ssrError ||
@@ -203,6 +208,15 @@ export default (state, action, config = defaultConfig) => {
       queryActionType,
       config,
     );
+
+    if (updatedQuery === undefined) {
+      const { [queryType]: toRemove, ...remainingQueries } = state.queries;
+
+      return {
+        queries: remainingQueries,
+        normalizedData,
+      };
+    }
 
     if (
       updatedQuery.normalized &&

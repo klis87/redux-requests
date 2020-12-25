@@ -1,5 +1,6 @@
 import {
   isErrorAction,
+  isAbortAction,
   isResponseAction,
   getRequestActionFromResponse,
 } from '../actions';
@@ -35,7 +36,14 @@ export default (state, action) => {
     };
   }
 
-  // success or abort case
+  if (
+    isAbortAction(action) &&
+    state[mutationType].pending === 1 &&
+    state[mutationType].error === null
+  ) {
+    return state;
+  }
+
   return {
     ...state,
     [mutationType]: {
