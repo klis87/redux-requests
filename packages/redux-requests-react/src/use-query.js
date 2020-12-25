@@ -1,6 +1,11 @@
 import { useEffect, useCallback, useMemo } from 'react';
-import { useSelector } from 'react-redux';
-import { getQuerySelector, resetRequests } from '@redux-requests/core';
+import { useSelector, useStore } from 'react-redux';
+import {
+  getQuerySelector,
+  resetRequests,
+  addWatcher,
+  removeWatcher,
+} from '@redux-requests/core';
 
 import useDispatchRequest from './use-dispatch-request';
 
@@ -12,6 +17,7 @@ const useQuery = ({
   ...selectorProps
 }) => {
   const dispatchRequest = useDispatchRequest();
+  const store = useStore();
 
   const dispatchQuery = useCallback(() => {
     if (dispatch) {
@@ -32,19 +38,26 @@ const useQuery = ({
   const query = useSelector(getQuerySelector(selectorProps));
 
   useEffect(() => {
+    const key = selectorProps.type + (selectorProps.requestKey || '');
+    dispatchRequest(addWatcher(key));
+
     return () => {
-      dispatchRequest(
-        resetRequests(
-          [
-            {
-              requestType: selectorProps.type,
-              requestKey: selectorProps.requestKey,
-            },
-          ],
-          true,
-          false,
-        ),
-      );
+      dispatchRequest(removeWatcher(key));
+
+      if (!store.getState().requests.watchers[key]) {
+        dispatchRequest(
+          resetRequests(
+            [
+              {
+                requestType: selectorProps.type,
+                requestKey: selectorProps.requestKey,
+              },
+            ],
+            true,
+            false,
+          ),
+        );
+      }
     };
   }, [selectorProps.type, selectorProps.requestKey]);
 
