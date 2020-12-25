@@ -185,6 +185,20 @@ export const abortRequests: (
   requests: (string | { requestType: string; requestKey: string })[];
 };
 
+export const addWatcher: (
+  requestType: string,
+) => {
+  type: string;
+  requestType: string;
+};
+
+export const removeWatcher: (
+  requestType: string,
+) => {
+  type: string;
+  requestType: string;
+};
+
 export interface QueryState<QueryStateData> {
   data: QueryStateData;
   error: any;
