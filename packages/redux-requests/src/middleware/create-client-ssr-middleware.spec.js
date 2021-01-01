@@ -71,7 +71,7 @@ describe('middleware', () => {
           },
           downloadProgress: {},
           uploadProgress: {},
-          ssr: ['REQUEST'],
+          ssr: ['REQUEST1'],
         },
       });
       const action = {

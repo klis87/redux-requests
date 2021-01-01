@@ -5,6 +5,7 @@ import {
   resetRequests,
   addWatcher,
   removeWatcher,
+  joinRequest,
 } from '@redux-requests/core';
 
 import useDispatchRequest from './use-dispatch-request';
@@ -14,10 +15,13 @@ const emptyVariables = [];
 const useQuery = ({
   variables = emptyVariables,
   dispatch = false,
+  suspense = false,
   ...selectorProps
 }) => {
   const dispatchRequest = useDispatchRequest();
   const store = useStore();
+
+  const key = `${selectorProps.type}${selectorProps.requestKey || ''}`;
 
   const dispatchQuery = useCallback(() => {
     if (dispatch) {
@@ -38,7 +42,6 @@ const useQuery = ({
   const query = useSelector(getQuerySelector(selectorProps));
 
   useEffect(() => {
-    const key = selectorProps.type + (selectorProps.requestKey || '');
     dispatchRequest(addWatcher(key));
 
     return () => {
@@ -60,6 +63,22 @@ const useQuery = ({
       }
     };
   }, [selectorProps.type, selectorProps.requestKey]);
+
+  if (suspense && typeof window !== 'undefined' && query.loading) {
+    throw dispatchRequest(joinRequest(key));
+  }
+
+  if (
+    suspense &&
+    typeof window === 'undefined' &&
+    (query.loading || query.pristine)
+  ) {
+    if (dispatch && query.pristine) {
+      throw dispatchQuery();
+    }
+
+    throw dispatchRequest(joinRequest(key, dispatch));
+  }
 
   return useMemo(
     () => ({

@@ -9,6 +9,7 @@ import {
   SET_UPLOAD_PROGRESS,
   ADD_WATCHER,
   REMOVE_WATCHER,
+  JOIN_REQUEST,
 } from './constants';
 
 const getActionWithSuffix = suffix => actionType => actionType + suffix;
@@ -150,4 +151,10 @@ export const addWatcher = requestType => ({
 export const removeWatcher = requestType => ({
   type: REMOVE_WATCHER,
   requestType,
+});
+
+export const joinRequest = (requestType, rehydrate = false) => ({
+  type: JOIN_REQUEST,
+  requestType,
+  rehydrate,
 });

@@ -8,8 +8,11 @@ export default (config = defaultConfig) => store => next => action => {
 
   const state = store.getState();
   const actionsToIgnore = state.requests.ssr;
+  const actionToIgnore = actionsToIgnore.find(
+    v => (v.requestType || v) === action.type + (action.meta?.requestKey || ''),
+  );
 
-  if (actionsToIgnore.findIndex(v => v === action.type) === -1) {
+  if (!actionToIgnore) {
     return next(action);
   }
 
@@ -17,6 +20,10 @@ export default (config = defaultConfig) => store => next => action => {
     type: action.type,
     requestKey: action.meta?.requestKey,
   });
+
+  action.meta = actionToIgnore.duplicate
+    ? { ...action.meta, ssrDuplicate: true }
+    : action.meta;
 
   if (query.error) {
     return next({

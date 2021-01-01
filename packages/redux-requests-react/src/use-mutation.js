@@ -5,15 +5,22 @@ import {
   resetRequests,
   addWatcher,
   removeWatcher,
+  joinRequest,
 } from '@redux-requests/core';
 
 import useDispatchRequest from './use-dispatch-request';
 
 const emptyVariables = [];
 
-const useMutation = ({ variables = emptyVariables, ...selectorProps }) => {
+const useMutation = ({
+  variables = emptyVariables,
+  suspense = false,
+  ...selectorProps
+}) => {
   const dispatchRequest = useDispatchRequest();
   const store = useStore();
+
+  const key = `${selectorProps.type}${selectorProps.requestKey || ''}`;
 
   const dispatchMutation = useCallback(() => {
     return dispatchRequest(
@@ -24,7 +31,6 @@ const useMutation = ({ variables = emptyVariables, ...selectorProps }) => {
   const mutation = useSelector(getMutationSelector(selectorProps));
 
   useEffect(() => {
-    const key = selectorProps.type + (selectorProps.requestKey || '');
     dispatchRequest(addWatcher(key));
 
     return () => {
@@ -45,6 +51,10 @@ const useMutation = ({ variables = emptyVariables, ...selectorProps }) => {
       }
     };
   }, [selectorProps.type, selectorProps.requestKey]);
+
+  if (suspense && typeof window !== 'undefined' && mutation.loading) {
+    throw dispatchRequest(joinRequest(key));
+  }
 
   return useMemo(
     () => ({

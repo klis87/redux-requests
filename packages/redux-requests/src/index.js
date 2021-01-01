@@ -10,6 +10,7 @@ export {
   isResponseAction,
   addWatcher,
   removeWatcher,
+  joinRequest,
 } from './actions';
 export { default as handleRequests } from './handle-requests';
 export {
