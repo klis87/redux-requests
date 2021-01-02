@@ -21,12 +21,14 @@ const defer = () => {
 
 const handleRequests = userConfig => {
   const config = { ...defaultConfig, ...userConfig };
-  const requestsPromise = config.ssr === 'server' ? defer() : null;
+  const requestsPromise =
+    config.ssr === 'server' && !config.disableRequestsPromise ? defer() : null;
 
   return {
     requestsReducer: requestsReducer(config),
     requestsMiddleware: [
       config.ssr === 'server' &&
+        !config.disableRequestsPromise &&
         createServerSsrMiddleware(requestsPromise, config),
       config.ssr === 'client' && createClientSsrMiddleware(config),
       config.cache && createRequestsCacheMiddleware(config),

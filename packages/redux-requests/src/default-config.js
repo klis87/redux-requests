@@ -8,6 +8,7 @@ export default {
   onAbort: null,
   cache: false,
   ssr: null,
+  disableRequestsPromise: false,
   isRequestAction,
   isRequestActionQuery,
   takeLatest: isRequestActionQuery,
