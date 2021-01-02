@@ -3,7 +3,8 @@ import React from 'react';
 const RequestsContext = React.createContext({
   suspense: false,
   suspenseSsr: false,
-  dispatch: false,
+  autoLoad: false,
+  autoReset: false,
 });
 
 export default RequestsContext;

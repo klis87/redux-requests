@@ -15,12 +15,14 @@ const emptyVariables = [];
 
 const useMutation = ({
   variables = emptyVariables,
+  autoReset,
   suspense,
   ...selectorProps
 }) => {
   const requestContext = useContext(RequestsContext);
 
   suspense = suspense === undefined ? requestContext.suspense : suspense;
+  autoReset = autoReset === undefined ? requestContext.autoReset : autoReset;
 
   const dispatchRequest = useDispatchRequest();
   const store = useStore();
@@ -41,7 +43,7 @@ const useMutation = ({
     return () => {
       dispatchRequest(removeWatcher(key));
 
-      if (!store.getState().requests.watchers[key]) {
+      if (autoReset && !store.getState().requests.watchers[key]) {
         dispatchRequest(
           resetRequests(
             [

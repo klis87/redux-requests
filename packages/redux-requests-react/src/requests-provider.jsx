@@ -14,7 +14,8 @@ const RequestsProvider = ({
   store: customStore,
   getMiddleware = defaultGetMiddleware,
   suspense = false,
-  dispatch = false,
+  autoLoad = false,
+  autoReset = false,
   suspenseSsr = false,
   getStore = undefined,
   initialState = undefined,
@@ -22,10 +23,11 @@ const RequestsProvider = ({
   const contextValue = useMemo(
     () => ({
       suspense,
-      dispatch,
+      autoLoad,
+      autoReset,
       suspenseSsr,
     }),
-    [suspense, dispatch, suspenseSsr],
+    [suspense, autoLoad, autoReset, suspenseSsr],
   );
 
   const store = useMemo(() => {

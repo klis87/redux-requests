@@ -15,7 +15,8 @@ const emptyVariables = [];
 
 const useQuery = ({
   variables = emptyVariables,
-  dispatch,
+  autoLoad,
+  autoReset,
   suspense,
   ...selectorProps
 }) => {
@@ -23,7 +24,8 @@ const useQuery = ({
 
   const { suspenseSsr } = requestContext;
   suspense = suspense === undefined ? requestContext.suspense : suspense;
-  dispatch = dispatch === undefined ? requestContext.dispatch : dispatch;
+  autoLoad = autoLoad === undefined ? requestContext.autoLoad : autoLoad;
+  autoReset = autoReset === undefined ? requestContext.autoReset : autoReset;
 
   const dispatchRequest = useDispatchRequest();
   const store = useStore();
@@ -31,20 +33,20 @@ const useQuery = ({
   const key = `${selectorProps.type}${selectorProps.requestKey || ''}`;
 
   const dispatchQuery = useCallback(() => {
-    if (dispatch) {
+    if (autoLoad) {
       return dispatchRequest(
         (selectorProps.action || selectorProps.type)(...variables),
       );
     }
 
     return Promise.resolve(null);
-  }, [dispatch, selectorProps.action, selectorProps.type, ...variables]);
+  }, [autoLoad, selectorProps.action, selectorProps.type, ...variables]);
 
   useEffect(() => {
-    if (dispatch) {
+    if (autoLoad) {
       dispatchQuery();
     }
-  }, [dispatch, dispatchQuery]);
+  }, [autoLoad, dispatchQuery]);
 
   const query = useSelector(getQuerySelector(selectorProps));
 
@@ -54,7 +56,7 @@ const useQuery = ({
     return () => {
       dispatchRequest(removeWatcher(key));
 
-      if (!store.getState().requests.watchers[key]) {
+      if (autoReset && !store.getState().requests.watchers[key]) {
         dispatchRequest(
           resetRequests(
             [
@@ -72,11 +74,11 @@ const useQuery = ({
   }, [selectorProps.type, selectorProps.requestKey]);
 
   if (suspenseSsr && (query.loading || query.pristine)) {
-    if (dispatch && query.pristine) {
+    if (autoLoad && query.pristine) {
       throw dispatchQuery();
     }
 
-    throw dispatchRequest(joinRequest(key, dispatch));
+    throw dispatchRequest(joinRequest(key, autoLoad));
   }
 
   if (suspense && !suspenseSsr && query.loading) {
