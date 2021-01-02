@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useMemo } from 'react';
+import { useEffect, useCallback, useMemo, useContext } from 'react';
 import { useSelector, useStore } from 'react-redux';
 import {
   getQuerySelector,
@@ -9,15 +9,22 @@ import {
 } from '@redux-requests/core';
 
 import useDispatchRequest from './use-dispatch-request';
+import RequestsContext from './requests-context';
 
 const emptyVariables = [];
 
 const useQuery = ({
   variables = emptyVariables,
-  dispatch = false,
-  suspense = false,
+  dispatch,
+  suspense,
   ...selectorProps
 }) => {
+  const requestContext = useContext(RequestsContext);
+
+  const { suspenseSsr } = requestContext;
+  suspense = suspense === undefined ? requestContext.suspense : suspense;
+  dispatch = dispatch === undefined ? requestContext.dispatch : dispatch;
+
   const dispatchRequest = useDispatchRequest();
   const store = useStore();
 
@@ -64,20 +71,16 @@ const useQuery = ({
     };
   }, [selectorProps.type, selectorProps.requestKey]);
 
-  if (suspense && typeof window !== 'undefined' && query.loading) {
-    throw dispatchRequest(joinRequest(key));
-  }
-
-  if (
-    suspense &&
-    typeof window === 'undefined' &&
-    (query.loading || query.pristine)
-  ) {
+  if (suspenseSsr && (query.loading || query.pristine)) {
     if (dispatch && query.pristine) {
       throw dispatchQuery();
     }
 
     throw dispatchRequest(joinRequest(key, dispatch));
+  }
+
+  if (suspense && !suspenseSsr && query.loading) {
+    throw dispatchRequest(joinRequest(key));
   }
 
   return useMemo(

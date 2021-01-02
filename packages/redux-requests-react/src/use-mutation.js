@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useEffect } from 'react';
+import { useCallback, useMemo, useEffect, useContext } from 'react';
 import { useSelector, useStore } from 'react-redux';
 import {
   getMutationSelector,
@@ -9,14 +9,19 @@ import {
 } from '@redux-requests/core';
 
 import useDispatchRequest from './use-dispatch-request';
+import RequestsContext from './requests-context';
 
 const emptyVariables = [];
 
 const useMutation = ({
   variables = emptyVariables,
-  suspense = false,
+  suspense,
   ...selectorProps
 }) => {
+  const requestContext = useContext(RequestsContext);
+
+  suspense = suspense === undefined ? requestContext.suspense : suspense;
+
   const dispatchRequest = useDispatchRequest();
   const store = useStore();
 
@@ -52,7 +57,7 @@ const useMutation = ({
     };
   }, [selectorProps.type, selectorProps.requestKey]);
 
-  if (suspense && typeof window !== 'undefined' && mutation.loading) {
+  if (suspense && mutation.loading) {
     throw dispatchRequest(joinRequest(key));
   }
 

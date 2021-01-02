@@ -3,15 +3,36 @@ import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
 import { Provider } from 'react-redux';
 import { handleRequests } from '@redux-requests/core';
 
+import RequestsContext from './requests-context';
+
 const defaultGetMiddleware = requestsMiddleware => requestsMiddleware;
 
 const RequestsProvider = ({
   children,
   requestsConfig,
   extraReducers,
+  store: customStore,
   getMiddleware = defaultGetMiddleware,
+  suspense = false,
+  dispatch = false,
+  suspenseSsr = false,
+  getStore = undefined,
+  initialState = undefined,
 }) => {
+  const contextValue = useMemo(
+    () => ({
+      suspense,
+      dispatch,
+      suspenseSsr,
+    }),
+    [suspense, dispatch, suspenseSsr],
+  );
+
   const store = useMemo(() => {
+    if (customStore) {
+      return customStore;
+    }
+
     const { requestsReducer, requestsMiddleware } = handleRequests(
       requestsConfig,
     );
@@ -28,11 +49,22 @@ const RequestsProvider = ({
 
     return createStore(
       reducers,
+      initialState,
       composeEnhancers(applyMiddleware(...getMiddleware(requestsMiddleware))),
     );
   }, []);
 
-  return <Provider store={store}>{children}</Provider>;
+  if (getStore) {
+    getStore(store);
+  }
+
+  return (
+    <Provider store={store}>
+      <RequestsContext.Provider value={contextValue}>
+        {children}
+      </RequestsContext.Provider>
+    </Provider>
+  );
 };
 
 export default RequestsProvider;
