@@ -16,6 +16,7 @@ export default (state, action, config) => {
   }
 
   if (action.type === REMOVE_WATCHER && state[action.requestType] === 1) {
+    // eslint-disable-next-line no-unused-vars
     const { [action.requestType]: toRemove, ...remaining } = state;
 
     return remaining;

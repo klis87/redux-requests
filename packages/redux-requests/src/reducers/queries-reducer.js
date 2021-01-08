@@ -210,6 +210,7 @@ export default (state, action, config = defaultConfig) => {
     );
 
     if (updatedQuery === undefined) {
+      // eslint-disable-next-line no-unused-vars
       const { [queryType]: toRemove, ...remainingQueries } = state.queries;
 
       return {
