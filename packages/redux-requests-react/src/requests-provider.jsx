@@ -16,6 +16,7 @@ const RequestsProvider = ({
   suspense = false,
   autoLoad = false,
   autoReset = false,
+  throwError = false,
   suspenseSsr = false,
   getStore = undefined,
   initialState = undefined,
@@ -25,9 +26,10 @@ const RequestsProvider = ({
       suspense,
       autoLoad,
       autoReset,
+      throwError,
       suspenseSsr,
     }),
-    [suspense, autoLoad, autoReset, suspenseSsr],
+    [suspense, autoLoad, autoReset, throwError, suspenseSsr],
   );
 
   const store = useMemo(() => {

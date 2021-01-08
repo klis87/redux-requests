@@ -17,6 +17,7 @@ const useQuery = ({
   variables = emptyVariables,
   autoLoad,
   autoReset,
+  throwError,
   suspense,
   ...selectorProps
 }) => {
@@ -26,6 +27,8 @@ const useQuery = ({
   suspense = suspense === undefined ? requestContext.suspense : suspense;
   autoLoad = autoLoad === undefined ? requestContext.autoLoad : autoLoad;
   autoReset = autoReset === undefined ? requestContext.autoReset : autoReset;
+  throwError =
+    throwError === undefined ? requestContext.throwError : throwError;
 
   const dispatchRequest = useDispatchRequest();
   const store = useStore();
@@ -83,6 +86,14 @@ const useQuery = ({
 
   if (suspense && !suspenseSsr && query.loading) {
     throw dispatchRequest(joinRequest(key));
+  }
+
+  if (throwError && query.error) {
+    throw {
+      error: query.error,
+      type: selectorProps.type,
+      requestKey: selectorProps.requestKey,
+    };
   }
 
   return useMemo(

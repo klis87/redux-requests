@@ -16,6 +16,7 @@ const emptyVariables = [];
 const useMutation = ({
   variables = emptyVariables,
   autoReset,
+  throwError,
   suspense,
   ...selectorProps
 }) => {
@@ -23,6 +24,8 @@ const useMutation = ({
 
   suspense = suspense === undefined ? requestContext.suspense : suspense;
   autoReset = autoReset === undefined ? requestContext.autoReset : autoReset;
+  throwError =
+    throwError === undefined ? requestContext.throwError : throwError;
 
   const dispatchRequest = useDispatchRequest();
   const store = useStore();
@@ -61,6 +64,14 @@ const useMutation = ({
 
   if (suspense && mutation.loading) {
     throw dispatchRequest(joinRequest(key));
+  }
+
+  if (throwError && mutation.error) {
+    throw {
+      error: mutation.error,
+      type: selectorProps.type,
+      requestKey: selectorProps.requestKey,
+    };
   }
 
   return useMemo(

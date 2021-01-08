@@ -5,6 +5,7 @@ const RequestsContext = React.createContext({
   suspenseSsr: false,
   autoLoad: false,
   autoReset: false,
+  throwError: false,
 });
 
 export default RequestsContext;

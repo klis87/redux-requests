@@ -4,3 +4,4 @@ export { default as useMutation } from './use-mutation';
 export { default as Mutation } from './mutation';
 export { default as useDispatchRequest } from './use-dispatch-request';
 export { default as RequestsProvider } from './requests-provider';
+export { default as RequestErrorBoundary } from './request-error-boundary';
