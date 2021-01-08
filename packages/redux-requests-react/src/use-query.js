@@ -19,11 +19,13 @@ const useQuery = ({
   autoReset,
   throwError,
   suspense,
+  suspenseSsr,
   ...selectorProps
 }) => {
   const requestContext = useContext(RequestsContext);
 
-  const { suspenseSsr } = requestContext;
+  suspenseSsr =
+    suspenseSsr === undefined ? requestContext.suspenseSsr : suspenseSsr;
   suspense = suspense === undefined ? requestContext.suspense : suspense;
   autoLoad = autoLoad === undefined ? requestContext.autoLoad : autoLoad;
   autoReset = autoReset === undefined ? requestContext.autoReset : autoReset;

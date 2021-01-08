@@ -57,6 +57,7 @@ const RequestErrorBoundary = ({
     autoLoad: false,
     throwError: false,
     suspense: false,
+    suspenseSsr: false,
   });
 
   const mutation = useMutation({
