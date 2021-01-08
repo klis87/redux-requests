@@ -48,7 +48,7 @@
     },
     {
       "path": "./packages/redux-requests-react/dist/redux-requests-react.min.js",
-      "maxSize": "3 kB"
+      "maxSize": "4 kB"
     }
   ]
 }
