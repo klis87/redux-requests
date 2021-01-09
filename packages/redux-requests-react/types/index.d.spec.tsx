@@ -60,7 +60,7 @@ query2.data;
 const query3 = useQuery({
   type: fetchBooks,
   action: fetchBooks,
-  dispatch: true,
+  autoLoad: true,
   variables: [1, '1', { a: true }],
 });
 query3.data;

@@ -142,6 +142,7 @@ export interface HandleRequestConfig {
   onAbort?: (action: RequestAction, store: RequestsStore) => void;
   cache?: boolean;
   ssr?: null | 'client' | 'server';
+  disableRequestsPromise?: boolean;
   isRequestAction?: (action: AnyAction) => boolean;
   isRequestActionQuery?: (requestAction: RequestAction) => boolean;
   takeLatest?: boolean | FilterActions;
@@ -197,6 +198,15 @@ export const removeWatcher: (
 ) => {
   type: string;
   requestType: string;
+};
+
+export const joinRequest: (
+  requestType: string,
+  rehydrate?: boolean,
+) => {
+  type: string;
+  requestType: string;
+  rehydrate: boolean;
 };
 
 export interface QueryState<QueryStateData> {

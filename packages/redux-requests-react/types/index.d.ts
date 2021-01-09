@@ -1,11 +1,12 @@
 import * as React from 'react';
-import { Reducer, Middleware } from 'redux';
+import { Reducer, Middleware, Store } from 'redux';
 import {
   QueryState,
   MutationState,
   RequestAction,
   DispatchRequest,
   HandleRequestConfig,
+  RequestsStore,
 } from '@redux-requests/core';
 
 interface LoadingProps {
@@ -78,8 +79,12 @@ export function useQuery<
   requestKey?: string;
   multiple?: boolean;
   defaultData?: any;
-  dispatch?: boolean;
   variables?: Parameters<QueryCreator>;
+  autoLoad?: boolean;
+  autoReset?: boolean;
+  throwError?: boolean;
+  suspense?: boolean;
+  suspenseSsr?: boolean;
 }): QueryState<
   Data extends undefined ? GetQueryStateData<QueryCreator> : Data
 > & {
@@ -101,6 +106,9 @@ export function useMutation<
   action?: MutationCreator;
   requestKey?: string;
   variables?: Parameters<MutationCreator>;
+  autoReset?: boolean;
+  throwError?: boolean;
+  suspense?: boolean;
 }): MutationState & {
   mutate: () => Promise<{
     data?: QueryState<
@@ -119,6 +127,28 @@ interface RequestsProviderProps {
   requestsConfig: HandleRequestConfig;
   extraReducers?: Reducer[];
   getMiddleware?: (extraMiddleware: Middleware[]) => Middleware[];
+  autoLoad?: boolean;
+  autoReset?: boolean;
+  throwError?: boolean;
+  suspense?: boolean;
+  suspenseSsr?: boolean;
+  store?: Store;
+  getStore?: (store: RequestsStore) => void;
+  initialState?: any;
 }
 
 export class RequestsProvider extends React.Component<RequestsProviderProps> {}
+
+interface RequestsErrorBoundaryProps {
+  type: string | ((...params: any[]) => RequestAction);
+  requestKey?: string;
+  autoReset?: boolean;
+  children: React.ReactNode;
+  fallback: (error: {
+    error: any;
+    type: string;
+    requestKey: string;
+  }) => React.ReactNode;
+}
+
+export class RequestsErrorBoundary extends React.Component<RequestsErrorBoundaryProps> {}
