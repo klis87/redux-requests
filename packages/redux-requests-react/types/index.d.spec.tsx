@@ -87,6 +87,7 @@ function BasicQuery() {
         data: 'x',
         error: null,
         loading: true,
+        pending: 1,
         pristine: false,
         downloadProgress: null,
         uploadProgress: null,
@@ -180,6 +181,7 @@ function MutationWithSelector() {
       selector={state => ({
         error: null,
         loading: false,
+        pending: 1,
         downloadProgress: null,
         uploadProgress: null,
       })}
