@@ -15,40 +15,6 @@ module.exports = [
     },
     resolve: {
       extensions: ['.js', '.jsx'],
-      alias: {
-        react: path.join(__dirname, '..', 'node_modules', 'react'),
-        'react-redux': path.join(
-          __dirname,
-          '..',
-          'node_modules',
-          'react-redux',
-          'es',
-        ),
-        '@redux-requests/core': path.join(
-          __dirname,
-          '..',
-          '..',
-          'packages',
-          'redux-requests',
-          'es',
-        ),
-        '@redux-requests/react': path.join(
-          __dirname,
-          '..',
-          '..',
-          'packages',
-          'redux-requests-react',
-          'es',
-        ),
-        '@redux-requests/axios': path.join(
-          __dirname,
-          '..',
-          '..',
-          'packages',
-          'redux-requests-axios',
-          'es',
-        ),
-      },
     },
     module: {
       rules: [
