@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import PropTypes from 'prop-types';
 import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
 import { Provider } from 'react-redux';
 import { handleRequests, createRequestsStore } from '@redux-requests/core';
@@ -71,6 +72,21 @@ const RequestsProvider = ({
       </RequestsContext.Provider>
     </Provider>
   );
+};
+
+RequestsProvider.propTypes = {
+  children: PropTypes.func.isRequired,
+  requestsConfig: PropTypes.any,
+  extraReducers: PropTypes.any,
+  store: PropTypes.any,
+  getMiddleware: PropTypes.func,
+  suspense: PropTypes.bool,
+  autoLoad: PropTypes.bool,
+  autoReset: PropTypes.bool,
+  throwError: PropTypes.bool,
+  suspenseSsr: PropTypes.bool,
+  getStore: PropTypes.func,
+  initialState: PropTypes.any,
 };
 
 export default RequestsProvider;

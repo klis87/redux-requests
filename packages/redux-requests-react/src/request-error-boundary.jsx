@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import PropTypes from 'prop-types';
 
 import useQuery from './use-query';
 import useMutation from './use-mutation';
@@ -98,6 +99,14 @@ const RequestErrorBoundary = ({
       {children}
     </InternalRequestErrorBoundary>
   );
+};
+
+RequestErrorBoundary.propTypes = {
+  type: PropTypes.oneOfType([PropTypes.string, PropTypes.func]).isRequired,
+  requestKey: PropTypes.string,
+  children: PropTypes.func.isRequired,
+  fallback: PropTypes.func.isRequired,
+  autoReset: PropTypes.bool,
 };
 
 export default RequestErrorBoundary;
