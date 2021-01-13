@@ -1,6 +1,6 @@
 ---
-title:  6. Interceptors
-description: 6th part of the tutorial for redux-requests - declarative AJAX requests and automatic network state management for Redux
+title: 6. Interceptors
+description: 6th part of the tutorial for redux-requests - declarative AJAX requests and automatic network state management for single-page applications
 ---
 
 ## Interceptors introduction
@@ -20,6 +20,7 @@ Now, let's analyze all **interceptors**.
 
 `onRequest` allows you to change a request action before a request is made. For instance,
 you could add a token to all of your request actions if it exists. Let's see an example:
+
 ```js
 import { getToken } from './selectors';
 
@@ -37,7 +38,7 @@ const onRequest = (request, requestAction, store) => {
   }
 
   return request;
-}
+};
 ```
 
 So, `onRequest` is just a function which receives `request` object (from request action for convenience),
@@ -48,6 +49,7 @@ are perfect to implement a global logic.
 
 However, interceptors are also useful for creating side effects. Yes, you could
 do this with a custom middleware, sagas etc, but see below example:
+
 ```js
 import { addMessage } from './actions';
 
@@ -77,6 +79,7 @@ you sagas for side effects if you want, you have many options.
 but before `success` action is dispatched. You can use it then to amend response or
 to provide a side effect like another action dispatched before `success` action is fired,
 like:
+
 ```js
 const onSuccess = (response, requestAction, store) => {
   if (shouldBeTransformed(response)) {
@@ -84,7 +87,7 @@ const onSuccess = (response, requestAction, store) => {
   }
 
   return response;
-}
+};
 ```
 
 Just remember to always return `response` and that `response` has to be an object
@@ -101,12 +104,14 @@ to provide a side effect or even to recover from error and replace `error` respo
 with `success`.
 
 The easiest example of `onError` is to dispatch an error message or any error:
+
 ```js
 const onError = (error, requestAction, store) => {
   store.dispatch(addMessage('Something wrong happened!'));
   throw error;
-}
+};
 ```
+
 A very important things here is that you need to `throw` error (passed or another)
 or return a rejected promise with an error. Forgetting about it will probably
 create some bugs, because if you don't rethrow, it will be treated that error is fixed.
@@ -114,6 +119,7 @@ create some bugs, because if you don't rethrow, it will be treated that error is
 This is because it is possible to recover from error. Imagine you received an error
 because a token expired. This can be an usual occurrence in your application and you
 might want to handle it in centralized place. See this example:
+
 ```js
 const onError = async (error, requestAction, store) => {
   if (tokenExpired(error)) {
@@ -156,6 +162,7 @@ const onError = async (error, requestAction, store) => {
   throw error;
 }
 ```
+
 The key thing to notice above is that if you return an object with `data` key in
 `onError`, the error will be catched and `success` action will be fired later instead
 of `error`.
@@ -168,11 +175,12 @@ We will get back to this problem a little later.
 
 `onAbort` is called for any request which was not finished because it was aborted.
 Probably you will never use it, but it is available just in case. It looks like that:
+
 ```js
 const onAbort = (requestAction, store) => {
   // do sth, for example an action dispatch
   // you don't need to return anything
-}
+};
 ```
 
 ## `meta.silent` and `meta.runOn...`
@@ -180,14 +188,16 @@ const onAbort = (requestAction, store) => {
 Let's go back to `onError` example with token refresh. We pointed that above example
 was a little simplified. Before we improve it, here is the list of additional `meta`
 options related to interceptors:
+
 - `silent: boolean`: after setting to `false` no action will be dispatched for a given request, so reducers won't be hit,
-useful if you want to make a request and not store it, or in an interceptor to avoid duplicated actions in some cases
+  useful if you want to make a request and not store it, or in an interceptor to avoid duplicated actions in some cases
 - `runOnRequest: boolean`: passing `false` would prevent running `onRequest` interceptor for this action, useful to avoid infinitive loops in some cases
 - `runOnSuccess`: like above, but for `onSuccess` interceptor
 - `runOnError`: like above, but for `onError` interceptor
 - `runOnAbort`: like above, but for `onAbort` interceptor
 
 With this knowledge, let's rewrite `onError` interceptor:
+
 ```js
 const onError = async (error, requestAction, store) => {
   if (tokenExpired(error)) {
@@ -240,6 +250,7 @@ const onError = async (error, requestAction, store) => {
   throw error;
 }
 ```
+
 Hopefully comments in the code are enough to understand what is going on. The most
 interesting thing probably is using `runOnSuccess: false`. Why it could be necessary?
 Because if you recover from error in `onError`, as the next step `onSuccess` will
@@ -254,6 +265,7 @@ sometimes they will be necessary to use. Just be aware of their existance and us
 Based on above example you already know how to use local interceptos. That's it,
 you just add them to action `meta`. For global interceptors, you just need to pass
 them to `handleRequests`:
+
 ```js
 import axios from 'axios';
 import { handleRequests } from '@redux-requests/core';

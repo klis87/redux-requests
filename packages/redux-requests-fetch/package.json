@@ -1,7 +1,7 @@
 {
   "name": "@redux-requests/fetch",
   "version": "1.0.1",
-  "description": "Fetch API driver for redux-requests, declarative AJAX requests and automatic network state management for Redux",
+  "description": "Fetch API driver for redux-requests, declarative AJAX requests and automatic network state management for single-page applications",
   "main": "lib/index.js",
   "module": "es/index.js",
   "jsnext:main": "es/index.js",

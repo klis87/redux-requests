@@ -1,6 +1,6 @@
 ---
-title:  9. Caching
-description: 9th part of the tutorial for redux-requests - declarative AJAX requests and automatic network state management for Redux
+title: 9. Caching
+description: 9th part of the tutorial for redux-requests - declarative AJAX requests and automatic network state management for single-page applications
 ---
 
 ## `cache`
@@ -8,6 +8,7 @@ description: 9th part of the tutorial for redux-requests - declarative AJAX requ
 Sometimes you might want your responses to be cached for an amount of time or even forever (until the page is not reloaded at least).
 Or, putting it another way, you would like to send a given request no more often than once for an amount of time. You can easily
 achieve it with an optional cache middleware. To activate it, just pass `cache: true` to `handleRequests`:
+
 ```js
 import { handleRequests } from '@redux-requests/core';
 
@@ -18,10 +19,11 @@ handleRequests({
 ```
 
 After this, you can use `meta.cache`:
+
 ```js
 const fetchBooks = () => ({
   type: FETCH_BOOKS,
-  request: { url: '/books'},
+  request: { url: '/books' },
   meta: {
     cache: 10, // in seconds, or true to cache forever
   },
@@ -36,6 +38,7 @@ previously cached server response. You could also use `cache: true` to cache for
 
 Sometimes you would like to invalidate your cache based on a key, so if a key is changed, then you would bypass the cache
 and network would be hit. You can use `meta.cacheKey` for that:
+
 ```js
 const fetchBooks = language => ({
   type: FETCH_BOOKS,
@@ -51,10 +54,11 @@ const fetchBooks = language => ({
 
 Another use case is that you might want to keep a separate cache for the same request action based on a key.
 Then, like for usual not cached queries, you could use `meta.RequestKey`. For example:
+
 ```js
 const fetchBook = id => ({
   type: FETCH_BOOK,
-  request: { url: `/books/${id}`},
+  request: { url: `/books/${id}` },
   meta: {
     cache: true,
     requestKey: id,
@@ -74,6 +78,7 @@ const fetchBook = id => ({
 
 You can also use `cacheKey` and `requestKey` at the same time, then different `cacheKey`
 will be able to invalidate cache for each `requestKey` individually, like:
+
 ```js
 const fetchBook = (id, language) => ({
   type: FETCH_BOOK,
@@ -103,10 +108,11 @@ the same `cacheKey` could never happen.
 
 When you use `cache` with `requestKey`, like without caching you can also be worried
 about storing too many queries in state. Like there, in the same fashion you can use `requestsCapacity`:
+
 ```js
 const fetchBook = id => ({
   type: FETCH_BOOK,
-  request: { url: `/books/${id}`},
+  request: { url: `/books/${id}` },
   meta: {
     cache: true,
     requestKey: id,
@@ -128,6 +134,7 @@ const fetchBook = id => ({
 ## Manual cache clearing
 
 If you need to clear the cache manually for some reason, you can use `clearRequestsCache` action:
+
 ```js
 import { clearRequestsCache } from '@redux-requests/core';
 

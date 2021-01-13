@@ -1,6 +1,6 @@
 ---
 title: LocalMutationAction
-description: LocalMutationAction API reference for redux-requests - declarative AJAX requests and automatic network state management for Redux
+description: LocalMutationAction API reference for redux-requests - declarative AJAX requests and automatic network state management for single-page applications
 ---
 
 `LocalMutationAction` is a type which defines the structure of local mutation actions. You can use it if you use Typescript,

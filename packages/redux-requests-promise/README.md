@@ -6,7 +6,7 @@
 [![Known Vulnerabilities](https://snyk.io/test/github/klis87/redux-requests/badge.svg)](https://snyk.io/test/github/klis87/redux-requests)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
-Promise driver for redux-requests, declarative AJAX requests and automatic network state management for Redux
+Promise driver for redux-requests, declarative AJAX requests and automatic network state management for single-page applications
 
 ## Installation
 

@@ -1,6 +1,6 @@
 ---
-title:  handleRequests
-description: handleRequests API reference for redux-requests - declarative AJAX requests and automatic network state management for Redux
+title: handleRequests
+description: handleRequests API reference for redux-requests - declarative AJAX requests and automatic network state management for single-page applications
 ---
 
 As you probably noticed in other chapters, `handleRequests` is a function which gets some options
@@ -63,6 +63,11 @@ Set to `true` if you need to use caching. See [caching tutorial](../tutorial/9-c
 
 Pass `server` on the server and `client` on the client to activate server side rendering support.
 See [server side rendering guide](../guides/server-side-rendering).
+
+### `disableRequestsPromise: boolean`
+
+It only matters when `ssr: 'server'`, you can set it to `true` if you don't need to be notified by `requestsPromise` when
+all requests were resolved. Typically you would set it to `true` when using React SSR suspense, `false` by default.
 
 ### `isRequestAction: action => boolean`
 

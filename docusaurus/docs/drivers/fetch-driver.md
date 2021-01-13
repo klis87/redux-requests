@@ -1,6 +1,6 @@
 ---
-title:  Fetch driver
-description: Fetch API guide for redux-requests - declarative AJAX requests and automatic network state management for Redux
+title: Fetch driver
+description: Fetch API guide for redux-requests - declarative AJAX requests and automatic network state management for single-page applications
 ---
 
 ## Introduction
@@ -10,21 +10,26 @@ description: Fetch API guide for redux-requests - declarative AJAX requests and 
 ## Installation
 
 First, install the driver:
+
 ```bash
 $ npm install @redux-requests/fetch
 ```
+
 or you can just use CDN: `https://unpkg.com/@redux-requests/fetch`.
 
 You might want to also install `Fetch API` polyfill, like `isomorphic-fetch`:
+
 ```bash
 $ npm install isomorphic-fetch
 ```
+
 but this depends on browsers you want to support and is totally optional. The same
 goes for any `AbortController` polyfill.
 
 ## Usage
 
 Before you can use `fetch` driver, first pass it to `handleRequests`:
+
 ```js
 import 'isomorphic-fetch'; // or a different fetch polyfill
 import { handleRequests } from '@redux-requests/core';
@@ -44,6 +49,7 @@ handleRequests({
 
 Then, you can start using Fetch API config in your requests actions. For example,
 in order to create Fetch API requests, below:
+
 ```js
 fetch('/users', {
   method: 'POST',
@@ -53,7 +59,9 @@ fetch('/users', {
   },
 });
 ```
+
 should be translated to this request action:
+
 ```js
 const fetchUsers = data => ({
   type: 'FETCH_USERS',
@@ -64,9 +72,10 @@ const fetchUsers = data => ({
     headers: {
       'Content-Type': 'application/json',
     },
-  }
+  },
 });
 ```
+
 The point is, you can use the same request config like you do with pure Fetch API.
 The only difference is that you need to pass `url` in the config itself.
 

@@ -193,7 +193,7 @@ function Home() {
   return (
     <Layout
       title="Home page"
-      description="Declarative AJAX requests and automatic network state management for Redux"
+      description="Declarative AJAX requests and automatic network state management for single-page applications"
     >
       <header className={classnames('hero hero--primary', styles.heroBanner)}>
         <div className="container">

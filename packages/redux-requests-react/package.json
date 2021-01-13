@@ -1,7 +1,7 @@
 {
   "name": "@redux-requests/react",
   "version": "1.3.0",
-  "description": "React bindings for redux-requests, declarative AJAX requests and automatic network state management for Redux",
+  "description": "React bindings for redux-requests, declarative AJAX requests and automatic network state management for single-page applications",
   "main": "lib/index.js",
   "module": "es/index.js",
   "jsnext:main": "es/index.js",

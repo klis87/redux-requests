@@ -1,6 +1,6 @@
 ---
 title: getQuery
-description: getQuery API reference for redux-requests - declarative AJAX requests and automatic network state management for Redux
+description: getQuery API reference for redux-requests - declarative AJAX requests and automatic network state management for single-page applications
 ---
 
 `getQuery` is a selector which returns a state for a given query. It is the selector which requires props.
@@ -15,6 +15,7 @@ const booksQuery = getQuery(state, { type: 'FETCH_BOOKS' });
   loading: false,
   error: null,
   pristine: false, // true only when there was no request made for a give type
+  pending: 0 // number of pending requests
   downloadProgress: null, // only when requestAction.meta.measureDownloadProgress is true
   uploadProgress: null, // only when requestAction.meta.measureUploadProgress is true
 } */

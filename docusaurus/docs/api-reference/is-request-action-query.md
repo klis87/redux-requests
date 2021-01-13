@@ -1,10 +1,11 @@
 ---
-title:  isRequestActionQuery
-description: isRequestActionQuery API reference for redux-requests - declarative AJAX requests and automatic network state management for Redux
+title: isRequestActionQuery
+description: isRequestActionQuery API reference for redux-requests - declarative AJAX requests and automatic network state management for single-page applications
 ---
 
 `isRequestActionQuery` is a small helper function which checks whether a request action
 is a query or a mutation, for example:
+
 ```js
 import { isRequestActionQuery } from '@redux-requests/core';
 

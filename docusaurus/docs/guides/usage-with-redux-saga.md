@@ -1,6 +1,6 @@
 ---
-title:  Usage with redux-saga
-description: Redux-saga guide for redux-requests - declarative AJAX requests and automatic network state management for Redux
+title: Usage with redux-saga
+description: Redux-saga guide for redux-requests - declarative AJAX requests and automatic network state management for single-page applications
 ---
 
 ## How to use it with `redux-saga`?
@@ -12,6 +12,7 @@ see several examples below to get some ideas.
 ## Dispatching request actions
 
 You can dispatch request actions from sagas like any other action. So, for example:
+
 ```js
 import { put } from 'redux-saga/effects';
 
@@ -22,6 +23,7 @@ function* fetchBookSaga() {
 
 What to do if you need to read a response in saga? Request action dispatches return
 promises, so you can use `putResolve` instead:
+
 ```js
 import { putResolve } from 'redux-saga/effects';
 
@@ -33,18 +35,22 @@ function* fetchBookSaga() {
 ## Reading requests state
 
 Just use `select` effect and `getQuerySelector` or `getMutationSelector`, for example:
+
 ```js
 import { select } from 'redux-saga/effects';
 import { getQuerySelector } from '@redux-requests/core';
 
 function* booksQuerySaga() {
-  const booksQueryState = yield select(getQuerySelector({ type: 'FETCH_BOOKS' }));
+  const booksQueryState = yield select(
+    getQuerySelector({ type: 'FETCH_BOOKS' }),
+  );
 }
 ```
 
 ## Reacting to request and response actions
 
 Request action is just a Redux action, so you can listen with `take` as usually:
+
 ```js
 import { take } from 'redux-saga/effects';
 
@@ -55,6 +61,7 @@ function* onFetchBookRequest() {
 ```
 
 For response actions it is the same, but you also can use response helpers:
+
 ```js
 import { take } from 'redux-saga/effects';
 import { success, error, abort } from '@redux-requests/core';
@@ -74,5 +81,3 @@ function* onFetchBookAbort() {
   // do sth
 }
 ```
-
-

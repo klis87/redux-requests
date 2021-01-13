@@ -1,11 +1,12 @@
 ---
 title: Basic usage
-description: Basic usage guide for redux-requests - declarative AJAX requests and automatic network state management for Redux
+description: Basic usage guide for redux-requests - declarative AJAX requests and automatic network state management for single-page applications
 ---
 
 ## Initial setup
 
 Before you start using `redux-requests` library, just add below snippet to your code:
+
 ```js
 import axios from 'axios';
 import { handleRequests } from '@redux-requests/core';
@@ -20,10 +21,7 @@ const configureStore = () => {
     requests: requestsReducer,
   });
 
-  const store = createStore(
-    reducers,
-    applyMiddleware(...requestsMiddleware),
-  );
+  const store = createStore(reducers, applyMiddleware(...requestsMiddleware));
 
   return store;
 };
@@ -39,11 +37,13 @@ After initial setup is done, you will gain a power to send AJAX requests with ju
 
 For example, imagine you have and endpoint `/books`. With pure `axios`, you could
 make a request as:
+
 ```js
 axios.get('/books').then(response => response.data);
 ```
 
 With `redux-requests` all you need to do is write a Redux action and dispatch it:
+
 ```js
 const FETCH_BOOKS = 'FETCH_BOOKS';
 
@@ -69,22 +69,28 @@ or `FETCH_BOOKS_ABORT` action will be dispatched automatically and data, error a
 loading state will be saved in the reducer.
 
 To read response, you can wait until request action promise is resolved:
+
 ```js
 store.dispatch(fetchBooks()).then(({ data, error, isAborted, action }) => {
   // do sth with response
 });
 ```
+
 ... or with `await` syntax:
+
 ```js
 const { data, error, isAborted, action } = await store.dispatch(fetchBooks());
 ```
 
 However, usually you would prefer to read this state just from Redux store.
 For that you can use built-in selectors:
+
 ```js
 import { getQuery } from '@redux-requests/core';
 
-const { data, error, loading, pristine } = getQuery(state, { type: FETCH_BOOKS });
+const { data, error, loading, pristine } = getQuery(state, {
+  type: FETCH_BOOKS,
+});
 ```
 
 What is **query** by the way? This is just a naming convention used by this library,
@@ -102,12 +108,15 @@ need to know whether `data` is really `null` or just because no request was made
 ## Mutations
 
 What about updating data? Let's say you could update a book with `axios` like that:
+
 ```js
 axios.post('/books/1', { title: 'New title' });
 ```
+
 which would update `title` of book with `id: 1` to `new title`.
 
 Again, let's implement it as Redux action:
+
 ```js
 const UPDATE_BOOK = 'UPDATE_BOOK';
 
@@ -121,8 +130,8 @@ const updateBook = (id, title) => ({
   meta: {
     mutations: {
       [FETCH_BOOKS]: (data, mutationData) =>
-        data.map(book => book.id === id ? mutationData : book),
-    }
+        data.map(book => (book.id === id ? mutationData : book)),
+    },
   },
 });
 
@@ -140,16 +149,25 @@ The first argument is `data` (current `data` of `FETCH_BOOKS` query) and `mutati
 (data returned from server for `UPDATE_BOOK` mutation).
 
 And how to read responses and mutation state? Similar to queries:
+
 ```js
-store.dispatch(updateBook('1', 'New title')).then(({ data, error, isAborted, action }) => {
-  // do sth with response
-});
+store
+  .dispatch(updateBook('1', 'New title'))
+  .then(({ data, error, isAborted, action }) => {
+    // do sth with response
+  });
 ```
+
 ... or with `await` syntax:
+
 ```js
-const { data, error, isAborted, action } = await store.dispatch(updateBook('1', 'New title'));
+const { data, error, isAborted, action } = await store.dispatch(
+  updateBook('1', 'New title'),
+);
 ```
+
 ... or just by using selector:
+
 ```js
 import { getMutation } from '@redux-requests/core';
 
@@ -165,10 +183,11 @@ we do this only for queries.
 Notice, that usually you would do such a thing like data update with a reducer. But this library has
 a different approach, it manages the whole remote state with one global reducer (`requestsReducer`) and
 advocates having update instructions in requests actions themselves. This has the following advantages:
+
 - you don't need to write reducers, just actions
 - all logic related to a request is kept in one place, encapsulated in a single action
 - because there is one global reducer, remote state is standardized which allowed
-to implement many features like caching, automatic normalisation and so on
+  to implement many features like caching, automatic normalisation and so on
 - as a consequence of above, you also don't need to write selectors, they are provided for you
 
 A theoretical disadvantage is that passing a function like update function to an action

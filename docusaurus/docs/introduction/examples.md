@@ -1,6 +1,6 @@
 ---
 title: Examples
-description: Examples for redux-requests - declarative AJAX requests and automatic network state management for Redux
+description: Examples for redux-requests - declarative AJAX requests and automatic network state management for single-page applications
 ---
 
 There are following examples currently:
@@ -14,5 +14,6 @@ There are following examples currently:
 - [actions-creator](https://github.com/klis87/redux-requests/tree/master/examples/actions-creator)
 - [mock-and-multiple-drivers](https://github.com/klis87/redux-requests/tree/master/examples/mock-and-multiple-drivers)
 - [server-side-rendering](https://github.com/klis87/redux-requests/tree/master/examples/server-side-rendering)
+- [suspense-ssr](https://github.com/klis87/redux-requests/tree/master/examples/suspense-ssr)
 - [promise driver](https://github.com/klis87/redux-requests/tree/master/examples/promise-driver)
 - [showcase](https://github.com/klis87/redux-requests/tree/master/examples/showcase)

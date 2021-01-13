@@ -1,6 +1,6 @@
 ---
 title: Axios driver
-description: Axios guide for redux-requests - declarative AJAX requests and automatic network state management for Redux
+description: Axios guide for redux-requests - declarative AJAX requests and automatic network state management for single-page applications
 ---
 
 ## Introduction

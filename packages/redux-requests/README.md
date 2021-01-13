@@ -11,7 +11,7 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
-Declarative AJAX requests and automatic network state management for Redux
+Declarative AJAX requests and automatic network state management for single-page applications
 
 ![Redux-Requests showcase](https://raw.githubusercontent.com/klis87/redux-requests/master/images/showcase.gif)
 
@@ -199,6 +199,7 @@ There are following examples currently:
 - [actions-creator](https://github.com/klis87/redux-requests/tree/master/examples/actions-creator)
 - [mock-and-multiple-drivers](https://github.com/klis87/redux-requests/tree/master/examples/mock-and-multiple-drivers)
 - [server-side-rendering](https://github.com/klis87/redux-requests/tree/master/examples/server-side-rendering)
+- [suspense-ssr](https://github.com/klis87/redux-requests/tree/master/examples/suspense-ssr)
 - [promise driver](https://github.com/klis87/redux-requests/tree/master/examples/promise-driver)
 - [showcase](https://github.com/klis87/redux-requests/tree/master/examples/showcase)
 

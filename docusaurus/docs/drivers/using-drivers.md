@@ -1,6 +1,6 @@
 ---
 title: Using drivers
-description: Using drivers guide for redux-requests - declarative AJAX requests and automatic network state management for Redux
+description: Using drivers guide for redux-requests - declarative AJAX requests and automatic network state management for single-page applications
 ---
 
 ## What is driver?

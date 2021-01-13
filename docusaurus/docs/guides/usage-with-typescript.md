@@ -1,6 +1,6 @@
 ---
 title: Usage with Typescript
-description: Typescript guide for redux-requests - declarative AJAX requests and automatic network state management for Redux
+description: Typescript guide for redux-requests - declarative AJAX requests and automatic network state management for single-page applications
 ---
 
 ## How to use it with Typescript?
@@ -161,7 +161,7 @@ with Typescript and how it could help us with `Data` generics:
 ```ts
 import { createSmartAction } from 'redux-smart-actions';
 
-const fetchBook = createSmartAction(function(
+const fetchBook = createSmartAction(function (
   id: string,
 ): RequestAction<{ id: string; title: string }, { id: string; name: string }> {
   return {

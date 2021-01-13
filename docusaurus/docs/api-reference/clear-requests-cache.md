@@ -1,10 +1,11 @@
 ---
-title:  clearRequestsCache
-description: clearRequestsCache API reference for redux-requests - declarative AJAX requests and automatic network state management for Redux
+title: clearRequestsCache
+description: clearRequestsCache API reference for redux-requests - declarative AJAX requests and automatic network state management for single-page applications
 ---
 
 `clearRequestsCache` is a built-in action, which you might need to clear the cache manually for some reason,
 for example:
+
 ```js
 import { clearRequestsCache } from '@redux-requests/core';
 
@@ -21,4 +22,3 @@ dispatch(clearRequestsCache([FETCH_BOOKS, FETCH_AUTHORS]));
 Note however, that `clearRequestsCache` won't remove any query state, it will just remove cache timeout so that
 the next time a request of a given type is dispatched, AJAX request will hit your server.
 So it is like cache invalidation operation.
-

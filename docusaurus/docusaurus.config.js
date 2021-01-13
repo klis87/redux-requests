@@ -3,7 +3,7 @@
 module.exports = {
   title: 'redux-requests',
   tagline:
-    'Declarative AJAX requests and automatic network state management for Redux',
+    'Declarative AJAX requests and automatic network state management for single-page applications',
   url: 'https://redux-requests.klisiczynski.com',
   baseUrl: '/',
   favicon: 'img/favicon.ico',

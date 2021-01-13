@@ -1,6 +1,6 @@
 ---
-title:  10. Automatic normalisation
-description: 10th part of the tutorial for redux-requests - declarative AJAX requests and automatic network state management for Redux
+title: 10. Automatic normalisation
+description: 10th part of the tutorial for redux-requests - declarative AJAX requests and automatic network state management for single-page applications
 ---
 
 ## What is normalisation?
@@ -23,6 +23,7 @@ to normalize everything, or you can use request action `meta.normalize: true` to
 per request type.
 
 Now, lets say you have two queries:
+
 ```js
 const fetchBooks = () => ({
   type: FETCH_BOOKS,
@@ -34,9 +35,11 @@ const fetchBook = id => ({
   type: FETCH_BOOK,
   request: { url: `/books/${id}` },
   meta: { normalize: true },
-})
+});
 ```
+
 and `getQuery` returns the following data:
+
 ```js
 import { getQuery } from '@redux-requests/core';
 
@@ -49,27 +52,32 @@ const bookDetailQuery = getQuery(state, { type: 'FETCH_BOOK' });
 
 Now, imagine you have a mutation to update a book title. Normally you would need to do
 something like that:
+
 ```js
 const updateBookTitle = (id, newTitle) => ({
   type: UPDATE_BOOK_TITLE,
   request: { url: `books/${id}`, method: 'PATCH', data: { newTitle } },
   meta: {
     mutations: {
-      FETCH_BOOKS: (data, mutationData) => data.map(v => v.id === id ? mutationData : v),
-      FETCH_BOOK: (data, mutationData) => data.id === id ? mutationData : data,
+      FETCH_BOOKS: (data, mutationData) =>
+        data.map(v => (v.id === id ? mutationData : v)),
+      FETCH_BOOK: (data, mutationData) =>
+        data.id === id ? mutationData : data,
     },
   },
-})
+});
 ```
+
 assuming `mutationData` is equal to the book with updated title.
 
 Now, because we have queries normalized, we can also use normalization in mutation:
+
 ```js
 const updateBookTitle = (id, newTitle) => ({
   type: 'UPDATE_BOOK_TITLE',
   request: { url: `books/${id}`, method: 'PATCH', data: { newTitle } },
   meta: { normalize: true },
-})
+});
 ```
 
 No manual mutations! How does it work? By default all objects with `id` key are
@@ -89,9 +97,9 @@ In order to make automatic normalisation work, the following conditions must be 
 
 1. you must have a standardized way to identify your objects, usually this is just `id` key
 2. ids must be unique across the whole app, not only across object types, if not, you will need to append something to them,
-the same has to be done in GraphQL world, usually adding `_typename`
+   the same has to be done in GraphQL world, usually adding `_typename`
 3. objects with the same ids should have consistent structure, if an object like book in one
-query has `title` key, it should be `title` in others, not `name` out of a sudden
+   query has `title` key, it should be `title` in others, not `name` out of a sudden
 
 Two functions which can be passed to `handleRequest` can help to meet those requirements,
 `shouldObjectBeNormalized` and `getNormalisationObjectKey`.
@@ -104,6 +112,7 @@ objects differently, for instance by `_id` key, then you can pass
 are unique, but not across the whole app, but within object types, you could use
 `getNormalisationObjectKey: obj => obj.id + obj.type` or something similar.
 If that is not possible, then you could just compute a suffix yourself, for example:
+
 ```js
 const getType = obj => {
   if (obj.bookTitle) {
@@ -140,24 +149,27 @@ then if you return new book with updated list in `likedByUsers`, this will work 
 
 Automatic normalisation is compatible with local and optimistic updates. There are
 3 action meta options dedicated to normalized data:
+
 - `optimisticData`: cousin of meta.mutation `updateDataOptimistic`,
 - `revertedData`: cousin of meta.mutation `revertData`
 - `localData`: cousing of meta.mutation `updateData` with `local: true`
 
 Just attached an object or objects with ids there to update data, for example:
+
 ```js
 const likeBooks = ids => ({
   type: 'LIKE_BOOKS',
   meta: {
     localData: ids.map(id => ({ id, liked: true })),
   },
-})
+});
 ```
 
 Dispatching above action like `store.dispatch(likeBooks(['1', '2', '3']))` would
 mark books with ids `1`, `2` and `3` as liked.
 
 With optimistic updates usage is similar, for instance:
+
 ```js
 const likeBookOptimistic = id => ({
   type: 'LIKE_BOOK_OPTIMISTIC',
@@ -165,5 +177,5 @@ const likeBookOptimistic = id => ({
     optimisticData: { id, liked: true },
     revertedData: { id, liked: false },
   },
-})
+});
 ```

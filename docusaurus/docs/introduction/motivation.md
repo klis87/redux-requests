@@ -1,7 +1,7 @@
 ---
 id: motivation
 title: Motivation
-description: Motivation guide for redux-requests - declarative AJAX requests and automatic network state management for Redux
+description: Motivation guide for redux-requests - declarative AJAX requests and automatic network state management for single-page applications
 ---
 
 ## Genesis
@@ -18,6 +18,7 @@ those on the app level?
 ## The solution
 
 With `redux-requests`, assuming you use `axios` you could refactor a code in the following way:
+
 ```diff
   import axios from 'axios';
 - import thunk from 'redux-thunk';
@@ -97,4 +98,3 @@ or showing loading spinners. You don't need to write requests related repetitive
 You don't even need to worry about writing selectors, as this library provides optimized selectors out of the box.
 With action helper library like [`redux-smart-actions`](https://github.com/klis87/redux-smart-actions), you don't even need to write constants!
 So basically you end up writing just actions to manage your whole remote state, so no more famous boilerplate in your Redux apps!
-

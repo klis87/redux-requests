@@ -1,6 +1,6 @@
 ---
 title: GraphQL driver
-description: GraphQL guide for redux-requests - declarative AJAX requests and automatic network state management for Redux
+description: GraphQL guide for redux-requests - declarative AJAX requests and automatic network state management for single-page applications
 ---
 
 ## Introduction

@@ -1,13 +1,13 @@
 ---
-title:  1. Requests aborts
-description: 1st part of the tutorial for redux-requests - declarative AJAX requests and automatic network state management for Redux
+title: 1. Requests aborts
+description: 1st part of the tutorial for redux-requests - declarative AJAX requests and automatic network state management for single-page applications
 ---
-
 
 ## Basic setup
 
 Before we begin, make sure you read [basic usage chapter](../introduction/basic-usage). Now, let's start with
 a basic setup:
+
 ```js
 import axios from 'axios';
 import { handleRequests } from '@redux-requests/core';
@@ -22,10 +22,7 @@ const configureStore = () => {
     requests: requestsReducer,
   });
 
-  const store = createStore(
-    reducers,
-    applyMiddleware(...requestsMiddleware),
-  );
+  const store = createStore(reducers, applyMiddleware(...requestsMiddleware));
 
   return store;
 };
@@ -33,6 +30,7 @@ const configureStore = () => {
 
 Now, imagine we need to fetch books which are paginated on the server. We start
 with writing a request action:
+
 ```js
 const FETCH_BOOKS = 'FETCH_BOOKS';
 
@@ -49,6 +47,7 @@ We pass `page` param to `fetchBooks` action, because as described earlier, books
 are paginated on the backend side.
 
 Once we have the action ready, let's download the 1st page of books:
+
 ```js
 store.dispatch(fetchBooks(1));
 ```
@@ -60,6 +59,7 @@ or `FETCH_BOOKS_ERROR` action will be dispatched with the server response.
 But there is yet another possibility, imagine that we dispatch `fetchBooks` whenever
 a user wants to see a page. There is an interesting case, when the user is faster
 than our network. Let's simulate this behaviour:
+
 ```js
 store.dispatch(fetchBooks(1));
 store.dispatch(fetchBooks(2));
@@ -89,7 +89,7 @@ So, going back, `redux-requests` has first class support for requests aborts. By
 if a query of a given type is pending and a new one is fired, the previous request will be
 automatically aborted.
 
-##  Requests aborts configuration
+## Requests aborts configuration
 
 By default only queries are aborted this way, mutations are not. You can easily change
 those defaults by a special `takeLatest` option, which can be passed either to `handleRequests`
@@ -97,6 +97,7 @@ for global configuration or in request action `meta`.
 
 If for a some reason you would like to prevent aborts for `FETCH_BOOKS`, you could
 do it like that:
+
 ```js
 const fetchBooks = page => ({
   type: FETCH_BOOKS,
@@ -116,6 +117,7 @@ Or... if you had a mutation which you would like to have aborted, you would add
 As mentioned above, you can configure it globally by using `takeLatest` option
 in `handleRequest`. Default implementation uses aborts only for
 queries and it looks like that:
+
 ```js
 import { isRequestActionQuery } from '@redux-requests/core';
 
@@ -128,6 +130,7 @@ const takeLatest = action => isRequestActionQuery(action);
 
 Sometimes you might need to abort some pending requests manually.
 You can use `abortRequests` action to do it, for example:
+
 ```js
 import { abortRequests } from '@redux-requests/core';
 
@@ -139,7 +142,9 @@ dispatch(abortRequests([FETCH_BOOKS]));
 
 // abort FETCH_BOOKS and FETCH_BOOK with 1 request key
 // you will learn about requestKey in another tutorial
-dispatch(abortRequests([FETCH_BOOKS, { requestType: FETCH_BOOK, requestKey: '1' }]));
+dispatch(
+  abortRequests([FETCH_BOOKS, { requestType: FETCH_BOOK, requestKey: '1' }]),
+);
 ```
 
 ## `resetRequests`

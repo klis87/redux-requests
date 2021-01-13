@@ -1,6 +1,6 @@
 ---
-title:  isResponseAction
-description: isResponseAction API reference for redux-requests - declarative AJAX requests and automatic network state management for Redux
+title: isResponseAction
+description: isResponseAction API reference for redux-requests - declarative AJAX requests and automatic network state management for single-page applications
 ---
 
 `isResponseAction` is a small helper function which checks whether a Redux action

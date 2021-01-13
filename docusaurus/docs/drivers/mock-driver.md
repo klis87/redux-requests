@@ -1,6 +1,6 @@
 ---
-title:  Mock driver
-description: Mocking guide for redux-requests - declarative AJAX requests and automatic network state management for Redux
+title: Mock driver
+description: Mocking guide for redux-requests - declarative AJAX requests and automatic network state management for single-page applications
 ---
 
 ## Introduction
@@ -14,14 +14,17 @@ you could replace it with a "real" driver like `axios` once backend is ready.
 ## Installation
 
 To install the package, just run:
+
 ```bash
 $ npm install @redux-requests/mock
 ```
+
 or you can just use CDN: `https://unpkg.com/@redux-requests/mock`.
 
 ## Usage
 
 As always, pass it to `handleRequests` first:
+
 ```js
 import { handleRequests } from '@redux-requests/core';
 import { createDriver } from '@redux-requests/mock';
@@ -35,6 +38,7 @@ handleRequests({
 ```
 
 Then, start using it inside your request actions:
+
 ```js
 const fetchPhoto = id => ({
   type: FETCH_PHOTO,

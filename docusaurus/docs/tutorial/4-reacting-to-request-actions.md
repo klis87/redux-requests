@@ -1,6 +1,6 @@
 ---
-title:  4. Reacting to request actions
-description: 4th part of the tutorial for redux-requests - declarative AJAX requests and automatic network state management for Redux
+title: 4. Reacting to request actions
+description: 4th part of the tutorial for redux-requests - declarative AJAX requests and automatic network state management for single-page applications
 ---
 
 Despite the fact this library advocates using mostly actions and built-in selectors,
@@ -10,6 +10,7 @@ to request actions in your reducers, middleware, sagas or whatever you use.
 With request actions this is easy, just treat it as a normal Redux action. But what
 about response actions, like success, error and abort actions? For that you can use
 helpers, which add proper suffixes to request types, for example:
+
 ```js
 import { success, error, abort } from '@redux-requests/core'
 

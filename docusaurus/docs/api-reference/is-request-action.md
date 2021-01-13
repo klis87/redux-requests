@@ -1,10 +1,11 @@
 ---
-title:  isRequestAction
-description: isRequestAction API reference for redux-requests - declarative AJAX requests and automatic network state management for Redux
+title: isRequestAction
+description: isRequestAction API reference for redux-requests - declarative AJAX requests and automatic network state management for single-page applications
 ---
 
 `isRequestAction` is a small helper function which checks whether a Redux action
 is a request action or not, for example:
+
 ```js
 import { isRequestAction } from '@redux-requests/core';
 
@@ -18,5 +19,5 @@ const fetchBooks = () => ({
 const notRequest = () => ({ type: 'NOT_REQUEST' });
 
 isRequestAction(fetchBooks()) === true;
-isRequestAction(notRequest()) === false
+isRequestAction(notRequest()) === false;
 ```

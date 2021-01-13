@@ -1,12 +1,13 @@
 ---
-title:  8. Optimistic updates
-description: 8th part of the tutorial for redux-requests - declarative AJAX requests and automatic network state management for Redux
+title: 8. Optimistic updates
+description: 8th part of the tutorial for redux-requests - declarative AJAX requests and automatic network state management for single-page applications
 ---
 
 Sometimes you don't want to wait for a mutation response to update your data. This
 can improve perceived performance of your app. If you can predict in advance how data will be updated,
 you might want to update it immediately. For that you can use **optimistic updates**.
 See an example:
+
 ```js
 const deleteBookOptimistic = book => ({
   type: DELETE_BOOK_OPTIMISTIC,
@@ -24,6 +25,7 @@ const deleteBookOptimistic = book => ({
   },
 });
 ```
+
 So, above we have a mutation action with optimistic update for `FETCH_BOOKS` query.
 `updateDataOptimistic` is called right away after `DELETE_BOOK_OPTIMISTIC` action is dispatched,
 so not on success like in case for `updateData`.

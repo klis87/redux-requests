@@ -1,6 +1,6 @@
 ---
 title: createRequestsStore
-description: createRequestsStore API reference for redux-requests - declarative AJAX requests and automatic network state management for Redux
+description: createRequestsStore API reference for redux-requests - declarative AJAX requests and automatic network state management for single-page applications
 ---
 
 As always, in order to create a request, you must dispatch a **request action**, for instance:

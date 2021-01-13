@@ -1,7 +1,7 @@
 {
   "name": "@redux-requests/axios",
   "version": "1.1.0",
-  "description": "Axios driver for redux-requests, declarative AJAX requests and automatic network state management for Redux",
+  "description": "Axios driver for redux-requests, declarative AJAX requests and automatic network state management for single-page applications",
   "main": "lib/index.js",
   "module": "es/index.js",
   "jsnext:main": "es/index.js",
