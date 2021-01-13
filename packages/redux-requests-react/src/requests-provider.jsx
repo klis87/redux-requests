@@ -75,7 +75,7 @@ const RequestsProvider = ({
 };
 
 RequestsProvider.propTypes = {
-  children: PropTypes.func.isRequired,
+  children: PropTypes.element.isRequired,
   requestsConfig: PropTypes.any,
   extraReducers: PropTypes.any,
   store: PropTypes.any,

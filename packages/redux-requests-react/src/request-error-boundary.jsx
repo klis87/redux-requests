@@ -104,7 +104,7 @@ const RequestErrorBoundary = ({
 RequestErrorBoundary.propTypes = {
   type: PropTypes.oneOfType([PropTypes.string, PropTypes.func]).isRequired,
   requestKey: PropTypes.string,
-  children: PropTypes.func.isRequired,
+  children: PropTypes.element.isRequired,
   fallback: PropTypes.func.isRequired,
   autoReset: PropTypes.bool,
 };
