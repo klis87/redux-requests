@@ -11,9 +11,9 @@
   },
   "dependencies": {
     "@babel/polyfill": "7.12.1",
-    "@redux-requests/core": "1.3.0",
+    "@redux-requests/core": "1.4.0",
     "@redux-requests/fetch": "1.0.2",
-    "@redux-requests/react": "1.4.0",
+    "@redux-requests/react": "1.4.1",
     "isomorphic-fetch": "3.0.0",
     "react": "16.9.0",
     "react-dom": "16.9.0",
