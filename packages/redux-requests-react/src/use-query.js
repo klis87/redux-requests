@@ -3,6 +3,7 @@ import { useSelector, useStore } from 'react-redux';
 import {
   getQuerySelector,
   resetRequests,
+  stopPolling,
   addWatcher,
   removeWatcher,
   joinRequest,
@@ -46,6 +47,17 @@ const useQuery = ({
 
     return Promise.resolve(null);
   }, [autoLoad, selectorProps.action, selectorProps.type, ...variables]);
+
+  const dispatchStopPolling = useCallback(() => {
+    dispatchRequest(
+      stopPolling([
+        {
+          requestType: selectorProps.type,
+          requestKey: selectorProps.requestKey,
+        },
+      ]),
+    );
+  }, [selectorProps.type, selectorProps.requestKey]);
 
   useEffect(() => {
     if (autoLoad) {
@@ -102,8 +114,9 @@ const useQuery = ({
     () => ({
       ...query,
       load: dispatchQuery,
+      stopPolling: dispatchStopPolling,
     }),
-    [query, dispatchQuery],
+    [query, dispatchQuery, dispatchStopPolling],
   );
 };
 

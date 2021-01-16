@@ -96,6 +96,7 @@ export function useQuery<
     isAborted?: true;
     action: any;
   }>;
+  stopPolling: () => void;
 };
 
 export function useMutation<

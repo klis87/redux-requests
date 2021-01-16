@@ -4,6 +4,7 @@ import {
   createClientSsrMiddleware,
   createServerSsrMiddleware,
   createSendRequestsMiddleware,
+  createPollingMiddleware,
 } from './middleware';
 import defaultConfig from './default-config';
 
@@ -27,6 +28,7 @@ const handleRequests = userConfig => {
   return {
     requestsReducer: requestsReducer(config),
     requestsMiddleware: [
+      config.ssr !== 'server' && createPollingMiddleware(config),
       config.ssr === 'server' &&
         !config.disableRequestsPromise &&
         createServerSsrMiddleware(requestsPromise, config),

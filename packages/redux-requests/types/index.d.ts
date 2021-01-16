@@ -49,6 +49,7 @@ interface RequestActionMeta<Data, TransformedData> {
   localData?: any;
   cache?: boolean | number;
   cacheKey?: string;
+  poll?: number;
   dependentRequestsNumber?: number;
   isDependentRequest?: boolean;
   silent?: boolean;
@@ -180,6 +181,13 @@ export const resetRequests: (
 };
 
 export const abortRequests: (
+  requests?: (string | { requestType: string; requestKey: string })[],
+) => {
+  type: string;
+  requests: (string | { requestType: string; requestKey: string })[];
+};
+
+export const stopPolling: (
   requests?: (string | { requestType: string; requestKey: string })[],
 ) => {
   type: string;

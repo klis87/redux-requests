@@ -10,6 +10,7 @@ import {
   ADD_WATCHER,
   REMOVE_WATCHER,
   JOIN_REQUEST,
+  STOP_POLLING,
 } from './constants';
 
 const getActionWithSuffix = suffix => actionType => actionType + suffix;
@@ -128,6 +129,11 @@ export const resetRequests = (
 
 export const abortRequests = (requests = null) => ({
   type: ABORT_REQUESTS,
+  requests,
+});
+
+export const stopPolling = (requests = null) => ({
+  type: STOP_POLLING,
   requests,
 });
 

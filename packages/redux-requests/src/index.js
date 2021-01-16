@@ -4,6 +4,7 @@ export {
   abort,
   clearRequestsCache,
   resetRequests,
+  stopPolling,
   abortRequests,
   isRequestActionQuery,
   isRequestAction,

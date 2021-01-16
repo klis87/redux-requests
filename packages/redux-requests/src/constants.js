@@ -9,3 +9,4 @@ export const SET_UPLOAD_PROGRESS = 'SET_UPLOAD_PROGRESS';
 export const ADD_WATCHER = 'ADD_WATCHER';
 export const REMOVE_WATCHER = 'REMOVE_WATCHER';
 export const JOIN_REQUEST = 'JOIN_REQUEST';
+export const STOP_POLLING = 'STOP_POLLING';

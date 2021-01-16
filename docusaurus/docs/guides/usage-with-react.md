@@ -92,6 +92,7 @@ const Book = () => {
     loading,
     pristine,
     load, // callback to dispatch this query action any time
+    stopPolling, // callback to stop polling for this query action, if set
   } = useQuery({
     type: 'FETCH_BOOK',
     action: fetchBook,

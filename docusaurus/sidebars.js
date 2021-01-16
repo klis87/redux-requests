@@ -46,6 +46,7 @@ module.exports = {
       'api-reference/get-mutation-selector',
       'api-reference/reset-requests',
       'api-reference/abort-requests',
+      'api-reference/stop-polling',
       'api-reference/clear-requests-cache',
       'api-reference/join-request',
       'api-reference/add-watcher',

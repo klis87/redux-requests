@@ -97,6 +97,11 @@ FIFO rule is applied here. See [requests keys tutorial](../tutorial/3-request-ke
 It can be used to cache queries, forever when `true` or for a number of seconds, more information
 in [caching tutorial](../tutorial/9-caching).
 
+### `poll: number`
+
+It can be used to execute short polling for a given query, value is in seconds. For example, `poll: 10` will refetch a given
+query every 10 seconds, until `resetRequests` or `stopPolling` action is dispatched for this type of query.
+
 ### `dependentRequestsNumber: number`
 
 Number of requests which will be fired after this one, only for SSR purposes, more information in
