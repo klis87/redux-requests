@@ -31,3 +31,5 @@ You can prevent it by passing 2nd argument `dispatch(resetRequests([FETCH_BOOKS]
 Also note that `resetRequests` also sets query `pristine` to `true` and clears cache if set.
 
 Moreover, it is possible to prevent reset of queries which are cached by passing 3rd argument `resetCached` (`true` by default), for example `dispatch(resetRequests([FETCH_BOOKS], false, false))`
+
+Last but not least, it also stops all pollings for requests of the given types.

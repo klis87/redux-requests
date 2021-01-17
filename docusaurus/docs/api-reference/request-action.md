@@ -100,7 +100,8 @@ in [caching tutorial](../tutorial/9-caching).
 ### `poll: number`
 
 It can be used to execute short polling for a given query, value is in seconds. For example, `poll: 10` will refetch a given
-query every 10 seconds, until `resetRequests` or `stopPolling` action is dispatched for this type of query.
+query every 10 seconds, until `resetRequests` or `stopPolling` action is dispatched for this type of query. Also note, that
+this option doesn't do anything when `ssr: 'server'` in `handleRequests`
 
 ### `dependentRequestsNumber: number`
 
