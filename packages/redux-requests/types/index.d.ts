@@ -1,4 +1,4 @@
-import { AnyAction, Reducer, Middleware, Store } from 'redux';
+import { Action, AnyAction, Reducer, Middleware, Store } from 'redux';
 
 export interface DispatchRequest {
   <QueryStateData = any>(
@@ -9,6 +9,7 @@ export interface DispatchRequest {
     isAborted?: true;
     action: any;
   }>;
+  <T extends Action = AnyAction>(action: T): T; // typing of default redux Dispatch function
 }
 
 interface FilterActions {

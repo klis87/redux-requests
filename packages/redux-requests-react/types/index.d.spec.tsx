@@ -9,6 +9,13 @@ import {
   useDispatchRequest,
 } from './index';
 
+function ordinaryEvent(payload: string) {
+  return {
+    type: 'ORDINARY_EVENT',
+    payload: payload
+  };
+}
+
 function fetchBooks(
   x: number,
   y: string,
@@ -206,6 +213,8 @@ const QueryDispatcher = () => {
         response.data.parsed;
         const response2 = await dispatch(fetchBook('1'));
         response2.data.title;
+        const response3 = await dispatch(ordinaryEvent('payload'));
+        response3.payload;
       }}
     >
       Make a query
