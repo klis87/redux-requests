@@ -1086,10 +1086,10 @@
   resolved "https://registry.yarnpkg.com/@redux-requests/axios/-/axios-1.1.1.tgz#d3c6ad98c69511dc80f586893cbcd00d7dc464e4"
   integrity sha512-3eU+XkfvAk35iI2pCVzmA0BmWTtg5ODhOmpq12fKbi2RZy96gLZeu3Y7o0ks+QIqfcziStDTSEXGggdXK1EiUA==
 
-"@redux-requests/core@1.4.0":
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/@redux-requests/core/-/core-1.4.0.tgz#d4d99ea3875e75cb24d07602c97c0ca702a2f293"
-  integrity sha512-RtVTg7yC67SpwaIale9UAU9Le3ol7FmIg00zHS4n3m9LuuJHd6+LAwTLjIvJLix65Aa/qPhCJObMgcyuDwu8kw==
+"@redux-requests/core@1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@redux-requests/core/-/core-1.5.0.tgz#070aa952b903742a5235c09991e9b2243e7d5bfd"
+  integrity sha512-YHTwcUARel9FXBCZQZjVqPPqeFZW63y0DQdMge7qPlLeIscWiRgnO0jmWmrjuYL4nIV1tTw5dqkPWB/IEX4LCQ==
   dependencies:
     "@babel/runtime" "^7.2.0"
     deepmerge "^4.0.0"
@@ -1119,10 +1119,10 @@
   resolved "https://registry.yarnpkg.com/@redux-requests/promise/-/promise-1.0.2.tgz#3c3eb5d357d0c6075e7802c366a7d99854298f65"
   integrity sha512-qReb0NWlOQ6njImNI26Hg5zQRWRM8G71xTe3K4GuCH/HTpFxp1khAUVJdiYmbOaVKkSIS2hPuBj+I8u18HFUEw==
 
-"@redux-requests/react@1.4.1":
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/@redux-requests/react/-/react-1.4.1.tgz#1bcc27362c22eff8de8293117ebb4452db3541f7"
-  integrity sha512-ihL4BmWgT+jbmadHE4anoh8+KfS8GU2LNJ1j2GDff4b7sCYvrILpDoIB3WiG6H0UOVFJdHah0NIBEkan04e6uw==
+"@redux-requests/react@1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@redux-requests/react/-/react-1.5.0.tgz#67af5da79e2a6551dc78a5037e2a9891b0cccbe6"
+  integrity sha512-OrajLvRkpRqb8L9Dgdo+NFF11JFyOdN9SFz3lP7nWbldBc+yrkVamS/c6Q1tzGKu6ieOX2572NamK5KTdmlb2Q==
   dependencies:
     prop-types "^15.5.7"
     react-is ">=16.13.1"
@@ -2874,6 +2874,13 @@ express-handlebars@5.2.0:
     glob "^7.1.6"
     graceful-fs "^4.2.4"
     handlebars "^4.7.6"
+
+express-ws@4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/express-ws/-/express-ws-4.0.0.tgz#dabd8dc974516418902a41fe6e30ed949b4d36c4"
+  integrity sha512-KEyUw8AwRET2iFjFsI1EJQrJ/fHeGiJtgpYgEWG3yDv4l/To/m3a2GaYfeGyB3lsWdvbesjF5XCMx+SVBgAAYw==
+  dependencies:
+    ws "^5.2.0"
 
 express@4.17.1, express@^4.17.1:
   version "4.17.1"
