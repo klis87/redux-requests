@@ -1,4 +1,5 @@
 import { RESET_REQUESTS } from '../constants';
+import { mapObject } from '../helpers';
 
 const getRequestTypeString = requestType =>
   typeof requestType === 'function' ? requestType.toString() : requestType;
@@ -28,18 +29,6 @@ const resetMutation = mutation =>
         ...mutation,
         error: null,
       };
-
-const mapObject = (obj, callback) =>
-  Object.entries(obj).reduce((prev, [k, v]) => {
-    const newValue = callback(k, v);
-
-    if (newValue === undefined) {
-      return prev;
-    }
-
-    prev[k] = newValue;
-    return prev;
-  }, {});
 
 // TODO: probably move a cache module
 const isCacheValid = (cache, action) =>

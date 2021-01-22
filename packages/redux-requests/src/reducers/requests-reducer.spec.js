@@ -15,6 +15,7 @@ describe('reducers', () => {
         uploadProgress: {},
         ssr: null,
         watchers: {},
+        websocket: { pristine: true, connected: false },
       });
     });
 

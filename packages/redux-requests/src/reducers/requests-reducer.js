@@ -9,6 +9,7 @@ import progressReducer from './progress-reducer';
 import requestsResetReducer from './requests-reset-reducer';
 import ssrReducer from './ssr-reducer';
 import watchersReducer from './watchers-reducer';
+import websocketReducer from './websocket-reducer';
 
 const defaultState = {
   queries: {},
@@ -19,6 +20,7 @@ const defaultState = {
   uploadProgress: {},
   requestsKeys: {},
   watchers: {},
+  websocket: { pristine: true, connected: false },
 };
 
 export default (config = defaultConfig) => (state = defaultState, action) => {
@@ -65,5 +67,6 @@ export default (config = defaultConfig) => (state = defaultState, action) => {
     normalizedData,
     ssr: config.ssr ? ssrReducer(state.ssr, action, config) : null,
     watchers: watchersReducer(state.watchers, action, config),
+    websocket: websocketReducer(state.websocket, action, config),
   };
 };

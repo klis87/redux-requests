@@ -11,6 +11,9 @@ import {
   REMOVE_WATCHER,
   JOIN_REQUEST,
   STOP_POLLING,
+  WEBSOCKET_OPENED,
+  WEBSOCKET_CLOSED,
+  GET_WEBSOCKET,
 } from './constants';
 
 const getActionWithSuffix = suffix => actionType => actionType + suffix;
@@ -164,3 +167,9 @@ export const joinRequest = (requestType, rehydrate = false) => ({
   requestType,
   rehydrate,
 });
+
+export const websocketOpened = () => ({ type: WEBSOCKET_OPENED });
+
+export const websocketClosed = () => ({ type: WEBSOCKET_CLOSED });
+
+export const getWebsocket = () => ({ type: GET_WEBSOCKET });
