@@ -14,6 +14,7 @@ import {
   WEBSOCKET_OPENED,
   WEBSOCKET_CLOSED,
   GET_WEBSOCKET,
+  STOP_SUBSCRIPTIONS,
 } from './constants';
 
 const getActionWithSuffix = suffix => actionType => actionType + suffix;
@@ -173,3 +174,8 @@ export const websocketOpened = () => ({ type: WEBSOCKET_OPENED });
 export const websocketClosed = () => ({ type: WEBSOCKET_CLOSED });
 
 export const getWebsocket = () => ({ type: GET_WEBSOCKET });
+
+export const stopSubscriptions = (subscriptions = null) => ({
+  type: STOP_SUBSCRIPTIONS,
+  subscriptions,
+});

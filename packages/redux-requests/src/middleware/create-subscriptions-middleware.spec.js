@@ -59,8 +59,10 @@ describe('middleware', () => {
     it('doesnt do anything for not subscription requests', () => {
       const mockStore = configureStore([
         createSubscriptionsMiddleware({
-          WS: DummyWebsocket,
-          url: 'ws://localhost:1234',
+          subscriber: {
+            WS: DummyWebsocket,
+            url: 'ws://localhost:1234',
+          },
         }),
       ]);
       const store = mockStore({});
@@ -72,8 +74,10 @@ describe('middleware', () => {
     it('dispatches websocketOpened on opened', () => {
       const mockStore = configureStore([
         createSubscriptionsMiddleware({
-          WS: DummyWebsocket,
-          url: 'ws://localhost:1234',
+          subscriber: {
+            WS: DummyWebsocket,
+            url: 'ws://localhost:1234',
+          },
         }),
       ]);
       const store = mockStore({});
@@ -85,8 +89,10 @@ describe('middleware', () => {
     it('dispatches websocketClosed on error', () => {
       const mockStore = configureStore([
         createSubscriptionsMiddleware({
-          WS: DummyWebsocket,
-          url: 'ws://localhost:1234',
+          subscriber: {
+            WS: DummyWebsocket,
+            url: 'ws://localhost:1234',
+          },
         }),
       ]);
       const store = mockStore({});
@@ -98,8 +104,10 @@ describe('middleware', () => {
     it('dispatches websocketOpened and websocketClosed on open and close', () => {
       const mockStore = configureStore([
         createSubscriptionsMiddleware({
-          WS: DummyWebsocket,
-          url: 'ws://localhost:1234',
+          subscriber: {
+            WS: DummyWebsocket,
+            url: 'ws://localhost:1234',
+          },
         }),
       ]);
       const store = mockStore({});
@@ -115,8 +123,10 @@ describe('middleware', () => {
     it('doesnt do anything in meta onMessage if no subscription', () => {
       const mockStore = configureStore([
         createSubscriptionsMiddleware({
-          WS: DummyWebsocket,
-          url: 'ws://localhost:1234',
+          subscriber: {
+            WS: DummyWebsocket,
+            url: 'ws://localhost:1234',
+          },
         }),
       ]);
       const store = mockStore({});
@@ -128,8 +138,10 @@ describe('middleware', () => {
     it('doesnt do anything when no matching subscription', () => {
       const mockStore = configureStore([
         createSubscriptionsMiddleware({
-          WS: DummyWebsocket,
-          url: 'ws://localhost:1234',
+          subscriber: {
+            WS: DummyWebsocket,
+            url: 'ws://localhost:1234',
+          },
         }),
       ]);
       const store = mockStore({});
@@ -153,8 +165,10 @@ describe('middleware', () => {
     it('calls meta onMessage for active subscription', () => {
       const mockStore = configureStore([
         createSubscriptionsMiddleware({
-          WS: DummyWebsocket,
-          url: 'ws://localhost:1234',
+          subscriber: {
+            WS: DummyWebsocket,
+            url: 'ws://localhost:1234',
+          },
         }),
       ]);
       const store = mockStore({});
@@ -187,8 +201,10 @@ describe('middleware', () => {
     it('transforms data with meta getData', () => {
       const mockStore = configureStore([
         createSubscriptionsMiddleware({
-          WS: DummyWebsocket,
-          url: 'ws://localhost:1234',
+          subscriber: {
+            WS: DummyWebsocket,
+            url: 'ws://localhost:1234',
+          },
         }),
       ]);
       const store = mockStore({});
@@ -219,8 +235,10 @@ describe('middleware', () => {
     it('dispatches mutations for received subscription messages', () => {
       const mockStore = configureStore([
         createSubscriptionsMiddleware({
-          WS: DummyWebsocket,
-          url: 'ws://localhost:1234',
+          subscriber: {
+            WS: DummyWebsocket,
+            url: 'ws://localhost:1234',
+          },
         }),
       ]);
       const store = mockStore({});
@@ -259,8 +277,10 @@ describe('middleware', () => {
     it('sends message to server if defined in subscription action', () => {
       const mockStore = configureStore([
         createSubscriptionsMiddleware({
-          WS: DummyWebsocket,
-          url: 'ws://localhost:1234',
+          subscriber: {
+            WS: DummyWebsocket,
+            url: 'ws://localhost:1234',
+          },
         }),
       ]);
       const store = mockStore({});

@@ -29,7 +29,9 @@ const handleRequests = userConfig => {
   return {
     requestsReducer: requestsReducer(config),
     requestsMiddleware: [
-      config.ssr !== 'server' && createSubscriptionsMiddleware(config),
+      config.ssr !== 'server' &&
+        config.subscriber &&
+        createSubscriptionsMiddleware(config),
       config.ssr !== 'server' && createPollingMiddleware(config),
       config.ssr === 'server' &&
         !config.disableRequestsPromise &&

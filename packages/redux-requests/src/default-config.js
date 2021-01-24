@@ -15,4 +15,5 @@ export default {
   normalize: false,
   getNormalisationObjectKey: obj => obj.id,
   shouldObjectBeNormalized: obj => obj.id !== undefined,
+  subscriber: null,
 };

@@ -12,6 +12,7 @@ export {
   addWatcher,
   removeWatcher,
   joinRequest,
+  stopSubscriptions,
 } from './actions';
 export { default as handleRequests } from './handle-requests';
 export {

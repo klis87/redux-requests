@@ -1,6 +1,6 @@
 import { mapObject } from '../helpers';
 import { websocketOpened, websocketClosed } from '../actions';
-import { GET_WEBSOCKET } from '../constants';
+import { GET_WEBSOCKET, STOP_SUBSCRIPTIONS } from '../constants';
 
 // probably do this on subscription save
 const transformIntoLocalMutation = (
@@ -27,33 +27,82 @@ const transformIntoLocalMutation = (
   };
 };
 
-export default ({ WS, url }) => {
+const getDefaultWebSocket = () =>
+  typeof WebSocket === 'undefined' ? undefined : WebSocket;
+
+export default ({
+  subscriber: {
+    WS = getDefaultWebSocket(),
+    url,
+    protocols,
+    onOpen,
+    onClose,
+    onError,
+    onMessage,
+    onSend,
+    activateOn,
+    getData,
+    onStopSubscriptions,
+  } = {},
+}) => {
   let subscriptions = {};
   let ws;
+  let active = false;
 
   return store => next => action => {
-    if (!ws) {
-      ws = new WS(url);
+    if (!ws && WS && url) {
+      ws = new WS(url, protocols);
 
       ws.addEventListener('open', () => {
-        store.dispatch(websocketOpened());
+        if (!activateOn) {
+          store.dispatch(websocketOpened());
+          active = true;
+        }
+
+        if (onOpen) {
+          onOpen(store, ws);
+        }
       });
 
-      ws.addEventListener('error', () => {
+      ws.addEventListener('error', e => {
         store.dispatch(websocketClosed());
+        active = false;
+
+        if (onError) {
+          onError(e, store, ws);
+        }
       });
 
-      ws.addEventListener('close', () => {
+      ws.addEventListener('close', e => {
         store.dispatch(websocketClosed());
+        active = false;
+
+        if (onClose) {
+          onClose(store, ws);
+        }
       });
 
       ws.addEventListener('message', message => {
+        if (!active && activateOn && activateOn(message)) {
+          store.dispatch(websocketOpened());
+          active = true;
+        }
+
         let data = JSON.parse(message.data);
+
+        if (getData) {
+          data = getData(data);
+        }
+
         const subscription = subscriptions[data.type];
 
         if (subscription) {
           if (subscription.meta?.getData) {
             data = subscription.meta.getData(data);
+          }
+
+          if (onMessage) {
+            onMessage(data, message, store);
           }
 
           if (subscription.meta?.onMessage) {
@@ -73,17 +122,40 @@ export default ({ WS, url }) => {
       return ws;
     }
 
-    if (action.subscription !== undefined) {
+    if (action.type === STOP_SUBSCRIPTIONS) {
+      if (!action.subscriptions) {
+        if (onStopSubscriptions) {
+          onStopSubscriptions(Object.keys(subscriptions), action, ws, store);
+        }
+
+        subscriptions = {};
+      } else {
+        if (onStopSubscriptions) {
+          onStopSubscriptions(action.subscriptions, action, ws, store);
+        }
+
+        subscriptions = mapObject(subscriptions, (k, v) =>
+          action.subscriptions.includes(k) ? undefined : v,
+        );
+      }
+    } else if (action.subscription !== undefined) {
       if (
         action.meta?.onMessage ||
         action.meta?.mutations ||
         action.meta?.normalize
       ) {
-        subscriptions = { ...subscriptions, [action.type]: action };
+        subscriptions = {
+          ...subscriptions,
+          [action.type + (action.meta.requestKey || '')]: action,
+        };
       }
 
       if (action.subscription) {
-        ws.send(JSON.stringify(action.subscription));
+        ws.send(
+          JSON.stringify(
+            onSend ? onSend(action.subscription, action) : action.subscription,
+          ),
+        );
       }
     }
 
