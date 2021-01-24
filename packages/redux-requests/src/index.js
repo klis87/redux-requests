@@ -20,5 +20,6 @@ export {
   getMutation,
   getQuerySelector,
   getMutationSelector,
+  getWebsocketState,
 } from './selectors';
 export { createRequestsStore } from './middleware';

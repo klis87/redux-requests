@@ -78,7 +78,7 @@ export default ({
         active = false;
 
         if (onClose) {
-          onClose(store, ws);
+          onClose(e, store, ws);
         }
       });
 
