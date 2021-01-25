@@ -94,15 +94,15 @@ export default ({
           data = getData(data);
         }
 
+        if (onMessage) {
+          onMessage(data, message, store);
+        }
+
         const subscription = subscriptions[data.type];
 
         if (subscription) {
           if (subscription.meta?.getData) {
             data = subscription.meta.getData(data);
-          }
-
-          if (onMessage) {
-            onMessage(data, message, store);
           }
 
           if (subscription.meta?.onMessage) {
