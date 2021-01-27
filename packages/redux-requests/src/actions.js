@@ -14,6 +14,8 @@ import {
   WEBSOCKET_OPENED,
   WEBSOCKET_CLOSED,
   GET_WEBSOCKET,
+  OPEN_WEBSOCKET,
+  CLOSE_WEBSOCKET,
   STOP_SUBSCRIPTIONS,
 } from './constants';
 
@@ -174,6 +176,13 @@ export const websocketOpened = () => ({ type: WEBSOCKET_OPENED });
 export const websocketClosed = () => ({ type: WEBSOCKET_CLOSED });
 
 export const getWebsocket = () => ({ type: GET_WEBSOCKET });
+
+export const openWebsocket = (props = null) => ({
+  type: OPEN_WEBSOCKET,
+  props,
+});
+
+export const closeWebsocket = () => ({ type: CLOSE_WEBSOCKET });
 
 export const stopSubscriptions = (subscriptions = null) => ({
   type: STOP_SUBSCRIPTIONS,

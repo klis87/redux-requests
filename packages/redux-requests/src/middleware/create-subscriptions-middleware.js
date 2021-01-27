@@ -1,6 +1,11 @@
 import { mapObject } from '../helpers';
 import { websocketOpened, websocketClosed } from '../actions';
-import { GET_WEBSOCKET, STOP_SUBSCRIPTIONS } from '../constants';
+import {
+  GET_WEBSOCKET,
+  STOP_SUBSCRIPTIONS,
+  OPEN_WEBSOCKET,
+  CLOSE_WEBSOCKET,
+} from '../constants';
 
 // probably do this on subscription save
 const transformIntoLocalMutation = (
@@ -43,6 +48,7 @@ export default ({
     activateOn,
     getData,
     onStopSubscriptions,
+    lazy = false,
   } = {},
 }) => {
   let subscriptions = {};
@@ -50,7 +56,11 @@ export default ({
   let active = false;
 
   return store => next => action => {
-    if (!ws && WS && url) {
+    if ((!ws && WS && url && !lazy) || action.type === OPEN_WEBSOCKET) {
+      if (ws) {
+        ws.close();
+      }
+
       ws = new WS(url, protocols);
 
       ws.addEventListener('open', () => {
@@ -60,7 +70,11 @@ export default ({
         }
 
         if (onOpen) {
-          onOpen(store, ws);
+          onOpen(
+            store,
+            ws,
+            action.type === OPEN_WEBSOCKET ? action.props : null,
+          );
         }
       });
 
@@ -122,7 +136,9 @@ export default ({
       return ws;
     }
 
-    if (action.type === STOP_SUBSCRIPTIONS) {
+    if (ws && action.type === CLOSE_WEBSOCKET) {
+      ws.close();
+    } else if (action.type === STOP_SUBSCRIPTIONS) {
       if (!action.subscriptions) {
         if (onStopSubscriptions) {
           onStopSubscriptions(Object.keys(subscriptions), action, ws, store);
@@ -150,7 +166,7 @@ export default ({
         };
       }
 
-      if (action.subscription) {
+      if (action.subscription && ws) {
         ws.send(
           JSON.stringify(
             onSend ? onSend(action.subscription, action) : action.subscription,

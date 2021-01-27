@@ -13,6 +13,8 @@ export {
   removeWatcher,
   joinRequest,
   stopSubscriptions,
+  openWebsocket,
+  closeWebsocket,
 } from './actions';
 export { default as handleRequests } from './handle-requests';
 export {
