@@ -5,9 +5,9 @@ import {
   STOP_SUBSCRIPTIONS,
   OPEN_WEBSOCKET,
   CLOSE_WEBSOCKET,
+  WEBSOCKET_OPENED,
 } from '../constants';
 
-// probably do this on subscription save
 const transformIntoLocalMutation = (
   subscriptionAction,
   subscriptionData,
@@ -138,6 +138,18 @@ export default ({
 
     if (ws && action.type === CLOSE_WEBSOCKET) {
       ws.close();
+    } else if (action.type === WEBSOCKET_OPENED) {
+      Object.values(subscriptions).forEach(subscriptionAction => {
+        if (subscriptionAction.subscription) {
+          ws.send(
+            JSON.stringify(
+              onSend
+                ? onSend(subscriptionAction.subscription, subscriptionAction)
+                : subscriptionAction.subscription,
+            ),
+          );
+        }
+      });
     } else if (action.type === STOP_SUBSCRIPTIONS) {
       if (!action.subscriptions) {
         if (onStopSubscriptions) {
