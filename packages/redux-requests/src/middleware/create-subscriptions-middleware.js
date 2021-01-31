@@ -39,6 +39,88 @@ const transformIntoLocalMutation = (
   };
 };
 
+/*
+This wrapper is implemented to always call onClose when ws,close(1000) is called.
+Sometimes onClose is not called at all in native implementation on network disconnection, sometimes it is called later.
+Above makes things unpredictable.
+Also it cleans all attached event handlers.
+*/
+class CleanableWebsocket {
+  constructor(url, protocols, WS) {
+    this.ws = new WS(url, protocols);
+    this.onError = null;
+    this.onOpen = null;
+    this.onClose = null;
+    this.onMessage = null;
+    this.killed = false;
+    this.sentMessages = this.ws.sentMessages;
+  }
+
+  addEventListener(type, callback) {
+    if (type === 'error') {
+      this.onError = callback;
+    } else if (type === 'close') {
+      // we make sure onClose could be called only once
+      this.onClose = e => {
+        if (!this.killed) {
+          this.killed = true;
+          callback(e);
+          this.removeAllListeners();
+        }
+      };
+    } else if (type === 'open') {
+      this.onOpen = callback;
+    } else if (type === 'message') {
+      this.onMessage = callback;
+    }
+
+    this.ws.addEventListener(type, type === 'close' ? this.onClose : callback);
+  }
+
+  removeAllListeners() {
+    if (this.onError) {
+      this.ws.removeEventListener('error', this.onError);
+    }
+
+    if (this.onMessage) {
+      this.ws.removeEventListener('message', this.onMessage);
+    }
+
+    if (this.onOpen) {
+      this.ws.removeEventListener('open', this.onOpen);
+    }
+
+    if (this.onClose) {
+      this.ws.removeEventListener('close', this.onClose);
+    }
+  }
+
+  close(code) {
+    // for ws.close() we call onClose manually, to force this call always immediately
+    if (this.onClose) {
+      this.onClose({ code });
+    }
+
+    this.ws.close(code);
+  }
+
+  send(message) {
+    this.ws.send(message);
+  }
+
+  sendToClient(message) {
+    this.ws.sendToClient(message);
+  }
+
+  open() {
+    this.ws.open();
+  }
+
+  error(e) {
+    this.ws.error(e);
+  }
+}
+
 const getDefaultWebSocket = () =>
   typeof WebSocket === 'undefined' ? undefined : WebSocket;
 
@@ -92,15 +174,12 @@ export default ({
       clearLastHeartbeatTimeout();
 
       if (ws) {
-        console.log('closing ws in open');
         ws.close(1000);
       }
 
-      ws = new WS(url, protocols);
+      ws = new CleanableWebsocket(url, protocols, WS);
 
       ws.addEventListener('open', () => {
-        console.log('opening ws');
-
         if (!activateOn) {
           store.dispatch(websocketOpened());
           active = true;
@@ -118,8 +197,7 @@ export default ({
           clearLastHeartbeatTimeout();
 
           lastHeartbeatTimeout = setTimeout(() => {
-            store.dispatch(closeWebsocket());
-            store.dispatch(lastOpenWebsocketAction ? action : openWebsocket());
+            store.dispatch(closeWebsocket(3000));
           }, heartbeatTimeout * 1000);
         }
       });
@@ -132,16 +210,14 @@ export default ({
       });
 
       ws.addEventListener('close', e => {
-        console.log('close ws', e, e.code);
-        store.dispatch(websocketClosed());
+        store.dispatch(websocketClosed(e.code));
         active = false;
+        clearLastReconnectTimeout();
+        clearLastHeartbeatTimeout();
 
         if (onClose) {
           onClose(e, store, ws);
         }
-
-        clearLastReconnectTimeout();
-        clearLastHeartbeatTimeout();
 
         if (e.code !== 1000 && reconnectTimeout) {
           lastReconnectTimeout = setTimeout(() => {
@@ -151,8 +227,6 @@ export default ({
       });
 
       ws.addEventListener('message', message => {
-        console.log('message ws', message);
-
         if (!active && activateOn && activateOn(message)) {
           store.dispatch(websocketOpened());
           active = true;
@@ -162,8 +236,7 @@ export default ({
           clearLastHeartbeatTimeout();
 
           lastHeartbeatTimeout = setTimeout(() => {
-            store.dispatch(closeWebsocket());
-            store.dispatch(lastOpenWebsocketAction ? action : openWebsocket());
+            store.dispatch(closeWebsocket(3000));
           }, heartbeatTimeout * 1000);
         }
 
@@ -202,13 +275,12 @@ export default ({
     }
 
     if (ws && action.type === CLOSE_WEBSOCKET) {
-      console.log('closing ws due to CLOSE_WEBSOCKET', action);
-
       clearLastReconnectTimeout();
       clearLastHeartbeatTimeout();
-      ws.close(1000);
-      console.log('after calling close');
+      const response = next(action);
+      ws.close(action.code);
       ws = null;
+      return response;
     } else if (action.type === WEBSOCKET_OPENED) {
       Object.values(subscriptions).forEach(subscriptionAction => {
         if (subscriptionAction.subscription) {

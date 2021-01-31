@@ -173,7 +173,7 @@ export const joinRequest = (requestType, rehydrate = false) => ({
 
 export const websocketOpened = () => ({ type: WEBSOCKET_OPENED });
 
-export const websocketClosed = () => ({ type: WEBSOCKET_CLOSED });
+export const websocketClosed = code => ({ type: WEBSOCKET_CLOSED, code });
 
 export const getWebsocket = () => ({ type: GET_WEBSOCKET });
 
@@ -182,8 +182,9 @@ export const openWebsocket = (props = null) => ({
   props,
 });
 
-export const closeWebsocket = () => ({
+export const closeWebsocket = (code = 1000) => ({
   type: CLOSE_WEBSOCKET,
+  code,
 });
 
 export const stopSubscriptions = (subscriptions = null) => ({

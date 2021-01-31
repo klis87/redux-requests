@@ -25,6 +25,10 @@ class DummyWebsocket {
     }
   }
 
+  removeEventListener() {
+    // not to break tests
+  }
+
   open() {
     if (this.onOpen) {
       this.onOpen();
@@ -84,21 +88,6 @@ describe('middleware', () => {
       const ws = store.dispatch(getWebsocket());
       ws.open();
       expect(store.getActions()).toEqual([websocketOpened()]);
-    });
-
-    it('dispatches websocketClosed on error', () => {
-      const mockStore = configureStore([
-        createSubscriptionsMiddleware({
-          subscriber: {
-            WS: DummyWebsocket,
-            url: 'ws://localhost:1234',
-          },
-        }),
-      ]);
-      const store = mockStore({});
-      const ws = store.dispatch(getWebsocket());
-      ws.error();
-      expect(store.getActions()).toEqual([websocketClosed()]);
     });
 
     it('dispatches websocketOpened and websocketClosed on open and close', () => {

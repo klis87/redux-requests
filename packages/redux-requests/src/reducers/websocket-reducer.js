@@ -14,7 +14,7 @@ export default (state, action, config) => {
 
   if (action.type === WEBSOCKET_CLOSED) {
     return {
-      pristine: false,
+      pristine: action.code === 1000,
       connected: false,
     };
   }
