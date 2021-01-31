@@ -208,7 +208,6 @@ export default ({
       });
 
       ws.addEventListener('error', e => {
-        console.log('error ws');
         if (onError) {
           onError(e, store, ws);
         }
