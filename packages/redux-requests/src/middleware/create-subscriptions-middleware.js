@@ -13,16 +13,20 @@ import {
   WEBSOCKET_OPENED,
 } from '../constants';
 
-// normalize from global config default
+const shouldBeNormalized = (action, globalNormalize) =>
+  action.meta?.normalize !== undefined
+    ? action.meta.normalize
+    : globalNormalize;
 
 const transformIntoLocalMutation = (
   subscriptionAction,
   subscriptionData,
   message,
+  globalNormalize,
 ) => {
   const meta = {};
 
-  if (subscriptionAction.meta.normalize) {
+  if (shouldBeNormalized(subscriptionAction, globalNormalize)) {
     meta.localData = subscriptionData;
   }
 
@@ -125,6 +129,7 @@ const getDefaultWebSocket = () =>
   typeof WebSocket === 'undefined' ? undefined : WebSocket;
 
 export default ({
+  normalize = false,
   subscriber: {
     WS = getDefaultWebSocket(),
     url,
@@ -261,9 +266,17 @@ export default ({
             subscription.meta.onMessage(data, message, store);
           }
 
-          if (subscription.meta?.mutations || subscription.meta?.normalize) {
+          if (
+            subscription.meta?.mutations ||
+            shouldBeNormalized(subscription, normalize)
+          ) {
             store.dispatch(
-              transformIntoLocalMutation(subscription, data, message),
+              transformIntoLocalMutation(
+                subscription,
+                data,
+                message,
+                normalize,
+              ),
             );
           }
         }
@@ -313,7 +326,7 @@ export default ({
       if (
         action.meta?.onMessage ||
         action.meta?.mutations ||
-        action.meta?.normalize
+        shouldBeNormalized(action, normalize)
       ) {
         subscriptions = {
           ...subscriptions,
