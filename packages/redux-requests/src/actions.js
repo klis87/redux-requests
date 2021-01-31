@@ -182,7 +182,9 @@ export const openWebsocket = (props = null) => ({
   props,
 });
 
-export const closeWebsocket = () => ({ type: CLOSE_WEBSOCKET });
+export const closeWebsocket = () => ({
+  type: CLOSE_WEBSOCKET,
+});
 
 export const stopSubscriptions = (subscriptions = null) => ({
   type: STOP_SUBSCRIPTIONS,

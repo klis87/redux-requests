@@ -1,5 +1,10 @@
 import { mapObject } from '../helpers';
-import { websocketOpened, websocketClosed } from '../actions';
+import {
+  websocketOpened,
+  websocketClosed,
+  openWebsocket,
+  closeWebsocket,
+} from '../actions';
 import {
   GET_WEBSOCKET,
   STOP_SUBSCRIPTIONS,
@@ -7,6 +12,8 @@ import {
   CLOSE_WEBSOCKET,
   WEBSOCKET_OPENED,
 } from '../constants';
+
+// normalize from global config default
 
 const transformIntoLocalMutation = (
   subscriptionAction,
@@ -49,21 +56,51 @@ export default ({
     getData,
     onStopSubscriptions,
     lazy = false,
+    isHeartbeatMessage,
+    heartbeatTimeout = 20,
+    reconnectTimeout = 5,
   } = {},
 }) => {
   let subscriptions = {};
   let ws;
   let active = false;
+  let lastHeartbeatTimeout = null;
+  let lastReconnectTimeout = null;
+  let lastOpenWebsocketAction = null;
+
+  const clearLastReconnectTimeout = () => {
+    if (lastReconnectTimeout) {
+      clearTimeout(lastReconnectTimeout);
+      lastReconnectTimeout = null;
+    }
+  };
+
+  const clearLastHeartbeatTimeout = () => {
+    if (lastHeartbeatTimeout) {
+      clearTimeout(lastHeartbeatTimeout);
+      lastHeartbeatTimeout = null;
+    }
+  };
 
   return store => next => action => {
+    if (action.type === OPEN_WEBSOCKET) {
+      lastOpenWebsocketAction = action;
+    }
+
     if ((!ws && WS && url && !lazy) || action.type === OPEN_WEBSOCKET) {
+      clearLastReconnectTimeout();
+      clearLastHeartbeatTimeout();
+
       if (ws) {
-        ws.close();
+        console.log('closing ws in open');
+        ws.close(1000);
       }
 
       ws = new WS(url, protocols);
 
       ws.addEventListener('open', () => {
+        console.log('opening ws');
+
         if (!activateOn) {
           store.dispatch(websocketOpened());
           active = true;
@@ -76,30 +113,58 @@ export default ({
             action.type === OPEN_WEBSOCKET ? action.props : null,
           );
         }
+
+        if (isHeartbeatMessage) {
+          clearLastHeartbeatTimeout();
+
+          lastHeartbeatTimeout = setTimeout(() => {
+            store.dispatch(closeWebsocket());
+            store.dispatch(lastOpenWebsocketAction ? action : openWebsocket());
+          }, heartbeatTimeout * 1000);
+        }
       });
 
       ws.addEventListener('error', e => {
-        store.dispatch(websocketClosed());
-        active = false;
-
+        console.log('error ws');
         if (onError) {
           onError(e, store, ws);
         }
       });
 
       ws.addEventListener('close', e => {
+        console.log('close ws', e, e.code);
         store.dispatch(websocketClosed());
         active = false;
 
         if (onClose) {
           onClose(e, store, ws);
         }
+
+        clearLastReconnectTimeout();
+        clearLastHeartbeatTimeout();
+
+        if (e.code !== 1000 && reconnectTimeout) {
+          lastReconnectTimeout = setTimeout(() => {
+            store.dispatch(lastOpenWebsocketAction ? action : openWebsocket());
+          }, reconnectTimeout * 1000);
+        }
       });
 
       ws.addEventListener('message', message => {
+        console.log('message ws', message);
+
         if (!active && activateOn && activateOn(message)) {
           store.dispatch(websocketOpened());
           active = true;
+        }
+
+        if (isHeartbeatMessage && isHeartbeatMessage(message)) {
+          clearLastHeartbeatTimeout();
+
+          lastHeartbeatTimeout = setTimeout(() => {
+            store.dispatch(closeWebsocket());
+            store.dispatch(lastOpenWebsocketAction ? action : openWebsocket());
+          }, heartbeatTimeout * 1000);
         }
 
         let data = JSON.parse(message.data);
@@ -137,7 +202,13 @@ export default ({
     }
 
     if (ws && action.type === CLOSE_WEBSOCKET) {
-      ws.close();
+      console.log('closing ws due to CLOSE_WEBSOCKET', action);
+
+      clearLastReconnectTimeout();
+      clearLastHeartbeatTimeout();
+      ws.close(1000);
+      console.log('after calling close');
+      ws = null;
     } else if (action.type === WEBSOCKET_OPENED) {
       Object.values(subscriptions).forEach(subscriptionAction => {
         if (subscriptionAction.subscription) {
