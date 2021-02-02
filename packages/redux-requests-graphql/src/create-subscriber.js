@@ -44,10 +44,15 @@ export const createSubscriber = ({
 
     return data;
   },
-  onStopSubscriptions: (stoppedSubscriptions, action, ws) =>
+  onStopSubscriptions: (stoppedSubscriptions, action, ws) => {
+    if (!ws) {
+      return;
+    }
+
     stoppedSubscriptions.forEach(subscription => {
       ws.send(JSON.stringify({ type: 'stop', id: subscription }));
-    }),
+    });
+  },
   onMessage: message => {
     if (
       (message.type === 'data' && message.payload && message.payload.errors) ||
