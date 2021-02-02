@@ -30,7 +30,7 @@ const transformIntoLocalMutation = (
     meta.localData = subscriptionData;
   }
 
-  if (subscriptionAction.meta.mutations) {
+  if (subscriptionAction.meta?.mutations) {
     meta.mutations = mapObject(subscriptionAction.meta.mutations, (k, v) => ({
       local: true,
       updateData: data => v(data, subscriptionData, message),
@@ -329,7 +329,7 @@ export default ({
       ) {
         subscriptions = {
           ...subscriptions,
-          [action.type + (action.meta.requestKey || '')]: action,
+          [action.type + (action.meta?.requestKey || '')]: action,
         };
       }
 
