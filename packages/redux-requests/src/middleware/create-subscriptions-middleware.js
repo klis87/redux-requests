@@ -13,6 +13,8 @@ import {
   WEBSOCKET_OPENED,
 } from '../constants';
 
+import createRequestsStore from './create-requests-store';
+
 const shouldBeNormalized = (action, globalNormalize) =>
   action.meta?.normalize !== undefined
     ? action.meta.normalize
@@ -175,6 +177,8 @@ export default ({
     }
 
     if ((!ws && WS && url && !lazy) || action.type === OPEN_WEBSOCKET) {
+      const requestsStore = createRequestsStore(store);
+
       clearLastReconnectTimeout();
       clearLastHeartbeatTimeout();
 
@@ -192,7 +196,7 @@ export default ({
 
         if (onOpen) {
           onOpen(
-            store,
+            requestsStore,
             ws,
             action.type === OPEN_WEBSOCKET ? action.props : null,
           );
@@ -209,7 +213,7 @@ export default ({
 
       ws.addEventListener('error', e => {
         if (onError) {
-          onError(e, store, ws);
+          onError(e, requestsStore, ws);
         }
       });
 
@@ -220,7 +224,7 @@ export default ({
         clearLastHeartbeatTimeout();
 
         if (onClose) {
-          onClose(e, store, ws);
+          onClose(e, requestsStore, ws);
         }
 
         if (e.code !== 1000 && reconnectTimeout) {
@@ -251,7 +255,7 @@ export default ({
         }
 
         if (onMessage) {
-          onMessage(data, message, store);
+          onMessage(data, message, requestsStore);
         }
 
         const subscription = subscriptions[data.type];
@@ -262,7 +266,7 @@ export default ({
           }
 
           if (subscription.meta?.onMessage) {
-            subscription.meta.onMessage(data, message, store);
+            subscription.meta.onMessage(data, message, requestsStore);
           }
 
           if (
@@ -306,15 +310,22 @@ export default ({
         }
       });
     } else if (action.type === STOP_SUBSCRIPTIONS) {
+      const requestsStore = createRequestsStore(store);
+
       if (!action.subscriptions) {
         if (onStopSubscriptions) {
-          onStopSubscriptions(Object.keys(subscriptions), action, ws, store);
+          onStopSubscriptions(
+            Object.keys(subscriptions),
+            action,
+            ws,
+            requestsStore,
+          );
         }
 
         subscriptions = {};
       } else {
         if (onStopSubscriptions) {
-          onStopSubscriptions(action.subscriptions, action, ws, store);
+          onStopSubscriptions(action.subscriptions, action, ws, requestsStore);
         }
 
         subscriptions = mapObject(subscriptions, (k, v) =>
