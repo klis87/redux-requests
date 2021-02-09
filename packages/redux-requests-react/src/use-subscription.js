@@ -35,14 +35,7 @@ const useSubscriptions = ({
       dispatchRequest(removeWatcher(key));
 
       if (!store.getState().requests.watchers[key]) {
-        dispatchRequest(
-          stopSubscriptions([
-            {
-              requestType: type,
-              requestKey,
-            },
-          ]),
-        );
+        dispatchRequest(stopSubscriptions([key]));
       }
     };
   }, [type, requestKey]);
