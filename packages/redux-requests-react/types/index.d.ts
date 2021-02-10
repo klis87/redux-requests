@@ -7,6 +7,7 @@ import {
   DispatchRequest,
   HandleRequestConfig,
   RequestsStore,
+  SubscriptionAction,
 } from '@redux-requests/core';
 
 interface LoadingProps {
@@ -62,6 +63,10 @@ export class Mutation extends React.Component<MutationProps> {}
 
 interface RequestCreator<QueryStateData = any> {
   (...args: any[]): RequestAction<any, QueryStateData>;
+}
+
+interface SubscriptionCreator {
+  (...args: any[]): SubscriptionAction;
 }
 
 type GetQueryStateData<T extends RequestCreator> = T extends RequestCreator<
@@ -120,6 +125,14 @@ export function useMutation<
     action: any;
   }>;
 };
+
+export function useSubscription<SC extends SubscriptionCreator = any>(props: {
+  type: string | SC;
+  action?: SC;
+  requestKey?: string;
+  variables?: Parameters<SC>;
+  active?: boolean;
+}): void;
 
 export function useDispatchRequest(): DispatchRequest;
 

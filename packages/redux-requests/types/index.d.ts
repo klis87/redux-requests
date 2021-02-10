@@ -102,6 +102,31 @@ export type LocalMutationAction = {
   };
 };
 
+interface SubscriptionActionMeta {
+  requestKey?: string;
+  normalize?: boolean;
+  mutations?: {
+    [actionType: string]: (data: any, message: any) => any;
+  };
+  getData?: (data: any) => any;
+  onMessage?: (data: any, message: any, store: RequestsStore) => void;
+  [extraProperty: string]: any;
+}
+
+export type SubscriptionAction =
+  | {
+      type?: string;
+      subscription: any;
+      meta?: SubscriptionActionMeta;
+    }
+  | {
+      type?: string;
+      payload: {
+        subscription: any;
+      };
+      meta?: SubscriptionActionMeta;
+    };
+
 type ResponseData<
   Request extends (...args: any[]) => RequestAction
 > = ReturnType<ReturnType<Request>['meta']['getData']>;
@@ -127,6 +152,29 @@ export interface Driver {
   ): Promise<any>;
 }
 
+export interface Subscriber {
+  url: string;
+  protocols?: string | string[];
+  WS?: any;
+  onOpen?: (store: RequestsStore, ws: any, props?: any) => void;
+  onClose?: (e: any, store: RequestsStore, ws: any) => void;
+  onError?: (e: any, store: RequestsStore, ws: any) => void;
+  onMessage?: (data: any, message: any, store: RequestsStore) => void;
+  onSend?: (message: any, action: AnyAction) => any;
+  activateOn?: (message: any) => boolean;
+  getData?: (data: any) => any;
+  onStopSubscriptions?: (
+    stoppedSubscriptions: string[],
+    action: AnyAction,
+    ws: any,
+    store: RequestsStore,
+  ) => void;
+  lazy?: boolean;
+  isHeartbeatMessage?: (message: any) => boolean;
+  heartbeatTimeout?: number;
+  reconnectTimeout?: number;
+}
+
 export interface HandleRequestConfig {
   driver: Driver | { default: Driver; [driverType: string]: Driver };
   onRequest?: (
@@ -150,6 +198,7 @@ export interface HandleRequestConfig {
   normalize?: boolean;
   getNormalisationObjectKey?: (obj: any) => string;
   shouldObjectBeNormalized?: (obj: any) => boolean;
+  subscriber?: Subscriber;
 }
 
 interface handleRequestsResponse {
@@ -192,6 +241,27 @@ export const stopPolling: (
 ) => {
   type: string;
   requests: (string | { requestType: string; requestKey: string })[];
+};
+
+export const openWebsocket: (
+  props?: any,
+) => {
+  type: string;
+  props: any;
+};
+
+export const closeWebsocket: (
+  code?: number,
+) => {
+  type: string;
+  code: string | null;
+};
+
+export const stopSubscriptions: (
+  subscriptions?: string[],
+) => {
+  type: string;
+  subscriptions?: string[] | null;
 };
 
 export const addWatcher: (
@@ -266,6 +336,8 @@ export function getMutationSelector(props: {
   type: string | ((...params: any[]) => RequestAction);
   requestKey?: string;
 }): (state: any) => MutationState;
+
+export function getWebsocketState(): { pristine: boolean; connected: boolean };
 
 export const isRequestAction: (action: AnyAction) => boolean;
 

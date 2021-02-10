@@ -1,6 +1,6 @@
 export const createSubscriber = ({
-  WS,
   url,
+  WS,
   lazy,
   heartbeatTimeout,
   reconnectTimeout,
