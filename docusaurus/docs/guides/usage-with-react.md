@@ -64,6 +64,7 @@ As you can see, `useQuery` hook is a convenient way to read query state, however
 
 Above can be configured with extra props:
 
+- `requestKey: string` - pass it if you used requestKey in the associated query
 - `autoLoad: boolean` - default `false`, if `true`, then query action will be dispatched on component mount automatically, also,
   query will be dispatched again on `type` or `requestKey` change, as well as on `variables` change, be aware that in order for this to work, you need to pass `variables` and `action` props (see below)
 - `variables` - required when `autoLoad` is `true` (or you want to use `load` callback) and your query action accepts variables, you need to pass them as array, for example
@@ -128,7 +129,8 @@ const Books = () => {
 
 Like in case of `useQuery`, `useMutation` also accepts some extra props:
 
-- `variables` - required when you want to use `mutate` callback) and your mutation action accepts variables, you need to pass them as array, for example
+- `requestKey: string` - pass it if you used requestKey in the associated mutation
+- `variables` - required when you want to use `mutate` callback and your mutation action accepts variables, you need to pass them as array, for example
   `variables={['firstVariable', 2, 'thirdVariable']}`
 - `action` - necessary if you want to use `mutate` callback and `type` is `string` (so you don't use Redux action creator library and you have constants)
 - `autoReset: boolean`: `false` by default, setting to `true` will reset mutation on component unmount, be adviced that nothing will be reset on unmount if there is any other active component with another `useMutation` of the same type
@@ -160,6 +162,28 @@ const Book = () => {
   // ...
 };
 ```
+
+### `useSubscription`
+
+`useSubscription` is a hook which automatically dispatches subscription actions. Also, on onmount, it automatically
+stop subscription. For example:
+
+```js
+import React from 'react';
+import { useSubscription } from '@redux-requests/react';
+
+const Books = () => {
+  useSubscription({ type: 'ON_BOOK_DELETION' });
+  // ...
+};
+```
+
+`useSubscription` also accepts some extra props:
+
+- `requestKey: string`: pass it if you used requestKey in the associated subscription
+- `variables` - required if your subscription action accepts some arguments
+- `action` - like in `useQuery` and `useMutation`, required if you pass `string` to `type` - that's it, you don't use action creator library, then you need to pass your subscription action here
+- `active: boolean`: `true` by default, setting to `false` will prevent subscription action to be dispatched
 
 ### `RequestsProvider`
 

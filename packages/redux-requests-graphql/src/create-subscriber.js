@@ -53,12 +53,12 @@ export const createSubscriber = ({
       ws.send(JSON.stringify({ type: 'stop', id: subscription }));
     });
   },
-  onMessage: message => {
+  onMessage: data => {
     if (
-      (message.type === 'data' && message.payload && message.payload.errors) ||
-      message.type === 'connection_error'
+      (data.type === 'data' && data.payload && data.payload.errors) ||
+      data.type === 'connection_error'
     ) {
-      Promise.reject(message);
+      Promise.reject(data);
     }
   },
 });

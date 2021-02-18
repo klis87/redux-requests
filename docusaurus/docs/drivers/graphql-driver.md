@@ -49,6 +49,10 @@ type Mutation {
   singleUpload(file: Upload!): File!
   multipleUpload(files: [Upload!]!): [File!]!
 }
+
+type Subscription {
+  onBookLiking(id: ID!): Book
+}
 ```
 
 To use this driver, just import it and pass to `handleRequests`, like you would do
@@ -167,6 +171,46 @@ const deleteBook = id => ({
     `,
     variables: { id },
   },
+});
+```
+
+## Subscriptions
+
+Again, just use subscription action structure and GraphQL language:
+
+```js
+const onBookLiking = id => ({
+  type: 'ON_BOOK_LIKING',
+  subscription: {
+    query: gql`
+      subscription($id: ID!) {
+        onBookLiking(id: $id) {
+          id
+          liked
+        }
+      }
+    `,
+    variables: { id },
+  },
+});
+```
+
+In order for this to work, it is needed to configure `subscriber` to be compatible with [Apollo Websocket Protocol](https://github.com/apollographql/subscriptions-transport-ws/blob/master/PROTOCOL.md). Here is how:
+
+```js
+import { handleRequests } from '@redux-requests/core';
+import { createDriver, createSubscriber } from '@redux-requests/graphql';
+
+handleRequests({
+  driver: createDriver({ url: 'http://localhost:3000/graphql' }),
+  subscriber: createSubscriber({
+    url: 'ws://localhost:3000/graphql',
+    lazy: true, // false by default
+    useHeartbeat: true, // pass true if you use apollo server heartbeats
+    heartbeatTimeout: 20, // 20 by default
+    reconnectTimeout: 5, // 5 by default
+    // WS: CustomWebsocketConstructor
+  }),
 });
 ```
 

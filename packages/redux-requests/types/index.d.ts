@@ -106,7 +106,11 @@ interface SubscriptionActionMeta {
   requestKey?: string;
   normalize?: boolean;
   mutations?: {
-    [actionType: string]: (data: any, message: any) => any;
+    [actionType: string]: (
+      data: any,
+      subscriptionData: any,
+      message: any,
+    ) => any;
   };
   getData?: (data: any) => any;
   onMessage?: (data: any, message: any, store: RequestsStore) => void;
