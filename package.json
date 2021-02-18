@@ -36,7 +36,7 @@
     },
     {
       "path": "./packages/redux-requests-graphql/dist/redux-requests-graphql.min.js",
-      "maxSize": "6 kB"
+      "maxSize": "7 kB"
     },
     {
       "path": "./packages/redux-requests-promise/dist/redux-requests-promise.min.js",
