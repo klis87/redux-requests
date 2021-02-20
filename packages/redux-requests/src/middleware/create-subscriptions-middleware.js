@@ -352,7 +352,7 @@ export default ({
 
       const actionPayload = getActionPayload(action);
 
-      if (actionPayload.subscription && ws) {
+      if (actionPayload.subscription && ws && active) {
         ws.send(
           JSON.stringify(
             onSend
