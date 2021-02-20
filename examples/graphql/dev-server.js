@@ -1,10 +1,14 @@
 require('@babel/polyfill');
+const { createServer } = require('http');
+
 const express = require('express');
 const webpack = require('webpack');
 const webpackDevMiddleware = require('webpack-dev-middleware');
-const { ApolloServer, gql } = require('apollo-server-express');
+const { ApolloServer, gql, PubSub } = require('apollo-server-express');
 
 const webpackConfig = require('./webpack.config');
+
+const pubsub = new PubSub();
 
 const app = express();
 
@@ -29,6 +33,8 @@ const books = [
   },
 ];
 
+let numberOfBookLikes = 0;
+
 const typeDefs = gql`
   type Book {
     id: ID!
@@ -46,6 +52,7 @@ const typeDefs = gql`
   type Query {
     books: [Book!]!
     book(id: ID!): Book
+    numberOfBookLikes: Int!
   }
 
   type Mutation {
@@ -55,14 +62,26 @@ const typeDefs = gql`
     singleUpload(file: Upload!): File!
     multipleUpload(files: [Upload!]!): [File!]!
   }
+
+  type Subscription {
+    onBookLiked: Int!
+  }
 `;
 
 const findBookById = id => books.find(book => book.id === id);
+
+const ON_BOOK_LIKED = 'ON_BOOK_LIKED';
 
 const resolvers = {
   Query: {
     books: () => books,
     book: (_, args) => findBookById(args.id),
+    numberOfBookLikes: () => numberOfBookLikes,
+  },
+  Subscription: {
+    onBookLiked: {
+      subscribe: () => pubsub.asyncIterator([ON_BOOK_LIKED]),
+    },
   },
   Mutation: {
     deleteBook: (_, args) => findBookById(args.id),
@@ -74,6 +93,8 @@ const resolvers = {
       }
 
       book.liked = true;
+      numberOfBookLikes += 1;
+      pubsub.publish(ON_BOOK_LIKED, { onBookLiked: numberOfBookLikes });
       return book;
     },
     unlikeBook: (_, args) => {
@@ -99,13 +120,32 @@ const resolvers = {
   },
 };
 
+// const sleep = () => new Promise(resolve => setTimeout(resolve, 50));
+
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  subscriptions: {
+    // onConnect: async connectionParams => {
+    //   if (connectionParams.token === 'pass') {
+    //     await sleep();
+
+    //     return {
+    //       currentUser: 'user',
+    //     };
+    //   }
+
+    //   throw new Error('Missing auth token!');
+    // },
+    keepAlive: 10000,
+  },
 });
 
-server.applyMiddleware({ app });
+server.applyMiddleware({ app, path: '/graphql' });
 
-app.listen(3000, () => {
+const httpServer = createServer(app);
+server.installSubscriptionHandlers(httpServer);
+
+httpServer.listen(3000, () => {
   console.log('Listening on port 3000!');
 });

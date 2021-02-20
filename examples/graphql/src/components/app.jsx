@@ -1,8 +1,15 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
-import { Query, Mutation } from '@redux-requests/react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getWebsocketState } from '@redux-requests/core';
+import {
+  Query,
+  Mutation,
+  useQuery,
+  useSubscription,
+} from '@redux-requests/react';
 
 import {
+  fetchNumberOfBookLikes,
   fetchBooks,
   fetchBook,
   deleteBook,
@@ -10,14 +17,17 @@ import {
   unlikeBook,
   uploadFile,
   uploadFiles,
+  onBookLiked,
 } from '../store/actions';
 import {
+  FETCH_NUMBER_OF_BOOK_LIKES,
   LIKE_BOOK,
   UNLIKE_BOOK,
   FETCH_BOOK,
   FETCH_BOOKS,
   UPLOAD_FILE,
   UPLOAD_FILES,
+  ON_BOOK_LIKED,
 } from '../store/constants';
 
 import Spinner from './spinner';
@@ -30,10 +40,26 @@ const RequestError = () => (
 
 const App = () => {
   const dispatch = useDispatch();
+  const websocketState = useSelector(getWebsocketState);
+  const { data } = useQuery({
+    type: FETCH_NUMBER_OF_BOOK_LIKES,
+    action: fetchNumberOfBookLikes,
+    autoLoad: true,
+  });
+
+  useSubscription({
+    type: ON_BOOK_LIKED,
+    action: onBookLiked,
+  });
 
   return (
     <div>
       <h1>Redux Requests GraphQL example</h1>
+      <div>
+        WS: {websocketState.connected ? 'connected' : 'disconnected'},{' '}
+        {websocketState.pristine ? 'pristine' : 'not pristine'}{' '}
+      </div>
+      {data && <div>Number of likes: {data.numberOfBookLikes}</div>}
       <p>
         In order to see aborts in action, you should set network throttling in
         your browser

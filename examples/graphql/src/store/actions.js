@@ -1,11 +1,13 @@
 import { gql } from '@redux-requests/graphql';
 
 import {
+  FETCH_NUMBER_OF_BOOK_LIKES,
   FETCH_BOOKS,
   FETCH_BOOK,
   DELETE_BOOK,
   LIKE_BOOK,
   UNLIKE_BOOK,
+  ON_BOOK_LIKED,
   UPLOAD_FILE,
   UPLOAD_FILES,
 } from './constants';
@@ -17,6 +19,17 @@ const bookFragment = gql`
     author
   }
 `;
+
+export const fetchNumberOfBookLikes = () => ({
+  type: FETCH_NUMBER_OF_BOOK_LIKES,
+  request: {
+    query: gql`
+      {
+        numberOfBookLikes
+      }
+    `,
+  },
+});
 
 export const fetchBooks = () => ({
   type: FETCH_BOOKS,
@@ -121,6 +134,24 @@ export const unlikeBook = id => ({
           ),
         }),
       },
+    },
+  },
+});
+
+export const onBookLiked = () => ({
+  type: ON_BOOK_LIKED,
+  subscription: {
+    query: gql`
+      subscription {
+        onBookLiked
+      }
+    `,
+  },
+  meta: {
+    mutations: {
+      [FETCH_NUMBER_OF_BOOK_LIKES]: (data, subscriptionData) => ({
+        numberOfBookLikes: subscriptionData.onBookLiked,
+      }),
     },
   },
 });

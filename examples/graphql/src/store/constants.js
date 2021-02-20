@@ -1,7 +1,9 @@
 export const FETCH_BOOKS = 'FETCH_BOOKS';
 export const FETCH_BOOK = 'FETCH_BOOK';
+export const FETCH_NUMBER_OF_BOOK_LIKES = 'FETCH_NUMBER_OF_BOOK_LIKES';
 export const DELETE_BOOK = 'DELETE_BOOK';
 export const LIKE_BOOK = 'LIKE_BOOK';
 export const UNLIKE_BOOK = 'UNLIKE_BOOK';
 export const UPLOAD_FILE = 'UPLOAD_FILE';
 export const UPLOAD_FILES = 'UPLOAD_FILES';
+export const ON_BOOK_LIKED = 'ON_BOOK_LIKED';

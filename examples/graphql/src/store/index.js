@@ -1,10 +1,18 @@
 import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
 import { handleRequests } from '@redux-requests/core';
-import { createDriver } from '@redux-requests/graphql';
+import { createDriver, createSubscriber } from '@redux-requests/graphql';
 
 export const configureStore = () => {
   const { requestsReducer, requestsMiddleware } = handleRequests({
-    driver: createDriver({ url: 'http://localhost:3000/graphql' }),
+    driver: createDriver({
+      url: 'http://localhost:3000/graphql',
+    }),
+    subscriber: createSubscriber({
+      url: 'ws://localhost:3000/graphql',
+      // lazy: false,
+      heartbeatTimeout: 12,
+      useHeartbeat: true,
+    }),
   });
 
   const reducers = combineReducers({
