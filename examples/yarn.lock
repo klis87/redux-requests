@@ -1086,10 +1086,10 @@
   resolved "https://registry.yarnpkg.com/@redux-requests/axios/-/axios-1.1.1.tgz#d3c6ad98c69511dc80f586893cbcd00d7dc464e4"
   integrity sha512-3eU+XkfvAk35iI2pCVzmA0BmWTtg5ODhOmpq12fKbi2RZy96gLZeu3Y7o0ks+QIqfcziStDTSEXGggdXK1EiUA==
 
-"@redux-requests/core@1.5.0":
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/@redux-requests/core/-/core-1.5.0.tgz#070aa952b903742a5235c09991e9b2243e7d5bfd"
-  integrity sha512-YHTwcUARel9FXBCZQZjVqPPqeFZW63y0DQdMge7qPlLeIscWiRgnO0jmWmrjuYL4nIV1tTw5dqkPWB/IEX4LCQ==
+"@redux-requests/core@1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@redux-requests/core/-/core-1.6.0.tgz#28cb03dce57a4f99650c55694bf1ebd374092f26"
+  integrity sha512-muP3ubQzGMHv1SOzSe869On6ISShywHd1xh3IGy84/DNvtwzkLbuF65ABS0O9por0w0/sprQkKy4BSlGI2FOPg==
   dependencies:
     "@babel/runtime" "^7.2.0"
     deepmerge "^4.0.0"
@@ -1101,10 +1101,10 @@
   dependencies:
     axios ">=0.16.0"
 
-"@redux-requests/graphql@1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@redux-requests/graphql/-/graphql-1.1.1.tgz#b5c2f6290c9ba52c10ff94a6562a5cada5703d5d"
-  integrity sha512-YoAVyG8llP6KVlMB1GXOTWkp5YSlluw2Z60aEms43XnLBvGgBrWeYsRXAROMqobbmf90SGTgSHOpBDhIj5VA0w==
+"@redux-requests/graphql@1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@redux-requests/graphql/-/graphql-1.2.0.tgz#7cc248b6c5835662664901b2330003893c4fb416"
+  integrity sha512-aQxPbEGurvYuCsdtpkduRKAPazr22KyKHE1rWDkaVs1p1RWTYMwW4g9AXUthW9xXJU0+nqm6UDhrEY9HpfNe/Q==
   dependencies:
     axios ">=0.16.0"
     extract-files "9.0.0"
@@ -1119,10 +1119,10 @@
   resolved "https://registry.yarnpkg.com/@redux-requests/promise/-/promise-1.0.2.tgz#3c3eb5d357d0c6075e7802c366a7d99854298f65"
   integrity sha512-qReb0NWlOQ6njImNI26Hg5zQRWRM8G71xTe3K4GuCH/HTpFxp1khAUVJdiYmbOaVKkSIS2hPuBj+I8u18HFUEw==
 
-"@redux-requests/react@1.5.0":
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/@redux-requests/react/-/react-1.5.0.tgz#67af5da79e2a6551dc78a5037e2a9891b0cccbe6"
-  integrity sha512-OrajLvRkpRqb8L9Dgdo+NFF11JFyOdN9SFz3lP7nWbldBc+yrkVamS/c6Q1tzGKu6ieOX2572NamK5KTdmlb2Q==
+"@redux-requests/react@1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@redux-requests/react/-/react-1.6.0.tgz#940d838b17449ea3dc4fecd6de9296fe3c8afe65"
+  integrity sha512-u34QYwxTFgJHukVHAEmfYog0mKLBo+PKKtuwsqxdEeKzaI7S9/JqP4tpFM6Vi2NVwTCKe+LlN+X2GXGd+e8RLQ==
   dependencies:
     prop-types "^15.5.7"
     react-is ">=16.13.1"
