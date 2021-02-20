@@ -15,7 +15,7 @@
     "@redux-requests/axios": "1.1.1",
     "@redux-requests/core": "1.6.1",
     "@redux-requests/react": "1.6.0",
-    "axios": "0.21.0",
+    "axios": "0.21.1",
     "express": "4.17.1",
     "express-ws": "4.0.0",
     "react": "16.9.0",

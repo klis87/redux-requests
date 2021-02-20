@@ -15,7 +15,7 @@
     "@redux-requests/core": "1.6.1",
     "@redux-requests/mock": "1.0.2",
     "@redux-requests/react": "1.6.0",
-    "axios": "0.21.0",
+    "axios": "0.21.1",
     "react": "16.9.0",
     "react-dom": "16.9.0",
     "react-redux": "7.2.2",
