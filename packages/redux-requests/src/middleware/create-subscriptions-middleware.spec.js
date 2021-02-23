@@ -23,6 +23,10 @@ class DummyWebsocket {
     } else if (type === 'message') {
       this.onMessage = callback;
     }
+
+    if (type === 'open') {
+      this.open();
+    }
   }
 
   removeEventListener() {
@@ -72,7 +76,7 @@ describe('middleware', () => {
       const store = mockStore({});
       const action = { type: 'REQUEST', request: { url: '/' } };
       expect(store.dispatch(action)).toBe(action);
-      expect(store.getActions()).toEqual([action]);
+      expect(store.getActions()).toEqual([websocketOpened(), action]);
     });
 
     it('dispatches websocketOpened on opened', () => {
@@ -85,8 +89,7 @@ describe('middleware', () => {
         }),
       ]);
       const store = mockStore({});
-      const ws = store.dispatch(getWebsocket());
-      ws.open();
+      store.dispatch(getWebsocket());
       expect(store.getActions()).toEqual([websocketOpened()]);
     });
 
@@ -101,7 +104,6 @@ describe('middleware', () => {
       ]);
       const store = mockStore({});
       const ws = store.dispatch(getWebsocket());
-      ws.open();
       ws.close();
       expect(store.getActions()).toEqual([
         websocketOpened(),
@@ -121,7 +123,7 @@ describe('middleware', () => {
       const store = mockStore({});
       const ws = store.dispatch(getWebsocket());
       ws.sendToClient({ type: 'SUBSCRIPTION' });
-      expect(store.getActions()).toEqual([]);
+      expect(store.getActions()).toEqual([websocketOpened()]);
     });
 
     it('doesnt do anything when no matching subscription', () => {
@@ -146,7 +148,7 @@ describe('middleware', () => {
 
       store.dispatch(subscription);
       ws.sendToClient({ type: 'SUBSCRIPTION' });
-      expect(store.getActions()).toEqual([subscription]);
+      expect(store.getActions()).toEqual([websocketOpened(), subscription]);
       expect(subscription.meta.onMessage).not.toHaveBeenCalled();
       expect(ws.sentMessages).toEqual([]);
     });
@@ -174,7 +176,7 @@ describe('middleware', () => {
       store.dispatch(subscription);
       ws.sendToClient({ type: 'SUBSCRIPTION' });
 
-      expect(store.getActions()).toEqual([subscription]);
+      expect(store.getActions()).toEqual([websocketOpened(), subscription]);
       expect(subscription.meta.onMessage).toHaveBeenCalledTimes(1);
       expect(subscription.meta.onMessage.mock.calls[0][0]).toEqual({
         type: 'SUBSCRIPTION',
@@ -211,7 +213,7 @@ describe('middleware', () => {
       store.dispatch(subscription);
       ws.sendToClient({ type: 'SUBSCRIPTION' });
 
-      expect(store.getActions()).toEqual([subscription]);
+      expect(store.getActions()).toEqual([websocketOpened(), subscription]);
       expect(subscription.meta.onMessage).toHaveBeenCalledTimes(1);
       expect(subscription.meta.onMessage.mock.calls[0][0]).toEqual(
         'SUBSCRIPTION',
@@ -250,16 +252,16 @@ describe('middleware', () => {
 
       const dispatchedActions = store.getActions();
 
-      expect(dispatchedActions.length).toBe(2);
-      expect(dispatchedActions[0]).toEqual(onBookAdded);
-      expect(dispatchedActions[1].type).toBe('ON_BOOK_ADDED_MUTATION');
-      expect(dispatchedActions[1].meta.localData).toEqual({
+      expect(dispatchedActions.length).toBe(3);
+      expect(dispatchedActions[1]).toEqual(onBookAdded);
+      expect(dispatchedActions[2].type).toBe('ON_BOOK_ADDED_MUTATION');
+      expect(dispatchedActions[2].meta.localData).toEqual({
         type: 'ON_BOOK_ADDED',
         newBook: 'New book',
       });
-      expect(dispatchedActions[1].meta.mutations.FETCH_BOOK.local).toBe(true);
+      expect(dispatchedActions[2].meta.mutations.FETCH_BOOK.local).toBe(true);
       expect(
-        dispatchedActions[1].meta.mutations.FETCH_BOOK.updateData(['Old book']),
+        dispatchedActions[2].meta.mutations.FETCH_BOOK.updateData(['Old book']),
       ).toEqual(['Old book', 'New book']);
     });
 
@@ -282,7 +284,7 @@ describe('middleware', () => {
 
       store.dispatch(subscription);
       ws.sendToClient({ type: 'SUBSCRIPTION' });
-      expect(store.getActions()).toEqual([subscription]);
+      expect(store.getActions()).toEqual([websocketOpened(), subscription]);
       expect(ws.sentMessages).toEqual([
         JSON.stringify({ type: 'SUBSCRIPTION' }),
       ]);
