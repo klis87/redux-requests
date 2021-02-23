@@ -4,7 +4,6 @@ import {
   websocketClosed,
   openWebsocket,
   closeWebsocket,
-  getActionPayload,
 } from '../actions';
 import {
   GET_WEBSOCKET,
@@ -300,14 +299,12 @@ export default ({
       return response;
     } else if (action.type === WEBSOCKET_OPENED) {
       Object.values(subscriptions).forEach(subscriptionAction => {
-        const actionPayload = getActionPayload(subscriptionAction);
-
-        if (actionPayload.subscription) {
+        if (subscriptionAction.subscription) {
           ws.send(
             JSON.stringify(
               onSend
-                ? onSend(actionPayload.subscription, subscriptionAction)
-                : actionPayload.subscription,
+                ? onSend(subscriptionAction.subscription, subscriptionAction)
+                : subscriptionAction.subscription,
             ),
           );
         }
@@ -350,14 +347,10 @@ export default ({
         };
       }
 
-      const actionPayload = getActionPayload(action);
-
-      if (actionPayload.subscription && ws && active) {
+      if (action.subscription && ws && active) {
         ws.send(
           JSON.stringify(
-            onSend
-              ? onSend(actionPayload.subscription, action)
-              : actionPayload.subscription,
+            onSend ? onSend(action.subscription, action) : action.subscription,
           ),
         );
       }

@@ -27,11 +27,9 @@ export const error = getActionWithSuffix(ERROR_SUFFIX);
 
 export const abort = getActionWithSuffix(ABORT_SUFFIX);
 
-const isFSA = action => !!action.payload;
-
 export const createSuccessAction = (action, response) => ({
   type: success(action.type),
-  ...(isFSA(action) ? { payload: response } : { response }),
+  response,
   meta: {
     ...action.meta,
     requestAction: action,
@@ -40,14 +38,7 @@ export const createSuccessAction = (action, response) => ({
 
 export const createErrorAction = (action, errorData) => ({
   type: error(action.type),
-  ...(isFSA(action)
-    ? {
-        payload: errorData,
-        error: true,
-      }
-    : {
-        error: errorData,
-      }),
+  error: errorData,
   meta: {
     ...action.meta,
     requestAction: action,
@@ -62,28 +53,19 @@ export const createAbortAction = action => ({
   },
 });
 
-export const getActionPayload = action =>
-  action.payload === undefined ? action : action.payload;
-
-// eslint-disable-next-line import/no-unused-modules
-export const getResponseFromSuccessAction = action =>
-  action.payload ? action.payload : action.response;
-
 export const isRequestAction = action => {
-  const actionPayload = getActionPayload(action);
-
   return (
-    !!actionPayload?.request &&
+    !!action?.request &&
     !!(
-      Array.isArray(actionPayload.request) ||
-      actionPayload.request.url ||
-      actionPayload.request.query ||
-      actionPayload.request.promise ||
-      actionPayload.request.response ||
-      actionPayload.request.error
+      Array.isArray(action.request) ||
+      action.request.url ||
+      action.request.query ||
+      action.request.promise ||
+      action.request.response ||
+      action.request.error
     ) &&
-    !actionPayload.response &&
-    !(actionPayload instanceof Error)
+    !action.response &&
+    !(action instanceof Error)
   );
 };
 
@@ -106,7 +88,7 @@ const isRequestQuery = request =>
   (request.query && !request.query.trim().startsWith('mutation'));
 
 export const isRequestActionQuery = action => {
-  const { request } = getActionPayload(action);
+  const { request } = action;
 
   if (action.meta?.asMutation !== undefined) {
     return !action.meta.asMutation;

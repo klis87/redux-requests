@@ -1,5 +1,4 @@
 import {
-  getActionPayload,
   createSuccessAction,
   createErrorAction,
   createAbortAction,
@@ -38,11 +37,10 @@ const isActionRehydrated = action =>
 
 // TODO: remove to more functional style, we need object maps and filters
 const abortPendingRequests = (action, pendingRequests) => {
-  const payload = getActionPayload(action);
-  const clearAll = !payload.requests;
-  const keys = !clearAll && getKeys(payload.requests);
+  const clearAll = !action.requests;
+  const keys = !clearAll && getKeys(action.requests);
 
-  if (!payload.requests) {
+  if (!action.requests) {
     Object.values(pendingRequests).forEach(requests =>
       requests.forEach(r => r.cancel()),
     );
@@ -61,26 +59,14 @@ const isTakeLatest = (action, config) =>
     : config.takeLatest;
 
 const maybeCallOnRequestInterceptor = (action, config, store) => {
-  const payload = getActionPayload(action);
-
   if (
     config.onRequest &&
     (!action.meta ||
       (action.meta.runOnRequest !== false && !action.meta.ssrDuplicate))
   ) {
-    if (action.request) {
-      return {
-        ...action,
-        request: config.onRequest(payload.request, action, store),
-      };
-    }
-
     return {
       ...action,
-      payload: {
-        ...action.payload,
-        request: config.onRequest(payload.request, action, store),
-      },
+      request: config.onRequest(action.request, action, store),
     };
   }
 
@@ -88,22 +74,10 @@ const maybeCallOnRequestInterceptor = (action, config, store) => {
 };
 
 const maybeCallOnRequestMeta = (action, store) => {
-  const payload = getActionPayload(action);
-
   if (action.meta?.onRequest && !action.meta.ssrDuplicate) {
-    if (action.request) {
-      return {
-        ...action,
-        request: action.meta.onRequest(payload.request, action, store),
-      };
-    }
-
     return {
       ...action,
-      payload: {
-        ...action.payload,
-        request: action.meta.onRequest(payload.request, action, store),
-      },
+      request: action.meta.onRequest(action.request, action, store),
     };
   }
 
@@ -158,8 +132,7 @@ const defer = () => {
 };
 
 const getResponsePromises = (action, config, pendingRequests, store) => {
-  const actionPayload = getActionPayload(action);
-  const isBatchedRequest = Array.isArray(actionPayload.request);
+  const isBatchedRequest = Array.isArray(action.request);
 
   if (action.meta?.cacheResponse) {
     return [Promise.resolve(action.meta.cacheResponse)];
@@ -179,8 +152,8 @@ const getResponsePromises = (action, config, pendingRequests, store) => {
   }
 
   const responsePromises = isBatchedRequest
-    ? actionPayload.request.map(r => driver(r, action, driverActions))
-    : [driver(actionPayload.request, action, driverActions)];
+    ? action.request.map(r => driver(r, action, driverActions))
+    : [driver(action.request, action, driverActions)];
 
   if (responsePromises[0].cancel) {
     pendingRequests[lastActionKey] = responsePromises;
@@ -253,8 +226,7 @@ const getInitialBatchObject = responseKeys =>
   }, {});
 
 const maybeTransformBatchRequestResponse = (action, response) => {
-  const actionPayload = getActionPayload(action);
-  const isBatchedRequest = Array.isArray(actionPayload.request);
+  const isBatchedRequest = Array.isArray(action.request);
   const responseKeys = Object.keys(response[0]);
 
   return isBatchedRequest && !isActionRehydrated(action)
@@ -319,7 +291,6 @@ const createSendRequestMiddleware = config => {
   const allPendingRequests = {}; // for joining
 
   return store => next => action => {
-    const payload = getActionPayload(action);
     const requestsStore = createRequestsStore(store);
 
     if (action.type === JOIN_REQUEST) {
@@ -329,7 +300,7 @@ const createSendRequestMiddleware = config => {
 
     if (
       action.type === ABORT_REQUESTS ||
-      (action.type === RESET_REQUESTS && payload.abortPending)
+      (action.type === RESET_REQUESTS && action.abortPending)
     ) {
       abortPendingRequests(action, pendingRequests);
       return next(action);

@@ -105,51 +105,6 @@ describe('reducers', () => {
           normalizedData: {},
         });
       });
-
-      it('supports FSA actions for getting data and error by default', () => {
-        const action = {
-          type: 'FETCH_BOOK',
-          payload: {
-            request: {
-              url: '/',
-            },
-          },
-        };
-
-        expect(
-          queriesReducer(
-            { queries: {}, normalizedData: {} },
-            createSuccessAction(action, { data: 'data' }),
-            defaultConfig,
-          ),
-        ).toEqual({
-          queries: {
-            FETCH_BOOK: {
-              ...defaultState,
-              pending: -1,
-              data: 'data',
-            },
-          },
-          normalizedData: {},
-        });
-
-        expect(
-          queriesReducer(
-            { queries: {}, normalizedData: {} },
-            createErrorAction(action, 'error'),
-            defaultConfig,
-          ),
-        ).toEqual({
-          queries: {
-            FETCH_BOOK: {
-              ...defaultState,
-              pending: -1,
-              error: 'error',
-            },
-          },
-          normalizedData: {},
-        });
-      });
     });
 
     describe('with requestKey', () => {
@@ -324,41 +279,6 @@ describe('reducers', () => {
               {
                 type: MUTATION_ACTION,
                 request: { url: '/books', method: 'post' },
-                meta: {
-                  mutations: {
-                    FETCH_BOOK: (data, mutationData) =>
-                      data + mutationData.nested,
-                  },
-                },
-              },
-              { data: { nested: 'suffix' } },
-            ),
-            defaultConfig,
-          ),
-        ).toEqual({
-          queries: {
-            FETCH_BOOK: {
-              data: 'datasuffix',
-              error: null,
-              pending: 0,
-              pristine: false,
-              normalized: false,
-            },
-          },
-          normalizedData: {},
-        });
-      });
-
-      it('handles updateData customized per mutation in FSA action', () => {
-        expect(
-          queriesReducer(
-            initialState,
-            createSuccessAction(
-              {
-                type: MUTATION_ACTION,
-                payload: {
-                  request: { url: '/books', method: 'post' },
-                },
                 meta: {
                   mutations: {
                     FETCH_BOOK: (data, mutationData) =>

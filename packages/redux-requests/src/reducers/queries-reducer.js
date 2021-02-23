@@ -23,9 +23,6 @@ const getInitialQuery = normalized => ({
   usedKeys: normalized ? {} : null,
 });
 
-const getDataFromResponseAction = action =>
-  action.payload ? action.payload.data : action.response.data;
-
 const shouldBeNormalized = (action, config) =>
   action.meta?.normalize !== undefined
     ? action.meta.normalize
@@ -64,7 +61,7 @@ const queryReducer = (state, action, actionType, config, normalizedData) => {
         ? state
         : {
             ...state,
-            data: getDataFromResponseAction(action),
+            data: action.response.data,
             pending: state.pending - 1,
             error: null,
           };
@@ -76,7 +73,7 @@ const queryReducer = (state, action, actionType, config, normalizedData) => {
             ...state,
             data: null,
             pending: state.pending - 1,
-            error: action.payload ? action.payload : action.error,
+            error: action.error,
           };
     case abort(actionType): {
       if (state.pending === 1 && state.data === null && state.error === null) {
@@ -138,10 +135,7 @@ const updateNormalizedData = (normalizedData, action, config) => {
     shouldBeNormalized(action, config) &&
     !config.isRequestActionQuery(getRequestActionFromResponse(action))
   ) {
-    const [, newNormalizedData] = normalize(
-      getDataFromResponseAction(action),
-      config,
-    );
+    const [, newNormalizedData] = normalize(action.response.data, config);
     return mergeData(normalizedData, newNormalizedData);
   }
 

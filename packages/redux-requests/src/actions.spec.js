@@ -5,7 +5,6 @@ import {
   createSuccessAction,
   createErrorAction,
   createAbortAction,
-  getActionPayload,
   isRequestAction,
   getRequestActionFromResponse,
   isSuccessAction,
@@ -51,25 +50,6 @@ describe('actions', () => {
       });
     });
 
-    it('handles FSA actions', () => {
-      const requestAction = {
-        type: 'REQUEST',
-        payload: {
-          request: { url: '/' },
-        },
-      };
-
-      expect(createSuccessAction(requestAction, { data: 'data' })).toEqual({
-        type: 'REQUEST_SUCCESS',
-        payload: {
-          data: 'data',
-        },
-        meta: {
-          requestAction,
-        },
-      });
-    });
-
     it('should merge request meta', () => {
       const requestAction = {
         type: 'REQUEST',
@@ -100,24 +80,6 @@ describe('actions', () => {
       expect(createErrorAction(requestAction, 'errorData')).toEqual({
         type: 'REQUEST_ERROR',
         error: 'errorData',
-        meta: {
-          requestAction,
-        },
-      });
-    });
-
-    it('handles FSA actions', () => {
-      const requestAction = {
-        type: 'REQUEST',
-        payload: {
-          request: { url: '/' },
-        },
-      };
-
-      expect(createErrorAction(requestAction, 'errorData')).toEqual({
-        type: 'REQUEST_ERROR',
-        payload: 'errorData',
-        error: true,
         meta: {
           requestAction,
         },
@@ -178,32 +140,11 @@ describe('actions', () => {
     });
   });
 
-  describe('getActionPayload', () => {
-    it('just returns not FSA action', () => {
-      const action = { type: 'ACTION' };
-      expect(getActionPayload(action)).toEqual(action);
-    });
-
-    it('returns payload of FSA action', () => {
-      const action = { type: 'ACTION', payload: 'payload' };
-      expect(getActionPayload(action)).toBe('payload');
-    });
-  });
-
   describe('isRequestAction', () => {
     it('recognizes request action', () => {
       expect(isRequestAction({ type: 'ACTION', request: { url: '/' } })).toBe(
         true,
       );
-    });
-
-    it('recognizes request FSA action', () => {
-      expect(
-        isRequestAction({
-          type: 'ACTION',
-          payload: { request: { url: '/' } },
-        }),
-      ).toBe(true);
     });
 
     it('recognizes request action with multiple requests', () => {
