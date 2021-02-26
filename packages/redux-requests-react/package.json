@@ -22,8 +22,8 @@
   "scripts": {
     "clean": "rimraf es lib dist",
     "lint": "eslint 'src/**'",
-    "test": "jest src",
-    "test:cover": "jest --coverage src",
+    "test": "jest --passWithNoTests src",
+    "test:cover": "jest --passWithNoTests --coverage src",
     "test-types": "tsc types/index.d.spec.tsx --noEmit --strict --lib es2015 --jsx react",
     "build:commonjs": "cross-env BABEL_ENV=cjs babel src --out-dir lib --ignore 'src/**/*.spec.js'",
     "build:es": "babel src --out-dir es --ignore 'src/**/*.spec.js'",
@@ -40,8 +40,7 @@
     "redux": ">=4.0.0"
   },
   "dependencies": {
-    "prop-types": "^15.5.7",
-    "react-is": ">=16.13.1"
+    "prop-types": "^15.5.7"
   },
   "devDependencies": {
     "@babel/cli": "7.12.8",
