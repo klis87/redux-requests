@@ -332,10 +332,7 @@ export default ({
           action.subscriptions.includes(k) ? undefined : v,
         );
       }
-    } else if (
-      action.subscription !== undefined ||
-      action.payload?.subscription !== undefined
-    ) {
+    } else if (action.subscription !== undefined) {
       if (
         action.meta?.onMessage ||
         action.meta?.mutations ||

@@ -74,21 +74,11 @@ interface RequestActionMeta<Data, TransformedData> {
   [extraProperty: string]: any;
 }
 
-export type RequestAction<Data = any, TransformedData = Data> =
-  | {
-      type?: string;
-      payload?: never;
-      request: any | any[];
-      meta?: RequestActionMeta<Data, TransformedData>;
-    }
-  | {
-      type?: string;
-      payload: {
-        request: any | any[];
-      };
-      request?: never;
-      meta?: RequestActionMeta<Data, TransformedData>;
-    };
+export type RequestAction<Data = any, TransformedData = Data> = {
+  type?: string;
+  request: any | any[];
+  meta?: RequestActionMeta<Data, TransformedData>;
+};
 
 export type LocalMutationAction = {
   type?: string;
@@ -119,19 +109,11 @@ interface SubscriptionActionMeta {
   [extraProperty: string]: any;
 }
 
-export type SubscriptionAction =
-  | {
-      type?: string;
-      subscription: any;
-      meta?: SubscriptionActionMeta;
-    }
-  | {
-      type?: string;
-      payload: {
-        subscription: any;
-      };
-      meta?: SubscriptionActionMeta;
-    };
+export type SubscriptionAction = {
+  type?: string;
+  subscription: any;
+  meta?: SubscriptionActionMeta;
+};
 
 type ResponseData<
   Request extends (...args: any[]) => RequestAction

@@ -29,7 +29,7 @@ export default (state, action) => {
     return {
       ...state,
       [mutationType]: {
-        error: action.payload ? action.payload : action.error,
+        error: action.error,
         pending: state[mutationType].pending - 1,
         ref: state[mutationType].ref,
       },
