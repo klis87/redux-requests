@@ -177,7 +177,6 @@ export interface HandleRequestConfig {
   ) => any;
   onError?: (error: any, action: RequestAction, store: RequestsStore) => any;
   onAbort?: (action: RequestAction, store: RequestsStore) => void;
-  cache?: boolean;
   ssr?: null | 'client' | 'server';
   disableRequestsPromise?: boolean;
   isRequestAction?: (action: AnyAction) => boolean;

@@ -6,7 +6,6 @@ export default {
   onSuccess: null,
   onError: null,
   onAbort: null,
-  cache: false,
   ssr: null,
   disableRequestsPromise: false,
   isRequestAction,

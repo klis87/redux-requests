@@ -37,7 +37,7 @@ const handleRequests = userConfig => {
         !config.disableRequestsPromise &&
         createServerSsrMiddleware(requestsPromise, config),
       config.ssr === 'client' && createClientSsrMiddleware(config),
-      config.cache && createRequestsCacheMiddleware(config),
+      createRequestsCacheMiddleware(config),
       createSendRequestsMiddleware(config),
     ].filter(Boolean),
     requestsPromise,
