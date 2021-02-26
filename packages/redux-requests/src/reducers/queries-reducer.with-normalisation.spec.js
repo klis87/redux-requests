@@ -13,6 +13,7 @@ describe('reducers', () => {
         pristine: true,
         normalized: true,
         usedKeys: [],
+        dependencies: [],
         ref: {},
       };
       const requestAction = {

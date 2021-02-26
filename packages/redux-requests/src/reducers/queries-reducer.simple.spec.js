@@ -18,6 +18,7 @@ describe('reducers', () => {
         normalized: false,
         ref: {},
         usedKeys: null,
+        dependencies: null,
       };
       const requestAction = {
         type: 'FETCH_BOOK',

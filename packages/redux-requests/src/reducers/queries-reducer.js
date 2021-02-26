@@ -21,6 +21,7 @@ const getInitialQuery = normalized => ({
   ref: {},
   normalized,
   usedKeys: normalized ? {} : null,
+  dependencies: normalized ? [] : null,
 });
 
 const shouldBeNormalized = (action, config) =>
