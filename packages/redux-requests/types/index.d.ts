@@ -291,8 +291,6 @@ export function getQuery<QueryStateData = any>(
     type: string | ((...params: any[]) => RequestAction<any, QueryStateData>);
     action?: (...params: any[]) => RequestAction<any, QueryStateData>;
     requestKey?: string;
-    multiple?: boolean;
-    defaultData?: any;
   },
 ): QueryState<QueryStateData>;
 
@@ -300,8 +298,6 @@ export function getQuerySelector<QueryStateData = any>(props: {
   type: string | ((...params: any[]) => RequestAction<any, QueryStateData>);
   action?: (...params: any[]) => RequestAction<any, QueryStateData>;
   requestKey?: string;
-  multiple?: boolean;
-  defaultData?: any;
 }): (state: any) => QueryState<QueryStateData>;
 
 export interface MutationState {
