@@ -3,6 +3,153 @@ import { createSuccessAction, createErrorAction } from '../actions';
 
 import queriesReducer from './queries-reducer';
 
+/*
+1) fetchBooks
+[
+  { id: 1, name: 'Harry', author: { id: 100, surname: 'Harry author' }, likers: [], },
+  { id: 2, name: 'Lord', author: { id: 101, surname: 'Lord author' }, likers: [], },
+]
+
+fetchBooks: ['@@1', '@@2'],
+@@1: { id: 1, name: 'Harry', author: '@@100', likers: [] }
+@@2: { id: 2, name: 'Lord', author: '@@101', likers: [] }
+@@100: { id: 100, surname: 'Harry author' }
+@@101: { id: 101, surname: 'Lord author' }
+
+dependencies:
+fetchBooks: [@@1, @@2, @@100, @@101]
+
+dependents:
+@@1: [fetchBooks]
+@@2: [fetchBooks]
+@@100: [fetchBooks]
+@@101: [fetchBooks]
+
+2) fetchBook 1
+
+{ id: 1, name: 'Harry', author: { id: 100, surname: 'Harry author' } }
+
+fetchBooks: ['@@1', '@@2']
+fetchBook: '@@1'
+@@1: { id: 1, name: 'Harry', author: '@@100', likers: [] }
+@@2: { id: 2, name: 'Lord', author: '@@101', likers: [] }
+@@100: { id: 100, surname: 'Harry author' }
+@@101: { id: 101, surname: 'Lord author' }
+
+dependencies:
+fetchBooks: [@@1, @@2, @@100, @@101]
+fetchBooks: [@@1, @@100]
+
+dependents:
+@@1: [fetchBooks, fetchBook]
+@@2: [fetchBooks]
+@@100: [fetchBooks, fetchBook]
+@@101: [fetchBooks]
+
+3) updateBook 1
+
+{ id: 1, name: 'Harry 2', author: { id: 100, surname: 'Harry 2 author' }, liker: { id: 1000 } }
+
+mutation dependencies: [@@1, @@100, @1000]
+getting affected queries: [fetchBooks, fetchBook]
+recalculate them, nothing changed re dependencies
+
+!!!!! what to do about this 1000 we must ignore it, not a dependency!
+
+fetchBooks: ['@@1', '@@2']
+fetchBook: '@@1'
+@@1: { id: 1, name: 'Harry 2', author: '@@100' }
+@@2: { id: 2, name: 'Lord', author: '@@101' }
+@@100: { id: 100, surname: 'Harry 2 author' }
+@@101: { id: 101, surname: 'Lord author' }
+
+dependencies:
+fetchBooks: [@@1, @@2, @@100, @@101]
+fetchBooks: [@@1, @@100]
+
+dependents:
+@@1: [fetchBooks, fetchBook]
+@@2: [fetchBooks]
+@@100: [fetchBooks, fetchBook]
+@@101: [fetchBooks]
+
+4) updateBook 1 - change author!
+
+{ id: 1, author: { id: 102, surname: 'Harry 2 new author' }, liker: { id: 1000 } }
+
+mutation dependencies: [@@1, @@102, @1000]
+@@1 found, getting affected queries: [fetchBooks, fetchBook]
+recalculate them, new dependencies:
+dependencies:
+fetchBooks: [@@1, @@2, @@100, @@101] => [@@1, @@2, @@102, @@101] 100 gone, 102 added
+fetchBook: [@@1, @@100] => [@@1, @@102] 100 gone, 102 added
+
+!!!!! what to do about this 1000 we must ignore it, not a dependency!
+
+fetchBooks: ['@@1', '@@2']
+fetchBook: '@@1'
+@@1: { id: 1, name: 'Harry 2', author: '@@102' }
+@@2: { id: 2, name: 'Lord', author: '@@101' }
+@@102: { id: 102, surname: 'Harry 2 new author' }
+@@101: { id: 101, surname: 'Lord author' }
+
+
+dependents:
+@@1: [fetchBooks, fetchBook]
+@@2: [fetchBooks]
+@@102: [fetchBooks, fetchBook]
+@@101: [fetchBooks]
+@@100: [] to remove
+
+5) updateBook 1 - add liker!
+
+{ id: 1, likers: [{ id: 1000 }] }
+
+mutation dependencies: [@@1, @@1000]
+@@1 found, getting affected queries: [fetchBooks, fetchBook]
+
+recalculate them, new dependencies:
+dependencies:
+fetchBooks: [@@1, @@2, @@102, @@101] => [@@1, @@2, @@102, @@101, @@1000] 1000 added!
+fetchBook: [@@1, @@102] => [@@1, @@102, @@1000] 1000 added
+
+
+fetchBooks: ['@@1', '@@2']
+fetchBook: '@@1'
+@@1: { id: 1, name: 'Harry 2', author: '@@102' }
+@@2: { id: 2, name: 'Lord', author: '@@101' }
+@@102: { id: 102, surname: 'Harry 2 new author' }
+@@101: { id: 101, surname: 'Lord author' }
+@@1000: { id: 1000 }
+
+dependents:
+@@1: [fetchBooks, fetchBook]
+@@2: [fetchBooks]
+@@102: [fetchBooks, fetchBook]
+@@101: [fetchBooks]
+@@1000: [fetchBooks, fetchBook]
+
+6) reset fetchBooks
+
+fetchBooks: null
+fetchBook: '@@1'
+@@1: { id: 1, name: 'Harry', author: '@@100' }
+@@2: { id: 2, name: 'Lord', author: '@@101' }
+@@100: { id: 100, surname: 'Harry author' }
+@@101: { id: 101, surname: 'Lord author' }
+
+dependencies:
+fetchBooks: [] diff -1, 2, 100, 101
+fetchBooks: [@@1, @@100]
+
+dependents:
+@@1: [fetchBook]
+@@2: [] // safe to remove
+@@100: [fetchBook]
+@@101: [] // safe to remove
+
+*/
+
 describe('reducers', () => {
   describe('queriesReducer', () => {
     describe('with normalization', () => {
@@ -40,6 +187,7 @@ describe('reducers', () => {
               pending: -1,
               data: '@@1',
               usedKeys: { '': ['id', 'name'] },
+              dependencies: ['@@1'],
             },
           },
           normalizedData: { '@@1': { id: '1', name: 'name' } },
@@ -55,6 +203,7 @@ describe('reducers', () => {
               error: null,
               normalized: true,
               usedKeys: { '': ['id', 'name'] },
+              dependencies: [],
               ref: {},
             },
           },
@@ -99,6 +248,7 @@ describe('reducers', () => {
                 '.root': ['id', 'name', 'nested'],
                 '.root.nested': ['id', 'v'],
               },
+              dependencies: ['@@1', '@@2', '@@3'],
             },
           },
           normalizedData: {
@@ -132,6 +282,7 @@ describe('reducers', () => {
               pending: -1,
               data: '@@1',
               usedKeys: { '': ['id', 'a', 'c'] },
+              dependencies: ['@@1'],
             },
           },
           normalizedData: { '@@1': { id: '1', a: 'd', b: 'b', c: 'c' } },
@@ -182,6 +333,7 @@ describe('reducers', () => {
                   normalized: true,
                   ref: {},
                   usedKeys: { '': ['id', 'x'] },
+                  dependencies: ['@@1'],
                 },
               },
               normalizedData: { '@@1': { id: '1', x: 1 } },
@@ -211,6 +363,7 @@ describe('reducers', () => {
               error: null,
               normalized: true,
               usedKeys: { '': ['id', 'x'] },
+              dependencies: ['@@1', '@@2', '@@3'],
               ref: {},
             },
           },
@@ -239,6 +392,7 @@ describe('reducers', () => {
                   usedKeys: {
                     '': ['id', 'x'],
                   },
+                  dependencies: ['@@1'],
                   ref: {},
                 },
               },
@@ -266,6 +420,7 @@ describe('reducers', () => {
               error: null,
               normalized: true,
               usedKeys: { '': ['id', 'x'] },
+              dependencies: ['@@1', '@@2'],
               ref: {},
             },
           },
@@ -286,6 +441,7 @@ describe('reducers', () => {
                   pending: 0,
                   error: null,
                   normalized: true,
+                  dependencies: ['@@1'],
                   ref: {},
                 },
               },
@@ -306,6 +462,7 @@ describe('reducers', () => {
               pending: 0,
               error: null,
               normalized: true,
+              dependencies: ['@@1'],
               ref: {},
             },
           },
@@ -325,6 +482,7 @@ describe('reducers', () => {
                   pending: 0,
                   error: null,
                   normalized: true,
+                  dependencies: ['@@1'],
                   ref: {},
                 },
               },
@@ -346,6 +504,7 @@ describe('reducers', () => {
               pending: 0,
               error: null,
               normalized: true,
+              dependencies: ['@@1'],
               ref: {},
             },
           },
@@ -365,6 +524,7 @@ describe('reducers', () => {
                   pending: 0,
                   error: null,
                   normalized: true,
+                  dependencies: ['@@1'],
                   ref: {},
                 },
               },
@@ -387,6 +547,7 @@ describe('reducers', () => {
               pending: 0,
               error: null,
               normalized: true,
+              dependencies: ['@@1'],
               ref: {},
             },
           },
@@ -415,6 +576,7 @@ describe('reducers', () => {
               ...defaultState,
               pending: -1,
               data: '@@1',
+              dependencies: ['@@1'],
               usedKeys: { '': ['_id', 'name'] },
             },
           },

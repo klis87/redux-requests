@@ -9,7 +9,7 @@ import {
   isSuccessAction,
 } from '../actions';
 import { getQuery } from '../selectors';
-import { normalize, mergeData } from '../normalizers';
+import { normalize, mergeData, getDependentKeys } from '../normalizers';
 
 import updateData from './update-data';
 
@@ -178,8 +178,18 @@ export default (state, action, config = defaultConfig) => {
                 updatedQuery.data,
                 config,
               );
+              const dependencies = getDependentKeys(
+                newdata,
+                newNormalizedData,
+                usedKeys,
+              );
               normalizedData = mergeData(normalizedData, newNormalizedData);
-              prev[actionType] = { ...updatedQuery, data: newdata, usedKeys };
+              prev[actionType] = {
+                ...updatedQuery,
+                data: newdata,
+                dependencies: [...dependencies],
+                usedKeys,
+              };
             } else {
               prev[actionType] = updatedQuery;
             }
@@ -225,10 +235,17 @@ export default (state, action, config = defaultConfig) => {
         config,
       );
 
+      const dependencies = getDependentKeys(data, newNormalizedData, usedKeys);
+
       return {
         queries: {
           ...state.queries,
-          [queryType]: { ...updatedQuery, data, usedKeys },
+          [queryType]: {
+            ...updatedQuery,
+            data,
+            usedKeys,
+            dependencies: [...dependencies],
+          },
         },
         normalizedData: mergeData(normalizedData, newNormalizedData),
       };
