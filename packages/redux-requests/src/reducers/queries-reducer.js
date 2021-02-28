@@ -29,6 +29,19 @@ const shouldBeNormalized = (action, config) =>
     ? action.meta.normalize
     : config.normalize;
 
+const addQueryAsDependency = (dependentQueries, dependencies, queryType) =>
+  dependencies.reduce((prev, current) => {
+    if (!prev[current]) {
+      return { ...prev, [current]: [queryType] };
+    }
+
+    if (!prev[current].includes(queryType)) {
+      return { ...prev, [current]: [...prev.current, queryType] };
+    }
+
+    return prev;
+  }, dependentQueries);
+
 const queryReducer = (state, action, actionType, config, normalizedData) => {
   if (state === undefined) {
     state = getInitialQuery(shouldBeNormalized(action, config));
@@ -156,6 +169,8 @@ export default (state, action, config = defaultConfig) => {
   );
 
   if (action.meta?.mutations) {
+    let { dependentQueries } = state;
+
     return {
       queries: {
         ...state.queries,
@@ -178,18 +193,22 @@ export default (state, action, config = defaultConfig) => {
                 updatedQuery.data,
                 config,
               );
-              const dependencies = getDependentKeys(
-                newdata,
-                newNormalizedData,
-                usedKeys,
-              );
+              const dependencies = [
+                ...getDependentKeys(newdata, newNormalizedData, usedKeys),
+              ];
               normalizedData = mergeData(normalizedData, newNormalizedData);
               prev[actionType] = {
                 ...updatedQuery,
                 data: newdata,
-                dependencies: [...dependencies],
+                dependencies,
                 usedKeys,
               };
+
+              dependentQueries = addQueryAsDependency(
+                dependentQueries,
+                dependencies,
+                actionType,
+              );
             } else {
               prev[actionType] = updatedQuery;
             }
@@ -197,6 +216,7 @@ export default (state, action, config = defaultConfig) => {
           }, {}),
       },
       normalizedData,
+      dependentQueries,
     };
   }
 
@@ -221,6 +241,7 @@ export default (state, action, config = defaultConfig) => {
       return {
         queries: remainingQueries,
         normalizedData,
+        dependentQueries: state.dependentQueries,
       };
     }
 
@@ -235,7 +256,9 @@ export default (state, action, config = defaultConfig) => {
         config,
       );
 
-      const dependencies = getDependentKeys(data, newNormalizedData, usedKeys);
+      const dependencies = [
+        ...getDependentKeys(data, newNormalizedData, usedKeys),
+      ];
 
       return {
         queries: {
@@ -244,10 +267,15 @@ export default (state, action, config = defaultConfig) => {
             ...updatedQuery,
             data,
             usedKeys,
-            dependencies: [...dependencies],
+            dependencies,
           },
         },
         normalizedData: mergeData(normalizedData, newNormalizedData),
+        dependentQueries: addQueryAsDependency(
+          state.dependentQueries,
+          dependencies,
+          queryType,
+        ),
       };
     }
 

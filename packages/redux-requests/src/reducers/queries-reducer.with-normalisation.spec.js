@@ -174,7 +174,7 @@ describe('reducers', () => {
       it('should normalize data on query success', () => {
         expect(
           queriesReducer(
-            { queries: {}, normalizedData: {} },
+            { queries: {}, normalizedData: {}, dependentQueries: {} },
             createSuccessAction(requestAction, {
               data: { id: '1', name: 'name' },
             }),
@@ -191,6 +191,9 @@ describe('reducers', () => {
             },
           },
           normalizedData: { '@@1': { id: '1', name: 'name' } },
+          dependentQueries: {
+            '@@1': ['FETCH_BOOK'],
+          },
         });
       });
 
@@ -208,6 +211,7 @@ describe('reducers', () => {
             },
           },
           normalizedData: {},
+          dependentQueries: {},
         };
         const state = queriesReducer(
           initialState,
@@ -221,7 +225,7 @@ describe('reducers', () => {
       it('should normalize data with nested ids and arrays on query success', () => {
         expect(
           queriesReducer(
-            { queries: {}, normalizedData: {} },
+            { queries: {}, normalizedData: {}, dependentQueries: {} },
             createSuccessAction(requestAction, {
               data: {
                 root: {
@@ -260,6 +264,11 @@ describe('reducers', () => {
             '@@2': { id: '2', v: 2 },
             '@@3': { id: '3', v: 3 },
           },
+          dependentQueries: {
+            '@@1': ['FETCH_BOOK'],
+            '@@2': ['FETCH_BOOK'],
+            '@@3': ['FETCH_BOOK'],
+          },
         });
       });
 
@@ -269,6 +278,7 @@ describe('reducers', () => {
             {
               queries: {},
               normalizedData: { '@@1': { id: '1', a: 'a', b: 'b' } },
+              dependentQueries: {},
             },
             createSuccessAction(requestAction, {
               data: { id: '1', a: 'd', c: 'c' },
@@ -286,6 +296,9 @@ describe('reducers', () => {
             },
           },
           normalizedData: { '@@1': { id: '1', a: 'd', b: 'b', c: 'c' } },
+          dependentQueries: {
+            '@@1': ['FETCH_BOOK'],
+          },
         });
       });
 
@@ -295,6 +308,7 @@ describe('reducers', () => {
             {
               queries: {},
               normalizedData: { '@@1': { id: '1', a: 'a', b: 'b' } },
+              dependentQueries: {},
             },
             createSuccessAction(
               {
@@ -313,6 +327,7 @@ describe('reducers', () => {
         ).toEqual({
           queries: {},
           normalizedData: { '@@1': { id: '1', a: 'd', b: 'b', c: 'c' } },
+          dependentQueries: {},
         });
       });
 
@@ -337,6 +352,7 @@ describe('reducers', () => {
                 },
               },
               normalizedData: { '@@1': { id: '1', x: 1 } },
+              dependentQueries: { '@@1': ['FETCH_BOOK'] },
             },
             createSuccessAction(
               {
@@ -372,6 +388,11 @@ describe('reducers', () => {
             '@@2': { id: '2', x: 2 },
             '@@3': { id: '3', x: 3 },
           },
+          dependentQueries: {
+            '@@1': ['FETCH_BOOK'],
+            '@@2': ['FETCH_BOOK'],
+            '@@3': ['FETCH_BOOK'],
+          },
         });
         expect(updateData).toBeCalledWith([{ id: '1', x: 1 }], {
           id: '2',
@@ -397,6 +418,7 @@ describe('reducers', () => {
                 },
               },
               normalizedData: { '@@1': { id: '1', x: 1 } },
+              dependentQueries: { '@@1': ['FETCH_BOOK'] },
             },
             {
               type: 'ADD_BOOK_LOCALLY',
@@ -428,6 +450,10 @@ describe('reducers', () => {
             '@@1': { id: '1', x: 1 },
             '@@2': { id: '2', x: 2 },
           },
+          dependentQueries: {
+            '@@1': ['FETCH_BOOK'],
+            '@@2': ['FETCH_BOOK'],
+          },
         });
       });
 
@@ -446,6 +472,9 @@ describe('reducers', () => {
                 },
               },
               normalizedData: { '@@1': { id: '1', x: 1 } },
+              dependentQueries: {
+                '@@1': ['FETCH_BOOK'],
+              },
             },
             {
               type: 'UPDATE_BOOK_LOCALLY',
@@ -469,6 +498,9 @@ describe('reducers', () => {
           normalizedData: {
             '@@1': { id: '1', x: 2 },
           },
+          dependentQueries: {
+            '@@1': ['FETCH_BOOK'],
+          },
         });
       });
 
@@ -487,6 +519,9 @@ describe('reducers', () => {
                 },
               },
               normalizedData: { '@@1': { id: '1', x: 1 } },
+              dependentQueries: {
+                '@@1': ['FETCH_BOOK'],
+              },
             },
             {
               type: 'UPDATE_BOOK',
@@ -511,6 +546,9 @@ describe('reducers', () => {
           normalizedData: {
             '@@1': { id: '1', x: 2 },
           },
+          dependentQueries: {
+            '@@1': ['FETCH_BOOK'],
+          },
         });
       });
 
@@ -529,6 +567,9 @@ describe('reducers', () => {
                 },
               },
               normalizedData: { '@@1': { id: '1', x: 2 } },
+              dependentQueries: {
+                '@@1': ['FETCH_BOOK'],
+              },
             },
             createErrorAction({
               type: 'UPDATE_BOOK',
@@ -554,13 +595,16 @@ describe('reducers', () => {
           normalizedData: {
             '@@1': { id: '1', x: 1 },
           },
+          dependentQueries: {
+            '@@1': ['FETCH_BOOK'],
+          },
         });
       });
 
       it('should allow custom shouldObjectBeNormalized and getNormalisationObjectKey', () => {
         expect(
           queriesReducer(
-            { queries: {}, normalizedData: {} },
+            { queries: {}, normalizedData: {}, dependentQueries: {} },
             createSuccessAction(requestAction, {
               data: { _id: '1', name: 'name' },
             }),
@@ -581,6 +625,9 @@ describe('reducers', () => {
             },
           },
           normalizedData: { '@@1': { _id: '1', name: 'name' } },
+          dependentQueries: {
+            '@@1': ['FETCH_BOOK'],
+          },
         });
       });
     });
