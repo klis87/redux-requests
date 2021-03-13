@@ -152,6 +152,433 @@ dependents:
 
 describe('reducers', () => {
   describe('queriesReducer', () => {
+    describe('normalisation garbage collecting story', () => {
+      const defaultState = {
+        data: null,
+        error: null,
+        pending: 0,
+        pristine: true,
+        normalized: true,
+        usedKeys: [],
+        dependencies: [],
+        ref: {},
+      };
+
+      it('handles initial books fetch', () => {
+        const fetchBooks = {
+          type: 'FETCH_BOOKS',
+          request: { url: '/books' },
+          meta: { normalize: true },
+        };
+
+        expect(
+          queriesReducer(
+            {
+              queries: { FETCH_BOOKS: defaultState },
+              normalizedData: {},
+              dependentQueries: {},
+            },
+            createSuccessAction(fetchBooks, {
+              data: [
+                {
+                  id: 1,
+                  name: 'Harry',
+                  author: { id: 100, surname: 'Harry author' },
+                  likers: [],
+                },
+                {
+                  id: 2,
+                  name: 'Lord',
+                  author: { id: 101, surname: 'Lord author' },
+                  likers: [],
+                },
+              ],
+            }),
+            defaultConfig,
+          ),
+        ).toEqual({
+          queries: {
+            FETCH_BOOKS: {
+              ...defaultState,
+              pending: -1,
+              data: ['@@1', '@@2'],
+              usedKeys: {
+                '': ['id', 'name', 'author', 'likers'],
+                '.author': ['id', 'surname'],
+              },
+              dependencies: ['@@1', '@@100', '@@2', '@@101'],
+            },
+          },
+          normalizedData: {
+            '@@1': { id: 1, name: 'Harry', author: '@@100', likers: [] },
+            '@@2': { id: 2, name: 'Lord', author: '@@101', likers: [] },
+            '@@100': { id: 100, surname: 'Harry author' },
+            '@@101': { id: 101, surname: 'Lord author' },
+          },
+          dependentQueries: {
+            '@@1': ['FETCH_BOOKS'],
+            '@@2': ['FETCH_BOOKS'],
+            '@@100': ['FETCH_BOOKS'],
+            '@@101': ['FETCH_BOOKS'],
+          },
+        });
+      });
+
+      it('handles book detail fetch', () => {
+        const fetchBook = {
+          type: 'FETCH_BOOK',
+          request: { url: '/book/1' },
+          meta: { normalize: true },
+        };
+
+        expect(
+          queriesReducer(
+            {
+              queries: {
+                FETCH_BOOKS: {
+                  ...defaultState,
+                  data: ['@@1', '@@2'],
+                  usedKeys: {
+                    '': ['id', 'name', 'author', 'likers'],
+                    '.author': ['id', 'surname'],
+                  },
+                  dependencies: ['@@1', '@@100', '@@2', '@@101'],
+                },
+                FETCH_BOOK: defaultState,
+              },
+              normalizedData: {
+                '@@1': { id: 1, name: 'Harry', author: '@@100', likers: [] },
+                '@@2': { id: 2, name: 'Lord', author: '@@101', likers: [] },
+                '@@100': { id: 100, surname: 'Harry author' },
+                '@@101': { id: 101, surname: 'Lord author' },
+              },
+              dependentQueries: {
+                '@@1': ['FETCH_BOOKS'],
+                '@@2': ['FETCH_BOOKS'],
+                '@@100': ['FETCH_BOOKS'],
+                '@@101': ['FETCH_BOOKS'],
+              },
+            },
+            createSuccessAction(fetchBook, {
+              data: {
+                id: 1,
+                name: 'Harry',
+                author: { id: 100, surname: 'Harry author' },
+                likers: [],
+              },
+            }),
+            defaultConfig,
+          ),
+        ).toEqual({
+          queries: {
+            FETCH_BOOKS: {
+              ...defaultState,
+              data: ['@@1', '@@2'],
+              usedKeys: {
+                '': ['id', 'name', 'author', 'likers'],
+                '.author': ['id', 'surname'],
+              },
+              dependencies: ['@@1', '@@100', '@@2', '@@101'],
+            },
+            FETCH_BOOK: {
+              ...defaultState,
+              pending: -1,
+              data: '@@1',
+              usedKeys: {
+                '': ['id', 'name', 'author', 'likers'],
+                '.author': ['id', 'surname'],
+              },
+              dependencies: ['@@1', '@@100'],
+            },
+          },
+          normalizedData: {
+            '@@1': { id: 1, name: 'Harry', author: '@@100', likers: [] },
+            '@@2': { id: 2, name: 'Lord', author: '@@101', likers: [] },
+            '@@100': { id: 100, surname: 'Harry author' },
+            '@@101': { id: 101, surname: 'Lord author' },
+          },
+          dependentQueries: {
+            '@@1': ['FETCH_BOOKS', 'FETCH_BOOK'],
+            '@@2': ['FETCH_BOOKS'],
+            '@@100': ['FETCH_BOOKS', 'FETCH_BOOK'],
+            '@@101': ['FETCH_BOOKS'],
+          },
+        });
+      });
+
+      it('handles book update', () => {
+        const updateBook = {
+          type: 'UPDATE_BOOK',
+          request: { url: '/book/1', method: 'put' },
+          meta: { normalize: true },
+        };
+
+        expect(
+          queriesReducer(
+            {
+              queries: {
+                FETCH_BOOKS: {
+                  ...defaultState,
+                  data: ['@@1', '@@2'],
+                  usedKeys: {
+                    '': ['id', 'name', 'author', 'likers'],
+                    '.author': ['id', 'surname'],
+                  },
+                  dependencies: ['@@1', '@@100', '@@2', '@@101'],
+                },
+                FETCH_BOOK: {
+                  ...defaultState,
+                  data: '@@1',
+                  usedKeys: {
+                    '': ['id', 'name', 'author', 'likers'],
+                    '.author': ['id', 'surname'],
+                  },
+                  dependencies: ['@@1', '@@100'],
+                },
+              },
+              normalizedData: {
+                '@@1': { id: 1, name: 'Harry', author: '@@100', likers: [] },
+                '@@2': { id: 2, name: 'Lord', author: '@@101', likers: [] },
+                '@@100': { id: 100, surname: 'Harry author' },
+                '@@101': { id: 101, surname: 'Lord author' },
+              },
+              dependentQueries: {
+                '@@1': ['FETCH_BOOKS', 'FETCH_BOOK'],
+                '@@2': ['FETCH_BOOKS'],
+                '@@100': ['FETCH_BOOKS', 'FETCH_BOOK'],
+                '@@101': ['FETCH_BOOKS'],
+              },
+            },
+            createSuccessAction(updateBook, {
+              data: {
+                id: 1,
+                name: 'Harry 2',
+                author: { id: 100, surname: 'Harry 2 author' },
+              },
+            }),
+            defaultConfig,
+          ),
+        ).toEqual({
+          queries: {
+            FETCH_BOOKS: {
+              ...defaultState,
+              data: ['@@1', '@@2'],
+              usedKeys: {
+                '': ['id', 'name', 'author', 'likers'],
+                '.author': ['id', 'surname'],
+              },
+              dependencies: ['@@1', '@@100', '@@2', '@@101'],
+            },
+            FETCH_BOOK: {
+              ...defaultState,
+              data: '@@1',
+              usedKeys: {
+                '': ['id', 'name', 'author', 'likers'],
+                '.author': ['id', 'surname'],
+              },
+              dependencies: ['@@1', '@@100'],
+            },
+          },
+          normalizedData: {
+            '@@1': { id: 1, name: 'Harry 2', author: '@@100', likers: [] },
+            '@@2': { id: 2, name: 'Lord', author: '@@101', likers: [] },
+            '@@100': { id: 100, surname: 'Harry 2 author' },
+            '@@101': { id: 101, surname: 'Lord author' },
+          },
+          dependentQueries: {
+            '@@1': ['FETCH_BOOKS', 'FETCH_BOOK'],
+            '@@2': ['FETCH_BOOKS'],
+            '@@100': ['FETCH_BOOKS', 'FETCH_BOOK'],
+            '@@101': ['FETCH_BOOKS'],
+          },
+        });
+      });
+
+      it('handles book author change and orphan object', () => {
+        const updateBookAuthor = {
+          type: 'UPDATE_BOOK_AUTHOR',
+          request: { url: '/book/1/author', method: 'put' },
+          meta: { normalize: true },
+        };
+
+        expect(
+          queriesReducer(
+            {
+              queries: {
+                FETCH_BOOKS: {
+                  ...defaultState,
+                  data: ['@@1', '@@2'],
+                  usedKeys: {
+                    '': ['id', 'name', 'author', 'likers'],
+                    '.author': ['id', 'surname'],
+                  },
+                  dependencies: ['@@1', '@@100', '@@2', '@@101'],
+                },
+                FETCH_BOOK: {
+                  ...defaultState,
+                  data: '@@1',
+                  usedKeys: {
+                    '': ['id', 'name', 'author', 'likers'],
+                    '.author': ['id', 'surname'],
+                  },
+                  dependencies: ['@@1', '@@100'],
+                },
+              },
+              normalizedData: {
+                '@@1': { id: 1, name: 'Harry 2', author: '@@100', likers: [] },
+                '@@2': { id: 2, name: 'Lord', author: '@@101', likers: [] },
+                '@@100': { id: 100, surname: 'Harry 2 author' },
+                '@@101': { id: 101, surname: 'Lord author' },
+              },
+              dependentQueries: {
+                '@@1': ['FETCH_BOOKS', 'FETCH_BOOK'],
+                '@@2': ['FETCH_BOOKS'],
+                '@@100': ['FETCH_BOOKS', 'FETCH_BOOK'],
+                '@@101': ['FETCH_BOOKS'],
+              },
+            },
+            createSuccessAction(updateBookAuthor, {
+              data: {
+                book: {
+                  id: 1,
+                  author: { id: 102, surname: 'Harry 2 new author' },
+                },
+                orphan: { id: 1000 },
+              },
+            }),
+            defaultConfig,
+          ),
+        ).toEqual({
+          queries: {
+            FETCH_BOOKS: {
+              ...defaultState,
+              data: ['@@1', '@@2'],
+              usedKeys: {
+                '': ['id', 'name', 'author', 'likers'],
+                '.author': ['id', 'surname'],
+              },
+              dependencies: ['@@1', '@@102', '@@2', '@@101'],
+            },
+            FETCH_BOOK: {
+              ...defaultState,
+              data: '@@1',
+              usedKeys: {
+                '': ['id', 'name', 'author', 'likers'],
+                '.author': ['id', 'surname'],
+              },
+              dependencies: ['@@1', '@@102'],
+            },
+          },
+          normalizedData: {
+            '@@1': { id: 1, name: 'Harry 2', author: '@@102', likers: [] },
+            '@@2': { id: 2, name: 'Lord', author: '@@101', likers: [] },
+            '@@101': { id: 101, surname: 'Lord author' },
+            '@@102': { id: 102, surname: 'Harry 2 new author' },
+          },
+          dependentQueries: {
+            '@@1': ['FETCH_BOOKS', 'FETCH_BOOK'],
+            '@@2': ['FETCH_BOOKS'],
+            '@@101': ['FETCH_BOOKS'],
+            '@@102': ['FETCH_BOOKS', 'FETCH_BOOK'],
+          },
+        });
+      });
+
+      it('handles added liker', () => {
+        const addBookLiker = {
+          type: 'ADD_BOOK_LIKER',
+          request: { url: '/book/1/liker', method: 'put' },
+          meta: { normalize: true },
+        };
+
+        expect(
+          queriesReducer(
+            {
+              queries: {
+                FETCH_BOOKS: {
+                  ...defaultState,
+                  data: ['@@1', '@@2'],
+                  usedKeys: {
+                    '': ['id', 'name', 'author', 'likers'],
+                    '.author': ['id', 'surname'],
+                  },
+                  dependencies: ['@@1', '@@102', '@@2', '@@101'],
+                },
+                FETCH_BOOK: {
+                  ...defaultState,
+                  data: '@@1',
+                  usedKeys: {
+                    '': ['id', 'name', 'author', 'likers'],
+                    '.author': ['id', 'surname'],
+                  },
+                  dependencies: ['@@1', '@@102'],
+                },
+              },
+              normalizedData: {
+                '@@1': { id: 1, name: 'Harry 2', author: '@@102', likers: [] },
+                '@@2': { id: 2, name: 'Lord', author: '@@101', likers: [] },
+                '@@101': { id: 101, surname: 'Lord author' },
+                '@@102': { id: 102, surname: 'Harry 2 new author' },
+              },
+              dependentQueries: {
+                '@@1': ['FETCH_BOOKS', 'FETCH_BOOK'],
+                '@@2': ['FETCH_BOOKS'],
+                '@@101': ['FETCH_BOOKS'],
+                '@@102': ['FETCH_BOOKS', 'FETCH_BOOK'],
+              },
+            },
+            createSuccessAction(addBookLiker, {
+              data: {
+                id: 1,
+                likers: [{ id: 1000, name: 'Liker 1' }],
+              },
+            }),
+            defaultConfig,
+          ),
+        ).toEqual({
+          queries: {
+            FETCH_BOOKS: {
+              ...defaultState,
+              data: ['@@1', '@@2'],
+              usedKeys: {
+                '': ['id', 'name', 'author', 'likers'],
+                '.author': ['id', 'surname'],
+              },
+              dependencies: ['@@1', '@@102', '@@1000', '@@2', '@@101'],
+            },
+            FETCH_BOOK: {
+              ...defaultState,
+              data: '@@1',
+              usedKeys: {
+                '': ['id', 'name', 'author', 'likers'],
+                '.author': ['id', 'surname'],
+              },
+              dependencies: ['@@1', '@@102', '@@1000'],
+            },
+          },
+          normalizedData: {
+            '@@1': {
+              id: 1,
+              name: 'Harry 2',
+              author: '@@102',
+              likers: ['@@1000'],
+            },
+            '@@2': { id: 2, name: 'Lord', author: '@@101', likers: [] },
+            '@@101': { id: 101, surname: 'Lord author' },
+            '@@102': { id: 102, surname: 'Harry 2 new author' },
+            '@@1000': { id: 1000, name: 'Liker 1' },
+          },
+          dependentQueries: {
+            '@@1': ['FETCH_BOOKS', 'FETCH_BOOK'],
+            '@@2': ['FETCH_BOOKS'],
+            '@@101': ['FETCH_BOOKS'],
+            '@@102': ['FETCH_BOOKS', 'FETCH_BOOK'],
+            '@@1000': ['FETCH_BOOKS', 'FETCH_BOOK'],
+          },
+        });
+      });
+    });
+
     describe('with normalization', () => {
       const defaultState = {
         data: null,
@@ -306,9 +733,18 @@ describe('reducers', () => {
         expect(
           queriesReducer(
             {
-              queries: {},
+              queries: {
+                FETCH_BOOK: {
+                  ...defaultState,
+                  data: '@@1',
+                  usedKeys: { '': ['id', 'a', 'b'] },
+                  dependencies: ['@@1'],
+                },
+              },
               normalizedData: { '@@1': { id: '1', a: 'a', b: 'b' } },
-              dependentQueries: {},
+              dependentQueries: {
+                '@@1': ['FETCH_BOOK'],
+              },
             },
             createSuccessAction(
               {
@@ -325,9 +761,18 @@ describe('reducers', () => {
             defaultConfig,
           ),
         ).toEqual({
-          queries: {},
+          queries: {
+            FETCH_BOOK: {
+              ...defaultState,
+              data: '@@1',
+              usedKeys: { '': ['id', 'a', 'b'] },
+              dependencies: ['@@1'],
+            },
+          },
           normalizedData: { '@@1': { id: '1', a: 'd', b: 'b', c: 'c' } },
-          dependentQueries: {},
+          dependentQueries: {
+            '@@1': ['FETCH_BOOK'],
+          },
         });
       });
 
@@ -469,6 +914,9 @@ describe('reducers', () => {
                   normalized: true,
                   dependencies: ['@@1'],
                   ref: {},
+                  usedKeys: {
+                    '': ['id', 'x'],
+                  },
                 },
               },
               normalizedData: { '@@1': { id: '1', x: 1 } },
@@ -493,6 +941,9 @@ describe('reducers', () => {
               normalized: true,
               dependencies: ['@@1'],
               ref: {},
+              usedKeys: {
+                '': ['id', 'x'],
+              },
             },
           },
           normalizedData: {
@@ -516,6 +967,9 @@ describe('reducers', () => {
                   normalized: true,
                   dependencies: ['@@1'],
                   ref: {},
+                  usedKeys: {
+                    '': ['id', 'x'],
+                  },
                 },
               },
               normalizedData: { '@@1': { id: '1', x: 1 } },
@@ -541,6 +995,9 @@ describe('reducers', () => {
               normalized: true,
               dependencies: ['@@1'],
               ref: {},
+              usedKeys: {
+                '': ['id', 'x'],
+              },
             },
           },
           normalizedData: {
@@ -564,6 +1021,9 @@ describe('reducers', () => {
                   normalized: true,
                   dependencies: ['@@1'],
                   ref: {},
+                  usedKeys: {
+                    '': ['id', 'x'],
+                  },
                 },
               },
               normalizedData: { '@@1': { id: '1', x: 2 } },
@@ -590,6 +1050,9 @@ describe('reducers', () => {
               normalized: true,
               dependencies: ['@@1'],
               ref: {},
+              usedKeys: {
+                '': ['id', 'x'],
+              },
             },
           },
           normalizedData: {

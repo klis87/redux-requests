@@ -20,6 +20,7 @@ const resetQuery = query =>
         error: null,
         pristine: true,
         usedKeys: query.normalized ? {} : null,
+        dependencies: query.normalized ? [] : null,
       };
 
 const resetMutation = mutation =>
