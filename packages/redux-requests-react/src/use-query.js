@@ -39,14 +39,10 @@ const useQuery = ({
   const key = `${selectorProps.type}${selectorProps.requestKey || ''}`;
 
   const dispatchQuery = useCallback(() => {
-    if (autoLoad) {
-      return dispatchRequest(
-        (selectorProps.action || selectorProps.type)(...variables),
-      );
-    }
-
-    return Promise.resolve(null);
-  }, [autoLoad, selectorProps.action, selectorProps.type, ...variables]);
+    return dispatchRequest(
+      (selectorProps.action || selectorProps.type)(...variables),
+    );
+  }, [selectorProps.action, selectorProps.type, ...variables]);
 
   const dispatchStopPolling = useCallback(() => {
     dispatchRequest(
