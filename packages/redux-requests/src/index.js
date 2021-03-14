@@ -16,6 +16,11 @@ export {
   openWebsocket,
   closeWebsocket,
 } from './actions';
+export {
+  createQuery,
+  createMutation,
+  createSubscription,
+} from './requests-creators';
 export { default as handleRequests } from './handle-requests';
 export {
   getQuery,

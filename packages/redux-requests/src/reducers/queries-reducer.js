@@ -236,11 +236,6 @@ export default (state, action, config = defaultConfig) => {
     const potentialDependenciesToRemove = new Set(orphanDependencies);
 
     foundQueries.forEach(query => {
-      // const [newdata, newNormalizedData, usedKeys] = normalize(
-      //   queries[query],
-      //   config,
-      // );
-
       const dependencies = [
         ...getDependentKeys(
           queries[query].data,
