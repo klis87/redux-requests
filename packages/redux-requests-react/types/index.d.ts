@@ -91,7 +91,7 @@ export function useQuery<
   suspense?: boolean;
   suspenseSsr?: boolean;
 }): QueryState<
-  Data extends undefined ? GetQueryStateData<QueryCreator> | undefined : Data
+  Data extends undefined ? GetQueryStateData<QueryCreator> | null : Data
 > & {
   load: () => Promise<{
     data?: QueryState<
