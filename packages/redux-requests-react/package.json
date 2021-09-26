@@ -1,6 +1,6 @@
 {
   "name": "@redux-requests/react",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "description": "React bindings for redux-requests, declarative AJAX requests and automatic network state management for single-page applications",
   "main": "lib/index.js",
   "module": "es/index.js",
