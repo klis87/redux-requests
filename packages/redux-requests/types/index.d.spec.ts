@@ -48,6 +48,14 @@ const requestAction: RequestAction = {
   },
 };
 
+const accessRequestActionProps = (requestAction: RequestAction) => {
+  if (requestAction.request !== undefined) {
+    // this request action has an existing `request` key
+  } else if (requestAction.payload !== undefined) {
+    // this request action has an existing `payload` key
+  }
+}
+
 const fetchBook: (
   id: string,
 ) => RequestAction<{ id: string; title: string }> = () => {
