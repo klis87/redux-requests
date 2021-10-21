@@ -77,6 +77,7 @@ interface RequestActionMeta<Data, TransformedData> {
 export type RequestAction<Data = any, TransformedData = Data> =
   | {
       type?: string;
+      payload?: never;
       request: any | any[];
       meta?: RequestActionMeta<Data, TransformedData>;
     }
@@ -85,6 +86,7 @@ export type RequestAction<Data = any, TransformedData = Data> =
       payload: {
         request: any | any[];
       };
+      request?: never;
       meta?: RequestActionMeta<Data, TransformedData>;
     };
 
