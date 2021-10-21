@@ -140,9 +140,11 @@ export function useSubscription<SC extends SubscriptionCreator = any>(props: {
 
 export function useDispatchRequest(): DispatchRequest;
 
-interface RequestsProviderProps {
+type RequestsProviderProps =
+  ({ requestsConfig: HandleRequestConfig; store?: never; }
+  | { store: Store; requestsConfig?: never; })
+& {
   children: React.ReactNode;
-  requestsConfig: HandleRequestConfig;
   extraReducers?: Reducer[];
   getMiddleware?: (extraMiddleware: Middleware[]) => Middleware[];
   autoLoad?: boolean;
@@ -150,10 +152,9 @@ interface RequestsProviderProps {
   throwError?: boolean;
   suspense?: boolean;
   suspenseSsr?: boolean;
-  store?: Store;
   getStore?: (store: RequestsStore) => void;
   initialState?: any;
-}
+};
 
 export class RequestsProvider extends React.Component<RequestsProviderProps> {}
 
