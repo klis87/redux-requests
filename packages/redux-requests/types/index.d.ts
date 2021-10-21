@@ -133,7 +133,7 @@ export type SubscriptionAction =
 
 type ResponseData<
   Request extends (...args: any[]) => RequestAction
-> = ReturnType<ReturnType<Request>['meta']['getData']>;
+> = ReturnType<NonNullable<ReturnType<Request>['meta']>['getData']>;
 
 type ActionTypeModifier = (actionType: string) => string;
 
