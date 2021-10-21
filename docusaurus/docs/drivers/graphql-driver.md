@@ -67,6 +67,20 @@ handleRequests({
 });
 ```
 
+To enable cross-site Access-Control requests to be made using credentials, `handleRequests` is configured as follows:
+
+```js
+import { handleRequests } from '@redux-requests/core';
+import { createDriver } from '@redux-requests/graphql';
+
+handleRequests({
+  driver: createDriver({
+    url: 'http://localhost:3000/graphql',
+    withCredentials: true
+  }),
+});
+```
+
 In order to send a query, just do it in a similar fashion to other drivers. The only
 one thing really specific to GraphQL is a way you define your actions. Let's create an action
 to fetch books:
