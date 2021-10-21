@@ -21,7 +21,12 @@ interface ErrorProps {
   [errorProp: string]: any;
 }
 
-interface QueryProps<QueryStateData> {
+interface QueryCustomComponentProps<QueryStateData> {
+  query: QueryState<QueryStateData>;
+  [extraProperty: string]: any;
+}
+
+interface QueryProps<QueryStateData, CustomComponentProps> {
   type?: string | ((...params: any[]) => RequestAction<any, QueryStateData>);
   action?: (...params: any[]) => RequestAction<any, QueryStateData>;
   requestKey?: string;
@@ -29,10 +34,7 @@ interface QueryProps<QueryStateData> {
   defaultData?: any;
   selector?: (state: any) => QueryState<QueryStateData>;
   children?: (query: QueryState<QueryStateData>) => React.ReactNode;
-  component?: React.ComponentType<{
-    query: QueryState<QueryStateData>;
-    [extraProperty: string]: any;
-  }>;
+  component?: CustomComponentProps extends QueryCustomComponentProps<QueryStateData> ? React.ComponentType<CustomComponentProps> : never;
   isDataEmpty?: (query: QueryState<QueryStateData>) => boolean;
   showLoaderDuringRefetch?: boolean;
   noDataMessage?: React.ReactNode;
@@ -43,23 +45,25 @@ interface QueryProps<QueryStateData> {
   [extraProperty: string]: any;
 }
 
-export class Query<QueryStateData = any> extends React.Component<
-  QueryProps<QueryStateData>
+export class Query<QueryStateData = any, CustomComponentProps = {}> extends React.Component<
+  QueryProps<QueryStateData, CustomComponentProps>
 > {}
 
-interface MutationProps {
+interface MutationCustomComponentProps {
+  mutation: MutationState;
+  [extraProperty: string]: any;
+}
+
+interface MutationProps<CustomComponentProps> {
   type?: string | ((...params: any[]) => RequestAction);
   requestKey?: string;
   selector?: (state: any) => MutationState;
   children?: (mutation: MutationState) => React.ReactNode;
-  component?: React.ComponentType<{
-    mutation: MutationState;
-    [extraProperty: string]: any;
-  }>;
+  component?: CustomComponentProps extends MutationCustomComponentProps ? React.ComponentType<CustomComponentProps> : never;
   [extraProperty: string]: any;
 }
 
-export class Mutation extends React.Component<MutationProps> {}
+export class Mutation<CustomComponentProps = {}> extends React.Component<MutationProps<CustomComponentProps>> {}
 
 interface RequestCreator<QueryStateData = any> {
   (...args: any[]): RequestAction<any, QueryStateData>;

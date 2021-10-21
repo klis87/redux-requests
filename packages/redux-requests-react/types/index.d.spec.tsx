@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { RequestAction } from '@redux-requests/core';
+import { MutationState, QueryState, RequestAction } from '@redux-requests/core';
 
 import {
   Query,
@@ -115,28 +115,19 @@ function Error({ error, extra }) {
   );
 }
 
-function Component({ query, extra }) {
+function Component({ query, extra }: { query: QueryState<number>, extra: any }) {
   return (
     <div>
-      {query.data as number} {extra}
+      {query.data} {extra}
     </div>
   );
 }
 
 function QueryWithComponents() {
   return (
-    <Query<string>
+    <Query
       type="QUERY"
       component={Component}
-      loadingComponent={Spinner}
-      loadingComponentProps={{
-        extra: 'extra',
-      }}
-      errorComponent={Error}
-      errorComponentProps={{ extra: 'extra' }}
-      noDataMessage={<span>No data</span>}
-      showLoaderDuringRefetch={false}
-      isDataEmpty={query => true}
     />
   );
 }
@@ -154,7 +145,7 @@ function BasicMutation() {
   );
 }
 
-function MutationComponent({ mutation, extra }) {
+function MutationComponent({ mutation, extra }: { mutation: MutationState, extra: any }) {
   return (
     <div>
       {mutation.loading && 'loading'}
