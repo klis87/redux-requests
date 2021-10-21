@@ -4,9 +4,10 @@ import { extractFiles } from 'extract-files';
 const calculateProgress = progressEvent =>
   parseInt((progressEvent.loaded / progressEvent.total) * 100);
 
-export const createDriver = ({ url }) => {
+export const createDriver = ({ url, ...rest }) => {
   const axiosInstance = axios.create({
     baseURL: url,
+    ...rest
   });
 
   return (requestConfig, requestAction, driverActions) => {

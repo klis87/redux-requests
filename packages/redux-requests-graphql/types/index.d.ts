@@ -2,6 +2,7 @@ import { Driver, Subscriber } from '@redux-requests/core';
 
 interface GraphqlDriverConfig {
   url: string;
+  withCredentials?: boolean;
 }
 
 export const createDriver: (config: GraphqlDriverConfig) => Driver;
