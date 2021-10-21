@@ -59,12 +59,8 @@ const fetchBook: (
   };
 };
 
-let dummyDriver: Driver;
-dummyDriver({}, requestAction, {})
-  .then(v => v)
-  .catch(e => {
-    throw e;
-  });
+const dummyDriver: Driver = ({}, requestAction, {}) =>
+  new Promise<void>((resolve) => { resolve() });
 
 handleRequests({ driver: dummyDriver });
 handleRequests({
