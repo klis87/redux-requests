@@ -1,3 +1,6 @@
+import 'isomorphic-fetch'
+import 'yet-another-abortcontroller-polyfill'
+
 import { createDriver } from './fetch-api-driver';
 
 describe('fetchApiDriver', () => {
@@ -142,6 +145,22 @@ describe('fetchApiDriver', () => {
     expect(abort).not.toHaveBeenCalled();
     promise.cancel();
     expect(abort).toHaveBeenCalledTimes(1);
+  });
+
+  it('properly handles aborting requests with the polyfilled `fetch` & `AbortController`', async() => {
+    const driver = createDriver(fetch, {
+      AbortController,
+    });
+
+    const promise = driver({ url: 'http://localhost' });
+    try {
+      promise.cancel();
+      await promise;
+    } catch(e) {
+      expect(e).toBe('REQUEST_ABORTED')
+    }
+    // makes sure the promise doesn't resolve
+    expect(promise).rejects.toBeDefined();
   });
 
   it('uses baseURL for relative urls', async () => {
