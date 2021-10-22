@@ -1,6 +1,6 @@
 module.exports = {
   transform: {
-    '^.+\\.jsx?$': './wrapper.js',
+    '^.+\\.jsx?$': 'babel-jest',
   },
   coveragePathIgnorePatterns: [
     '/node_modules/',
