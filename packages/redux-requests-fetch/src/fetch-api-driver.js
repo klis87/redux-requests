@@ -1,5 +1,7 @@
 import isAbsoluteUrl from 'axios/lib/helpers/isAbsoluteURL';
 
+import { isNativeAbortError } from './helpers';
+
 const responseTypes = ['arraybuffer', 'blob', 'formData', 'json', 'text', null];
 
 const getData = (response, responseType) => {
@@ -50,6 +52,12 @@ export const createDriver = (
         throw response;
       },
     );
+  }).catch(error => {
+    if (isNativeAbortError(error)) {
+      throw 'REQUEST_ABORTED';
+    }
+
+    throw error;
   });
 
   responsePromise.cancel = () => abortSource.abort();
