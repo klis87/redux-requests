@@ -103,11 +103,11 @@ function BasicQuery2() {
   return <Query type={fetchBooks}>{({ data }) => data}</Query>;
 }
 
-function Spinner({ extra }) {
+function Spinner({ extra }: { extra: any }) {
   return <span>loading... {extra}</span>;
 }
 
-function Error({ error, extra }) {
+function Error({ error, extra }: { error: Error, extra: any }) {
   return (
     <span>
       {error} {extra}
@@ -194,9 +194,9 @@ const QueryDispatcher = () => {
     <button
       onClick={async () => {
         const response = await dispatch(fetchBooks(1, '1', { a: false }));
-        response.data.parsed;
+        response.data?.parsed;
         const response2 = await dispatch(fetchBook('1'));
-        response2.data.title;
+        response2.data?.title;
       }}
     >
       Make a query
