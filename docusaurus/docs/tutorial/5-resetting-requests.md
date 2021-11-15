@@ -15,7 +15,7 @@ dispatch(resetRequests());
 // clear errors and data for FETCH_BOOKS query
 dispatch(resetRequests([FETCH_BOOKS]));
 
-// clear errors if any for for DELETE_BOOKS mutation
+// clear errors if any for DELETE_BOOKS mutation
 dispatch(resetRequests([DELETE_BOOKS]));
 
 // clear errors and data for FETCH_BOOKS and FETCH_BOOK with 1 request key
