@@ -10,7 +10,7 @@ const getKey = action => action.type + (action.meta.requestKey || '');
 export default (config = defaultConfig) => store => next => action => {
   if (
     config.isRequestAction(action) &&
-    action.meta?.cache &&
+    action.meta.cache &&
     !action.meta.ssrResponse
   ) {
     const key = getKey(action);
@@ -20,7 +20,7 @@ export default (config = defaultConfig) => store => next => action => {
     if (cacheValue !== undefined && isCacheValid(cacheValue, action)) {
       const query = getQuery(state, {
         type: action.type,
-        requestKey: action.meta?.requestKey,
+        requestKey: action.meta.requestKey,
       });
 
       return next({

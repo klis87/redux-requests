@@ -19,6 +19,7 @@ export {
 export {
   createQuery,
   createMutation,
+  createLocalMutation,
   createSubscription,
 } from './requests-creators';
 export { default as handleRequests } from './handle-requests';
@@ -29,4 +30,3 @@ export {
   getMutationSelector,
   getWebsocketState,
 } from './selectors';
-export { createRequestsStore } from './middleware';

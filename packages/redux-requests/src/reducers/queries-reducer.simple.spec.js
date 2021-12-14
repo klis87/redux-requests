@@ -4,6 +4,7 @@ import {
   createErrorAction,
   createAbortAction,
 } from '../actions';
+import { createQuery } from '../requests-creators';
 
 import queriesReducer from './queries-reducer';
 
@@ -20,10 +21,7 @@ describe('reducers', () => {
         usedKeys: null,
         dependencies: null,
       };
-      const requestAction = {
-        type: 'FETCH_BOOK',
-        request: { url: '/ ' },
-      };
+      const requestAction = createQuery('FETCH_BOOK', { url: '/ ' })();
 
       it('returns the same state for not handled action', () => {
         const state = { queries: {}, normalizedData: {} };

@@ -1,5 +1,10 @@
 import defaultConfig from '../default-config';
 import { createSuccessAction, createErrorAction } from '../actions';
+import {
+  createQuery,
+  createMutation,
+  createLocalMutation,
+} from '../requests-creators';
 
 import queriesReducer from './queries-reducer';
 
@@ -165,11 +170,11 @@ describe('reducers', () => {
       };
 
       it('handles initial books fetch', () => {
-        const fetchBooks = {
-          type: 'FETCH_BOOKS',
-          request: { url: '/books' },
-          meta: { normalize: true },
-        };
+        const fetchBooks = createQuery(
+          'FETCH_BOOKS',
+          { url: '/books' },
+          { normalize: true },
+        )();
 
         expect(
           queriesReducer(
@@ -225,11 +230,11 @@ describe('reducers', () => {
       });
 
       it('handles book detail fetch', () => {
-        const fetchBook = {
-          type: 'FETCH_BOOK',
-          request: { url: '/book/1' },
-          meta: { normalize: true },
-        };
+        const fetchBook = createQuery(
+          'FETCH_BOOK',
+          { url: '/book/1' },
+          { normalize: true },
+        )();
 
         expect(
           queriesReducer(
@@ -307,11 +312,11 @@ describe('reducers', () => {
       });
 
       it('handles book update', () => {
-        const updateBook = {
-          type: 'UPDATE_BOOK',
-          request: { url: '/book/1', method: 'put' },
-          meta: { normalize: true },
-        };
+        const updateBook = createMutation(
+          'UPDATE_BOOK',
+          { url: '/book/1', method: 'put' },
+          { normalize: true },
+        )();
 
         expect(
           queriesReducer(
@@ -395,11 +400,11 @@ describe('reducers', () => {
       });
 
       it('handles book author change and orphan object', () => {
-        const updateBookAuthor = {
-          type: 'UPDATE_BOOK_AUTHOR',
-          request: { url: '/book/1/author', method: 'put' },
-          meta: { normalize: true },
-        };
+        const updateBookAuthor = createMutation(
+          'UPDATE_BOOK_AUTHOR',
+          { url: '/book/1/author', method: 'put' },
+          { normalize: true },
+        )();
 
         expect(
           queriesReducer(
@@ -485,11 +490,11 @@ describe('reducers', () => {
       });
 
       it('handles added liker', () => {
-        const addBookLiker = {
-          type: 'ADD_BOOK_LIKER',
-          request: { url: '/book/1/liker', method: 'put' },
-          meta: { normalize: true },
-        };
+        const addBookLiker = createMutation(
+          'ADD_BOOK_LIKER',
+          { url: '/book/1/liker', method: 'put' },
+          { normalize: true },
+        )();
 
         expect(
           queriesReducer(
@@ -590,13 +595,13 @@ describe('reducers', () => {
         dependencies: [],
         ref: {},
       };
-      const requestAction = {
-        type: 'FETCH_BOOK',
-        request: { url: '/ ' },
-        meta: {
+      const requestAction = createQuery(
+        'FETCH_BOOK',
+        { url: '/ ' },
+        {
           normalize: true,
         },
-      };
+      )();
 
       it('should normalize data on query success', () => {
         expect(
@@ -747,13 +752,13 @@ describe('reducers', () => {
               },
             },
             createSuccessAction(
-              {
-                type: 'UPDATE_BOOK',
-                request: { url: '/', method: 'put' },
-                meta: {
+              createMutation(
+                'UPDATE_BOOK',
+                { url: '/', method: 'put' },
+                {
                   normalize: true,
                 },
-              },
+              )(),
               {
                 data: { id: '1', a: 'd', c: 'c' },
               },
@@ -800,16 +805,16 @@ describe('reducers', () => {
               dependentQueries: { '@@1': ['FETCH_BOOK'] },
             },
             createSuccessAction(
-              {
-                type: 'ADD_BOOK',
-                request: { url: '/', method: 'put' },
-                meta: {
+              createMutation(
+                'ADD_BOOK',
+                { url: '/', method: 'put' },
+                {
                   normalize: true,
                   mutations: {
                     FETCH_BOOK: updateData,
                   },
                 },
-              },
+              )(),
               {
                 data: { id: '2', x: 2 },
               },
@@ -865,18 +870,14 @@ describe('reducers', () => {
               normalizedData: { '@@1': { id: '1', x: 1 } },
               dependentQueries: { '@@1': ['FETCH_BOOK'] },
             },
-            {
-              type: 'ADD_BOOK_LOCALLY',
-              meta: {
-                // normalize: true,
-                mutations: {
-                  FETCH_BOOK: {
-                    updateData: data => [...data, { id: '2', x: 2 }],
-                    local: true,
-                  },
+            createLocalMutation('ADD_BOOK_LOCALLY', {
+              mutations: {
+                FETCH_BOOK: {
+                  updateData: data => [...data, { id: '2', x: 2 }],
+                  local: true,
                 },
               },
-            },
+            })(),
             defaultConfig,
           ),
         ).toEqual({
@@ -924,12 +925,9 @@ describe('reducers', () => {
                 '@@1': ['FETCH_BOOK'],
               },
             },
-            {
-              type: 'UPDATE_BOOK_LOCALLY',
-              meta: {
-                localData: { id: '1', x: 2 },
-              },
-            },
+            createLocalMutation('UPDATE_BOOK_LOCALLY', {
+              localData: { id: '1', x: 2 },
+            })(),
             defaultConfig,
           ),
         ).toEqual({
@@ -977,13 +975,13 @@ describe('reducers', () => {
                 '@@1': ['FETCH_BOOK'],
               },
             },
-            {
-              type: 'UPDATE_BOOK',
-              request: { url: '/books', method: 'post' },
-              meta: {
+            createMutation(
+              'UPDATE_BOOK',
+              { url: '/books', method: 'post' },
+              {
                 optimisticData: { id: '1', x: 2 },
               },
-            },
+            )(),
             defaultConfig,
           ),
         ).toEqual({
@@ -1031,14 +1029,16 @@ describe('reducers', () => {
                 '@@1': ['FETCH_BOOK'],
               },
             },
-            createErrorAction({
-              type: 'UPDATE_BOOK',
-              request: { url: '/books', method: 'post' },
-              meta: {
-                optimisticData: { id: '1', x: 2 },
-                revertedData: { id: '1', x: 1 },
-              },
-            }),
+            createErrorAction(
+              createMutation(
+                'UPDATE_BOOK',
+                { url: '/books', method: 'post' },
+                {
+                  optimisticData: { id: '1', x: 2 },
+                  revertedData: { id: '1', x: 1 },
+                },
+              )(),
+            ),
             defaultConfig,
           ),
         ).toEqual({

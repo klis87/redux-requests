@@ -21,22 +21,22 @@ export default (state, action, config) => {
     };
   }
 
-  if (config.isRequestAction(action) && action.meta?.measureDownloadProgress) {
+  if (config.isRequestAction(action) && action.meta.measureDownloadProgress) {
     return {
       ...state,
       downloadProgress: {
         ...state.downloadProgress,
-        [action.type + (action.meta?.requestKey || '')]: 0,
+        [action.type + (action.meta.requestKey || '')]: 0,
       },
     };
   }
 
-  if (config.isRequestAction(action) && action.meta?.measureUploadProgress) {
+  if (config.isRequestAction(action) && action.meta.measureUploadProgress) {
     return {
       ...state,
       uploadProgress: {
         ...state.uploadProgress,
-        [action.type + (action.meta?.requestKey || '')]: 0,
+        [action.type + (action.meta.requestKey || '')]: 0,
       },
     };
   }

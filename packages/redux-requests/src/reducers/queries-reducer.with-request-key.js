@@ -4,6 +4,7 @@ import {
   createErrorAction,
   createAbortAction,
 } from '../actions';
+import { createQuery } from '../requests-creators';
 
 import queriesReducer from './queries-reducer';
 
@@ -19,13 +20,13 @@ describe('reducers', () => {
         ref: {},
         usedKeys: null,
       };
-      const requestAction = {
-        type: 'FETCH_BOOK',
-        request: { url: '/ ' },
-        meta: {
+      const requestAction = createQuery(
+        'FETCH_BOOK',
+        { url: '/ ' },
+        {
           requestKey: 1,
         },
-      };
+      )();
 
       it('handles request query action', () => {
         expect(

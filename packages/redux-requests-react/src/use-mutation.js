@@ -8,7 +8,7 @@ import {
   joinRequest,
 } from '@redux-requests/core';
 
-import useDispatchRequest from './use-dispatch-request';
+import useDispatch from './use-dispatch';
 import RequestsContext from './requests-context';
 
 const emptyVariables = [];
@@ -27,27 +27,25 @@ const useMutation = ({
   throwError =
     throwError === undefined ? requestContext.throwError : throwError;
 
-  const dispatchRequest = useDispatchRequest();
+  const dispatch = useDispatch();
   const store = useStore();
 
   const key = `${selectorProps.type}${selectorProps.requestKey || ''}`;
 
   const dispatchMutation = useCallback(() => {
-    return dispatchRequest(
-      (selectorProps.action || selectorProps.type)(...variables),
-    );
-  }, [selectorProps.action, selectorProps.type, ...variables]);
+    return dispatch(selectorProps.type(...variables));
+  }, [selectorProps.type, ...variables]);
 
   const mutation = useSelector(getMutationSelector(selectorProps));
 
   useEffect(() => {
-    dispatchRequest(addWatcher(key));
+    dispatch(addWatcher(key));
 
     return () => {
-      dispatchRequest(removeWatcher(key));
+      dispatch(removeWatcher(key));
 
       if (autoReset && !store.getState().requests.watchers[key]) {
-        dispatchRequest(
+        dispatch(
           resetRequests(
             [
               {
@@ -63,7 +61,7 @@ const useMutation = ({
   }, [selectorProps.type, selectorProps.requestKey]);
 
   if (suspense && mutation.loading) {
-    throw dispatchRequest(joinRequest(key));
+    throw dispatch(joinRequest(key));
   }
 
   if (throwError && mutation.error) {

@@ -1,5 +1,6 @@
 import { createSuccessAction } from '../actions';
 import defaultConfig from '../default-config';
+import { createQuery } from '../requests-creators';
 
 import ssrReducer from './ssr-reducer';
 
@@ -18,10 +19,7 @@ describe('reducers', () => {
       expect(
         ssrReducer(
           ['REQUEST'],
-          createSuccessAction(
-            { type: 'REQUEST', request: { url: '/' } },
-            'data',
-          ),
+          createSuccessAction(createQuery('REQUEST', { url: '/' })(), 'data'),
           { ...defaultConfig, ssr: 'server' },
         ),
       ).toEqual(['REQUEST', 'REQUEST']);
@@ -31,12 +29,11 @@ describe('reducers', () => {
       expect(
         ssrReducer(
           ['REQUEST', 'REQUEST'],
-
-          {
-            type: 'REQUEST',
-            request: { url: '/' },
-            meta: { ssrResponse: { data: 'data' } },
-          },
+          createQuery(
+            'REQUEST',
+            { url: '/' },
+            { ssrResponse: { data: 'data' } },
+          )(),
           { ...defaultConfig, ssr: 'client' },
         ),
       ).toEqual(['REQUEST']);
@@ -46,12 +43,11 @@ describe('reducers', () => {
       expect(
         ssrReducer(
           ['REQUEST', 'REQUEST'],
-
-          {
-            type: 'REQUEST2',
-            request: { url: '/' },
-            meta: { ssrResponse: { data: 'data' } },
-          },
+          createQuery(
+            'REQUEST2',
+            { url: '/' },
+            { ssrResponse: { data: 'data' } },
+          )(),
           { ...defaultConfig, ssr: 'client' },
         ),
       ).toEqual(['REQUEST', 'REQUEST']);

@@ -1,5 +1,4 @@
 import defaultConfig from '../default-config';
-import { isResponseAction, getRequestActionFromResponse } from '../actions';
 
 import queriesReducer from './queries-reducer';
 import mutationsReducer from './mutations-reducer';
@@ -30,23 +29,13 @@ export default (config = defaultConfig) => (state = defaultState, action) => {
     config,
   );
 
-  let { mutations } = state;
-
-  if (
-    (config.isRequestAction(action) && !config.isRequestActionQuery(action)) ||
-    (isResponseAction(action) &&
-      !config.isRequestActionQuery(getRequestActionFromResponse(action)))
-  ) {
-    mutations = mutationsReducer(mutations, action);
-  }
-
   return {
     ...requestKeysReducer(
       {
         ...requestsResetReducer(
           {
             queries,
-            mutations,
+            mutations: mutationsReducer(state.mutations, action, config),
             cache: cacheReducer(state.cache, action),
             ...progressReducer(
               {

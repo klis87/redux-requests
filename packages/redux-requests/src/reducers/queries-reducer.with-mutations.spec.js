@@ -4,6 +4,7 @@ import {
   createErrorAction,
   createAbortAction,
 } from '../actions';
+import { createMutation, createLocalMutation } from '../requests-creators';
 
 import queriesReducer from './queries-reducer';
 
@@ -29,17 +30,17 @@ describe('reducers', () => {
         expect(
           queriesReducer(
             initialState,
-            {
-              type: MUTATION_ACTION,
-              request: { url: '/books', method: 'post' },
-              meta: {
+            createMutation(
+              MUTATION_ACTION,
+              { url: '/books', method: 'post' },
+              {
                 mutations: {
                   FETCH_BOOK: {
                     updateDataOptimistic: data => `${data} suffix`,
                   },
                 },
               },
-            },
+            )(),
             defaultConfig,
           ),
         ).toEqual({
@@ -61,17 +62,17 @@ describe('reducers', () => {
           queriesReducer(
             initialState,
             createSuccessAction(
-              {
-                type: MUTATION_ACTION,
-                request: { url: '/books', method: 'post' },
-                meta: {
+              createMutation(
+                MUTATION_ACTION,
+                { url: '/books', method: 'post' },
+                {
                   mutations: {
                     FETCH_BOOK: {
                       updateDataOptimistic: data => `${data} suffix`,
                     },
                   },
                 },
-              },
+              )(),
               { data: 'updated data' },
             ),
             defaultConfig,
@@ -84,16 +85,16 @@ describe('reducers', () => {
           queriesReducer(
             initialState,
             createSuccessAction(
-              {
-                type: MUTATION_ACTION,
-                request: { url: '/books', method: 'post' },
-                meta: {
+              createMutation(
+                MUTATION_ACTION,
+                { url: '/books', method: 'post' },
+                {
                   mutations: {
                     FETCH_BOOK: (data, mutationData) =>
                       data + mutationData.nested,
                   },
                 },
-              },
+              )(),
               { data: { nested: 'suffix' } },
             ),
             defaultConfig,
@@ -117,10 +118,10 @@ describe('reducers', () => {
           queriesReducer(
             initialState,
             createSuccessAction(
-              {
-                type: MUTATION_ACTION,
-                request: { url: '/books', method: 'post' },
-                meta: {
+              createMutation(
+                MUTATION_ACTION,
+                { url: '/books', method: 'post' },
+                {
                   mutations: {
                     FETCH_BOOK: {
                       updateData: (data, mutationData) =>
@@ -128,7 +129,7 @@ describe('reducers', () => {
                     },
                   },
                 },
-              },
+              )(),
               { data: { nested: 'suffix' } },
             ),
             defaultConfig,
@@ -152,10 +153,10 @@ describe('reducers', () => {
           queriesReducer(
             initialState,
             createErrorAction(
-              {
-                type: MUTATION_ACTION,
-                request: { url: '/books', method: 'post' },
-                meta: {
+              createMutation(
+                MUTATION_ACTION,
+                { url: '/books', method: 'post' },
+                {
                   mutations: {
                     FETCH_BOOK: {
                       updateDataOptimistic: () => 'data2',
@@ -163,7 +164,7 @@ describe('reducers', () => {
                     },
                   },
                 },
-              },
+              )(),
               'error',
             ),
             defaultConfig,
@@ -187,17 +188,17 @@ describe('reducers', () => {
           queriesReducer(
             initialState,
             createErrorAction(
-              {
-                type: MUTATION_ACTION,
-                request: { url: '/books', method: 'post' },
-                meta: {
+              createMutation(
+                MUTATION_ACTION,
+                { url: '/books', method: 'post' },
+                {
                   mutations: {
                     FETCH_BOOK: {
                       updateDataOptimistic: () => 'data2',
                     },
                   },
                 },
-              },
+              )(),
               'error',
             ),
             defaultConfig,
@@ -220,18 +221,20 @@ describe('reducers', () => {
         expect(
           queriesReducer(
             initialState,
-            createAbortAction({
-              type: MUTATION_ACTION,
-              request: { url: '/books', method: 'post' },
-              meta: {
-                mutations: {
-                  FETCH_BOOK: {
-                    updateDataOptimistic: () => 'data2',
-                    revertData: data => `${data} reverted`,
+            createAbortAction(
+              createMutation(
+                MUTATION_ACTION,
+                { url: '/books', method: 'post' },
+                {
+                  mutations: {
+                    FETCH_BOOK: {
+                      updateDataOptimistic: () => 'data2',
+                      revertData: data => `${data} reverted`,
+                    },
                   },
                 },
-              },
-            }),
+              )(),
+            ),
             defaultConfig,
           ),
         ).toEqual({
@@ -252,17 +255,11 @@ describe('reducers', () => {
         expect(
           queriesReducer(
             initialState,
-            {
-              type: 'LOCAL_MUTATION_ACTION',
-              meta: {
-                mutations: {
-                  FETCH_BOOK: {
-                    local: true,
-                    updateData: data => `${data} suffix`,
-                  },
-                },
+            createLocalMutation('LOCAL_MUTATION_ACTION', {
+              mutations: {
+                FETCH_BOOK: data => `${data} suffix`,
               },
-            },
+            })(),
             defaultConfig,
           ),
         ).toEqual({

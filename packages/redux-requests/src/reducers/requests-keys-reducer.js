@@ -2,7 +2,7 @@ import defaultConfig from '../default-config';
 
 // TODO: this should be rewritten to more functional style, we need things like filter object helpers
 export default (state, action, config = defaultConfig) => {
-  if (config.isRequestAction(action) && action.meta?.requestKey !== undefined) {
+  if (config.isRequestAction(action) && action.meta.requestKey) {
     let { queries, mutations, cache, requestsKeys } = state;
 
     if (!requestsKeys[action.type]) {

@@ -32,6 +32,7 @@ export const createSuccessAction = (action, response) => ({
   response,
   meta: {
     ...action.meta,
+    requestType: undefined,
     requestAction: action,
   },
 });
@@ -41,6 +42,7 @@ export const createErrorAction = (action, errorData) => ({
   error: errorData,
   meta: {
     ...action.meta,
+    requestType: undefined,
     requestAction: action,
   },
 });
@@ -49,23 +51,15 @@ export const createAbortAction = action => ({
   type: abort(action.type),
   meta: {
     ...action.meta,
+    requestType: undefined,
     requestAction: action,
   },
 });
 
 export const isRequestAction = action => {
   return (
-    !!action?.request &&
-    !!(
-      Array.isArray(action.request) ||
-      action.request.url ||
-      action.request.query ||
-      action.request.promise ||
-      action.request.response ||
-      action.request.error
-    ) &&
-    !action.response &&
-    !(action instanceof Error)
+    action?.meta?.requestType === 'QUERY' ||
+    action?.meta?.requestType === 'MUTATION'
   );
 };
 
@@ -82,21 +76,20 @@ export const isErrorAction = action =>
 export const isAbortAction = action =>
   isResponseAction(action) && action.type.endsWith(ABORT_SUFFIX);
 
-const isRequestQuery = request =>
-  (!request.query &&
-    (!request.method || request.method.toLowerCase() === 'get')) ||
-  (request.query && !request.query.trim().startsWith('mutation'));
-
 export const isRequestActionQuery = action => {
-  const { request } = action;
+  return action?.meta?.requestType === 'QUERY';
+};
 
-  if (action.meta?.asMutation !== undefined) {
-    return !action.meta.asMutation;
-  }
+export const isRequestActionMutation = action => {
+  return action?.meta?.requestType === 'MUTATION';
+};
 
-  return !!(Array.isArray(request)
-    ? request.every(isRequestQuery)
-    : isRequestQuery(request));
+export const isRequestActionLocalMutation = action => {
+  return action?.meta?.requestType === 'LOCAL_MUTATION';
+};
+
+export const isRequestActionSubscription = action => {
+  return action?.meta?.requestType === 'SUBSCRIPTION';
 };
 
 export const clearRequestsCache = (requests = null) => ({

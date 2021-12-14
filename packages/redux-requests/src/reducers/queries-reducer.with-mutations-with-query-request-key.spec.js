@@ -1,5 +1,6 @@
 import defaultConfig from '../default-config';
 import { createSuccessAction } from '../actions';
+import { createMutation, createLocalMutation } from '../requests-creators';
 
 import queriesReducer from './queries-reducer';
 
@@ -32,17 +33,17 @@ describe('reducers', () => {
         expect(
           queriesReducer(
             initialState,
-            {
-              type: MUTATION_ACTION,
-              request: { url: '/books', method: 'post' },
-              meta: {
+            createMutation(
+              MUTATION_ACTION,
+              { url: '/books', method: 'post' },
+              {
                 mutations: {
                   FETCH_BOOK1: {
                     updateDataOptimistic: data => `${data} suffix`,
                   },
                 },
               },
-            },
+            )(),
             defaultConfig,
           ),
         ).toEqual({
@@ -71,10 +72,10 @@ describe('reducers', () => {
           queriesReducer(
             initialState,
             createSuccessAction(
-              {
-                type: MUTATION_ACTION,
-                request: { url: '/books', method: 'post' },
-                meta: {
+              createMutation(
+                MUTATION_ACTION,
+                { url: '/books', method: 'post' },
+                {
                   mutations: {
                     FETCH_BOOK1: {
                       updateData: (data, mutationData) =>
@@ -82,7 +83,7 @@ describe('reducers', () => {
                     },
                   },
                 },
-              },
+              )(),
               { data: { nested: 'suffix' } },
             ),
             defaultConfig,
@@ -112,17 +113,11 @@ describe('reducers', () => {
         expect(
           queriesReducer(
             initialState,
-            {
-              type: 'LOCAL_MUTATION_ACTION',
-              meta: {
-                mutations: {
-                  FETCH_BOOK1: {
-                    local: true,
-                    updateData: data => `${data} suffix`,
-                  },
-                },
+            createLocalMutation('LOCAL_MUTATION_ACTION', {
+              mutations: {
+                FETCH_BOOK1: data => `${data} suffix`,
               },
-            },
+            })(),
             defaultConfig,
           ),
         ).toEqual({

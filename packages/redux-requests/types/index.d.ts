@@ -1,14 +1,7 @@
 import { AnyAction, Reducer, Middleware, Store } from 'redux';
 
-export interface DispatchRequest {
-  <QueryStateData = any>(
-    requestAction: RequestAction<any, QueryStateData>,
-  ): Promise<{
-    data?: QueryStateData;
-    error?: any;
-    isAborted?: true;
-    action: any;
-  }>;
+interface Config {
+  [key: string]: any;
 }
 
 interface FilterActions {
@@ -19,14 +12,15 @@ interface ModifyData {
   (data: any, mutationData: any): any;
 }
 
-interface RequestsStore extends Store {
-  dispatchRequest: DispatchRequest;
-}
+type ActionTypeModifier = (actionType: string) => string;
 
-export const createRequestsStore: (store: Store) => RequestsStore;
+export const success: ActionTypeModifier;
 
-interface RequestActionMeta<Data, TransformedData> {
-  asMutation?: boolean;
+export const error: ActionTypeModifier;
+
+export const abort: ActionTypeModifier;
+
+interface RequestMeta<Data, TransformedData> {
   driver?: string;
   takeLatest?: boolean;
   getData?: (data: Data, currentData: TransformedData) => TransformedData;
@@ -34,24 +28,6 @@ interface RequestActionMeta<Data, TransformedData> {
   requestKey?: string;
   requestsCapacity?: number;
   normalize?: boolean;
-  mutations?: {
-    [actionType: string]:
-      | ModifyData
-      | {
-          updateData?: ModifyData;
-          updateDataOptimistic?: (data: any) => any;
-          revertData?: (data: any) => any;
-          local?: boolean;
-        };
-  };
-  optimisticData?: any;
-  revertedData?: any;
-  localData?: any;
-  cache?: boolean | number;
-  cacheKey?: string;
-  poll?: number;
-  dependentRequestsNumber?: number;
-  isDependentRequest?: boolean;
   silent?: boolean;
   onRequest?: (
     request: any,
@@ -71,30 +47,44 @@ interface RequestActionMeta<Data, TransformedData> {
   runOnAbort?: boolean;
   measureDownloadProgress?: boolean;
   measureUploadProgress?: boolean;
-  [extraProperty: string]: any;
 }
 
-export type RequestAction<Data = any, TransformedData = Data> = {
-  type?: string;
-  request: any | any[];
-  meta?: RequestActionMeta<Data, TransformedData>;
-};
+interface QueryMeta<Data, TransformedData>
+  extends RequestMeta<Data, TransformedData> {
+  requestType: 'QUERY';
+  cache?: boolean | number;
+  cacheKey?: string;
+  poll?: number;
+  dependentRequestsNumber?: number;
+  isDependentRequest?: boolean;
+}
 
-export type LocalMutationAction = {
-  type?: string;
-  meta: {
-    mutations?: {
-      [actionType: string]: {
-        updateData: ModifyData;
-        local: true;
-      };
-    };
-    localData?: any;
-    [extraProperty: string]: any;
+interface MutationMeta<Data, TransformedData>
+  extends RequestMeta<Data, TransformedData> {
+  requestType: 'MUTATION';
+  mutations?: {
+    [actionType: string]:
+      | ModifyData
+      | {
+          updateData?: ModifyData;
+          updateDataOptimistic?: (data: any) => any;
+          revertData?: (data: any) => any;
+        };
   };
-};
+  optimisticData?: any;
+  revertedData?: any;
+}
 
-interface SubscriptionActionMeta {
+interface LocalMutationMeta {
+  requestType: 'LOCAL_MUTATION';
+  mutations?: {
+    [actionType: string]: ModifyData;
+  };
+  localData?: any;
+}
+
+interface SubscriptionMeta {
+  requestType: 'SUBSCRIPTION';
   requestKey?: string;
   normalize?: boolean;
   mutations?: {
@@ -106,26 +96,86 @@ interface SubscriptionActionMeta {
   };
   getData?: (data: any) => any;
   onMessage?: (data: any, message: any, store: RequestsStore) => void;
-  [extraProperty: string]: any;
 }
 
-export type SubscriptionAction = {
-  type?: string;
-  subscription: any;
-  meta?: SubscriptionActionMeta;
-};
+export interface Query<Data, TransformedData> {
+  type: string;
+  payload: any | any[];
+  meta?: QueryMeta<Data, TransformedData>;
+}
+
+export interface Mutation<Data, TransformedData> {
+  type: string;
+  payload: any | any[];
+  meta?: MutationMeta<Data, TransformedData>;
+}
+
+export interface LocalMutation {
+  type: string;
+  meta: LocalMutationMeta;
+}
+
+export interface Subscription {
+  type: string;
+  payload: any;
+  meta?: SubscriptionMeta;
+}
+
+export interface Dispatch {
+  <Action = AnyAction>(action: Action): Action extends
+    | Query<any, infer Data>
+    | Mutation<any, infer Data>
+    ? Promise<{
+        data?: Data;
+        error?: any;
+        isAborted?: true;
+        action: any;
+      }>
+    : Action;
+}
+
+interface RequestsStore extends Store {
+  dispatch: Dispatch;
+}
+
+export function createQuery<
+  Data = any,
+  TransformedData = Data,
+  Variables extends any[] = any[]
+>(
+  type: string,
+  requestConfig: Config | ((...params: Variables) => Config),
+  metaConfig?:
+    | QueryMeta<Data, TransformedData>
+    | ((...params: Variables) => QueryMeta<Data, TransformedData>),
+): (...params: Variables) => Query<Data, TransformedData>;
+
+export function createMutation<
+  Data = any,
+  TransformedData = Data,
+  Variables extends any[] = any[]
+>(
+  type: string,
+  requestConfig: Config | ((...params: Variables) => Config),
+  metaConfig?:
+    | MutationMeta<Data, TransformedData>
+    | ((...params: Variables) => MutationMeta<Data, TransformedData>),
+): (...params: Variables) => Mutation<Data, TransformedData>;
+
+export function createLocalMutation<Variables extends any[] = any[]>(
+  type: string,
+  metaConfig: LocalMutationMeta | ((...params: Variables) => LocalMutationMeta),
+): (...params: Variables) => LocalMutation;
+
+export function createSubscription<Variables extends any[] = any[]>(
+  type: string,
+  requestConfig: Config | ((...params: Variables) => Config) | null,
+  metaConfig?: SubscriptionMeta | ((...params: Variables) => SubscriptionMeta),
+): (...params: Variables) => Subscription;
 
 type ResponseData<
-  Request extends (...args: any[]) => RequestAction
-> = ReturnType<NonNullable<ReturnType<Request>['meta']>['getData']>;
-
-type ActionTypeModifier = (actionType: string) => string;
-
-export const success: ActionTypeModifier;
-
-export const error: ActionTypeModifier;
-
-export const abort: ActionTypeModifier;
+  Request extends (...args: any[]) => Query | Mutation
+> = ReturnType<ReturnType<Request>['meta']['getData']>;
 
 interface DriverActions {
   setDownloadProgress?: (downloadProgress: number) => void;
@@ -274,8 +324,8 @@ export const joinRequest: (
   rehydrate: boolean;
 };
 
-export interface QueryState<QueryStateData> {
-  data: QueryStateData;
+export interface QueryState<Data> {
+  data: Data;
   error: any;
   pending: number;
   loading: boolean;
@@ -284,20 +334,18 @@ export interface QueryState<QueryStateData> {
   downloadProgress: number | null;
 }
 
-export function getQuery<QueryStateData = any>(
+export function getQuery<Data = any>(
   state: any,
   props: {
-    type: string | ((...params: any[]) => RequestAction<any, QueryStateData>);
-    action?: (...params: any[]) => RequestAction<any, QueryStateData>;
+    type: (...params: any[]) => Query<any, Data>;
     requestKey?: string;
   },
-): QueryState<QueryStateData>;
+): QueryState<Data>;
 
-export function getQuerySelector<QueryStateData = any>(props: {
-  type: string | ((...params: any[]) => RequestAction<any, QueryStateData>);
-  action?: (...params: any[]) => RequestAction<any, QueryStateData>;
+export function getQuerySelector<Data = any>(props: {
+  type: (...params: any[]) => Query<any, Data>;
   requestKey?: string;
-}): (state: any) => QueryState<QueryStateData>;
+}): (state: any) => QueryState<Data>;
 
 export interface MutationState {
   pending: number;
@@ -310,13 +358,13 @@ export interface MutationState {
 export function getMutation(
   state: any,
   props: {
-    type: string | ((...params: any[]) => RequestAction);
+    type: (...params: any[]) => Mutation;
     requestKey?: string;
   },
 ): MutationState;
 
 export function getMutationSelector(props: {
-  type: string | ((...params: any[]) => RequestAction);
+  type: (...params: any[]) => Mutation;
   requestKey?: string;
 }): (state: any) => MutationState;
 

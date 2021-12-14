@@ -1,6 +1,7 @@
 import configureStore from 'redux-mock-store';
 
 import { websocketOpened, getWebsocket, websocketClosed } from '../actions';
+import { createQuery, createSubscription } from '../requests-creators';
 
 import createSubscriptionsMiddleware from './create-subscriptions-middleware';
 
@@ -74,7 +75,7 @@ describe('middleware', () => {
         }),
       ]);
       const store = mockStore({});
-      const action = { type: 'REQUEST', request: { url: '/' } };
+      const action = createQuery('REQUEST', { url: '/' })();
       expect(store.dispatch(action)).toBe(action);
       expect(store.getActions()).toEqual([websocketOpened(), action]);
     });
@@ -138,13 +139,9 @@ describe('middleware', () => {
       const store = mockStore({});
       const ws = store.dispatch(getWebsocket());
 
-      const subscription = {
-        type: 'SUBSCRIPTION2',
-        subscription: null,
-        meta: {
-          onMessage: jest.fn(),
-        },
-      };
+      const subscription = createSubscription('SUBSCRIPTION2', null, {
+        onMessage: jest.fn(),
+      })();
 
       store.dispatch(subscription);
       ws.sendToClient({ type: 'SUBSCRIPTION' });
@@ -165,13 +162,9 @@ describe('middleware', () => {
       const store = mockStore({});
       const ws = store.dispatch(getWebsocket());
 
-      const subscription = {
-        type: 'SUBSCRIPTION',
-        subscription: null,
-        meta: {
-          onMessage: jest.fn(),
-        },
-      };
+      const subscription = createSubscription('SUBSCRIPTION', null, {
+        onMessage: jest.fn(),
+      })();
 
       store.dispatch(subscription);
       ws.sendToClient({ type: 'SUBSCRIPTION' });
@@ -201,14 +194,10 @@ describe('middleware', () => {
       const store = mockStore({});
       const ws = store.dispatch(getWebsocket());
 
-      const subscription = {
-        type: 'SUBSCRIPTION',
-        subscription: null,
-        meta: {
-          getData: data => data.type,
-          onMessage: jest.fn(),
-        },
-      };
+      const subscription = createSubscription('SUBSCRIPTION', null, {
+        getData: data => data.type,
+        onMessage: jest.fn(),
+      })();
 
       store.dispatch(subscription);
       ws.sendToClient({ type: 'SUBSCRIPTION' });
@@ -235,17 +224,13 @@ describe('middleware', () => {
       const store = mockStore({});
       const ws = store.dispatch(getWebsocket());
 
-      const onBookAdded = {
-        type: 'ON_BOOK_ADDED',
-        subscription: null,
-        meta: {
-          normalize: true,
-          mutations: {
-            FETCH_BOOK: (data, subscriptionData) =>
-              data.concat(subscriptionData.newBook),
-          },
+      const onBookAdded = createSubscription('ON_BOOK_ADDED', null, {
+        normalize: true,
+        mutations: {
+          FETCH_BOOK: (data, subscriptionData) =>
+            data.concat(subscriptionData.newBook),
         },
-      };
+      })();
 
       store.dispatch(onBookAdded);
       ws.sendToClient({ type: 'ON_BOOK_ADDED', newBook: 'New book' });
@@ -259,9 +244,9 @@ describe('middleware', () => {
         type: 'ON_BOOK_ADDED',
         newBook: 'New book',
       });
-      expect(dispatchedActions[2].meta.mutations.FETCH_BOOK.local).toBe(true);
+      expect(dispatchedActions[2].meta.requestType).toBe('LOCAL_MUTATION');
       expect(
-        dispatchedActions[2].meta.mutations.FETCH_BOOK.updateData(['Old book']),
+        dispatchedActions[2].meta.mutations.FETCH_BOOK(['Old book']),
       ).toEqual(['Old book', 'New book']);
     });
 
@@ -277,10 +262,9 @@ describe('middleware', () => {
       const store = mockStore({});
       const ws = store.dispatch(getWebsocket());
 
-      const subscription = {
+      const subscription = createSubscription('SUBSCRIPTION', {
         type: 'SUBSCRIPTION',
-        subscription: { type: 'SUBSCRIPTION' },
-      };
+      })();
 
       store.dispatch(subscription);
       ws.sendToClient({ type: 'SUBSCRIPTION' });

@@ -1,6 +1,6 @@
-const createRequest = requestType => (name, requestConfig, metaConfig) => {
+const createRequest = requestType => (type, requestConfig, metaConfig) => {
   const actionCreator = (...params) => ({
-    type: name,
+    type,
     payload:
       typeof requestConfig === 'function'
         ? requestConfig(...params)
@@ -12,10 +12,26 @@ const createRequest = requestType => (name, requestConfig, metaConfig) => {
       requestType,
     },
   });
-  actionCreator.toString = () => name;
+  actionCreator.toString = () => type;
   return actionCreator;
 };
 
 export const createQuery = createRequest('QUERY');
+
 export const createMutation = createRequest('MUTATION');
+
 export const createSubscription = createRequest('SUBSCRIPTION');
+
+export const createLocalMutation = (type, metaConfig) => {
+  const actionCreator = (...params) => ({
+    type,
+    meta: {
+      ...(typeof metaConfig === 'function'
+        ? metaConfig(...params)
+        : metaConfig),
+      requestType: 'LOCAL_MUTATION',
+    },
+  });
+  actionCreator.toString = () => type;
+  return actionCreator;
+};

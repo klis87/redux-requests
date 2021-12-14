@@ -9,7 +9,7 @@ import {
   joinRequest,
 } from '@redux-requests/core';
 
-import useDispatchRequest from './use-dispatch-request';
+import useDispatch from './use-dispatch';
 import RequestsContext from './requests-context';
 
 const emptyVariables = [];
@@ -33,19 +33,17 @@ const useQuery = ({
   throwError =
     throwError === undefined ? requestContext.throwError : throwError;
 
-  const dispatchRequest = useDispatchRequest();
+  const dispatch = useDispatch();
   const store = useStore();
 
   const key = `${selectorProps.type}${selectorProps.requestKey || ''}`;
 
   const dispatchQuery = useCallback(() => {
-    return dispatchRequest(
-      (selectorProps.action || selectorProps.type)(...variables),
-    );
-  }, [selectorProps.action, selectorProps.type, ...variables]);
+    return dispatch(selectorProps.type(...variables));
+  }, [selectorProps.type, ...variables]);
 
   const dispatchStopPolling = useCallback(() => {
-    dispatchRequest(
+    dispatch(
       stopPolling([
         {
           requestType: selectorProps.type,
@@ -64,13 +62,13 @@ const useQuery = ({
   const query = useSelector(getQuerySelector(selectorProps));
 
   useEffect(() => {
-    dispatchRequest(addWatcher(key));
+    dispatch(addWatcher(key));
 
     return () => {
-      dispatchRequest(removeWatcher(key));
+      dispatch(removeWatcher(key));
 
       if (autoReset && !store.getState().requests.watchers[key]) {
-        dispatchRequest(
+        dispatch(
           resetRequests(
             [
               {
@@ -91,11 +89,11 @@ const useQuery = ({
       throw dispatchQuery();
     }
 
-    throw dispatchRequest(joinRequest(key, autoLoad));
+    throw dispatch(joinRequest(key, autoLoad));
   }
 
   if (suspense && !suspenseSsr && query.loading) {
-    throw dispatchRequest(joinRequest(key));
+    throw dispatch(joinRequest(key));
   }
 
   if (throwError && query.error) {

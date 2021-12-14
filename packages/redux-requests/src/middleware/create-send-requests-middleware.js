@@ -8,31 +8,25 @@ import {
 import { ABORT_REQUESTS, RESET_REQUESTS, JOIN_REQUEST } from '../constants';
 import { getQuery } from '../selectors';
 
-import createRequestsStore from './create-requests-store';
-
-const getRequestTypeString = requestType =>
-  typeof requestType === 'function' ? requestType.toString() : requestType;
-
 const getKeys = requests =>
   requests.map(v =>
     typeof v === 'object'
-      ? getRequestTypeString(v.requestType) + (v.requestKey || '')
-      : getRequestTypeString(v),
+      ? v.requestType.toString() + (v.requestKey || '')
+      : v.toString(),
   );
 
 const getDriver = (config, action) =>
-  action.meta?.driver
+  action.meta.driver
     ? config.driver[action.meta.driver]
     : config.driver.default || config.driver;
 
-const getLastActionKey = action =>
-  action.type + (action.meta?.requestKey ? action.meta.requestKey : '');
+const getLastActionKey = action => action.type + (action.meta.requestKey || '');
 
 const isActionRehydrated = action =>
   !!(
-    action.meta?.cacheResponse ||
-    action.meta?.ssrResponse ||
-    action.meta?.ssrError
+    action.meta.cacheResponse ||
+    action.meta.ssrResponse ||
+    action.meta.ssrError
   );
 
 // TODO: remove to more functional style, we need object maps and filters
@@ -52,7 +46,7 @@ const abortPendingRequests = (action, pendingRequests) => {
 };
 
 const isTakeLatest = (action, config) =>
-  action.meta?.takeLatest !== undefined
+  action.meta.takeLatest !== undefined
     ? action.meta.takeLatest
     : typeof config.takeLatest === 'function'
     ? config.takeLatest(action)
@@ -61,12 +55,12 @@ const isTakeLatest = (action, config) =>
 const maybeCallOnRequestInterceptor = (action, config, store) => {
   if (
     config.onRequest &&
-    (!action.meta ||
-      (action.meta.runOnRequest !== false && !action.meta.ssrDuplicate))
+    action.meta.runOnRequest !== false &&
+    !action.meta.ssrDuplicate
   ) {
     return {
       ...action,
-      request: config.onRequest(action.request, action, store),
+      payload: config.onRequest(action.payload, action, store),
     };
   }
 
@@ -74,10 +68,10 @@ const maybeCallOnRequestInterceptor = (action, config, store) => {
 };
 
 const maybeCallOnRequestMeta = (action, store) => {
-  if (action.meta?.onRequest && !action.meta.ssrDuplicate) {
+  if (action.meta.onRequest && !action.meta.ssrDuplicate) {
     return {
       ...action,
-      request: action.meta.onRequest(action.request, action, store),
+      payload: action.meta.onRequest(action.payload, action, store),
     };
   }
 
@@ -85,7 +79,7 @@ const maybeCallOnRequestMeta = (action, store) => {
 };
 
 const maybeDispatchRequestAction = (action, next) => {
-  if (!action.meta || !action.meta.silent) {
+  if (!action.meta.silent) {
     action = next(action);
   }
 
@@ -95,21 +89,21 @@ const maybeDispatchRequestAction = (action, next) => {
 const getDriverActions = (action, store) => {
   const driverActions = {};
 
-  if (action.meta?.measureDownloadProgress) {
+  if (action.meta.measureDownloadProgress) {
     driverActions.setDownloadProgress = progress =>
       store.dispatch(
         setDownloadProgress(
-          action.type + (action.meta?.requestKey || ''),
+          action.type + (action.meta.requestKey || ''),
           progress,
         ),
       );
   }
 
-  if (action.meta?.measureUploadProgress) {
+  if (action.meta.measureUploadProgress) {
     driverActions.setUploadProgress = progress =>
       store.dispatch(
         setUploadProgress(
-          action.type + (action.meta?.requestKey || ''),
+          action.type + (action.meta.requestKey || ''),
           progress,
         ),
       );
@@ -132,13 +126,13 @@ const defer = () => {
 };
 
 const getResponsePromises = (action, config, pendingRequests, store) => {
-  const isBatchedRequest = Array.isArray(action.request);
+  const isBatchedRequest = Array.isArray(action.payload);
 
-  if (action.meta?.cacheResponse) {
+  if (action.meta.cacheResponse) {
     return [Promise.resolve(action.meta.cacheResponse)];
-  } else if (action.meta?.ssrResponse) {
+  } else if (action.meta.ssrResponse) {
     return [Promise.resolve(action.meta.ssrResponse)];
-  } else if (action.meta?.ssrError) {
+  } else if (action.meta.ssrError) {
     return [Promise.reject(action.meta.ssrError)];
   }
 
@@ -152,8 +146,8 @@ const getResponsePromises = (action, config, pendingRequests, store) => {
   }
 
   const responsePromises = isBatchedRequest
-    ? action.request.map(r => driver(r, action, driverActions))
-    : [driver(action.request, action, driverActions)];
+    ? action.payload.map(r => driver(r, action, driverActions))
+    : [driver(action.payload, action, driverActions)];
 
   if (responsePromises[0].cancel) {
     pendingRequests[lastActionKey] = responsePromises;
@@ -166,7 +160,7 @@ const maybeCallGetError = (action, error) => {
   if (
     error !== 'REQUEST_ABORTED' &&
     !isActionRehydrated(action) &&
-    action.meta?.getError
+    action.meta.getError
   ) {
     throw action.meta.getError(error);
   }
@@ -178,8 +172,8 @@ const maybeCallOnErrorInterceptor = (action, config, store, error) => {
   if (
     error !== 'REQUEST_ABORTED' &&
     config.onError &&
-    (!action.meta ||
-      (action.meta.runOnError !== false && !action.meta.ssrDuplicate))
+    action.meta.runOnError !== false &&
+    !action.meta.ssrDuplicate
   ) {
     return Promise.all([config.onError(error, action, store)]);
   }
@@ -190,7 +184,7 @@ const maybeCallOnErrorInterceptor = (action, config, store, error) => {
 const maybeCallOnErrorMeta = (action, store, error) => {
   if (
     error !== 'REQUEST_ABORTED' &&
-    action.meta?.onError &&
+    action.meta.onError &&
     !action.meta.ssrDuplicate
   ) {
     return Promise.all([action.meta.onError(error, action, store)]);
@@ -203,7 +197,7 @@ const maybeCallOnAbortInterceptor = (action, config, store, error) => {
   if (
     error === 'REQUEST_ABORTED' &&
     config.onAbort &&
-    (!action.meta || action.meta.runOnAbort !== false)
+    action.meta.runOnAbort !== false
   ) {
     config.onAbort(action, store);
   }
@@ -212,7 +206,7 @@ const maybeCallOnAbortInterceptor = (action, config, store, error) => {
 };
 
 const maybeCallOnAbortMeta = (action, store, error) => {
-  if (error === 'REQUEST_ABORTED' && action.meta?.onAbort) {
+  if (error === 'REQUEST_ABORTED' && action.meta.onAbort) {
     action.meta.onAbort(action, store);
   }
 
@@ -226,7 +220,7 @@ const getInitialBatchObject = responseKeys =>
   }, {});
 
 const maybeTransformBatchRequestResponse = (action, response) => {
-  const isBatchedRequest = Array.isArray(action.request);
+  const isBatchedRequest = Array.isArray(action.payload);
   const responseKeys = Object.keys(response[0]);
 
   return isBatchedRequest && !isActionRehydrated(action)
@@ -240,10 +234,10 @@ const maybeTransformBatchRequestResponse = (action, response) => {
 };
 
 const maybeCallGetData = (action, store, response) => {
-  if (!isActionRehydrated(action) && action.meta?.getData) {
+  if (!isActionRehydrated(action) && action.meta.getData) {
     const query = getQuery(store.getState(), {
       type: action.type,
-      requestKey: action.meta?.requestKey,
+      requestKey: action.meta.requestKey,
     });
 
     return {
@@ -258,8 +252,8 @@ const maybeCallGetData = (action, store, response) => {
 const maybeCallOnSuccessInterceptor = (action, config, store, response) => {
   if (
     config.onSuccess &&
-    (!action.meta ||
-      (action.meta.runOnSuccess !== false && !action.meta.ssrDuplicate))
+    action.meta.runOnSuccess !== false &&
+    !action.meta.ssrDuplicate
   ) {
     const result = config.onSuccess(response, action, store);
 
@@ -272,7 +266,7 @@ const maybeCallOnSuccessInterceptor = (action, config, store, response) => {
 };
 
 const maybeCallOnSuccessMeta = (action, store, response) => {
-  if (action.meta?.onSuccess && !action.meta.ssrDuplicate) {
+  if (action.meta.onSuccess && !action.meta.ssrDuplicate) {
     const result = action.meta.onSuccess(response, action, store);
 
     if (!isActionRehydrated(action)) {
@@ -291,8 +285,6 @@ const createSendRequestMiddleware = config => {
   const allPendingRequests = {}; // for joining
 
   return store => next => action => {
-    const requestsStore = createRequestsStore(store);
-
     if (action.type === JOIN_REQUEST) {
       next(action);
       return allPendingRequests[action.requestType] || sleep();
@@ -310,8 +302,8 @@ const createSendRequestMiddleware = config => {
       const lastActionKey = getLastActionKey(action);
       allPendingRequests[lastActionKey] = defer();
 
-      action = maybeCallOnRequestInterceptor(action, config, requestsStore);
-      action = maybeCallOnRequestMeta(action, requestsStore);
+      action = maybeCallOnRequestInterceptor(action, config, store);
+      action = maybeCallOnRequestMeta(action, store);
       action = maybeDispatchRequestAction(action, next);
 
       const responsePromises = getResponsePromises(
@@ -324,18 +316,18 @@ const createSendRequestMiddleware = config => {
       return Promise.all(responsePromises)
         .catch(error => maybeCallGetError(action, error))
         .catch(error =>
-          maybeCallOnErrorInterceptor(action, config, requestsStore, error),
+          maybeCallOnErrorInterceptor(action, config, store, error),
         )
-        .catch(error => maybeCallOnErrorMeta(action, requestsStore, error))
+        .catch(error => maybeCallOnErrorMeta(action, store, error))
         .catch(error =>
-          maybeCallOnAbortInterceptor(action, config, requestsStore, error),
+          maybeCallOnAbortInterceptor(action, config, store, error),
         )
-        .catch(error => maybeCallOnAbortMeta(action, requestsStore, error))
+        .catch(error => maybeCallOnAbortMeta(action, store, error))
         .catch(error => {
           if (error === 'REQUEST_ABORTED') {
             const abortAction = createAbortAction(action);
 
-            if (!action.meta || !action.meta.silent) {
+            if (!action.meta.silent) {
               store.dispatch(abortAction);
             }
 
@@ -349,7 +341,7 @@ const createSendRequestMiddleware = config => {
 
           const errorAction = createErrorAction(action, error);
 
-          if (!action.meta || !action.meta.silent) {
+          if (!action.meta.silent) {
             store.dispatch(errorAction);
           }
 
@@ -365,20 +357,13 @@ const createSendRequestMiddleware = config => {
           return maybeCallGetData(action, store, response);
         })
         .then(response =>
-          maybeCallOnSuccessInterceptor(
-            action,
-            config,
-            requestsStore,
-            response,
-          ),
+          maybeCallOnSuccessInterceptor(action, config, store, response),
         )
-        .then(response =>
-          maybeCallOnSuccessMeta(action, requestsStore, response),
-        )
+        .then(response => maybeCallOnSuccessMeta(action, store, response))
         .then(response => {
           const successAction = createSuccessAction(action, response);
 
-          if (!action.meta || !action.meta.silent) {
+          if (!action.meta.silent) {
             store.dispatch(successAction);
           }
 

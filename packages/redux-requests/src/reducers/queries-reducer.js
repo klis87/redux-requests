@@ -7,6 +7,7 @@ import {
   getRequestActionFromResponse,
   isErrorAction,
   isSuccessAction,
+  isRequestActionLocalMutation,
 } from '../actions';
 import { getQuery } from '../selectors';
 import { normalize, mergeData, getDependentKeys } from '../normalizers';
@@ -26,7 +27,7 @@ const getInitialQuery = normalized => ({
 });
 
 const shouldBeNormalized = (action, config) =>
-  action.meta?.normalize !== undefined
+  action.meta.normalize !== undefined
     ? action.meta.normalize
     : config.normalize;
 
@@ -162,7 +163,7 @@ const maybeGetQueryActionType = (action, config) => {
 };
 
 const maybeGetMutationData = (action, config) => {
-  if (config.isRequestAction(action) && action.meta?.optimisticData) {
+  if (config.isRequestAction(action) && action.meta.optimisticData) {
     return action.meta.optimisticData;
   }
 
@@ -183,7 +184,7 @@ const maybeGetMutationData = (action, config) => {
     return action.response.data;
   }
 
-  if (action.meta?.localData) {
+  if (isRequestActionLocalMutation(action) && action.meta.localData) {
     return action.meta.localData;
   }
 

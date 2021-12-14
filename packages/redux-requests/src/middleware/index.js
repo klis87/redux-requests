@@ -4,4 +4,3 @@ export { default as createServerSsrMiddleware } from './create-server-ssr-middle
 export { default as createSendRequestsMiddleware } from './create-send-requests-middleware';
 export { default as createPollingMiddleware } from './create-polling-middleware';
 export { default as createSubscriptionsMiddleware } from './create-subscriptions-middleware';
-export { default as createRequestsStore } from './create-requests-store';
