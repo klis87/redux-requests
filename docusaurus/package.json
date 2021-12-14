@@ -10,14 +10,14 @@
     "deploy": "GIT_USER=klis87 USE_SSH=true docusaurus deploy"
   },
   "dependencies": {
-    "@docusaurus/core": "^2.0.0-alpha.48",
-    "@docusaurus/preset-classic": "^2.0.0-alpha.48",
-    "classnames": "^2.2.6",
+    "@docusaurus/core": "2.0.0-alpha.48",
+    "@docusaurus/preset-classic": "2.0.0-alpha.48",
+    "classnames": "2.2.6",
     "compression": "1.7.4",
     "express": "4.17.1",
     "prism-react-renderer": "1.1.1",
-    "react": "^16.8.4",
-    "react-dom": "^16.8.4"
+    "react": "16.13.1",
+    "react-dom": "16.13.1"
   },
   "browserslist": {
     "production": [
