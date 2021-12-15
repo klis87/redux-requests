@@ -1,5 +1,5 @@
-import defaultConfig from '../default-config';
 import { getQuery } from '../selectors';
+import { isRequestAction } from '../actions';
 
 const isCacheValid = (cache, action) =>
   cache.cacheKey === action.meta.cacheKey &&
@@ -7,9 +7,9 @@ const isCacheValid = (cache, action) =>
 
 const getKey = action => action.type + (action.meta.requestKey || '');
 
-export default (config = defaultConfig) => store => next => action => {
+export default () => store => next => action => {
   if (
-    config.isRequestAction(action) &&
+    isRequestAction(action) &&
     action.meta.cache &&
     !action.meta.ssrResponse
   ) {

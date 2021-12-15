@@ -1,13 +1,12 @@
-import defaultConfig from '../default-config';
-import { isResponseAction, isSuccessAction } from '../actions';
+import { isResponseAction, isSuccessAction, isRequestAction } from '../actions';
 
-export default (requestsPromise, config = defaultConfig) => {
+export default requestsPromise => {
   let index = 0;
   const successActions = [];
   const errorActions = [];
 
   return () => next => action => {
-    if (config.isRequestAction(action)) {
+    if (isRequestAction(action)) {
       index +=
         action.meta.dependentRequestsNumber !== undefined
           ? action.meta.dependentRequestsNumber + 1

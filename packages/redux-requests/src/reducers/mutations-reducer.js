@@ -3,11 +3,12 @@ import {
   isAbortAction,
   isResponseAction,
   getRequestActionFromResponse,
+  isRequestAction,
   isRequestActionMutation,
 } from '../actions';
 
-export default (state, action, config) => {
-  if (config.isRequestAction(action) && isRequestActionMutation(action)) {
+export default (state, action) => {
+  if (isRequestAction(action) && isRequestActionMutation(action)) {
     const mutationType = action.type + (action.meta.requestKey || '');
 
     return {

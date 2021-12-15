@@ -229,8 +229,6 @@ export interface HandleRequestConfig {
   onAbort?: (action: RequestAction, store: RequestsStore) => void;
   ssr?: null | 'client' | 'server';
   disableRequestsPromise?: boolean;
-  isRequestAction?: (action: AnyAction) => boolean;
-  isRequestActionQuery?: (requestAction: RequestAction) => boolean;
   takeLatest?: boolean | FilterActions;
   normalize?: boolean;
   getNormalisationObjectKey?: (obj: any) => string;

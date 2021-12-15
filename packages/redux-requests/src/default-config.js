@@ -1,4 +1,4 @@
-import { isRequestActionQuery, isRequestAction } from './actions';
+import { isRequestActionQuery } from './actions';
 
 export default {
   driver: null,
@@ -8,8 +8,6 @@ export default {
   onAbort: null,
   ssr: null,
   disableRequestsPromise: false,
-  isRequestAction,
-  isRequestActionQuery,
   takeLatest: isRequestActionQuery,
   normalize: false,
   getNormalisationObjectKey: obj => obj.id,

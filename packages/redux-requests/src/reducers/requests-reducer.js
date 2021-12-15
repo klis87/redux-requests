@@ -35,7 +35,7 @@ export default (config = defaultConfig) => (state = defaultState, action) => {
         ...requestsResetReducer(
           {
             queries,
-            mutations: mutationsReducer(state.mutations, action, config),
+            mutations: mutationsReducer(state.mutations, action),
             cache: cacheReducer(state.cache, action),
             ...progressReducer(
               {
@@ -43,7 +43,6 @@ export default (config = defaultConfig) => (state = defaultState, action) => {
                 uploadProgress: state.uploadProgress,
               },
               action,
-              config,
             ),
           },
           action,
@@ -51,7 +50,6 @@ export default (config = defaultConfig) => (state = defaultState, action) => {
         requestsKeys: state.requestsKeys,
       },
       action,
-      config,
     ),
     normalizedData,
     ssr: config.ssr ? ssrReducer(state.ssr, action, config) : null,

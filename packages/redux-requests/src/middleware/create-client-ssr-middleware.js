@@ -1,8 +1,8 @@
-import defaultConfig from '../default-config';
 import { getQuery } from '../selectors';
+import { isRequestAction } from '../actions';
 
-export default (config = defaultConfig) => store => next => action => {
-  if (!config.isRequestAction(action)) {
+export default () => store => next => action => {
+  if (!isRequestAction(action)) {
     return next(action);
   }
 

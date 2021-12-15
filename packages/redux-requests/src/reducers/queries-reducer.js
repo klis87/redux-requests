@@ -7,6 +7,8 @@ import {
   getRequestActionFromResponse,
   isErrorAction,
   isSuccessAction,
+  isRequestAction,
+  isRequestActionQuery,
   isRequestActionLocalMutation,
 } from '../actions';
 import { getQuery } from '../selectors';
@@ -147,14 +149,14 @@ const queryReducer = (state, action, actionType, config, normalizedData) => {
   }
 };
 
-const maybeGetQueryActionType = (action, config) => {
-  if (config.isRequestAction(action) && config.isRequestActionQuery(action)) {
+const maybeGetQueryActionType = action => {
+  if (isRequestAction(action) && isRequestActionQuery(action)) {
     return action.type;
   }
 
   if (
     isResponseAction(action) &&
-    config.isRequestActionQuery(getRequestActionFromResponse(action))
+    isRequestActionQuery(getRequestActionFromResponse(action))
   ) {
     return getRequestActionFromResponse(action).type;
   }
@@ -163,7 +165,7 @@ const maybeGetQueryActionType = (action, config) => {
 };
 
 const maybeGetMutationData = (action, config) => {
-  if (config.isRequestAction(action) && action.meta.optimisticData) {
+  if (isRequestAction(action) && action.meta.optimisticData) {
     return action.meta.optimisticData;
   }
 
@@ -179,7 +181,7 @@ const maybeGetMutationData = (action, config) => {
     isResponseAction(action) &&
     isSuccessAction(action) &&
     shouldBeNormalized(action, config) &&
-    !config.isRequestActionQuery(getRequestActionFromResponse(action))
+    !isRequestActionQuery(getRequestActionFromResponse(action))
   ) {
     return action.response.data;
   }
@@ -332,7 +334,7 @@ export default (state, action, config = defaultConfig) => {
     };
   }
 
-  const queryActionType = maybeGetQueryActionType(action, config);
+  const queryActionType = maybeGetQueryActionType(action);
 
   if (queryActionType) {
     const queryType =

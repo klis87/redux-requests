@@ -4,6 +4,7 @@ import {
   createAbortAction,
   setDownloadProgress,
   setUploadProgress,
+  isRequestAction,
 } from '../actions';
 import { ABORT_REQUESTS, RESET_REQUESTS, JOIN_REQUEST } from '../constants';
 import { getQuery } from '../selectors';
@@ -298,7 +299,7 @@ const createSendRequestMiddleware = config => {
       return next(action);
     }
 
-    if (config.isRequestAction(action)) {
+    if (isRequestAction(action)) {
       const lastActionKey = getLastActionKey(action);
       allPendingRequests[lastActionKey] = defer();
 

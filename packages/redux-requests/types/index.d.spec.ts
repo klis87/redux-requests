@@ -77,7 +77,6 @@ handleRequests({
   onError: (error, action) => ({ error }),
   onAbort: action => {},
   takeLatest: true,
-  isRequestActionQuery: () => true,
 });
 
 const reducer = (state = 0, action) => {
