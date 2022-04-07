@@ -32,7 +32,8 @@ describe('reducers', () => {
               },
             },
             mutations: {
-              MUTATION: { error: 'error', pending: 1 },
+              MUTATION: { error: 'error', pending: 1, data: null },
+              MUTATION2: { error: null, pending: 1, data: "success" }
             },
             cache: { QUERY2: {} },
             downloadProgress: {},
@@ -60,7 +61,8 @@ describe('reducers', () => {
           },
         },
         mutations: {
-          MUTATION: { error: null, pending: 1 },
+          MUTATION: { error: null, pending: 1, data: null },
+          MUTATION2: { error: null, pending: 1, data: null }
         },
         cache: {},
         downloadProgress: {},
@@ -99,9 +101,9 @@ describe('reducers', () => {
               },
             },
             mutations: {
-              MUTATION: { error: 'error', pending: 1 },
-              MUTATION2: { error: 'error', pending: 1 },
-              MUTATION3: { error: 'error', pending: 1 },
+              MUTATION: { error: 'error', pending: 1, data: null },
+              MUTATION2: { error: 'error', pending: 1, data: null },
+              MUTATION3: { error: null, pending: 1, data: 'data' },
             },
             downloadProgress: {},
             uploadProgress: {},
@@ -111,6 +113,7 @@ describe('reducers', () => {
             'QUERY',
             { requestType: 'QUERY', requestKey: '2' },
             { requestType: 'MUTATION', requestKey: '2' },
+            { requestType: 'MUTATION3', requestKey: '2' },
           ]),
         ),
       ).toEqual({
@@ -141,9 +144,9 @@ describe('reducers', () => {
           },
         },
         mutations: {
-          MUTATION: { error: 'error', pending: 1 },
-          MUTATION2: { error: null, pending: 1 },
-          MUTATION3: { error: 'error', pending: 1 },
+          MUTATION: { error: null, pending: 1, data: null },
+          MUTATION2: { error: 'error', pending: 1, data: null },
+          MUTATION3: { error: null, pending: 1, data: null },
         },
         cache: { QUERY3: {} },
         downloadProgress: {},

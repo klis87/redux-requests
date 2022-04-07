@@ -10,6 +10,7 @@ import { getMutation } from '@redux-requests/core';
 
 const deleteBookMutation = getMutation(state, { type: 'DELETE_BOOK' });
 /* for example {
+  data: null,
   loading: false,
   error: null,
   pending: 0 // number of pending requests
@@ -18,4 +19,4 @@ const deleteBookMutation = getMutation(state, { type: 'DELETE_BOOK' });
 } */
 ```
 
-It accept `type` and optionally `requestKey` props, which work like for queries.
+It accepts `type` and optionally `requestKey` props, which work like for queries.

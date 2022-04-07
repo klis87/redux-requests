@@ -322,26 +322,27 @@ export function getQuerySelector<QueryStateData = any>(props: {
   defaultData?: any;
 }): (state: any) => QueryState<QueryStateData>;
 
-export interface MutationState {
+export interface MutationState<MutationStateData> {
+  data: MutationStateData;
+  error: any;
   pending: number;
   loading: boolean;
-  error: any;
   uploadProgress: number | null;
   downloadProgress: number | null;
 }
 
-export function getMutation(
+export function getMutation<MutationStateData = any>(
   state: any,
   props: {
     type: string | ((...params: any[]) => RequestAction);
     requestKey?: string;
   },
-): MutationState;
+): MutationState<MutationStateData>;
 
-export function getMutationSelector(props: {
+export function getMutationSelector<MutationStateData = any>(props: {
   type: string | ((...params: any[]) => RequestAction);
   requestKey?: string;
-}): (state: any) => MutationState;
+}): (state: any) => MutationState<MutationStateData>;
 
 export function getWebsocketState(): { pristine: boolean; connected: boolean };
 

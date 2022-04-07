@@ -4,6 +4,7 @@ import {
   error,
   abort,
   isResponseAction,
+  getDataFromResponseAction,
   getRequestActionFromResponse,
   isErrorAction,
   isSuccessAction,
@@ -22,9 +23,6 @@ const getInitialQuery = normalized => ({
   normalized,
   usedKeys: normalized ? {} : null,
 });
-
-const getDataFromResponseAction = action =>
-  action.payload ? action.payload.data : action.response.data;
 
 const shouldBeNormalized = (action, config) =>
   action.meta?.normalize !== undefined
