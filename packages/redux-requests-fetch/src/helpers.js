@@ -5,3 +5,6 @@
 export const isNativeAbortError = err =>
   ['DOMException', 'AbortError'].includes(err.constructor.name) &&
   (err.name === 'AbortError' || err.code === DOMException.ABORT_ERR);
+
+// taken from https://github.com/axios/axios/blob/v1.x/lib/helpers/isAbsoluteURL.js
+export const isAbsoluteURL = url => /^([a-z][a-z\d+\-.]*:)?\/\//i.test(url);

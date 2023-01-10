@@ -1,6 +1,4 @@
-import isAbsoluteUrl from 'axios/lib/helpers/isAbsoluteURL';
-
-import { isNativeAbortError } from './helpers';
+import { isNativeAbortError, isAbsoluteURL } from './helpers';
 
 const responseTypes = ['arraybuffer', 'blob', 'formData', 'json', 'text', null];
 
@@ -36,29 +34,31 @@ export const createDriver = (
 ) => ({ url, responseType = 'json', ...requestConfig }) => {
   const abortSource = new AbortController();
   const responsePromise = fetchInstance(
-    isAbsoluteUrl(url) ? url : baseURL + url,
+    isAbsoluteURL(url) ? url : baseURL + url,
     { signal: abortSource.signal, ...requestConfig },
-  ).then(response => {
-    if (response.ok) {
-      return getResponse(response, responseType);
-    }
+  )
+    .then(response => {
+      if (response.ok) {
+        return getResponse(response, responseType);
+      }
 
-    return response.json().then(
-      data => {
-        response.data = data;
-        throw response;
-      },
-      () => {
-        throw response;
-      },
-    );
-  }).catch(error => {
-    if (isNativeAbortError(error)) {
-      throw 'REQUEST_ABORTED';
-    }
+      return response.json().then(
+        data => {
+          response.data = data;
+          throw response;
+        },
+        () => {
+          throw response;
+        },
+      );
+    })
+    .catch(error => {
+      if (isNativeAbortError(error)) {
+        throw 'REQUEST_ABORTED';
+      }
 
-    throw error;
-  });
+      throw error;
+    });
 
   responsePromise.cancel = () => abortSource.abort();
   return responsePromise;
