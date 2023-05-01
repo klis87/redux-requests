@@ -17,7 +17,7 @@ Declarative AJAX requests and automatic network state management for single-page
 
 > **Note**
 > 
-> If you use other feching libraries, like `react-query`, note, that one of the biggest advantage of `redux-requests` is an automatic normalisation and data updates. If you mostly care about this feature, you might also try too look at [normy](https://github.com/klis87/normy) - a library to add this feature to any data fetching library!
+> If you use other feching libraries, like `react-query`, note, that one of the biggest advantage of `redux-requests` is an automatic normalisation and data updates. If you mostly care about this feature, you might also try to look at [normy](https://github.com/klis87/normy) - a library to add this feature to any data fetching library!
 
 ## Table of content
 
