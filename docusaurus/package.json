@@ -14,7 +14,7 @@
     "@docusaurus/preset-classic": "^2.0.0-alpha.48",
     "classnames": "^2.2.6",
     "compression": "1.7.4",
-    "express": "4.17.1",
+    "express": "4.17.3",
     "prism-react-renderer": "1.1.1",
     "react": "^16.8.4",
     "react-dom": "^16.8.4"
