@@ -69,6 +69,9 @@ export const getActionPayload = action =>
 export const getResponseFromSuccessAction = action =>
   action.payload ? action.payload : action.response;
 
+export const getDataFromResponseAction = action =>
+  action.payload ? action.payload.data : action.response.data;
+
 export const isRequestAction = action => {
   const actionPayload = getActionPayload(action);
 

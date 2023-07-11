@@ -27,6 +27,7 @@ const resetMutation = mutation =>
     ? undefined
     : {
         ...mutation,
+        data: null,
         error: null,
       };
 

@@ -49,21 +49,23 @@ export class Query<QueryStateData = any, CustomComponentProps = {}> extends Reac
   QueryProps<QueryStateData, CustomComponentProps>
 > {}
 
-interface MutationCustomComponentProps {
-  mutation: MutationState;
+interface MutationCustomComponentProps<MutationStateData = any> {
+  mutation: MutationState<MutationStateData>;
   [extraProperty: string]: any;
 }
 
-interface MutationProps<CustomComponentProps> {
+interface MutationProps<MutationStateData, CustomComponentProps> {
   type?: string | ((...params: any[]) => RequestAction);
   requestKey?: string;
-  selector?: (state: any) => MutationState;
-  children?: (mutation: MutationState) => React.ReactNode;
+  selector?: (state: any) => MutationState<MutationStateData>;
+  children?: (mutation: MutationState<MutationStateData>) => React.ReactNode;
   component?: CustomComponentProps extends MutationCustomComponentProps ? React.ComponentType<CustomComponentProps> : never;
   [extraProperty: string]: any;
 }
 
-export class Mutation<CustomComponentProps = {}> extends React.Component<MutationProps<CustomComponentProps>> {}
+export class Mutation<MutationStateData = any, CustomComponentProps = {}> extends React.Component<
+  MutationProps<MutationStateData, CustomComponentProps>
+> {}
 
 interface RequestCreator<QueryStateData = any> {
   (...args: any[]): RequestAction<any, QueryStateData>;
@@ -119,7 +121,7 @@ export function useMutation<
   autoReset?: boolean;
   throwError?: boolean;
   suspense?: boolean;
-}): MutationState & {
+}): MutationState<Data> & {
   mutate: () => Promise<{
     data?: QueryState<
       Data extends undefined ? GetQueryStateData<MutationCreator> : Data

@@ -115,6 +115,13 @@ getMutation({}, { type: 'Mutation', requestKey: '1' });
 const mutationSelector = getMutationSelector({ type: 'Mutation' });
 mutationSelector({});
 
+const mutation = getMutation<{ key: string }>({}, { type: 'Mutation' });
+mutation.data.key = '1';
+
+const mutationSelector2 = getMutationSelector<{ key: string }>({ type: 'Mutation' });
+const mutation2 = mutationSelector2({});
+mutation2.data.key = '1';
+
 isRequestAction({ type: 'ACTION' }) === true;
 isRequestActionQuery({ type: 'ACTION', request: { url: '/' } }) === true;
 isResponseAction({ type: 'ACTION', request: { url: '/' } }) === true;
