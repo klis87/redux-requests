@@ -21,6 +21,7 @@ describe('reducers', () => {
                 pristine: false,
                 normalized: false,
                 usedKeys: null,
+                dependencies: null,
               },
               QUERY2: {
                 data: 'data',
@@ -29,6 +30,7 @@ describe('reducers', () => {
                 pristine: false,
                 normalized: true,
                 usedKeys: { x: 1 },
+                dependencies: [],
               },
             },
             mutations: {
@@ -49,6 +51,7 @@ describe('reducers', () => {
             pristine: true,
             normalized: false,
             usedKeys: null,
+            dependencies: null,
           },
           QUERY2: {
             data: null,
@@ -57,6 +60,7 @@ describe('reducers', () => {
             pristine: true,
             normalized: true,
             usedKeys: {},
+            dependencies: [],
           },
         },
         mutations: {
@@ -80,6 +84,7 @@ describe('reducers', () => {
                 pristine: false,
                 normalized: false,
                 usedKeys: null,
+                dependencies: null,
               },
               QUERY2: {
                 data: 'data',
@@ -88,6 +93,7 @@ describe('reducers', () => {
                 pristine: false,
                 normalized: true,
                 usedKeys: { x: 1 },
+                dependencies: [],
               },
               QUERY3: {
                 data: 'data',
@@ -96,6 +102,7 @@ describe('reducers', () => {
                 pristine: false,
                 normalized: true,
                 usedKeys: { x: 1 },
+                dependencies: [],
               },
             },
             mutations: {
@@ -122,6 +129,7 @@ describe('reducers', () => {
             pristine: true,
             normalized: false,
             usedKeys: null,
+            dependencies: null,
           },
           QUERY2: {
             data: null,
@@ -130,6 +138,7 @@ describe('reducers', () => {
             pristine: true,
             normalized: true,
             usedKeys: {},
+            dependencies: [],
           },
           QUERY3: {
             data: 'data',
@@ -138,6 +147,7 @@ describe('reducers', () => {
             pristine: false,
             normalized: true,
             usedKeys: { x: 1 },
+            dependencies: [],
           },
         },
         mutations: {
@@ -166,6 +176,7 @@ describe('reducers', () => {
                 pristine: false,
                 normalized: false,
                 usedKeys: null,
+                dependencies: null,
               },
             },
             mutations: {},
@@ -184,6 +195,7 @@ describe('reducers', () => {
             pristine: true,
             normalized: false,
             usedKeys: null,
+            dependencies: null,
           },
         },
         mutations: {},

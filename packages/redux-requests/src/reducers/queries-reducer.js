@@ -7,9 +7,13 @@ import {
   getRequestActionFromResponse,
   isErrorAction,
   isSuccessAction,
+  isRequestAction,
+  isRequestActionQuery,
+  isRequestActionLocalMutation,
 } from '../actions';
 import { getQuery } from '../selectors';
-import { normalize, mergeData } from '../normalizers';
+import { normalize, mergeData, getDependentKeys } from '../normalizers';
+import { mapObject } from '../helpers';
 
 import updateData from './update-data';
 
@@ -21,15 +25,58 @@ const getInitialQuery = normalized => ({
   ref: {},
   normalized,
   usedKeys: normalized ? {} : null,
+  dependencies: normalized ? [] : null,
 });
 
-const getDataFromResponseAction = action =>
-  action.payload ? action.payload.data : action.response.data;
-
 const shouldBeNormalized = (action, config) =>
-  action.meta?.normalize !== undefined
+  action.meta.normalize !== undefined
     ? action.meta.normalize
     : config.normalize;
+
+const addQueryAsDependency = (dependentQueries, dependencies, queryType) => {
+  dependencies.forEach(dependency => {
+    if (!dependentQueries[dependency]) {
+      dependentQueries = { ...dependentQueries, [dependency]: [queryType] };
+    }
+
+    if (!dependentQueries[dependency].includes(queryType)) {
+      dependentQueries = {
+        ...dependentQueries,
+        [dependency]: [...dependentQueries[dependency], queryType],
+      };
+    }
+  });
+
+  return dependentQueries;
+};
+
+const removeQueryAsDependency = (dependentQueries, dependencies, queryType) => {
+  dependencies.forEach(dependency => {
+    if (dependentQueries[dependency].length > 1) {
+      dependentQueries = {
+        ...dependentQueries,
+        [dependency]: dependentQueries[dependency].filter(v => v !== queryType),
+      };
+    } else {
+      dependentQueries = mapObject(dependentQueries, (k, v) =>
+        k === dependency ? undefined : v,
+      );
+    }
+  });
+
+  return dependentQueries;
+};
+
+const getDependenciesDiff = (oldDependencies, newDependencies) => {
+  return {
+    addedDependencies: newDependencies.filter(
+      v => !oldDependencies.includes(v),
+    ),
+    removedDependencies: oldDependencies.filter(
+      v => !newDependencies.includes(v),
+    ),
+  };
+};
 
 const queryReducer = (state, action, actionType, config, normalizedData) => {
   if (state === undefined) {
@@ -64,7 +111,7 @@ const queryReducer = (state, action, actionType, config, normalizedData) => {
         ? state
         : {
             ...state,
-            data: getDataFromResponseAction(action),
+            data: action.response.data,
             pending: state.pending - 1,
             error: null,
           };
@@ -76,7 +123,7 @@ const queryReducer = (state, action, actionType, config, normalizedData) => {
             ...state,
             data: null,
             pending: state.pending - 1,
-            error: action.payload ? action.payload : action.error,
+            error: action.error,
           };
     case abort(actionType): {
       if (state.pending === 1 && state.data === null && state.error === null) {
@@ -102,14 +149,14 @@ const queryReducer = (state, action, actionType, config, normalizedData) => {
   }
 };
 
-const maybeGetQueryActionType = (action, config) => {
-  if (config.isRequestAction(action) && config.isRequestActionQuery(action)) {
+const maybeGetQueryActionType = action => {
+  if (isRequestAction(action) && isRequestActionQuery(action)) {
     return action.type;
   }
 
   if (
     isResponseAction(action) &&
-    config.isRequestActionQuery(getRequestActionFromResponse(action))
+    isRequestActionQuery(getRequestActionFromResponse(action))
   ) {
     return getRequestActionFromResponse(action).type;
   }
@@ -117,10 +164,9 @@ const maybeGetQueryActionType = (action, config) => {
   return null;
 };
 
-const updateNormalizedData = (normalizedData, action, config) => {
-  if (config.isRequestAction(action) && action.meta?.optimisticData) {
-    const [, newNormalizedData] = normalize(action.meta.optimisticData, config);
-    return mergeData(normalizedData, newNormalizedData);
+const maybeGetMutationData = (action, config) => {
+  if (isRequestAction(action) && action.meta.optimisticData) {
+    return action.meta.optimisticData;
   }
 
   if (
@@ -128,47 +174,125 @@ const updateNormalizedData = (normalizedData, action, config) => {
     isErrorAction(action) &&
     action.meta.revertedData
   ) {
-    const [, newNormalizedData] = normalize(action.meta.revertedData, config);
-    return mergeData(normalizedData, newNormalizedData);
+    return action.meta.revertedData;
   }
 
   if (
     isResponseAction(action) &&
     isSuccessAction(action) &&
     shouldBeNormalized(action, config) &&
-    !config.isRequestActionQuery(getRequestActionFromResponse(action))
+    !isRequestActionQuery(getRequestActionFromResponse(action))
   ) {
-    const [, newNormalizedData] = normalize(
-      getDataFromResponseAction(action),
-      config,
-    );
-    return mergeData(normalizedData, newNormalizedData);
+    return action.response.data;
   }
 
-  if (action.meta?.localData) {
-    const [, newNormalizedData] = normalize(action.meta.localData, config);
-    return mergeData(normalizedData, newNormalizedData);
+  if (isRequestActionLocalMutation(action) && action.meta.localData) {
+    return action.meta.localData;
   }
 
-  return normalizedData;
+  return null;
+};
+
+const updateNormalizedData = (normalizedData, mutationData, config) => {
+  const [, newNormalizedData] = normalize(mutationData, config);
+  return mergeData(normalizedData, newNormalizedData);
+};
+
+const getQueriesDependentOnMutation = (
+  dependentQueries,
+  mutationDependencies,
+) => {
+  const queries = [];
+  const orphanDependencies = [];
+
+  mutationDependencies.forEach(dependency => {
+    if (dependentQueries[dependency]) {
+      queries.push(...dependentQueries[dependency]);
+    } else {
+      orphanDependencies.push(dependency);
+    }
+  });
+
+  return { foundQueries: [...new Set(queries)], orphanDependencies };
 };
 
 export default (state, action, config = defaultConfig) => {
-  let normalizedData = updateNormalizedData(
-    state.normalizedData,
-    action,
-    config,
-  );
+  let { normalizedData, queries, dependentQueries } = state;
+  const mutationDataToNormalize = maybeGetMutationData(action, config);
+
+  if (mutationDataToNormalize) {
+    const [, mutationNormalizedData] = normalize(
+      mutationDataToNormalize,
+      config,
+    );
+    const mutationDependencies = Object.keys(mutationNormalizedData);
+    const { foundQueries, orphanDependencies } = getQueriesDependentOnMutation(
+      dependentQueries,
+      mutationDependencies,
+    );
+    const recalculatedQueries = {};
+    normalizedData = updateNormalizedData(
+      normalizedData,
+      mutationDataToNormalize,
+      config,
+    );
+    const potentialDependenciesToRemove = new Set(orphanDependencies);
+
+    foundQueries.forEach(query => {
+      const dependencies = [
+        ...getDependentKeys(
+          queries[query].data,
+          normalizedData,
+          queries[query].usedKeys,
+        ),
+      ];
+
+      const { addedDependencies, removedDependencies } = getDependenciesDiff(
+        queries[query].dependencies,
+        dependencies,
+      );
+
+      removedDependencies.forEach(v => {
+        potentialDependenciesToRemove.add(v);
+      });
+
+      dependentQueries = addQueryAsDependency(
+        dependentQueries,
+        addedDependencies,
+        query,
+      );
+
+      dependentQueries = removeQueryAsDependency(
+        dependentQueries,
+        removedDependencies,
+        query,
+      );
+
+      recalculatedQueries[query] = {
+        ...queries[query],
+        dependencies,
+      };
+    });
+
+    queries = { ...queries, ...recalculatedQueries };
+
+    const reallyRemovedDeps = [...potentialDependenciesToRemove].filter(
+      v => !dependentQueries[v],
+    );
+    normalizedData = mapObject(normalizedData, (k, v) =>
+      reallyRemovedDeps.includes(k) ? undefined : v,
+    );
+  }
 
   if (action.meta?.mutations) {
     return {
       queries: {
-        ...state.queries,
+        ...queries,
         ...Object.keys(action.meta.mutations)
-          .filter(actionType => !!state.queries[actionType])
+          .filter(actionType => !!queries[actionType])
           .reduce((prev, actionType) => {
             const updatedQuery = queryReducer(
-              state.queries[actionType],
+              queries[actionType],
               action,
               actionType,
               config,
@@ -177,14 +301,28 @@ export default (state, action, config = defaultConfig) => {
 
             if (
               updatedQuery.normalized &&
-              updatedQuery.data !== state.queries[actionType].data
+              updatedQuery.data !== queries[actionType].data
             ) {
               const [newdata, newNormalizedData, usedKeys] = normalize(
                 updatedQuery.data,
                 config,
               );
+              const dependencies = [
+                ...getDependentKeys(newdata, newNormalizedData, usedKeys),
+              ];
               normalizedData = mergeData(normalizedData, newNormalizedData);
-              prev[actionType] = { ...updatedQuery, data: newdata, usedKeys };
+              prev[actionType] = {
+                ...updatedQuery,
+                data: newdata,
+                dependencies,
+                usedKeys,
+              };
+
+              dependentQueries = addQueryAsDependency(
+                dependentQueries,
+                dependencies,
+                actionType,
+              );
             } else {
               prev[actionType] = updatedQuery;
             }
@@ -192,10 +330,11 @@ export default (state, action, config = defaultConfig) => {
           }, {}),
       },
       normalizedData,
+      dependentQueries,
     };
   }
 
-  const queryActionType = maybeGetQueryActionType(action, config);
+  const queryActionType = maybeGetQueryActionType(action);
 
   if (queryActionType) {
     const queryType =
@@ -203,7 +342,7 @@ export default (state, action, config = defaultConfig) => {
         ? queryActionType + action.meta.requestKey
         : queryActionType;
     const updatedQuery = queryReducer(
-      state.queries[queryType],
+      queries[queryType],
       action,
       queryActionType,
       config,
@@ -211,37 +350,51 @@ export default (state, action, config = defaultConfig) => {
 
     if (updatedQuery === undefined) {
       // eslint-disable-next-line no-unused-vars
-      const { [queryType]: toRemove, ...remainingQueries } = state.queries;
+      const { [queryType]: toRemove, ...remainingQueries } = queries;
 
       return {
         queries: remainingQueries,
         normalizedData,
+        dependentQueries,
       };
     }
 
     if (
       updatedQuery.normalized &&
       updatedQuery.data &&
-      (!state.queries[queryType] ||
-        state.queries[queryType].data !== updatedQuery.data)
+      (!queries[queryType] || queries[queryType].data !== updatedQuery.data)
     ) {
       const [data, newNormalizedData, usedKeys] = normalize(
         updatedQuery.data,
         config,
       );
 
+      const dependencies = [
+        ...getDependentKeys(data, newNormalizedData, usedKeys),
+      ];
+
       return {
         queries: {
-          ...state.queries,
-          [queryType]: { ...updatedQuery, data, usedKeys },
+          ...queries,
+          [queryType]: {
+            ...updatedQuery,
+            data,
+            usedKeys,
+            dependencies,
+          },
         },
         normalizedData: mergeData(normalizedData, newNormalizedData),
+        dependentQueries: addQueryAsDependency(
+          dependentQueries,
+          dependencies,
+          queryType,
+        ),
       };
     }
 
     return {
       queries: {
-        ...state.queries,
+        ...queries,
         [queryType]: updatedQuery,
       },
       normalizedData,
@@ -253,5 +406,7 @@ export default (state, action, config = defaultConfig) => {
     : {
         ...state,
         normalizedData,
+        queries,
+        dependentQueries,
       };
 };

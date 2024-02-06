@@ -62,13 +62,14 @@
     "no-sequences": 2,
     "no-console": 1,
 
+    "import/no-unresolved": 2,
     "import/no-self-import": 2,
     "import/first": 2,
     "import/newline-after-import": 2,
     "import/no-named-default": 2,
     "import/dynamic-import-chunkname": 2,
     "import/no-unused-modules": [
-      2,
+      0,
       {
         "missingExports": false,
         "unusedExports": true,
@@ -76,7 +77,14 @@
       }
     ],
     "import/no-extraneous-dependencies": 2,
-    "import/order": [2, { "newlines-between": "always" }],
+    "import/order": [
+      2,
+      {
+        "groups": ["builtin", "external", "parent", "sibling", "index"],
+        "newlines-between": "always"
+      }
+    ],
+    "import/named": 2,
 
     "react/prop-types": 0,
     "react/no-array-index-key": 0,

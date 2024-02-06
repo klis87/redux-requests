@@ -4,7 +4,7 @@ import {
   websocketClosed,
   openWebsocket,
   closeWebsocket,
-  getActionPayload,
+  isRequestActionSubscription,
 } from '../actions';
 import {
   GET_WEBSOCKET,
@@ -13,13 +13,10 @@ import {
   CLOSE_WEBSOCKET,
   WEBSOCKET_OPENED,
 } from '../constants';
-
-import createRequestsStore from './create-requests-store';
+import { createLocalMutation } from '../requests-creators';
 
 const shouldBeNormalized = (action, globalNormalize) =>
-  action.meta?.normalize !== undefined
-    ? action.meta.normalize
-    : globalNormalize;
+  action.meta.normalize !== undefined ? action.meta.normalize : globalNormalize;
 
 const transformIntoLocalMutation = (
   subscriptionAction,
@@ -34,16 +31,13 @@ const transformIntoLocalMutation = (
   }
 
   if (subscriptionAction.meta?.mutations) {
-    meta.mutations = mapObject(subscriptionAction.meta.mutations, (k, v) => ({
-      local: true,
-      updateData: data => v(data, subscriptionData, message),
-    }));
+    meta.mutations = mapObject(
+      subscriptionAction.meta.mutations,
+      (k, v) => data => v(data, subscriptionData, message),
+    );
   }
 
-  return {
-    type: `${subscriptionAction.type}_MUTATION`,
-    meta,
-  };
+  return createLocalMutation(`${subscriptionAction.type}_MUTATION`, meta)();
 };
 
 /*
@@ -178,8 +172,6 @@ export default ({
     }
 
     if ((!ws && WS && url && !lazy) || action.type === OPEN_WEBSOCKET) {
-      const requestsStore = createRequestsStore(store);
-
       clearLastReconnectTimeout();
       clearLastHeartbeatTimeout();
 
@@ -197,7 +189,7 @@ export default ({
 
         if (onOpen) {
           onOpen(
-            requestsStore,
+            store,
             ws,
             action.type === OPEN_WEBSOCKET ? action.props : null,
           );
@@ -214,7 +206,7 @@ export default ({
 
       ws.addEventListener('error', e => {
         if (onError) {
-          onError(e, requestsStore, ws);
+          onError(e, store, ws);
         }
       });
 
@@ -225,7 +217,7 @@ export default ({
         clearLastHeartbeatTimeout();
 
         if (onClose) {
-          onClose(e, requestsStore, ws);
+          onClose(e, store, ws);
         }
 
         if (e.code !== 1000 && reconnectTimeout) {
@@ -256,22 +248,22 @@ export default ({
         }
 
         if (onMessage) {
-          onMessage(data, message, requestsStore);
+          onMessage(data, message, store);
         }
 
         const subscription = subscriptions[data.type];
 
         if (subscription) {
-          if (subscription.meta?.getData) {
+          if (subscription.meta.getData) {
             data = subscription.meta.getData(data);
           }
 
-          if (subscription.meta?.onMessage) {
-            subscription.meta.onMessage(data, message, requestsStore);
+          if (subscription.meta.onMessage) {
+            subscription.meta.onMessage(data, message, store);
           }
 
           if (
-            subscription.meta?.mutations ||
+            subscription.meta.mutations ||
             shouldBeNormalized(subscription, normalize)
           ) {
             store.dispatch(
@@ -298,66 +290,52 @@ export default ({
       ws.close(action.code);
       ws = null;
       return response;
-    } else if (action.type === WEBSOCKET_OPENED) {
-      Object.values(subscriptions).forEach(subscriptionAction => {
-        const actionPayload = getActionPayload(subscriptionAction);
+    }
 
-        if (actionPayload.subscription) {
+    if (action.type === WEBSOCKET_OPENED) {
+      Object.values(subscriptions).forEach(subscriptionAction => {
+        if (subscriptionAction.payload) {
           ws.send(
             JSON.stringify(
               onSend
-                ? onSend(actionPayload.subscription, subscriptionAction)
-                : actionPayload.subscription,
+                ? onSend(subscriptionAction.payload, subscriptionAction)
+                : subscriptionAction.payload,
             ),
           );
         }
       });
     } else if (action.type === STOP_SUBSCRIPTIONS) {
-      const requestsStore = createRequestsStore(store);
-
       if (!action.subscriptions) {
         if (onStopSubscriptions) {
-          onStopSubscriptions(
-            Object.keys(subscriptions),
-            action,
-            ws,
-            requestsStore,
-          );
+          onStopSubscriptions(Object.keys(subscriptions), action, ws, store);
         }
 
         subscriptions = {};
       } else {
         if (onStopSubscriptions) {
-          onStopSubscriptions(action.subscriptions, action, ws, requestsStore);
+          onStopSubscriptions(action.subscriptions, action, ws, store);
         }
 
         subscriptions = mapObject(subscriptions, (k, v) =>
           action.subscriptions.includes(k) ? undefined : v,
         );
       }
-    } else if (
-      action.subscription !== undefined ||
-      action.payload?.subscription !== undefined
-    ) {
+    } else if (isRequestActionSubscription(action)) {
       if (
-        action.meta?.onMessage ||
-        action.meta?.mutations ||
+        action.meta.onMessage ||
+        action.meta.mutations ||
         shouldBeNormalized(action, normalize)
       ) {
         subscriptions = {
           ...subscriptions,
-          [action.type + (action.meta?.requestKey || '')]: action,
+          [action.type + (action.meta.requestKey || '')]: action,
         };
       }
 
-      const actionPayload = getActionPayload(action);
-
-      if (actionPayload.subscription && ws && active) {
+      if (action.payload && ws && active) {
         ws.send(
           JSON.stringify(
-            onSend
-              ? onSend(actionPayload.subscription, action)
-              : actionPayload.subscription,
+            onSend ? onSend(action.payload, action) : action.payload,
           ),
         );
       }

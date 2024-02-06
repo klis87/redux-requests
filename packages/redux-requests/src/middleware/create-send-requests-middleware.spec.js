@@ -7,6 +7,7 @@ import {
   createAbortAction,
   abortRequests,
 } from '../actions';
+import { createQuery } from '../requests-creators';
 
 import { createSendRequestsMiddleware } from '.';
 
@@ -36,7 +37,6 @@ describe('middleware', () => {
   const testConfig = {
     ...defaultConfig,
     driver: dummyDriver,
-    isRequestAction: action => !!action.request,
   };
   const mockStore = configureStore([createSendRequestsMiddleware(testConfig)]);
 
@@ -50,26 +50,27 @@ describe('middleware', () => {
     });
 
     it('dispatches requests and resolves on success', async () => {
-      const requestAction = {
-        type: 'REQUEST',
-        request: { response: { data: 'data' } },
-      };
+      const requestAction = createQuery('REQUEST', {
+        response: { data: 'data' },
+      })();
 
       const { dispatch, getActions } = mockStore({});
       const successAction = createSuccessAction(requestAction, {
         data: 'data',
       });
+
       const result = await dispatch(requestAction);
+
       expect(result).toEqual({ action: successAction, data: 'data' });
       expect(getActions()).toEqual([requestAction, successAction]);
     });
 
     it('resolves on success but doesnt dispatch in silent mode', async () => {
-      const requestAction = {
-        type: 'REQUEST',
-        request: { response: { data: 'data' } },
-        meta: { silent: true },
-      };
+      const requestAction = createQuery(
+        'REQUEST',
+        { response: { data: 'data' } },
+        { silent: true },
+      )();
 
       const { dispatch, getActions } = mockStore({});
       const successAction = createSuccessAction(requestAction, {
@@ -81,13 +82,10 @@ describe('middleware', () => {
     });
 
     it('dispatches requests and resolves on success for batch request', async () => {
-      const requestAction = {
-        type: 'REQUEST',
-        request: [
-          { response: { data: 'data1' } },
-          { response: { data: 'data2' } },
-        ],
-      };
+      const requestAction = createQuery('REQUEST', [
+        { response: { data: 'data1' } },
+        { response: { data: 'data2' } },
+      ])();
 
       const { dispatch, getActions } = mockStore({});
       const successAction = createSuccessAction(requestAction, {
@@ -102,11 +100,11 @@ describe('middleware', () => {
     });
 
     it('dispatches requests and resolves on success for cache response', async () => {
-      const requestAction = {
-        type: 'REQUEST',
-        request: { response: { data: 'data' } },
-        meta: { cacheResponse: { data: 'data cached' } },
-      };
+      const requestAction = createQuery(
+        'REQUEST',
+        { response: { data: 'data' } },
+        { cacheResponse: { data: 'data cached' } },
+      )();
 
       const { dispatch, getActions } = mockStore({});
       const successAction = createSuccessAction(requestAction, {
@@ -118,11 +116,11 @@ describe('middleware', () => {
     });
 
     it('dispatches requests and resolves on success for ssr response', async () => {
-      const requestAction = {
-        type: 'REQUEST',
-        request: { response: { data: 'data' } },
-        meta: { ssrResponse: { data: 'data ssr' } },
-      };
+      const requestAction = createQuery(
+        'REQUEST',
+        { response: { data: 'data' } },
+        { ssrResponse: { data: 'data ssr' } },
+      )();
 
       const { dispatch, getActions } = mockStore({});
       const successAction = createSuccessAction(requestAction, {
@@ -134,10 +132,7 @@ describe('middleware', () => {
     });
 
     it('dispatches requests and resolves on error', async () => {
-      const requestAction = {
-        type: 'REQUEST',
-        request: { error: 'error' },
-      };
+      const requestAction = createQuery('REQUEST', { error: 'error' })();
 
       const { dispatch, getActions } = mockStore({});
       const errorAction = createErrorAction(requestAction, 'error');
@@ -150,11 +145,11 @@ describe('middleware', () => {
     });
 
     it('resolves on error but doesnt dispatch in silent mode', async () => {
-      const requestAction = {
-        type: 'REQUEST',
-        request: { error: 'error' },
-        meta: { silent: true },
-      };
+      const requestAction = createQuery(
+        'REQUEST',
+        { error: 'error' },
+        { silent: true },
+      )();
 
       const { dispatch, getActions } = mockStore({});
       const errorAction = createErrorAction(requestAction, 'error');
@@ -167,11 +162,11 @@ describe('middleware', () => {
     });
 
     it('dispatches requests and resolves on abort', async () => {
-      const requestAction = {
-        type: 'REQUEST',
-        request: { response: { data: 'data' } },
-        meta: { takeLatest: true },
-      };
+      const requestAction = createQuery(
+        'REQUEST',
+        { response: { data: 'data' } },
+        { takeLatest: true },
+      )();
 
       const { dispatch, getActions } = mockStore({});
       const successAction = createSuccessAction(requestAction, {
@@ -197,10 +192,9 @@ describe('middleware', () => {
     });
 
     it('aborts all requests on abortRequests action', async () => {
-      const requestAction = {
-        type: 'REQUEST',
-        request: { response: { data: 'data' } },
-      };
+      const requestAction = createQuery('REQUEST', {
+        response: { data: 'data' },
+      })();
 
       const { dispatch, getActions } = mockStore({});
       const abortAction = createAbortAction(requestAction);
@@ -225,19 +219,17 @@ describe('middleware', () => {
     });
 
     it('aborts specific requests on abortRequests action', async () => {
-      const requestAction1 = {
-        type: 'REQUEST1',
-        request: { response: { data: 'data' } },
-      };
-      const requestAction2 = {
-        type: 'REQUEST2',
-        request: { response: { data: 'data' } },
-      };
-      const requestAction3 = {
-        type: 'REQUEST3',
-        request: { response: { data: 'data' } },
-        meta: { requestKey: '1' },
-      };
+      const requestAction1 = createQuery('REQUEST1', {
+        response: { data: 'data' },
+      })();
+      const requestAction2 = createQuery('REQUEST2', {
+        response: { data: 'data' },
+      })();
+      const requestAction3 = createQuery(
+        'REQUEST3',
+        { response: { data: 'data' } },
+        { requestKey: '1' },
+      )();
 
       const { dispatch, getActions } = mockStore({});
       const responseAction1 = createSuccessAction(requestAction1, {
@@ -286,14 +278,12 @@ describe('middleware', () => {
           },
         }),
       ]);
-      const requestAction = {
-        type: 'REQUEST',
-        request: { response: { data: 'data' } },
-      };
-      const requestActionUpdated = {
-        type: 'REQUEST',
-        request: { response: { data: 'dataUpdated' } },
-      };
+      const requestAction = createQuery('REQUEST', {
+        response: { data: 'data' },
+      })();
+      const requestActionUpdated = createQuery('REQUEST', {
+        response: { data: 'dataUpdated' },
+      })();
 
       const { dispatch, getActions } = onRequestMockStore({});
       const successAction = createSuccessAction(requestActionUpdated, {
@@ -318,11 +308,11 @@ describe('middleware', () => {
           },
         }),
       ]);
-      const requestAction = {
-        type: 'REQUEST',
-        request: { response: { data: 'data' } },
-        meta: { runOnRequest: false },
-      };
+      const requestAction = createQuery(
+        'REQUEST',
+        { response: { data: 'data' } },
+        { runOnRequest: false },
+      )();
 
       const { dispatch, getActions } = onRequestMockStore({});
       const successAction = createSuccessAction(requestAction, {
@@ -343,10 +333,9 @@ describe('middleware', () => {
           },
         }),
       ]);
-      const requestAction = {
-        type: 'REQUEST',
-        request: { response: { data: 'data' } },
-      };
+      const requestAction = createQuery('REQUEST', {
+        response: { data: 'data' },
+      })();
       const { dispatch, getActions } = onSuccessMockStore({});
       const successAction = createSuccessAction(requestAction, {
         data: 'dataUpdated',
@@ -370,11 +359,11 @@ describe('middleware', () => {
           },
         }),
       ]);
-      const requestAction = {
-        type: 'REQUEST',
-        request: { response: { data: 'data' } },
-        meta: { runOnSuccess: false },
-      };
+      const requestAction = createQuery(
+        'REQUEST',
+        { response: { data: 'data' } },
+        { runOnSuccess: false },
+      )();
       const { dispatch, getActions } = onSuccessMockStore({});
       const successAction = createSuccessAction(requestAction, {
         data: 'data',
@@ -394,10 +383,7 @@ describe('middleware', () => {
           },
         }),
       ]);
-      const requestAction = {
-        type: 'REQUEST',
-        request: { error: 'error' },
-      };
+      const requestAction = createQuery('REQUEST', { error: 'error' })();
       const { dispatch, getActions } = onErrorMockStore({});
       const errorAction = createErrorAction(requestAction, 'errorUpdated');
       const result = dispatch(requestAction);
@@ -422,11 +408,11 @@ describe('middleware', () => {
           },
         }),
       ]);
-      const requestAction = {
-        type: 'REQUEST',
-        request: { error: 'error' },
-        meta: { runOnError: false },
-      };
+      const requestAction = createQuery(
+        'REQUEST',
+        { error: 'error' },
+        { runOnError: false },
+      )();
       const { dispatch, getActions } = onErrorMockStore({});
       const errorAction = createErrorAction(requestAction, 'error');
       const result = dispatch(requestAction);
@@ -442,20 +428,19 @@ describe('middleware', () => {
         createSendRequestsMiddleware({
           ...testConfig,
           onError: async (error, action, store) => {
-            const { data } = await store.dispatch({
-              type: 'REQUEST',
-              request: { response: { data: 'data' } },
-              meta: { silent: true },
-            });
+            const { data } = await store.dispatch(
+              createQuery(
+                'REQUEST',
+                { response: { data: 'data' } },
+                { silent: true },
+              )(),
+            );
 
             return { data };
           },
         }),
       ]);
-      const requestAction = {
-        type: 'REQUEST',
-        request: { error: 'error' },
-      };
+      const requestAction = createQuery('REQUEST', { error: 'error' })();
       const { dispatch, getActions } = onErrorMockStore({});
       const successAction = createSuccessAction(requestAction, {
         data: 'data',
@@ -477,10 +462,7 @@ describe('middleware', () => {
           },
         }),
       ]);
-      const requestAction = {
-        type: 'REQUEST',
-        request: { error: 'error' },
-      };
+      const requestAction = createQuery('REQUEST', { error: 'error' })();
       const { dispatch, getActions } = onErrorMockStore({});
       const abortAction = createAbortAction(requestAction);
       const result = dispatch(requestAction);
@@ -506,11 +488,11 @@ describe('middleware', () => {
           },
         }),
       ]);
-      const requestAction = {
-        type: 'REQUEST',
-        request: { error: 'error' },
-        meta: { runOnAbort: false },
-      };
+      const requestAction = createQuery(
+        'REQUEST',
+        { error: 'error' },
+        { runOnAbort: false },
+      )();
       const { dispatch, getActions } = onErrorMockStore({});
       const abortAction = createAbortAction(requestAction);
       const result = dispatch(requestAction);
@@ -527,13 +509,13 @@ describe('middleware', () => {
     });
 
     it('dispatches requests and rejects on success but with getData syntax error', async () => {
-      const requestAction = {
-        type: 'REQUEST',
-        request: { response: { data: 'data' } },
-        meta: {
+      const requestAction = createQuery(
+        'REQUEST',
+        { response: { data: 'data' } },
+        {
           getData: data => data.map(v => v), // error
         },
-      };
+      )();
 
       const { dispatch, getActions } = mockStore({
         requests: { queries: {}, mutations: {} },

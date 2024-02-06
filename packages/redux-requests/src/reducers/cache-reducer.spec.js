@@ -1,6 +1,7 @@
 import { advanceTo, clear } from 'jest-date-mock';
 
 import { clearRequestsCache, createSuccessAction } from '../actions';
+import { createQuery } from '../requests-creators';
 
 import cacheReducer from './cache-reducer';
 
@@ -34,7 +35,7 @@ describe('reducers', () => {
 
     it('doesnt do anything for request action', () => {
       expect(
-        cacheReducer(defaultState, { type: 'REQUEST', request: { url: '/' } }),
+        cacheReducer(defaultState, createQuery('REQUEST', { url: '/' })()),
       ).toBe(defaultState);
     });
 
@@ -42,10 +43,9 @@ describe('reducers', () => {
       expect(
         cacheReducer(
           defaultState,
-          createSuccessAction(
-            { type: 'QUERY4', request: { url: '/' } },
-            { data: 'data' },
-          ),
+          createSuccessAction(createQuery('QUERY4', { url: '/' })(), {
+            data: 'data',
+          }),
         ),
       ).toBe(defaultState);
     });
@@ -55,11 +55,11 @@ describe('reducers', () => {
         cacheReducer(
           defaultState,
           createSuccessAction(
-            {
-              type: 'QUERY4',
-              request: { url: '/' },
-              meta: { cache: true, cacheResponse: { data: 'data' } },
-            },
+            createQuery(
+              'QUERY4',
+              { url: '/' },
+              { cache: true, cacheResponse: { data: 'data' } },
+            )(),
             { data: 'data' },
           ),
         ),
@@ -71,7 +71,7 @@ describe('reducers', () => {
         cacheReducer(
           defaultState,
           createSuccessAction(
-            { type: 'QUERY4', request: { url: '/' }, meta: { cache: true } },
+            createQuery('QUERY4', { url: '/' }, { cache: true })(),
             { data: 'data' },
           ),
         ),
@@ -88,7 +88,7 @@ describe('reducers', () => {
           cacheReducer(
             defaultState,
             createSuccessAction(
-              { type: 'QUERY4', request: { url: '/' }, meta: { cache: 1 } },
+              createQuery('QUERY4', { url: '/' }, { cache: 1 })(),
               { data: 'data' },
             ),
           ),

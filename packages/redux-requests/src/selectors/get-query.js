@@ -15,14 +15,6 @@ const isQueryEqual = (currentVal, previousVal) => {
   }
 
   if (
-    currentVal.data === null &&
-    (currentVal.multiple !== previousVal.multiple ||
-      currentVal.defaultData !== previousVal.defaultData)
-  ) {
-    return false;
-  }
-
-  if (
     currentVal.normalized &&
     currentVal.normalizedData !== previousVal.normalizedData
   ) {
@@ -59,28 +51,12 @@ const createCustomSelector = createSelectorCreator(
   isQueryEqual,
 );
 
-const getData = (data, multiple, defaultData) => {
-  if (data !== null) {
-    return data;
-  }
-
-  if (defaultData !== undefined) {
-    return defaultData;
-  }
-
-  if (multiple) {
-    return [];
-  }
-
-  return data;
-};
-
 const getQueryState = (state, type, requestKey = '') =>
   state.requests.queries[type + requestKey];
 
 const createQuerySelector = (type, requestKey) =>
   createCustomSelector(
-    (state, defaultData, multiple) => {
+    state => {
       // in order not to keep queryState.ref reference in selector memoize
       const {
         data,
@@ -98,8 +74,6 @@ const createQuerySelector = (type, requestKey) =>
         pristine,
         normalized,
         usedKeys,
-        multiple,
-        defaultData,
         normalizedData: state.requests.normalizedData,
         downloadProgress:
           state.requests.downloadProgress[type + (requestKey || '')] ?? null,
@@ -115,18 +89,10 @@ const createQuerySelector = (type, requestKey) =>
       usedKeys,
       normalized,
       normalizedData,
-      defaultData,
-      multiple,
       downloadProgress,
       uploadProgress,
     }) => ({
-      data: normalized
-        ? denormalize(
-            getData(data, multiple, defaultData),
-            normalizedData,
-            usedKeys,
-          )
-        : getData(data, multiple, defaultData),
+      data: normalized ? denormalize(data, normalizedData, usedKeys) : data,
       pending,
       loading: pending > 0,
       error,
@@ -146,42 +112,18 @@ const defaultQuery = {
   uploadProgress: null,
 };
 
-const defaultQueryMultiple = {
-  ...defaultQuery,
-  data: [],
-};
-
-const defaultQueriesWithCustomData = new Map();
-
-const getDefaultQuery = (defaultData, multiple) => {
-  if (
-    defaultData !== undefined &&
-    defaultQueriesWithCustomData.get(defaultData)
-  ) {
-    return defaultQueriesWithCustomData.get(defaultData);
-  }
-
-  if (defaultData !== undefined) {
-    const query = { ...defaultQuery, data: defaultData };
-    defaultQueriesWithCustomData.set(defaultData, query);
-    return query;
-  }
-
-  return multiple ? defaultQueryMultiple : defaultQuery;
-};
-
 const querySelectors = new WeakMap();
 
-export default (state, { type, requestKey, defaultData, multiple = false }) => {
+export default (state, { type, requestKey }) => {
   const queryState = getQueryState(state, type, requestKey);
 
   if (!queryState) {
-    return getDefaultQuery(defaultData, multiple);
+    return defaultQuery;
   }
 
   if (!querySelectors.get(queryState.ref)) {
     querySelectors.set(queryState.ref, createQuerySelector(type, requestKey));
   }
 
-  return querySelectors.get(queryState.ref)(state, defaultData, multiple);
+  return querySelectors.get(queryState.ref)(state);
 };

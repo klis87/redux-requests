@@ -19,7 +19,6 @@ export const configureStore = (initialState = undefined) => {
       }),
     ),
     ssr: ssr ? 'server' : 'client',
-    cache: true,
   });
 
   const reducers = combineReducers({

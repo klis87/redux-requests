@@ -1,6 +1,7 @@
 import configureStore from 'redux-mock-store';
 
 import { createSuccessAction, createErrorAction } from '../actions';
+import { createQuery } from '../requests-creators';
 
 import { createServerSsrMiddleware } from '.';
 
@@ -18,7 +19,7 @@ const defer = () => {
 
 describe('middleware', () => {
   describe('createServerSsrMiddleware', () => {
-    const requestAction = { type: 'REQUEST', request: { url: '/' } };
+    const requestAction = createQuery('REQUEST', { url: '/' })();
     const successAction = createSuccessAction(requestAction, 'data');
     const errorAction = createErrorAction(requestAction, 'error');
 
@@ -72,21 +73,21 @@ describe('middleware', () => {
         createServerSsrMiddleware(requestsPromise),
       ]);
       const store = mockStore({});
-      const firstRequestAction = {
-        type: 'REQUEST',
-        request: { url: '/' },
-        meta: { dependentRequestsNumber: 2 },
-      };
-      const secondRequestAction = {
-        type: 'REQUEST2',
-        request: { url: '/' },
-        meta: { isDependentRequest: true },
-      };
-      const thirdRequestAction = {
-        type: 'REQUEST3',
-        request: { url: '/' },
-        meta: { isDependentRequest: true },
-      };
+      const firstRequestAction = createQuery(
+        'REQUEST',
+        { url: '/' },
+        { dependentRequestsNumber: 2 },
+      )();
+      const secondRequestAction = createQuery(
+        'REQUEST2',
+        { url: '/' },
+        { isDependentRequest: true },
+      )();
+      const thirdRequestAction = createQuery(
+        'REQUEST3',
+        { url: '/' },
+        { isDependentRequest: true },
+      )();
       const firsResponseAction = createSuccessAction(firstRequestAction);
       const secondResponseAction = createSuccessAction(secondRequestAction);
       const thirdResponseAction = createSuccessAction(thirdRequestAction);
@@ -117,11 +118,11 @@ describe('middleware', () => {
         createServerSsrMiddleware(requestsPromise),
       ]);
       const store = mockStore({});
-      const firstRequestAction = {
-        type: 'REQUEST',
-        request: { url: '/' },
-        meta: { dependentRequestsNumber: 2 },
-      };
+      const firstRequestAction = createQuery(
+        'REQUEST',
+        { url: '/' },
+        { dependentRequestsNumber: 2 },
+      )();
       // const secondRequestAction = {
       //   type: 'REQUEST2',
       //   request: { url: '/' },
@@ -161,21 +162,21 @@ describe('middleware', () => {
         createServerSsrMiddleware(requestsPromise),
       ]);
       const store = mockStore({});
-      const firstRequestAction = {
-        type: 'REQUEST',
-        request: { url: '/' },
-        meta: { dependentRequestsNumber: 2 },
-      };
-      const secondRequestAction = {
-        type: 'REQUEST2',
-        request: { url: '/' },
-        meta: { isDependentRequest: true },
-      };
-      const thirdRequestAction = {
-        type: 'REQUEST3',
-        request: { url: '/' },
-        meta: { isDependentRequest: true },
-      };
+      const firstRequestAction = createQuery(
+        'REQUEST',
+        { url: '/' },
+        { dependentRequestsNumber: 2 },
+      )();
+      const secondRequestAction = createQuery(
+        'REQUEST2',
+        { url: '/' },
+        { isDependentRequest: true },
+      )();
+      const thirdRequestAction = createQuery(
+        'REQUEST3',
+        { url: '/' },
+        { isDependentRequest: true },
+      )();
       const firsResponseAction = createSuccessAction(firstRequestAction);
       const secondResponseAction = createSuccessAction(secondRequestAction);
       const thirdErrorAction = createErrorAction(thirdRequestAction);
@@ -205,16 +206,16 @@ describe('middleware', () => {
         createServerSsrMiddleware(requestsPromise),
       ]);
       const store = mockStore({});
-      const firstRequestAction = {
-        type: 'REQUEST',
-        request: { url: '/' },
-        meta: { dependentRequestsNumber: 1 },
-      };
-      const secondRequestAction = {
-        type: 'REQUEST2',
-        request: { url: '/' },
-        meta: { isDependentRequest: true, dependentRequestsNumber: 1 },
-      };
+      const firstRequestAction = createQuery(
+        'REQUEST',
+        { url: '/' },
+        { dependentRequestsNumber: 1 },
+      )();
+      const secondRequestAction = createQuery(
+        'REQUEST2',
+        { url: '/' },
+        { isDependentRequest: true, dependentRequestsNumber: 1 },
+      )();
       // const thirdRequestAction = {
       //   type: 'REQUEST3',
       //   request: { url: '/' },

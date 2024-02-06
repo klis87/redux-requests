@@ -32,12 +32,12 @@ const handleRequests = userConfig => {
       config.ssr !== 'server' &&
         config.subscriber &&
         createSubscriptionsMiddleware(config),
-      config.ssr !== 'server' && createPollingMiddleware(config),
+      config.ssr !== 'server' && createPollingMiddleware(),
       config.ssr === 'server' &&
         !config.disableRequestsPromise &&
-        createServerSsrMiddleware(requestsPromise, config),
-      config.ssr === 'client' && createClientSsrMiddleware(config),
-      config.cache && createRequestsCacheMiddleware(config),
+        createServerSsrMiddleware(requestsPromise),
+      config.ssr === 'client' && createClientSsrMiddleware(),
+      createRequestsCacheMiddleware(),
       createSendRequestsMiddleware(config),
     ].filter(Boolean),
     requestsPromise,

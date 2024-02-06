@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
 import { Provider } from 'react-redux';
-import { handleRequests, createRequestsStore } from '@redux-requests/core';
+import { handleRequests } from '@redux-requests/core';
 
 import RequestsContext from './requests-context';
 
@@ -35,7 +35,7 @@ const RequestsProvider = ({
 
   const store = useMemo(() => {
     if (customStore) {
-      return createRequestsStore(customStore);
+      return customStore;
     }
 
     const { requestsReducer, requestsMiddleware } = handleRequests(
@@ -52,12 +52,10 @@ const RequestsProvider = ({
         window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) ||
       compose;
 
-    return createRequestsStore(
-      createStore(
-        reducers,
-        initialState,
-        composeEnhancers(applyMiddleware(...getMiddleware(requestsMiddleware))),
-      ),
+    return createStore(
+      reducers,
+      initialState,
+      composeEnhancers(applyMiddleware(...getMiddleware(requestsMiddleware))),
     );
   }, []);
 
