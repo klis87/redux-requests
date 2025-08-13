@@ -262,7 +262,7 @@ sometimes they will be necessary to use. Just be aware of their existance and us
 
 ## Global interceptors
 
-Based on above example you already know how to use local interceptos. That's it,
+Based on above example you already know how to use local interceptors. That's it,
 you just add them to action `meta`. For global interceptors, you just need to pass
 them to `handleRequests`:
 
