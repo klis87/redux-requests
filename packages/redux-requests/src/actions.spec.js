@@ -1,3 +1,4 @@
+import { createQuery } from './requests-creators';
 import {
   success,
   error,
@@ -5,7 +6,6 @@ import {
   createSuccessAction,
   createErrorAction,
   createAbortAction,
-  getActionPayload,
   isRequestAction,
   getRequestActionFromResponse,
   isSuccessAction,
@@ -37,33 +37,11 @@ describe('actions', () => {
 
   describe('createSuccessAction', () => {
     it('should correctly transform action payload', () => {
-      const requestAction = {
-        type: 'REQUEST',
-        request: { url: '/' },
-      };
+      const requestAction = createQuery('REQUEST', { url: '/' })();
 
       expect(createSuccessAction(requestAction, { data: 'data' })).toEqual({
         type: 'REQUEST_SUCCESS',
         response: { data: 'data' },
-        meta: {
-          requestAction,
-        },
-      });
-    });
-
-    it('handles FSA actions', () => {
-      const requestAction = {
-        type: 'REQUEST',
-        payload: {
-          request: { url: '/' },
-        },
-      };
-
-      expect(createSuccessAction(requestAction, { data: 'data' })).toEqual({
-        type: 'REQUEST_SUCCESS',
-        payload: {
-          data: 'data',
-        },
         meta: {
           requestAction,
         },
@@ -100,24 +78,6 @@ describe('actions', () => {
       expect(createErrorAction(requestAction, 'errorData')).toEqual({
         type: 'REQUEST_ERROR',
         error: 'errorData',
-        meta: {
-          requestAction,
-        },
-      });
-    });
-
-    it('handles FSA actions', () => {
-      const requestAction = {
-        type: 'REQUEST',
-        payload: {
-          request: { url: '/' },
-        },
-      };
-
-      expect(createErrorAction(requestAction, 'errorData')).toEqual({
-        type: 'REQUEST_ERROR',
-        payload: 'errorData',
-        error: true,
         meta: {
           requestAction,
         },
@@ -178,50 +138,9 @@ describe('actions', () => {
     });
   });
 
-  describe('getActionPayload', () => {
-    it('just returns not FSA action', () => {
-      const action = { type: 'ACTION' };
-      expect(getActionPayload(action)).toEqual(action);
-    });
-
-    it('returns payload of FSA action', () => {
-      const action = { type: 'ACTION', payload: 'payload' };
-      expect(getActionPayload(action)).toBe('payload');
-    });
-  });
-
   describe('isRequestAction', () => {
     it('recognizes request action', () => {
-      expect(isRequestAction({ type: 'ACTION', request: { url: '/' } })).toBe(
-        true,
-      );
-    });
-
-    it('recognizes request FSA action', () => {
-      expect(
-        isRequestAction({
-          type: 'ACTION',
-          payload: { request: { url: '/' } },
-        }),
-      ).toBe(true);
-    });
-
-    it('recognizes request action with multiple requests', () => {
-      expect(
-        isRequestAction({
-          type: 'ACTION',
-          request: [{ url: '/' }, { url: '/path' }],
-        }),
-      ).toBe(true);
-    });
-
-    it('recognizes request action with graphql query', () => {
-      expect(
-        isRequestAction({
-          type: 'ACTION',
-          request: { query: '{ x }' },
-        }),
-      ).toBe(true);
+      expect(isRequestAction(createQuery('ACTION', { url: '/' })())).toBe(true);
     });
 
     it('rejects actions without request object', () => {
@@ -232,42 +151,11 @@ describe('actions', () => {
         }),
       ).toBe(false);
     });
-
-    it('rejects actions with request without url', () => {
-      expect(
-        isRequestAction({
-          type: 'ACTION',
-          request: { headers: {} },
-        }),
-      ).toBe(false);
-    });
-
-    it('rejects actions with response object', () => {
-      expect(
-        isRequestAction({
-          type: 'ACTION',
-          request: { url: '/' },
-          response: {},
-        }),
-      ).toBe(false);
-    });
-
-    it('rejects actions with payload which is instance of error', () => {
-      const responseError = new Error();
-      responseError.request = { request: { url: '/' } };
-      expect(
-        isRequestAction({
-          type: 'ACTION',
-          payload: responseError,
-          response: {},
-        }),
-      ).toBe(false);
-    });
   });
 
   describe('getRequestActionFromResponse', () => {
     it('should return request action', () => {
-      const requestAction = { type: 'REQUEST', request: { url: '/' } };
+      const requestAction = createQuery('REQUEST', { url: '/' })();
       const responseAction = {
         type: success('REQUEST'),
         data: 'data',
@@ -341,35 +229,8 @@ describe('actions', () => {
 
   describe('isRequestActionQuery', () => {
     it('treats request with GET method as queries', () => {
-      expect(isRequestActionQuery({ request: { url: '/books' } })).toBe(true);
       expect(
-        isRequestActionQuery({ request: { url: '/books', method: 'GET' } }),
-      ).toBe(true);
-    });
-
-    it('treats request with POST method as mutations', () => {
-      expect(
-        isRequestActionQuery({ request: { url: '/books', method: 'POST' } }),
-      ).toBe(false);
-    });
-
-    it('treats request with GET method as mutation when asMutation is true', () => {
-      expect(isRequestActionQuery({ request: { url: '/books' } })).toBe(true);
-      expect(
-        isRequestActionQuery({
-          request: { url: '/books', method: 'GET' },
-          meta: { asMutation: true },
-        }),
-      ).toBe(false);
-    });
-
-    it('treats request with POST method as query when asMutation is false', () => {
-      expect(isRequestActionQuery({ request: { url: '/books' } })).toBe(true);
-      expect(
-        isRequestActionQuery({
-          request: { url: '/books', method: 'POST' },
-          meta: { asMutation: false },
-        }),
+        isRequestActionQuery(createQuery('QUERY', { url: '/books' })()),
       ).toBe(true);
     });
   });

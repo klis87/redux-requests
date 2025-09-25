@@ -1,15 +1,15 @@
-import defaultConfig from '../default-config';
 import { getQuery } from '../selectors';
+import { isRequestAction } from '../actions';
 
-export default (config = defaultConfig) => store => next => action => {
-  if (!config.isRequestAction(action)) {
+export default () => store => next => action => {
+  if (!isRequestAction(action)) {
     return next(action);
   }
 
   const state = store.getState();
   const actionsToIgnore = state.requests.ssr;
   const actionToIgnore = actionsToIgnore.find(
-    v => (v.requestType || v) === action.type + (action.meta?.requestKey || ''),
+    v => (v.requestType || v) === action.type + (action.meta.requestKey || ''),
   );
 
   if (!actionToIgnore) {
@@ -18,7 +18,7 @@ export default (config = defaultConfig) => store => next => action => {
 
   const query = getQuery(state, {
     type: action.type,
-    requestKey: action.meta?.requestKey,
+    requestKey: action.meta.requestKey,
   });
 
   action.meta = actionToIgnore.duplicate

@@ -1,3 +1,5 @@
+import { createQuery, createMutation } from '../requests-creators';
+
 import requestsKeysReducer from './requests-keys-reducer';
 
 describe('reducers', () => {
@@ -17,11 +19,10 @@ describe('reducers', () => {
 
     it('appends requestKeys for request actions', () => {
       expect(
-        requestsKeysReducer(defaultState, {
-          type: 'REQUEST',
-          request: { url: '/' },
-          meta: { requestKey: '1' },
-        }),
+        requestsKeysReducer(
+          defaultState,
+          createQuery('REQUEST', { url: '/' }, { requestKey: '1' })(),
+        ),
       ).toEqual({ ...defaultState, requestsKeys: { REQUEST: ['1'] } });
     });
 
@@ -36,11 +37,11 @@ describe('reducers', () => {
               REQUEST2: { pending: 1, data: 'data', error: null },
             },
           },
-          {
-            type: 'REQUEST',
-            request: { url: '/' },
-            meta: { requestKey: '2', requestsCapacity: 1 },
-          },
+          createQuery(
+            'REQUEST',
+            { url: '/' },
+            { requestKey: '2', requestsCapacity: 1 },
+          )(),
         ),
       ).toEqual({
         ...defaultState,
@@ -60,11 +61,11 @@ describe('reducers', () => {
               REQUEST2: { pending: 1, error: null },
             },
           },
-          {
-            type: 'REQUEST',
-            request: { url: '/' },
-            meta: { requestKey: '2', requestsCapacity: 1, asMutation: true },
-          },
+          createMutation(
+            'REQUEST',
+            { url: '/' },
+            { requestKey: '2', requestsCapacity: 1, asMutation: true },
+          )(),
         ),
       ).toEqual({
         ...defaultState,
@@ -86,11 +87,11 @@ describe('reducers', () => {
               REQUEST2: { pending: 0, data: 'data', error: null },
             },
           },
-          {
-            type: 'REQUEST',
-            request: { url: '/' },
-            meta: { requestKey: '2', requestsCapacity: 2 },
-          },
+          createQuery(
+            'REQUEST',
+            { url: '/' },
+            { requestKey: '2', requestsCapacity: 2 },
+          )(),
         ),
       ).toEqual({
         ...defaultState,
@@ -113,11 +114,11 @@ describe('reducers', () => {
               REQUEST2: { pending: 0, data: 'data', error: null },
             },
           },
-          {
-            type: 'REQUEST',
-            request: { url: '/' },
-            meta: { requestKey: '2', requestsCapacity: 1 },
-          },
+          createQuery(
+            'REQUEST',
+            { url: '/' },
+            { requestKey: '2', requestsCapacity: 1 },
+          )(),
         ),
       ).toEqual({
         ...defaultState,

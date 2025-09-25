@@ -27,29 +27,22 @@ export const error = getActionWithSuffix(ERROR_SUFFIX);
 
 export const abort = getActionWithSuffix(ABORT_SUFFIX);
 
-const isFSA = action => !!action.payload;
-
 export const createSuccessAction = (action, response) => ({
   type: success(action.type),
-  ...(isFSA(action) ? { payload: response } : { response }),
+  response,
   meta: {
     ...action.meta,
+    requestType: undefined,
     requestAction: action,
   },
 });
 
 export const createErrorAction = (action, errorData) => ({
   type: error(action.type),
-  ...(isFSA(action)
-    ? {
-        payload: errorData,
-        error: true,
-      }
-    : {
-        error: errorData,
-      }),
+  error: errorData,
   meta: {
     ...action.meta,
+    requestType: undefined,
     requestAction: action,
   },
 });
@@ -58,32 +51,15 @@ export const createAbortAction = action => ({
   type: abort(action.type),
   meta: {
     ...action.meta,
+    requestType: undefined,
     requestAction: action,
   },
 });
 
-export const getActionPayload = action =>
-  action.payload === undefined ? action : action.payload;
-
-// eslint-disable-next-line import/no-unused-modules
-export const getResponseFromSuccessAction = action =>
-  action.payload ? action.payload : action.response;
-
 export const isRequestAction = action => {
-  const actionPayload = getActionPayload(action);
-
   return (
-    !!actionPayload?.request &&
-    !!(
-      Array.isArray(actionPayload.request) ||
-      actionPayload.request.url ||
-      actionPayload.request.query ||
-      actionPayload.request.promise ||
-      actionPayload.request.response ||
-      actionPayload.request.error
-    ) &&
-    !actionPayload.response &&
-    !(actionPayload instanceof Error)
+    action?.meta?.requestType === 'QUERY' ||
+    action?.meta?.requestType === 'MUTATION'
   );
 };
 
@@ -100,21 +76,20 @@ export const isErrorAction = action =>
 export const isAbortAction = action =>
   isResponseAction(action) && action.type.endsWith(ABORT_SUFFIX);
 
-const isRequestQuery = request =>
-  (!request.query &&
-    (!request.method || request.method.toLowerCase() === 'get')) ||
-  (request.query && !request.query.trim().startsWith('mutation'));
-
 export const isRequestActionQuery = action => {
-  const { request } = getActionPayload(action);
+  return action?.meta?.requestType === 'QUERY';
+};
 
-  if (action.meta?.asMutation !== undefined) {
-    return !action.meta.asMutation;
-  }
+export const isRequestActionMutation = action => {
+  return action?.meta?.requestType === 'MUTATION';
+};
 
-  return !!(Array.isArray(request)
-    ? request.every(isRequestQuery)
-    : isRequestQuery(request));
+export const isRequestActionLocalMutation = action => {
+  return action?.meta?.requestType === 'LOCAL_MUTATION';
+};
+
+export const isRequestActionSubscription = action => {
+  return action?.meta?.requestType === 'SUBSCRIPTION';
 };
 
 export const clearRequestsCache = (requests = null) => ({

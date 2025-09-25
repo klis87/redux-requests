@@ -10,61 +10,6 @@ import {
   SubscriptionAction,
 } from '@redux-requests/core';
 
-interface LoadingProps {
-  downloadProgress?: number | null;
-  uploadProgress?: number | null;
-  [loadingProp: string]: any;
-}
-
-interface ErrorProps {
-  error?: any;
-  [errorProp: string]: any;
-}
-
-interface QueryCustomComponentProps<QueryStateData> {
-  query: QueryState<QueryStateData>;
-  [extraProperty: string]: any;
-}
-
-interface QueryProps<QueryStateData, CustomComponentProps> {
-  type?: string | ((...params: any[]) => RequestAction<any, QueryStateData>);
-  action?: (...params: any[]) => RequestAction<any, QueryStateData>;
-  requestKey?: string;
-  multiple?: boolean;
-  defaultData?: any;
-  selector?: (state: any) => QueryState<QueryStateData>;
-  children?: (query: QueryState<QueryStateData>) => React.ReactNode;
-  component?: CustomComponentProps extends QueryCustomComponentProps<QueryStateData> ? React.ComponentType<CustomComponentProps> : never;
-  isDataEmpty?: (query: QueryState<QueryStateData>) => boolean;
-  showLoaderDuringRefetch?: boolean;
-  noDataMessage?: React.ReactNode;
-  errorComponent?: React.ComponentType<ErrorProps>;
-  errorComponentProps?: { [errorProp: string]: any };
-  loadingComponent?: React.ComponentType<LoadingProps>;
-  loadingComponentProps?: { [loadingProp: string]: any };
-  [extraProperty: string]: any;
-}
-
-export class Query<QueryStateData = any, CustomComponentProps = {}> extends React.Component<
-  QueryProps<QueryStateData, CustomComponentProps>
-> {}
-
-interface MutationCustomComponentProps {
-  mutation: MutationState;
-  [extraProperty: string]: any;
-}
-
-interface MutationProps<CustomComponentProps> {
-  type?: string | ((...params: any[]) => RequestAction);
-  requestKey?: string;
-  selector?: (state: any) => MutationState;
-  children?: (mutation: MutationState) => React.ReactNode;
-  component?: CustomComponentProps extends MutationCustomComponentProps ? React.ComponentType<CustomComponentProps> : never;
-  [extraProperty: string]: any;
-}
-
-export class Mutation<CustomComponentProps = {}> extends React.Component<MutationProps<CustomComponentProps>> {}
-
 interface RequestCreator<QueryStateData = any> {
   (...args: any[]): RequestAction<any, QueryStateData>;
 }
@@ -86,8 +31,6 @@ export function useQuery<
   type: string | QueryCreator;
   action?: QueryCreator;
   requestKey?: string;
-  multiple?: boolean;
-  defaultData?: any;
   variables?: Parameters<QueryCreator>;
   autoLoad?: boolean;
   autoReset?: boolean;
@@ -140,13 +83,20 @@ export function useSubscription<SC extends SubscriptionCreator = any>(props: {
 
 export function useDispatchRequest(): DispatchRequest;
 
-type RequestsProviderProps =
-  ({ requestsConfig: HandleRequestConfig;
-    extraReducers?: Reducer[];
-    getMiddleware?: (extraMiddleware: Middleware[]) => Middleware[];
-    store?: never; }
-  | { store: Store; requestsConfig?: never; extraReducers?: never; getMiddleware?: never; })
-& {
+type RequestsProviderProps = (
+  | {
+      requestsConfig: HandleRequestConfig;
+      extraReducers?: Reducer[];
+      getMiddleware?: (extraMiddleware: Middleware[]) => Middleware[];
+      store?: never;
+    }
+  | {
+      store: Store;
+      requestsConfig?: never;
+      extraReducers?: never;
+      getMiddleware?: never;
+    }
+) & {
   children: React.ReactNode;
   autoLoad?: boolean;
   autoReset?: boolean;

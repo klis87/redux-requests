@@ -1,14 +1,11 @@
 import { RESET_REQUESTS } from '../constants';
 import { mapObject } from '../helpers';
 
-const getRequestTypeString = requestType =>
-  typeof requestType === 'function' ? requestType.toString() : requestType;
-
 const getKeys = requests =>
   requests.map(v =>
     typeof v === 'object'
-      ? getRequestTypeString(v.requestType) + (v.requestKey || '')
-      : getRequestTypeString(v),
+      ? v.requestType.toString() + (v.requestKey || '')
+      : v.toString(),
   );
 
 const resetQuery = query =>
@@ -20,6 +17,7 @@ const resetQuery = query =>
         error: null,
         pristine: true,
         usedKeys: query.normalized ? {} : null,
+        dependencies: query.normalized ? [] : null,
       };
 
 const resetMutation = mutation =>

@@ -1,4 +1,8 @@
-import { isSuccessAction, isResponseAction } from '../actions';
+import {
+  isSuccessAction,
+  isResponseAction,
+  isRequestActionLocalMutation,
+} from '../actions';
 
 const getDataUpdater = mutationConfig => {
   if (typeof mutationConfig === 'function') {
@@ -31,7 +35,7 @@ export default (data, action, mutationConfig) => {
     return mutationConfig.updateDataOptimistic(data);
   }
 
-  if (mutationConfig.local) {
+  if (isRequestActionLocalMutation(action)) {
     return getDataUpdater(mutationConfig)(data);
   }
 

@@ -1,5 +1,7 @@
 import configureStore from 'redux-mock-store';
 
+import { createQuery } from '../requests-creators';
+
 import { createClientSsrMiddleware } from '.';
 
 describe('middleware', () => {
@@ -28,10 +30,10 @@ describe('middleware', () => {
           ssr: ['REQUEST'],
         },
       });
-      const action = { type: 'REQUEST', request: { url: '/' } };
+      const action = createQuery('REQUEST', { url: '/' })();
       const actionWithSsrResponse = {
         ...action,
-        meta: { ssrResponse: { data: 'data' } },
+        meta: { ...action.meta, ssrResponse: { data: 'data' } },
       };
       expect(store.dispatch(action)).toEqual(actionWithSsrResponse);
       expect(store.getActions()).toEqual([actionWithSsrResponse]);
@@ -53,7 +55,7 @@ describe('middleware', () => {
           ssr: ['REQUEST'],
         },
       });
-      const action = { type: 'REQUEST2', request: { url: '/' } };
+      const action = createQuery('REQUEST2', { url: '/' })();
       expect(store.dispatch(action)).toEqual(action);
       expect(store.getActions()).toEqual([action]);
     });
@@ -74,11 +76,11 @@ describe('middleware', () => {
           ssr: ['REQUEST1'],
         },
       });
-      const action = {
-        type: 'REQUEST',
-        request: { url: '/' },
-        meta: { requestKey: '1' },
-      };
+      const action = createQuery(
+        'REQUEST',
+        { url: '/' },
+        { requestKey: '1' },
+      )();
       const actionWithSsrResponse = {
         ...action,
         meta: { ...action.meta, ssrResponse: { data: 'data' } },

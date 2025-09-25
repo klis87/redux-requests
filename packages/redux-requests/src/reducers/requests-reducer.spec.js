@@ -1,4 +1,9 @@
 import { createSuccessAction, createErrorAction } from '../actions';
+import {
+  createQuery,
+  createMutation,
+  createLocalMutation,
+} from '../requests-creators';
 
 import { requestsReducer } from '.';
 
@@ -48,8 +53,8 @@ describe('reducers', () => {
 
     it('handles read only requests', () => {
       const reducer = requestsReducer();
-      const firstRequest = { type: 'REQUEST', request: { url: '/' } };
-      const secondRequest = { type: 'REQUEST_2', request: { url: '/' } };
+      const firstRequest = createQuery('REQUEST', { url: '/' })();
+      const secondRequest = createQuery('REQUEST_2', { url: '/' })();
 
       let state = reducer(
         {
@@ -72,6 +77,7 @@ describe('reducers', () => {
           pristine: false,
           normalized: false,
           usedKeys: null,
+          dependencies: null,
           ref: {},
         },
       });
@@ -85,6 +91,7 @@ describe('reducers', () => {
           pristine: false,
           normalized: false,
           usedKeys: null,
+          dependencies: null,
           ref: {},
         },
         REQUEST_2: {
@@ -94,6 +101,7 @@ describe('reducers', () => {
           pristine: false,
           normalized: false,
           usedKeys: null,
+          dependencies: null,
           ref: {},
         },
       });
@@ -110,6 +118,7 @@ describe('reducers', () => {
           pristine: false,
           normalized: false,
           usedKeys: null,
+          dependencies: null,
           ref: {},
         },
         REQUEST_2: {
@@ -119,6 +128,7 @@ describe('reducers', () => {
           pristine: false,
           normalized: false,
           usedKeys: null,
+          dependencies: null,
           ref: {},
         },
       });
@@ -132,6 +142,7 @@ describe('reducers', () => {
           pristine: false,
           normalized: false,
           usedKeys: null,
+          dependencies: null,
           ref: {},
         },
         REQUEST_2: {
@@ -141,6 +152,7 @@ describe('reducers', () => {
           pristine: false,
           normalized: false,
           usedKeys: null,
+          dependencies: null,
           ref: {},
         },
       });
@@ -186,7 +198,7 @@ describe('reducers', () => {
           requestsKeys: {},
           ssr: null,
         },
-        { type: 'REQUEST', request: { url: '/' } },
+        createQuery('REQUEST', { url: '/' })(),
       );
 
       let state = {
@@ -198,6 +210,7 @@ describe('reducers', () => {
             pristine: false,
             normalized: false,
             usedKeys: null,
+            dependencies: null,
             ref: {},
           },
         },
@@ -208,17 +221,14 @@ describe('reducers', () => {
         ssr: null,
       };
 
-      state = reducer(state, {
-        type: 'LOCAL_MUTATION',
-        meta: {
+      state = reducer(
+        state,
+        createLocalMutation('LOCAL_MUTATION', {
           mutations: {
-            REQUEST: {
-              local: true,
-              updateData: () => 'data',
-            },
+            REQUEST: () => 'data',
           },
-        },
-      });
+        })(),
+      );
 
       expect(state).toEqual({
         queries: {
@@ -229,6 +239,7 @@ describe('reducers', () => {
             pristine: false,
             normalized: false,
             usedKeys: null,
+            dependencies: null,
             ref: {},
           },
         },
@@ -239,10 +250,10 @@ describe('reducers', () => {
         ssr: null,
       });
 
-      const mutationWithoutConfig = {
-        type: 'MUTATION_WITHOUT_CONFIG',
-        request: { url: '/', method: 'post' },
-      };
+      const mutationWithoutConfig = createMutation('MUTATION_WITHOUT_CONFIG', {
+        url: '/',
+        method: 'post',
+      })();
 
       state = reducer(state, mutationWithoutConfig);
 
@@ -255,6 +266,7 @@ describe('reducers', () => {
             pristine: false,
             normalized: false,
             usedKeys: null,
+            dependencies: null,
             ref: {},
           },
         },
@@ -282,6 +294,7 @@ describe('reducers', () => {
             pristine: false,
             normalized: false,
             usedKeys: null,
+            dependencies: null,
             ref: {},
           },
         },
@@ -309,6 +322,7 @@ describe('reducers', () => {
             pristine: false,
             normalized: false,
             usedKeys: null,
+            dependencies: null,
             ref: {},
           },
         },
@@ -339,6 +353,7 @@ describe('reducers', () => {
             pristine: false,
             normalized: false,
             usedKeys: null,
+            dependencies: null,
             ref: {},
           },
         },
@@ -355,15 +370,15 @@ describe('reducers', () => {
         ssr: null,
       });
 
-      const mutationWithConfig = {
-        type: 'MUTATION_WITH_CONFIG',
-        request: { url: '/', method: 'post' },
-        meta: {
+      const mutationWithConfig = createMutation(
+        'MUTATION_WITH_CONFIG',
+        { url: '/', method: 'post' },
+        {
           mutations: {
             REQUEST: (_, data) => data,
           },
         },
-      };
+      )();
 
       state = reducer(state, mutationWithConfig);
 
@@ -376,6 +391,7 @@ describe('reducers', () => {
             pristine: false,
             normalized: false,
             usedKeys: null,
+            dependencies: null,
             ref: {},
           },
         },
@@ -411,6 +427,7 @@ describe('reducers', () => {
             pristine: false,
             normalized: false,
             usedKeys: null,
+            dependencies: null,
             ref: {},
           },
         },
@@ -432,16 +449,16 @@ describe('reducers', () => {
         ssr: null,
       });
 
-      const mutationWithConfigWithRequestKey = {
-        type: 'MUTATION_WITH_CONFIG_WITH_REQUEST_KEY',
-        request: { url: '/', method: 'post' },
-        meta: {
+      const mutationWithConfigWithRequestKey = createMutation(
+        'MUTATION_WITH_CONFIG_WITH_REQUEST_KEY',
+        { url: '/', method: 'post' },
+        {
           requestKey: '1',
           mutations: {
             REQUEST: (_, data) => data,
           },
         },
-      };
+      )();
 
       state = reducer(state, mutationWithConfigWithRequestKey);
       state = reducer(state, mutationWithConfigWithRequestKey);
@@ -455,6 +472,7 @@ describe('reducers', () => {
             pristine: false,
             normalized: false,
             usedKeys: null,
+            dependencies: null,
             ref: {},
           },
         },
@@ -499,6 +517,7 @@ describe('reducers', () => {
             pristine: false,
             normalized: false,
             usedKeys: null,
+            dependencies: null,
             ref: {},
           },
         },
@@ -543,6 +562,7 @@ describe('reducers', () => {
             pristine: false,
             normalized: false,
             usedKeys: null,
+            dependencies: null,
             ref: {},
           },
         },
@@ -571,10 +591,10 @@ describe('reducers', () => {
         ssr: null,
       });
 
-      const mutationWithOptimisticUpdate = {
-        type: 'MUTATION_WITH_OPTIMISTIC_UPDATE',
-        request: { url: '/', method: 'post' },
-        meta: {
+      const mutationWithOptimisticUpdate = createMutation(
+        'MUTATION_WITH_OPTIMISTIC_UPDATE',
+        { url: '/', method: 'post' },
+        {
           mutations: {
             REQUEST: {
               updateData: (data, mutationData) => mutationData,
@@ -583,7 +603,7 @@ describe('reducers', () => {
             },
           },
         },
-      };
+      )();
 
       state = reducer(state, mutationWithOptimisticUpdate);
 
@@ -596,6 +616,7 @@ describe('reducers', () => {
             pristine: false,
             normalized: false,
             usedKeys: null,
+            dependencies: null,
             ref: {},
           },
         },
@@ -643,6 +664,7 @@ describe('reducers', () => {
             pristine: false,
             normalized: false,
             usedKeys: null,
+            dependencies: null,
             ref: {},
           },
         },
@@ -692,6 +714,7 @@ describe('reducers', () => {
             pristine: false,
             normalized: false,
             usedKeys: null,
+            dependencies: null,
             ref: {},
           },
         },
@@ -737,6 +760,7 @@ describe('reducers', () => {
             pristine: false,
             normalized: false,
             usedKeys: null,
+            dependencies: null,
             ref: {},
           },
         },
@@ -750,17 +774,14 @@ describe('reducers', () => {
       let state = reducer(initialState, {});
       expect(state).toEqual(initialState);
 
-      state = reducer(state, {
-        type: 'LOCAL_MUTATION',
-        meta: {
+      state = reducer(
+        state,
+        createLocalMutation('LOCAL_MUTATION', {
           mutations: {
-            QUERY: {
-              updateData: data => [...data, 'data2'],
-              local: true,
-            },
+            QUERY: data => [...data, 'data2'],
           },
-        },
-      });
+        })(),
+      );
       expect(state).toEqual({
         queries: {
           QUERY: {
@@ -770,6 +791,7 @@ describe('reducers', () => {
             pristine: false,
             normalized: false,
             usedKeys: null,
+            dependencies: null,
             ref: {},
           },
         },

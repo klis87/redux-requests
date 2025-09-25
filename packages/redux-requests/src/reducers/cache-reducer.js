@@ -6,14 +6,11 @@ const getNewCacheTimeout = cache =>
 
 const getRequestKey = action => action.type + (action.meta.requestKey || '');
 
-const getRequestTypeString = requestType =>
-  typeof requestType === 'function' ? requestType.toString() : requestType;
-
 const getRequestKeys = requests =>
   requests.map(v =>
     typeof v === 'object'
-      ? getRequestTypeString(v.requestType) + v.requestKey
-      : getRequestTypeString(v),
+      ? v.requestType.toString() + v.requestKey
+      : v.toString(),
   );
 
 export default (state, action) => {

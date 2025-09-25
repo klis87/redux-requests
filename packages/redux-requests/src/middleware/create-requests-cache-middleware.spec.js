@@ -2,6 +2,7 @@ import configureStore from 'redux-mock-store';
 import { advanceBy, advanceTo, clear } from 'jest-date-mock';
 
 import { createSuccessAction } from '../actions';
+import { createQuery } from '../requests-creators';
 
 import { createRequestsCacheMiddleware } from '.';
 
@@ -19,7 +20,7 @@ describe('middleware', () => {
     it('doesnt affect request actions with no meta cache', () => {
       const mockStore = configureStore([createRequestsCacheMiddleware()]);
       const store = mockStore({});
-      const action = { type: 'REQUEST', request: { url: '/' } };
+      const action = createQuery('REQUEST', { url: '/' })();
       const responseAction = createSuccessAction(action, { data: null });
       store.dispatch(action);
       store.dispatch(responseAction);
@@ -36,18 +37,14 @@ describe('middleware', () => {
           uploadProgress: {},
         },
       });
-      const action = {
-        type: 'REQUEST',
-        request: { url: '/' },
-        meta: { cache: true },
-      };
+      const action = createQuery('REQUEST', { url: '/' }, { cache: true })();
       store.dispatch(action);
       expect(store.getActions()).toEqual([
-        {
-          type: 'REQUEST',
-          request: { url: '/' },
-          meta: { cache: true, cacheResponse: { data: 'data' } },
-        },
+        createQuery(
+          'REQUEST',
+          { url: '/' },
+          { cache: true, cacheResponse: { data: 'data' } },
+        )(),
       ]);
     });
 
@@ -63,18 +60,14 @@ describe('middleware', () => {
             uploadProgress: {},
           },
         });
-        const action = {
-          type: 'REQUEST',
-          request: { url: '/' },
-          meta: { cache: 1 },
-        };
+        const action = createQuery('REQUEST', { url: '/' }, { cache: 1 })();
         store.dispatch(action);
         expect(store.getActions()).toEqual([
-          {
-            type: 'REQUEST',
-            request: { url: '/' },
-            meta: { cache: 1, cacheResponse: { data: 'data' } },
-          },
+          createQuery(
+            'REQUEST',
+            { url: '/' },
+            { cache: 1, cacheResponse: { data: 'data' } },
+          )(),
         ]);
       } finally {
         clear();
@@ -91,11 +84,7 @@ describe('middleware', () => {
             cache: { REQUEST: { cacheKey: undefined, timeout: Date.now() } },
           },
         });
-        const action = {
-          type: 'REQUEST',
-          request: { url: '/' },
-          meta: { cache: 1 },
-        };
+        const action = createQuery('REQUEST', { url: '/' }, { cache: 1 })();
         advanceBy(1);
         store.dispatch(action);
         expect(store.getActions()).toEqual([action]);
@@ -112,19 +101,9 @@ describe('middleware', () => {
           cache: {},
         },
       });
-      const action = {
-        type: 'REQUEST',
-        request: { url: '/' },
-        meta: { cache: true },
-      };
+      const action = createQuery('REQUEST', { url: '/' }, { cache: true })();
       store.dispatch(action);
-      expect(store.getActions()).toEqual([
-        {
-          type: 'REQUEST',
-          request: { url: '/' },
-          meta: { cache: true },
-        },
-      ]);
+      expect(store.getActions()).toEqual([action]);
     });
   });
 });

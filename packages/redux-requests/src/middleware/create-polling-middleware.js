@@ -1,7 +1,7 @@
-import defaultConfig from '../default-config';
 import { STOP_POLLING, RESET_REQUESTS } from '../constants';
+import { isRequestAction, isRequestActionQuery } from '../actions';
 
-const getIntervalKey = action => action.type + (action.meta?.requestKey || '');
+const getIntervalKey = action => action.type + (action.meta.requestKey || '');
 
 const getKeys = requests =>
   requests.map(v =>
@@ -10,7 +10,7 @@ const getKeys = requests =>
       : v.toString(),
   );
 
-export default (config = defaultConfig) => {
+export default () => {
   let intervals = {};
 
   return store => next => action => {
@@ -30,9 +30,9 @@ export default (config = defaultConfig) => {
         intervals = intervalsCopy;
       }
     } else if (
-      config.isRequestAction(action) &&
-      config.isRequestActionQuery(action) &&
-      !action.meta?.polled &&
+      isRequestAction(action) &&
+      isRequestActionQuery(action) &&
+      !action.meta.polled &&
       intervals[getIntervalKey(action)]
     ) {
       const intervalsCopy = { ...intervals };
@@ -42,9 +42,9 @@ export default (config = defaultConfig) => {
     }
 
     if (
-      config.isRequestAction(action) &&
-      config.isRequestActionQuery(action) &&
-      action.meta?.poll &&
+      isRequestAction(action) &&
+      isRequestActionQuery(action) &&
+      action.meta.poll &&
       !action.meta.polled
     ) {
       intervals[getIntervalKey(action)] = setInterval(() => {

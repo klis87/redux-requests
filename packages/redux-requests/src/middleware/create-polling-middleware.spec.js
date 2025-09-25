@@ -1,6 +1,7 @@
 import configureStore from 'redux-mock-store';
 
 import { stopPolling, resetRequests } from '../actions';
+import { createQuery } from '../requests-creators';
 
 import createPollingMiddleware from './create-polling-middleware';
 
@@ -17,7 +18,7 @@ describe('middleware', () => {
     it('doesnt do anything for not polling requests', () => {
       const mockStore = configureStore([createPollingMiddleware()]);
       const store = mockStore({});
-      const action = { type: 'REQUEST', request: { url: '/' } };
+      const action = createQuery('REQUEST', { url: '/' })();
       expect(store.dispatch(action)).toBe(action);
       expect(store.getActions()).toEqual([action]);
     });
@@ -25,11 +26,7 @@ describe('middleware', () => {
     it('repeats queries when meta poll defined', async () => {
       const mockStore = configureStore([createPollingMiddleware()]);
       const store = mockStore({});
-      const action = {
-        type: 'REQUEST',
-        request: { url: '/' },
-        meta: { poll: 0.1 },
-      };
+      const action = createQuery('REQUEST', { url: '/' }, { poll: 0.1 })();
       store.dispatch(action);
       await sleep(0.41);
       expect(store.getActions()).toEqual([
@@ -44,16 +41,8 @@ describe('middleware', () => {
     it('works with multiple queries types', async () => {
       const mockStore = configureStore([createPollingMiddleware()]);
       const store = mockStore({});
-      const action = {
-        type: 'REQUEST',
-        request: { url: '/' },
-        meta: { poll: 0.1 },
-      };
-      const action2 = {
-        type: 'REQUEST2',
-        request: { url: '/' },
-        meta: { poll: 0.2 },
-      };
+      const action = createQuery('REQUEST', { url: '/' }, { poll: 0.1 })();
+      const action2 = createQuery('REQUEST2', { url: '/' }, { poll: 0.2 })();
       store.dispatch(action);
       await sleep(0.01);
       store.dispatch(action2);
@@ -73,11 +62,7 @@ describe('middleware', () => {
     it('clears interval when query of the same type is dispatched', async () => {
       const mockStore = configureStore([createPollingMiddleware()]);
       const store = mockStore({});
-      const action = {
-        type: 'REQUEST',
-        request: { url: '/' },
-        meta: { poll: 0.1 },
-      };
+      const action = createQuery('REQUEST', { url: '/' }, { poll: 0.1 })();
       const action2 = { ...action, meta: { ...action.meta, poll: undefined } };
       store.dispatch(action);
       await sleep(0.11);
@@ -93,11 +78,7 @@ describe('middleware', () => {
     it('clears all intervals on reset action', async () => {
       const mockStore = configureStore([createPollingMiddleware()]);
       const store = mockStore({});
-      const action = {
-        type: 'REQUEST',
-        request: { url: '/' },
-        meta: { poll: 0.1 },
-      };
+      const action = createQuery('REQUEST', { url: '/' }, { poll: 0.1 })();
       store.dispatch(action);
       await sleep(0.01);
       store.dispatch(resetRequests());
@@ -108,11 +89,7 @@ describe('middleware', () => {
     it('clears all intervals on stopPolling action', async () => {
       const mockStore = configureStore([createPollingMiddleware()]);
       const store = mockStore({});
-      const action = {
-        type: 'REQUEST',
-        request: { url: '/' },
-        meta: { poll: 0.1 },
-      };
+      const action = createQuery('REQUEST', { url: '/' }, { poll: 0.1 })();
       store.dispatch(action);
       await sleep(0.01);
       store.dispatch(stopPolling());
@@ -123,16 +100,13 @@ describe('middleware', () => {
     it('can clear specific intervals only on reset action', async () => {
       const mockStore = configureStore([createPollingMiddleware()]);
       const store = mockStore({});
-      const action = {
-        type: 'REQUEST',
-        request: { url: '/' },
-        meta: { poll: 0.1 },
-      };
-      const action2 = {
-        type: 'REQUEST2',
-        request: { url: '/' },
-        meta: { poll: 0.1, requestKey: '1' },
-      };
+      const action = createQuery('REQUEST', { url: '/' }, { poll: 0.1 })();
+      const action2 = createQuery(
+        'REQUEST2',
+        { url: '/' },
+        { poll: 0.1, requestKey: '1' },
+      )();
+
       store.dispatch(action);
       store.dispatch(action2);
       await sleep(0.01);
@@ -151,16 +125,12 @@ describe('middleware', () => {
     it('can clear specific intervals only on stopPolling action', async () => {
       const mockStore = configureStore([createPollingMiddleware()]);
       const store = mockStore({});
-      const action = {
-        type: 'REQUEST',
-        request: { url: '/' },
-        meta: { poll: 0.1 },
-      };
-      const action2 = {
-        type: 'REQUEST2',
-        request: { url: '/' },
-        meta: { poll: 0.1, requestKey: '1' },
-      };
+      const action = createQuery('REQUEST', { url: '/' }, { poll: 0.1 })();
+      const action2 = createQuery(
+        'REQUEST2',
+        { url: '/' },
+        { poll: 0.1, requestKey: '1' },
+      )();
       store.dispatch(action);
       store.dispatch(action2);
       await sleep(0.01);
@@ -177,16 +147,12 @@ describe('middleware', () => {
     it('can clear specific intervals only on stopPolling action', async () => {
       const mockStore = configureStore([createPollingMiddleware()]);
       const store = mockStore({});
-      const action = {
-        type: 'REQUEST',
-        request: { url: '/' },
-        meta: { poll: 0.1 },
-      };
-      const action2 = {
-        type: 'REQUEST2',
-        request: { url: '/' },
-        meta: { poll: 0.1, requestKey: '1' },
-      };
+      const action = createQuery('REQUEST', { url: '/' }, { poll: 0.1 })();
+      const action2 = createQuery(
+        'REQUEST2',
+        { url: '/' },
+        { poll: 0.1, requestKey: '1' },
+      )();
       store.dispatch(action);
       store.dispatch(action2);
       await sleep(0.01);

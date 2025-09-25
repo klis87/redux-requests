@@ -6,7 +6,7 @@ import {
   stopSubscriptions,
 } from '@redux-requests/core';
 
-import useDispatchRequest from './use-dispatch-request';
+import useDispatch from './use-dispatch';
 
 const emptyVariables = [];
 
@@ -14,28 +14,27 @@ const useSubscriptions = ({
   variables = emptyVariables,
   type,
   requestKey,
-  action,
   active = true,
 }) => {
-  const dispatchRequest = useDispatchRequest();
+  const dispatch = useDispatch();
   const store = useStore();
 
   const key = `${type}${requestKey || ''}`;
 
   useEffect(() => {
     if (active) {
-      dispatchRequest((action || type)(...variables));
+      dispatch(type(...variables));
     }
-  }, [active, action, type, ...variables]);
+  }, [active, type, ...variables]);
 
   useEffect(() => {
-    dispatchRequest(addWatcher(key));
+    dispatch(addWatcher(key));
 
     return () => {
-      dispatchRequest(removeWatcher(key));
+      dispatch(removeWatcher(key));
 
       if (!store.getState().requests.watchers[key]) {
-        dispatchRequest(stopSubscriptions([key]));
+        dispatch(stopSubscriptions([key]));
       }
     };
   }, [type, requestKey]);

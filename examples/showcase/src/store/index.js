@@ -8,7 +8,6 @@ import { fetchBooks, fetchPosts, fetchGroups } from './actions';
 export const configureStore = () => {
   const { requestsReducer, requestsMiddleware } = handleRequests({
     driver: createDriver(axios),
-    cache: true,
   });
 
   const reducers = combineReducers({

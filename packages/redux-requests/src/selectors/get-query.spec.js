@@ -89,60 +89,6 @@ describe('selectors', () => {
       });
     });
 
-    it('replaces data as null with [] when multiple true', () => {
-      expect(
-        getQuery(
-          {
-            requests: {
-              queries: {},
-              mutations: {},
-              downloadProgress: {},
-              uploadProgress: {},
-            },
-          },
-          { type: 'QUERY', multiple: true },
-        ),
-      ).toEqual({
-        data: [],
-        pending: 0,
-        loading: false,
-        error: null,
-        pristine: true,
-        downloadProgress: null,
-        uploadProgress: null,
-      });
-    });
-
-    it('replaces data as custom object with {} when defaultData defined', () => {
-      expect(
-        getQuery(
-          {
-            requests: {
-              queries: {},
-              mutations: {},
-              downloadProgress: {},
-              uploadProgress: {},
-            },
-          },
-          { type: 'QUERY', defaultData: {} },
-        ),
-      ).toEqual({
-        data: {},
-        loading: false,
-        pending: 0,
-        error: null,
-        pristine: true,
-        downloadProgress: null,
-        uploadProgress: null,
-      });
-    });
-
-    it('doesnt recompute when multiple is changed when data not empty', () => {
-      expect(getQuery(state, { type: 'QUERY', multiple: true })).toBe(
-        getQuery(state, { type: 'QUERY', multiple: false }),
-      );
-    });
-
     it('returns transformed query state if found', () => {
       expect(getQuery(state, { type: 'QUERY' })).toEqual({
         data: 'data',
