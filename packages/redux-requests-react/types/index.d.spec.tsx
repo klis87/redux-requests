@@ -145,11 +145,12 @@ function BasicMutation() {
   );
 }
 
-function MutationComponent({ mutation, extra }: { mutation: MutationState, extra: any }) {
+function MutationComponent({ mutation, extra }: { mutation: MutationState<number>, extra: any }) {
   return (
     <div>
       {mutation.loading && 'loading'}
       {mutation.error}
+      {mutation.data}
       {extra}
     </div>
   );
@@ -170,6 +171,7 @@ function MutationWithSelector() {
   return (
     <Mutation
       selector={state => ({
+        data: null,
         error: null,
         loading: false,
         pending: 1,
